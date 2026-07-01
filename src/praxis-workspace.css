@@ -1,0 +1,292 @@
+/* =====================================================================
+   Praxis skin for the Workspace (Concierge home) — brings the home into
+   the Mazlan / Groom Lake language and adds a Mazlan-style dark mode, so
+   the Workspace and the record page read as one system. Layered on top
+   of concierge-base.css (which already shares the --ehsq-* tokens and a
+   dot-grid page background). Toggled via body[data-theme].
+   ===================================================================== */
+
+/* =====================================================================
+   App header + nav rail: "floating" light treatment, mirroring the
+   record page (record-page.html .appbar / .ehsq-navrail). The header
+   blends into the page background (no dark bar, no border, no shadow);
+   the search becomes a fully-rounded Mazlan-style floating pill; the
+   right-side controls read as dark ink on the light header; the nav
+   rail loses its background + border and blends into the page. Works
+   in both light and dark (the dark-mode token block below recolors it).
+   ===================================================================== */
+
+/* ---- App header: blend into the page (solid page-color bg — it's fixed) ---- */
+.top-bar{
+  background:var(--ehsq-color-surface-subtle);
+  color:var(--ehsq-color-text-primary);
+  border:0; box-shadow:none;
+}
+/* Brand wordmark — theme-aware (dark wordmark on light header, white in dark) */
+/* Match the record page's brand cluster geometry so the wordmark + page
+   switcher land in the exact same spot across pages */
+.top-bar__logo-area{ padding-left:var(--ehsq-space-16); gap:var(--ehsq-space-16); }
+.top-bar__brand{ display:inline-flex; align-items:center; text-decoration:none; }
+.top-bar__logo-img{ display:block; height:26px; width:auto; }
+.top-bar__logo-img--ondark{ display:none; }
+body[data-theme="dark"] .top-bar__logo-img--onlight{ display:none; }
+body[data-theme="dark"] .top-bar__logo-img--ondark{ display:block; }
+
+/* ---- Page switcher (next to the wordmark), mirrors the record page ---- */
+.appswitch{ position:relative; }
+.appswitch__trigger{
+  display:inline-flex; align-items:center; gap:4px; height:32px; padding:0 8px 0 10px;
+  border:0; background:transparent; color:inherit; font-family:inherit; font-size:.875rem;
+  font-weight:600; border-radius:8px; cursor:pointer;
+}
+.appswitch__trigger:hover{ background:rgba(16,36,58,.06); }
+.appswitch__pop{
+  position:absolute; top:calc(100% + 6px); left:0; min-width:200px; z-index:200;
+  background:var(--ehsq-color-surface-default); border:1px solid var(--ehsq-color-border-default);
+  border-radius:12px; padding:6px;
+  box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 18px 38px -16px rgba(16,36,58,.22);
+}
+.appswitch__pop[hidden]{ display:none; }
+.appswitch__item{
+  display:block; padding:8px 10px; border-radius:8px; font-size:.875rem; font-weight:500;
+  color:var(--ehsq-color-text-primary); text-decoration:none;
+}
+.appswitch__item:hover{ background:var(--ehsq-color-neutral-05); text-decoration:none; }
+.appswitch__item--active{ color:var(--ehsq-color-text-link,#1B838B); font-weight:600; }
+body[data-theme="dark"] .appswitch__trigger:hover{ background:rgba(255,255,255,.08); }
+body[data-theme="dark"] .appswitch__item:hover{ background:rgba(255,255,255,.06); }
+
+/* ---- Search: fully-rounded floating field (Mazlan style) ---- */
+.top-bar__search{
+  border-radius:9999px;
+  background:var(--ehsq-color-surface-default);
+  overflow:visible;
+  padding:0 6px 0 4px;
+  box-shadow:0 0 0 1px rgba(16,36,58,.08), 0 1px 2px rgba(16,36,58,.05);
+}
+body[data-theme="dark"] .top-bar__search{ box-shadow:0 0 0 1px rgba(255,255,255,.10); }
+/* Module selector — transparent floating text with a short centered divider */
+.top-bar__module-selector{
+  background:transparent;
+  color:var(--ehsq-color-text-secondary);
+  border-right:1px solid var(--ehsq-color-border-default);
+  align-self:center; height:56%;
+  min-width:0; padding:0 14px;
+}
+.top-bar__module-selector .material-symbols-rounded{ color:var(--ehsq-color-text-secondary); }
+/* Input area + input — transparent, primary ink */
+.top-bar__input-area{ background:transparent; }
+.top-bar__search-input{ background:transparent; color:var(--ehsq-color-text-primary); }
+/* Run-search button — transparent floating magnifier */
+.top-bar__search-go{
+  background:transparent;
+  color:var(--ehsq-color-text-secondary);
+  border-radius:9999px;
+}
+.top-bar__search-go:hover{ background:transparent; color:var(--ehsq-color-text-primary); }
+
+/* ---- Right-side controls: read as dark ink on the light header ---- */
+.top-bar__action-btn{
+  background:rgba(16,36,58,.06);
+  color:var(--ehsq-color-text-primary);
+  border-color:rgba(16,36,58,.10);
+}
+.top-bar__action-btn:hover{ background:rgba(16,36,58,.10); }
+.top-bar__icon-btn{ color:var(--ehsq-color-text-secondary); }
+.top-bar__icon-btn:hover{ background:rgba(16,36,58,.06); color:var(--ehsq-color-text-primary); }
+.top-bar__avatar{ border-color:rgba(16,36,58,.12); }
+.top-bar__avatar--photo{ background-size:cover; background-position:center; background-repeat:no-repeat; color:transparent; overflow:hidden; }
+/* Persona picker (styled inline in index.html — needs body-prefix to win) */
+body .persona-trigger{
+  background:rgba(16,36,58,.06);
+  color:var(--ehsq-color-text-primary);
+}
+body .persona-trigger:hover{ background:rgba(16,36,58,.10); }
+body .persona-trigger[aria-expanded="true"]{ background:rgba(16,36,58,.14); }
+body .persona-trigger__sub{ color:var(--ehsq-color-text-secondary); }
+
+/* dark: swap dark-tints for light-tints */
+body[data-theme="dark"] .top-bar__action-btn{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12); }
+body[data-theme="dark"] .top-bar__action-btn:hover{ background:rgba(255,255,255,.12); }
+body[data-theme="dark"] .top-bar__icon-btn:hover{ background:rgba(255,255,255,.10); }
+body[data-theme="dark"] .top-bar__avatar{ border-color:rgba(255,255,255,.22); }
+body[data-theme="dark"] .persona-trigger{ background:rgba(255,255,255,.08); }
+body[data-theme="dark"] .persona-trigger:hover{ background:rgba(255,255,255,.12); }
+body[data-theme="dark"] .persona-trigger[aria-expanded="true"]{ background:rgba(255,255,255,.16); }
+
+/* Mazlan trigger — teal→magenta AI signature (keep its gradient) */
+.top-bar__action-btn--mazlan,
+body[data-theme="dark"] .top-bar__action-btn--mazlan{
+  background:#E30072;
+  border-color:transparent; color:#fff;
+}
+.top-bar__action-btn--mazlan:hover,
+body[data-theme="dark"] .top-bar__action-btn--mazlan:hover{ filter:brightness(1.06); background:#E30072; }
+
+/* ---- Nav rail: blend into the page — no background, no border ---- */
+.nav-rail{ background:transparent; border-right:0; }
+
+/* ---- Nav rail buttons: neutral filled containers (a set with Create) ----
+   The Create button colors its 40×40 .nav-rail__icon box (radius-md); give the
+   plain nav buttons' icon boxes the SAME container silhouette but neutral, so
+   they read as a matched set of pickable chips rather than floating icons.
+   Create keeps its teal; the active item keeps its pink. */
+.nav-rail__btn:not(.nav-rail__btn--create):not(.nav-rail__btn--active) .nav-rail__icon{
+  background:var(--ehsq-color-surface-default);
+  box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 1px 2px rgba(16,36,58,.05);
+}
+.nav-rail__btn:not(.nav-rail__btn--create):not(.nav-rail__btn--active):hover .nav-rail__icon{
+  background:var(--ehsq-color-surface-default);
+  box-shadow:0 0 0 .5px rgba(16,36,58,.09), 0 2px 6px -1px rgba(16,36,58,.14);
+}
+body[data-theme="dark"] .nav-rail__btn:not(.nav-rail__btn--create):not(.nav-rail__btn--active) .nav-rail__icon{
+  background:rgba(255,255,255,.06);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.10);
+}
+body[data-theme="dark"] .nav-rail__btn:not(.nav-rail__btn--create):not(.nav-rail__btn--active):hover .nav-rail__icon{
+  background:rgba(255,255,255,.10);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.14);
+}
+
+/* ---- Cards: Mazlan slate elevation with a lit top edge, 12px geometry ---- */
+.card{
+  border:0; border-radius:12px;
+  box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 1px 1.5px rgba(16,36,58,.045),
+             0 10px 28px -14px rgba(16,36,58,.10), inset 0 .5px 0 rgba(255,255,255,.7);
+}
+
+/* ---- Dot grid: align pitch to the record page (18px), and fade the dots to
+   the page background at the left + right edges and top by compositing a
+   page-color gradient OVER the dots (not masking — masking would hide content). */
+.page{
+  background-color:var(--ehsq-color-surface-subtle);
+  background-image:
+    linear-gradient(to right, var(--ehsq-color-surface-subtle), transparent 7%, transparent 93%, var(--ehsq-color-surface-subtle)),
+    linear-gradient(to bottom, var(--ehsq-color-surface-subtle), transparent 10%),
+    radial-gradient(circle, rgba(16,36,58,.11) 1px, transparent 1px);
+  background-size:100% 100%, 100% 100%, 18px 18px;
+  background-repeat:no-repeat, no-repeat, repeat;
+}
+
+/* Theme toggle — inline moon/sun SVGs that swap by [data-theme] (same as the record page) */
+.gl-theme-btn{ color:rgba(255,255,255,.85); }
+.gl-theme-btn:hover{ color:#fff; }
+.gl-theme-btn .gl-sun{ display:none; }
+body[data-theme="dark"] .gl-theme-btn .gl-moon{ display:none; }
+body[data-theme="dark"] .gl-theme-btn .gl-sun{ display:block; }
+
+/* Profile menu (avatar-triggered) — now holds "Get started" + account actions */
+.profile-menu{ position:relative; }
+.profile-menu__pop{
+  position:absolute; top:calc(100% + 8px); right:0; min-width:236px; z-index:200;
+  background:var(--ehsq-color-surface-default);
+  border:1px solid var(--ehsq-color-border-default); border-radius:12px; padding:6px;
+  box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 18px 38px -16px rgba(16,36,58,.22), inset 0 .5px 0 rgba(255,255,255,.6);
+}
+.profile-menu__pop[hidden]{ display:none; }
+.profile-menu__head{ padding:10px 12px 8px; display:flex; flex-direction:column; gap:2px; border-bottom:1px solid var(--ehsq-color-border-default); margin-bottom:6px; }
+.profile-menu__name{ font-weight:600; font-size:var(--ehsq-type-size-sm); color:var(--ehsq-color-text-primary); }
+.profile-menu__role{ font-size:12px; color:var(--ehsq-color-text-secondary); }
+.profile-menu__item{
+  display:flex; align-items:center; gap:10px; width:100%; height:38px; padding:0 12px; border:0; background:transparent;
+  border-radius:8px; cursor:pointer; text-align:left; font-family:inherit; font-size:var(--ehsq-type-size-sm); font-weight:500;
+  color:var(--ehsq-color-text-primary);
+}
+.profile-menu__item .material-symbols-rounded{ font-size:20px; color:var(--ehsq-color-text-secondary); }
+.profile-menu__item:hover{ background:var(--ehsq-color-neutral-05); }
+.profile-menu__sep{ height:1px; background:var(--ehsq-color-border-default); margin:6px 0; }
+/* dark: frosted-glass popover */
+body[data-theme="dark"] .profile-menu__pop{
+  background:rgba(26,32,45,.9);
+  -webkit-backdrop-filter:saturate(1.3) blur(16px); backdrop-filter:saturate(1.3) blur(16px);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.08), 0 24px 50px -20px rgba(0,0,0,.7), inset 0 .5px 0 rgba(255,255,255,.07);
+}
+body[data-theme="dark"] .profile-menu__item:hover{ background:rgba(255,255,255,.06); }
+/* In-menu rows + segmented control (Appearance) */
+.profile-menu__row{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 12px; }
+.profile-menu__row-label{ font-size:.8125rem; font-weight:600; color:var(--ehsq-color-text-secondary); }
+.verswitch{ display:inline-flex; align-items:center; gap:2px; padding:3px; background:rgba(16,36,58,.06); border-radius:9999px; }
+.verswitch__opt{ height:28px; padding:0 12px; border:0; background:transparent; color:var(--ehsq-color-text-secondary);
+  font-family:inherit; font-size:.8125rem; font-weight:600; border-radius:9999px; cursor:pointer; white-space:nowrap; }
+.verswitch__opt:hover{ color:var(--ehsq-color-text-primary); }
+.verswitch__opt--active,.verswitch__opt--active:hover{ background:var(--ehsq-color-surface-default); color:var(--ehsq-color-text-primary); box-shadow:0 1px 2px rgba(16,36,58,.14); }
+body[data-theme="dark"] .verswitch{ background:rgba(255,255,255,.08); }
+body[data-theme="dark"] .verswitch__opt--active{ background:rgba(255,255,255,.16); box-shadow:none; }
+
+/* =====================================================================
+   Persona switcher relocated INTO the profile menu ("Viewing as").
+   The existing .persona-trigger + .persona-popover flyout keep working;
+   here we re-lay it out to sit as a full-width control inside the menu,
+   and open its proto-list flyout to the LEFT so it never clips.
+   ===================================================================== */
+.profile-menu__row--persona{ padding-bottom:2px; }
+.persona-picker--in-menu{ position:relative; padding:0 6px 2px; }
+/* Trigger becomes a full-width menu control (override the header pill sizing) */
+body .persona-picker--in-menu .persona-trigger{
+  display:flex; width:100%; height:auto; margin:0; box-sizing:border-box;
+  padding:8px 10px; gap:10px; border-radius:8px;
+  background:var(--ehsq-color-neutral-05); color:var(--ehsq-color-text-primary);
+}
+body .persona-picker--in-menu .persona-trigger:hover{ background:var(--ehsq-color-neutral-10); }
+body[data-theme="dark"] .persona-picker--in-menu .persona-trigger{ background:rgba(255,255,255,.06); }
+body[data-theme="dark"] .persona-picker--in-menu .persona-trigger:hover{ background:rgba(255,255,255,.10); }
+.persona-picker--in-menu .persona-trigger__icon{ font-size:20px; color:var(--ehsq-color-text-secondary); }
+.persona-picker--in-menu .persona-trigger__label{ font-size:var(--ehsq-type-size-sm); font-weight:600; color:var(--ehsq-color-text-primary); }
+.persona-picker--in-menu .persona-trigger__sub{ font-size:12px; font-weight:500; color:var(--ehsq-color-text-secondary); }
+.persona-picker--in-menu .persona-trigger__text{ flex:1; }
+.persona-picker--in-menu .persona-trigger__chev{ margin-left:auto; color:var(--ehsq-color-text-secondary); }
+/* Flyout opens to the LEFT of the profile popover so it doesn't clip */
+.persona-picker--in-menu .persona-popover{
+  position:absolute; top:0; right:calc(100% + 12px); left:auto;
+  min-width:320px; max-width:340px;
+  background:var(--ehsq-color-surface-default);
+  border:1px solid var(--ehsq-color-border-default); border-radius:12px; padding:6px;
+  box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 24px 50px -18px rgba(16,36,58,.30);
+}
+body[data-theme="dark"] .persona-picker--in-menu .persona-popover{
+  background:rgba(26,32,45,.96);
+  -webkit-backdrop-filter:saturate(1.3) blur(16px); backdrop-filter:saturate(1.3) blur(16px);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.08), 0 24px 50px -20px rgba(0,0,0,.7);
+}
+@media (max-width: 639px){
+  /* Phone: keep the label visible in-menu, and drop the flyout below the trigger */
+  .persona-picker--in-menu .persona-trigger__text{ display:flex; }
+  .persona-picker--in-menu .persona-popover{
+    position:fixed; top:auto; right:var(--ehsq-space-12); left:var(--ehsq-space-12); min-width:0; max-width:none;
+  }
+}
+
+/* =====================================================================
+   DARK MODE — Mazlan deep-slate palette (token overrides cascade to the
+   token-driven Concierge components; plus targeted surface fixes).
+   ===================================================================== */
+body[data-theme="dark"]{
+  color-scheme:dark;
+  --ehsq-color-surface-default:#1c2330;
+  --ehsq-color-surface-subtle:#12161f;
+  --ehsq-color-neutral-05:#12161f;
+  --ehsq-color-neutral-10:#222b39;
+  --ehsq-color-neutral-20:#3a4556;
+  --ehsq-color-neutral-30:#3a4556;
+  --ehsq-color-border-default:rgba(255,255,255,.10);
+  --ehsq-color-text-primary:#e7ebf1;
+  --ehsq-color-text-secondary:#9aa7b4;
+}
+body[data-theme="dark"]{ color:var(--ehsq-color-text-primary); }
+body[data-theme="dark"] .page{
+  background-color:#11161f;
+  background-image:
+    linear-gradient(to right, #11161f, transparent 7%, transparent 93%, #11161f),
+    linear-gradient(to bottom, #11161f, transparent 10%),
+    radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px);
+  background-size:100% 100%, 100% 100%, 18px 18px;
+  background-repeat:no-repeat, no-repeat, repeat;
+}
+body[data-theme="dark"] .card{
+  background:#1c2330;
+  box-shadow:0 0 0 .5px rgba(255,255,255,.08), 0 1px 2px rgba(0,0,0,.4),
+             0 16px 40px -18px rgba(0,0,0,.6), inset 0 .5px 0 rgba(255,255,255,.07);
+}
+body[data-theme="dark"] .nav-rail{ background:transparent; border-right:0; }
+/* soft cyan accent lift for the primary action in dark, matching Praxis */
+body[data-theme="dark"] .btn--primary{ filter:saturate(1.05) brightness(1.05); }
