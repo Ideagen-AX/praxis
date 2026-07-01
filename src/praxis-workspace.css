@@ -114,17 +114,11 @@ body[data-theme="dark"] .persona-trigger{ background:rgba(255,255,255,.08); }
 body[data-theme="dark"] .persona-trigger:hover{ background:rgba(255,255,255,.12); }
 body[data-theme="dark"] .persona-trigger[aria-expanded="true"]{ background:rgba(255,255,255,.16); }
 
-/* Mazlan trigger — teal→magenta AI signature (keep its gradient) */
-.top-bar__action-btn--mazlan,
-body[data-theme="dark"] .top-bar__action-btn--mazlan{
-  background:#E30072;
-  border-color:transparent; color:#fff;
-}
-.top-bar__action-btn--mazlan:hover,
-body[data-theme="dark"] .top-bar__action-btn--mazlan:hover{ filter:brightness(1.06); background:#E30072; }
+/* Mazlan trigger reads as a neutral control (base .top-bar__action-btn) —
+   the four-dot Mazlan mark carries the identity */
 
 /* ---- Nav rail: blend into the page — no background, no border ---- */
-.nav-rail{ background:transparent; border-right:0; }
+.nav-rail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
 
 /* ---- Nav rail buttons: neutral filled containers (a set with Create) ----
    The Create button colors its 40×40 .nav-rail__icon box (radius-md); give the
@@ -287,6 +281,6 @@ body[data-theme="dark"] .card{
   box-shadow:0 0 0 .5px rgba(255,255,255,.08), 0 1px 2px rgba(0,0,0,.4),
              0 16px 40px -18px rgba(0,0,0,.6), inset 0 .5px 0 rgba(255,255,255,.07);
 }
-body[data-theme="dark"] .nav-rail{ background:transparent; border-right:0; }
+body[data-theme="dark"] .nav-rail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
 /* soft cyan accent lift for the primary action in dark, matching Praxis */
 body[data-theme="dark"] .btn--primary{ filter:saturate(1.05) brightness(1.05); }
