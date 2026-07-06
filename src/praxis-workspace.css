@@ -17,7 +17,7 @@
    ===================================================================== */
 
 /* ---- App header: blend into the page (solid page-color bg — it's fixed) ---- */
-.top-bar{
+.appbar{
   background:var(--ehsq-color-surface-subtle);
   color:var(--ehsq-color-text-primary);
   border:0; box-shadow:none;
@@ -25,12 +25,12 @@
 /* Brand wordmark — theme-aware (dark wordmark on light header, white in dark) */
 /* Match the record page's brand cluster geometry so the wordmark + page
    switcher land in the exact same spot across pages */
-.top-bar__logo-area{ padding-left:var(--ehsq-space-16); gap:var(--ehsq-space-16); }
-.top-bar__brand{ display:inline-flex; align-items:center; text-decoration:none; }
-.top-bar__logo-img{ display:block; height:26px; width:auto; }
-.top-bar__logo-img--ondark{ display:none; }
-body[data-theme="dark"] .top-bar__logo-img--onlight{ display:none; }
-body[data-theme="dark"] .top-bar__logo-img--ondark{ display:block; }
+.appbar__logo-area{ padding-left:var(--ehsq-space-16); gap:var(--ehsq-space-16); }
+.appbar__brand{ display:inline-flex; align-items:center; text-decoration:none; }
+.appbar__logo-img{ display:block; height:26px; width:auto; }
+.appbar__logo-img--ondark{ display:none; }
+body[data-theme="dark"] .appbar__logo-img--onlight{ display:none; }
+body[data-theme="dark"] .appbar__logo-img--ondark{ display:block; }
 
 /* ---- Page switcher (next to the wordmark), mirrors the record page ---- */
 .appswitch{ position:relative; }
@@ -57,45 +57,45 @@ body[data-theme="dark"] .appswitch__trigger:hover{ background:rgba(255,255,255,.
 body[data-theme="dark"] .appswitch__item:hover{ background:rgba(255,255,255,.06); }
 
 /* ---- Search: fully-rounded floating field (Mazlan style) ---- */
-.top-bar__search{
+.appbar__search{
   border-radius:9999px;
   background:var(--ehsq-color-surface-default);
   overflow:visible;
   padding:0 6px 0 4px;
   box-shadow:0 0 0 1px rgba(16,36,58,.08), 0 1px 2px rgba(16,36,58,.05);
 }
-body[data-theme="dark"] .top-bar__search{ box-shadow:0 0 0 1px rgba(255,255,255,.10); }
+body[data-theme="dark"] .appbar__search{ box-shadow:0 0 0 1px rgba(255,255,255,.10); }
 /* Module selector — transparent floating text with a short centered divider */
-.top-bar__module-selector{
+.appbar__module-selector{
   background:transparent;
   color:var(--ehsq-color-text-secondary);
   border-right:1px solid var(--ehsq-color-border-default);
   align-self:center; height:56%;
   min-width:0; padding:0 14px;
 }
-.top-bar__module-selector .material-symbols-rounded{ color:var(--ehsq-color-text-secondary); }
+.appbar__module-selector .material-symbols-rounded{ color:var(--ehsq-color-text-secondary); }
 /* Input area + input — transparent, primary ink */
-.top-bar__input-area{ background:transparent; }
-.top-bar__search-input{ background:transparent; color:var(--ehsq-color-text-primary); }
+.appbar__input-area{ background:transparent; }
+.appbar__search-input{ background:transparent; color:var(--ehsq-color-text-primary); }
 /* Run-search button — transparent floating magnifier */
-.top-bar__search-go{
+.appbar__search-go{
   background:transparent;
   color:var(--ehsq-color-text-secondary);
   border-radius:9999px;
 }
-.top-bar__search-go:hover{ background:transparent; color:var(--ehsq-color-text-primary); }
+.appbar__search-go:hover{ background:transparent; color:var(--ehsq-color-text-primary); }
 
 /* ---- Right-side controls: read as dark ink on the light header ---- */
-.top-bar__action-btn{
+.appbar__action-btn{
   background:rgba(16,36,58,.06);
   color:var(--ehsq-color-text-primary);
   border-color:rgba(16,36,58,.10);
 }
-.top-bar__action-btn:hover{ background:rgba(16,36,58,.10); }
-.top-bar__icon-btn{ color:var(--ehsq-color-text-secondary); }
-.top-bar__icon-btn:hover{ background:rgba(16,36,58,.06); color:var(--ehsq-color-text-primary); }
-.top-bar__avatar{ border-color:rgba(16,36,58,.12); }
-.top-bar__avatar--photo{ background-size:cover; background-position:center; background-repeat:no-repeat; color:transparent; overflow:hidden; }
+.appbar__action-btn:hover{ background:rgba(16,36,58,.10); }
+.appbar__icon-btn{ color:var(--ehsq-color-text-secondary); }
+.appbar__icon-btn:hover{ background:rgba(16,36,58,.06); color:var(--ehsq-color-text-primary); }
+.appbar__avatar{ border-color:rgba(16,36,58,.12); }
+.appbar__avatar--photo{ background-size:cover; background-position:center; background-repeat:no-repeat; color:transparent; overflow:hidden; }
 /* Persona picker (styled inline in index.html — needs body-prefix to win) */
 body .persona-trigger{
   background:rgba(16,36,58,.06);
@@ -106,43 +106,43 @@ body .persona-trigger[aria-expanded="true"]{ background:rgba(16,36,58,.14); }
 body .persona-trigger__sub{ color:var(--ehsq-color-text-secondary); }
 
 /* dark: swap dark-tints for light-tints */
-body[data-theme="dark"] .top-bar__action-btn{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12); }
+body[data-theme="dark"] .appbar__action-btn{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12); }
 /* Mazlan trigger: dark fill so the four-dot mark stands out (was blending into the light fill) */
 #mazlan-trigger{ background:var(--ehsq-color-neutral-70); color:#fff; border-color:rgba(255,255,255,.14); }
 #mazlan-trigger:hover{ filter:brightness(1.08); }
 body[data-theme="dark"] #mazlan-trigger{ background:var(--ehsq-color-neutral-70); border-color:rgba(255,255,255,.14); }
 #mazlan-trigger .mazlan-mark>span:nth-child(1){ background:#fff; }
-body[data-theme="dark"] .top-bar__action-btn:hover{ background:rgba(255,255,255,.12); }
-body[data-theme="dark"] .top-bar__icon-btn:hover{ background:rgba(255,255,255,.10); }
-body[data-theme="dark"] .top-bar__avatar{ border-color:rgba(255,255,255,.22); }
+body[data-theme="dark"] .appbar__action-btn:hover{ background:rgba(255,255,255,.12); }
+body[data-theme="dark"] .appbar__icon-btn:hover{ background:rgba(255,255,255,.10); }
+body[data-theme="dark"] .appbar__avatar{ border-color:rgba(255,255,255,.22); }
 body[data-theme="dark"] .persona-trigger{ background:rgba(255,255,255,.08); }
 body[data-theme="dark"] .persona-trigger:hover{ background:rgba(255,255,255,.12); }
 body[data-theme="dark"] .persona-trigger[aria-expanded="true"]{ background:rgba(255,255,255,.16); }
 
-/* Mazlan trigger reads as a neutral control (base .top-bar__action-btn) —
+/* Mazlan trigger reads as a neutral control (base .appbar__action-btn) —
    the four-dot Mazlan mark carries the identity */
 
 /* ---- Nav rail: blend into the page — no background, no border ---- */
-.nav-rail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
+.ehsq-navrail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
 
 /* ---- Nav rail buttons: neutral filled containers (a set with Create) ----
-   The Create button colors its 40×40 .nav-rail__icon box (radius-md); give the
+   The Create button colors its 40×40 .ehsq-navrail__icon box (radius-md); give the
    plain nav buttons' icon boxes the SAME container silhouette but neutral, so
    they read as a matched set of pickable chips rather than floating icons.
    Create keeps its teal; the active item keeps its pink. */
-.nav-rail__btn:not(.nav-rail__btn--create):not(.nav-rail__btn--active) .nav-rail__icon{
+.ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active) .ehsq-navrail__icon{
   background:var(--ehsq-color-surface-default);
   box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 1px 2px rgba(16,36,58,.05);
 }
-.nav-rail__btn:not(.nav-rail__btn--create):not(.nav-rail__btn--active):hover .nav-rail__icon{
+.ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active):hover .ehsq-navrail__icon{
   background:var(--ehsq-color-surface-default);
   box-shadow:0 0 0 .5px rgba(16,36,58,.09), 0 2px 6px -1px rgba(16,36,58,.14);
 }
-body[data-theme="dark"] .nav-rail__btn:not(.nav-rail__btn--create):not(.nav-rail__btn--active) .nav-rail__icon{
+body[data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active) .ehsq-navrail__icon{
   background:rgba(255,255,255,.06);
   box-shadow:0 0 0 .5px rgba(255,255,255,.10);
 }
-body[data-theme="dark"] .nav-rail__btn:not(.nav-rail__btn--create):not(.nav-rail__btn--active):hover .nav-rail__icon{
+body[data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active):hover .ehsq-navrail__icon{
   background:rgba(255,255,255,.10);
   box-shadow:0 0 0 .5px rgba(255,255,255,.14);
 }
@@ -286,6 +286,6 @@ body[data-theme="dark"] .card{
   box-shadow:0 0 0 .5px rgba(255,255,255,.08), 0 1px 2px rgba(0,0,0,.4),
              0 16px 40px -18px rgba(0,0,0,.6), inset 0 .5px 0 rgba(255,255,255,.07);
 }
-body[data-theme="dark"] .nav-rail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
+body[data-theme="dark"] .ehsq-navrail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
 /* soft cyan accent lift for the primary action in dark, matching Praxis */
 body[data-theme="dark"] .btn--primary{ filter:saturate(1.05) brightness(1.05); }
