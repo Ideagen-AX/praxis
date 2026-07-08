@@ -21,6 +21,11 @@ body[data-variant="praxis"]{
   --ehsq-color-text-primary:#2F4051; --ehsq-color-text-secondary:#5D6977;
   --ehsq-color-border-default:#E2E5E9;
 
+  /* Solution accent palette — used to tint module/record-type icons (Create New
+     groups). pink + teal already exist as brand tokens; add the rest here so
+     nothing is hardcoded. */
+  --ehsq-color-blue-60:#4361c4; --ehsq-color-orange-60:#ef8100; --ehsq-color-purple-60:#805ad5;
+
   /* geometry + motion — Praxis 8/12/16 geometry takes primacy */
   --ehsq-radius-sm:8px; --ehsq-radius-md:12px; --ehsq-radius-lg:16px;
   --ehsq-radius-card:12px;
@@ -79,6 +84,8 @@ body[data-variant="praxis"][data-theme="dark"]{
   --ehsq-color-border-default:rgba(255,255,255,.10);
   --ehsq-color-surface-default:#1c2330; --ehsq-color-surface-subtle:#161c27;
   --ehsq-color-interactive-default:#29D2D7; --ehsq-color-text-link:#5CE0E5;
+  /* Solution accents brighten on dark so they read on tinted chips */
+  --ehsq-color-blue-60:#7a93e0; --ehsq-color-orange-60:#ffa94d; --ehsq-color-purple-60:#b088e8;
   --px-page:#11161f; --px-surface:#1c2330; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
   --px-chip:rgba(255,255,255,.07); --px-glass:rgba(26,32,45,.72); --px-hover:rgba(255,255,255,.05); --px-dot:rgba(255,255,255,.09);
   --px-edge:rgba(255,255,255,.08);
