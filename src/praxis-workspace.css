@@ -21,6 +21,11 @@
   background:var(--ehsq-color-surface-subtle);
   color:var(--ehsq-color-text-primary);
   border:0; box-shadow:none;
+  /* Span the full viewport width (incl. the scrollbar gutter) so the fixed
+     header geometry matches the record page's naturally full-width bar — the
+     content scrollbar then sits under the header, and the avatar + centred
+     search no longer shift when switching between the two pages. */
+  width:100vw; right:auto;
 }
 /* Brand wordmark — theme-aware (dark wordmark on light header, white in dark) */
 /* Match the record page's brand cluster geometry so the wordmark + page
@@ -124,6 +129,11 @@ body[data-theme="dark"] .persona-trigger[aria-expanded="true"]{ background:rgba(
 
 /* ---- Nav rail: blend into the page — no background, no border ---- */
 .ehsq-navrail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
+/* Hide the expand/collapse control for now — the record page's rail has none,
+   so this keeps the two consistent. Kept in the DOM (button + JS intact) so it
+   can be re-enabled later by removing this rule. The whole cell is hidden to
+   avoid leaving its 56px slot empty at the top of the rail. */
+.ehsq-navrail__cell:has(> .ehsq-navrail__toggle){ display:none; }
 
 /* ---- Nav rail buttons: neutral filled containers (a set with Create) ----
    The Create button colors its 40×40 .ehsq-navrail__icon box (radius-md); give the
