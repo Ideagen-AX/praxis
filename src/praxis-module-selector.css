@@ -99,3 +99,20 @@
 .msel__menu .cn-item.is-sel .cn-item__check{ display:inline-flex; }
 
 .msel__empty{ font-size:var(--ehsq-type-size-sm); color:var(--ehsq-color-text-secondary); padding:10px 8px; }
+
+/* =====================================================================
+   RESPONSIVE (≤768px md / ≤480px sm) — the trigger shrinks to a compact
+   scope chip and the body-level menu becomes a near-full-width sheet with a
+   single column of groups. The menu's left/top/width are set inline by JS
+   (positionMenu); these rules override with !important to reclaim the width.
+   ===================================================================== */
+@media (max-width:768px){
+  .msel{ width:auto; max-width:132px; padding:0 4px 0 10px; }
+  .msel__input{ font-size:.8125rem; }
+  .msel__menu{ left:8px !important; right:8px !important; width:auto !important;
+    max-width:none; max-height:74vh; padding:16px; }
+  .msel__groups{ column-count:1 !important; }
+}
+@media (max-width:480px){
+  .msel{ max-width:96px; }
+}

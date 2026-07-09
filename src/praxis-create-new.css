@@ -235,12 +235,17 @@
 .cn-row__check{ margin-left:auto; font-size:22px !important; color:var(--ehsq-color-border-strong, #c8cfd7); flex-shrink:0; }
 .cn-row--selected .cn-row__check{ color:var(--ehsq-color-teal-70); }
 
-/* ---- Narrow screens: dock the flyout to a bottom sheet ---- */
-@media (max-width: 620px){
-  .cn-flyout{
+/* ---- Narrow screens (≤768px): dock the flyout to a full-width bottom sheet;
+       the "All" wide view collapses from 3 columns to 1, and the Save dialog
+       modal fills the width. ---- */
+@media (max-width: 768px){
+  .cn-flyout,
+  .cn-flyout--wide{
     top:auto; left:0; right:0; bottom:0;
     width:100%; max-width:100%; max-height:88vh;
     border-radius:16px 16px 0 0;
   }
+  .cn-flyout--wide .cn-content{ column-count:1; }
   .cn-grid{ grid-template-columns:1fr; }
+  .cn-modal{ width:100%; max-width:100%; }
 }
