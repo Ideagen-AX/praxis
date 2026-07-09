@@ -34,6 +34,17 @@
 .cn-overlay[hidden]{ display:none; opacity:0; }
 @starting-style{ .cn-overlay:not([hidden]){ opacity:0; } }
 
+/* ---- Standalone scrim — for pages that anchor the flyout directly (e.g. the
+       record page uses its own [hidden]-toggled .cn-flyout, not .cn-overlay).
+       Sits just below the flyout (z120) to dim the page like the workspace. ---- */
+.cn-scrim{
+  position:fixed; inset:0; z-index:119;
+  background:rgba(16,36,58,.18);
+  opacity:1; transition:opacity .18s ease, display .18s allow-discrete;
+}
+.cn-scrim[hidden]{ display:none; opacity:0; }
+@starting-style{ .cn-scrim:not([hidden]){ opacity:0; } }
+
 /* ---- Create New flyout panel — anchored to the nav rail (position:fixed
        ignores the scrim's centering) ---- */
 .cn-flyout{
@@ -135,6 +146,13 @@
 .cn-group__icon .material-symbols-rounded{ font-size:16px; }
 .cn-group__title{ font-size:13px; font-weight:700; letter-spacing:.01em; color:var(--ehsq-color-text-primary); }
 
+/* PREVIEW: Module Selector's section-label group headers applied to Create New
+   (solid tone marker + uppercase tracked title in the solution colour). */
+.cn-flyout .cn-group__head{ gap:8px; height:24px; }
+.cn-flyout .cn-group__icon{ width:22px; height:22px; border-radius:6px; background:var(--cn-tone); color:#fff; }
+.cn-flyout .cn-group__icon .material-symbols-rounded{ font-size:15px; }
+.cn-flyout .cn-group__title{ text-transform:uppercase; font-size:11px; font-weight:800; letter-spacing:.06em; color:var(--cn-tone); }
+
 /* Solution tones (icons take a brand color per solution) */
 .cn-group--pink{   --cn-tone:var(--ehsq-color-pink-60); }
 .cn-group--teal{   --cn-tone:var(--ehsq-color-teal-70); }
@@ -207,8 +225,11 @@
 .cn-row:hover{ background:var(--px-hover); }
 .cn-row__icon{
   width:30px; height:30px; border-radius:8px; display:grid; place-items:center; flex-shrink:0;
-  background:var(--px-chip); color:var(--ehsq-color-text-secondary); font-size:18px !important;
+  background:var(--px-chip); color:var(--ehsq-color-text-secondary);
 }
+/* Glyph nested in its own span so the container keeps its grid centering
+   (a merged .cn-row__icon.material-symbols-rounded lets the font's display win). */
+.cn-row__icon .material-symbols-rounded{ font-size:18px; }
 .cn-row--selected .cn-row__icon{ background:var(--ehsq-color-teal-10); color:var(--ehsq-color-teal-80); }
 .cn-row__label{ font-size:14px; font-weight:600; color:var(--ehsq-color-text-primary); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .cn-row__check{ margin-left:auto; font-size:22px !important; color:var(--ehsq-color-border-strong, #c8cfd7); flex-shrink:0; }
