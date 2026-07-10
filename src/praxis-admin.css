@@ -453,7 +453,7 @@ body[data-variant="praxis"][data-theme="dark"] .mz-input{background:rgba(255,255
   line-height:1.6;background:transparent;color:var(--ehsq-color-text-primary);min-height:24px;max-height:120px;}
 .mz-input textarea::placeholder{color:var(--ehsq-color-text-secondary);}
 .mz-input__send{width:34px;height:34px;flex-shrink:0;border:0;border-radius:12px;color:#fff;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#1f8f97,#1b838b);
+  display:flex;align-items:center;justify-content:center;background:var(--px-primary-grad);
   box-shadow:0 0 0 .5px rgba(16,36,58,.2),inset 0 .5px 0 rgba(255,255,255,.25);}
 .mz-input__send:hover{filter:brightness(1.06);}
 

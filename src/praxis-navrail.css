@@ -60,7 +60,7 @@ body[data-variant="praxis"] .ehsq-navrail__link:hover{ background:var(--px-surfa
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__link{ background:rgba(255,255,255,.06); box-shadow:0 0 0 .5px rgba(255,255,255,.10); }
 body[data-variant="praxis"] .ehsq-navrail__link img{ width:auto; height:28px; }
 body[data-variant="praxis"] .ehsq-navrail__btn--create{
-  background:linear-gradient(180deg,#1f8f97,#1b838b); color:#fff;
+  background:var(--px-primary-grad); color:#fff;
   box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),inset 0 .5px 0 rgba(255,255,255,.25);
 }
 body[data-variant="praxis"] .ehsq-navrail__btn:focus-visible,
