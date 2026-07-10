@@ -267,6 +267,17 @@ body[data-theme="dark"] .admin-tab--active{color:#5CE0E5;border-bottom-color:#29
 .admin-rowx:hover{background:var(--px-hover);color:var(--ehsq-color-red-60);}
 .admin-rowx .material-symbols-rounded{font-size:18px;}
 .admin-check{width:16px;height:16px;accent-color:var(--ehsq-color-teal-60);cursor:pointer;}
+/* status pills (Users grid, etc.) */
+.admin-pill{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:.75rem;font-weight:700;white-space:nowrap;}
+.admin-pill--ok{background:var(--ehsq-color-green-10);color:var(--ehsq-color-green-60);}
+.admin-pill--off{background:var(--ehsq-color-neutral-10);color:var(--ehsq-color-text-secondary);}
+.admin-pill--lock{background:var(--ehsq-color-red-10);color:var(--ehsq-color-red-60);}
+body[data-theme="dark"] .admin-pill--ok{background:rgba(9,139,83,.16);color:#4cd08a;}
+body[data-theme="dark"] .admin-pill--off{background:rgba(255,255,255,.08);color:var(--ehsq-color-text-secondary);}
+body[data-theme="dark"] .admin-pill--lock{background:rgba(226,45,56,.18);color:#f28b91;}
+/* card header with a right-aligned count/meta */
+.admin-card__meta{margin-left:auto;font-size:.8125rem;font-weight:600;color:var(--ehsq-color-text-secondary);}
+.admin-table-scroll--tall{max-height:560px;}
 
 /* ---- Tinted panel (Details / setting groups / logon options) ---- */
 .admin-panel{background:var(--px-surface-2);border-radius:var(--ehsq-radius-md);padding:18px 20px;}
