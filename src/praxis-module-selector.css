@@ -10,12 +10,18 @@
 
 /* ---- Trigger — a 240px typeable field on the left of the search pill ---- */
 .msel{
-  /* static so the menu anchors to the search pill (.appbar__search), letting
-     it match the full search width */
-  position:static; display:flex; align-items:center; gap:2px;
+  /* relative so the inset divider (::after) anchors here; the body-level menu
+     is still positioned from the search pill (.appbar__search) in JS, so this
+     does not affect the menu's placement or width */
+  position:relative; display:flex; align-items:center; gap:2px;
   width:240px; flex-shrink:0; height:100%; box-sizing:border-box;
   padding:0 6px 0 14px; cursor:pointer;
-  border-right:1px solid var(--ehsq-color-border-default);
+}
+/* Divider between the module selector and the search input — a hairline that
+   is inset from the top/bottom edges rather than spanning the full height. */
+.msel::after{
+  content:""; position:absolute; right:0; top:50%; transform:translateY(-50%);
+  width:1px; height:56%; background:var(--ehsq-color-border-default);
 }
 /* The trigger field only displays the current scope; it opens the menu on click
    and is not typeable (filtering lives inside the menu). */
