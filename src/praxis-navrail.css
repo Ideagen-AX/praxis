@@ -72,8 +72,15 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create{
   background:var(--px-primary-grad); color:#fff;
   box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),inset 0 .5px 0 rgba(255,255,255,.25);
 }
-/* Dark: the Create icon uses the same navy ink as the quick-action buttons. */
-body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create{ color:rgb(14,19,36); }
+/* Dark: Create matches the quick-action buttons — a soft translucent-teal chip
+   with a bright-teal icon (not the bold gradient CTA). */
+body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create{
+  background:rgba(41,210,215,.15); color:rgb(92,224,229);
+  box-shadow:0 0 0 .5px rgba(41,210,215,.25);
+}
+body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create:hover{
+  background:rgba(41,210,215,.22);
+}
 body[data-variant="praxis"] .ehsq-navrail__btn:focus-visible,
 body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
   outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--ehsq-color-interactive-default) 22%, transparent);
