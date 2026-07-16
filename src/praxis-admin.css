@@ -363,7 +363,7 @@ body[data-theme="dark"] .admin-banner{background:rgba(71,102,235,.14);}
 .mazlan-mark>span:nth-child(2){right:12.5%;top:12.5%;background:#E30072;}
 .mazlan-mark>span:nth-child(3){left:12.5%;bottom:12.5%;background:#5CC9D0;}
 .mazlan-mark>span:nth-child(4){right:12.5%;bottom:12.5%;background:#1B838B;}
-body[data-theme="dark"] .mazlan-mark>span:nth-child(1){background:#8A95A0;}
+body[data-theme="dark"] .mazlan-mark>span:nth-child(1){background:#fff;}
 .mz-greeting__logo.mazlan-mark{width:36px;height:36px;}
 
 /* generic overlay rows (used by the Dashboards popout) */
