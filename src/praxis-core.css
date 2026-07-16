@@ -36,6 +36,7 @@ body[data-variant="praxis"]{
 
   /* Praxis surface/material palette (LIGHT) */
   --px-page:#F0F2F4; --px-surface:#ffffff; --px-surface-2:#F4F6F8; --px-tool:#ffffff;
+  --px-drawer:#ffffff;  /* shared drawer/panel surface (Mazlan + filter); dark deepens to navy */
   --px-chip:#EEF1F4; --px-glass:rgba(255,255,255,.82); --px-hover:rgba(16,36,58,.025); --px-dot:rgba(16,36,58,.11);
   --praxis-card:0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7);
   --px-tool-shadow:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05);
@@ -46,6 +47,7 @@ body[data-variant="praxis"]{
   /* primary button — refined teal with lit edge (used by Submit / Create New /
      Reassign task on the record page and the quick-actions on the workspace) */
   --px-primary-grad:linear-gradient(180deg,#1f8f97,#1b838b);
+  --px-primary-fg:#fff;
   --px-primary-shadow:0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(27,131,139,.5),inset 0 .5px 0 rgba(255,255,255,.28);
 
   /* Map the generic elevation tokens onto Praxis materials so any component
@@ -87,10 +89,31 @@ body[data-variant="praxis"][data-theme="dark"]{
   /* Solution accents brighten on dark so they read on tinted chips */
   --ehsq-color-blue-60:#7a93e0; --ehsq-color-orange-60:#ffa94d; --ehsq-color-purple-60:#b088e8;
   --px-page:#11161f; --px-surface:#1c2330; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
+  --px-drawer:#0e1324;  /* deep navy — matches the external Mazlan prototype */
   --px-chip:rgba(255,255,255,.07); --px-glass:rgba(26,32,45,.72); --px-hover:rgba(255,255,255,.05); --px-dot:rgba(255,255,255,.09);
   --px-edge:rgba(255,255,255,.08);
   --praxis-card:0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07);
   --px-tool-shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35);
   --px-tool-shadow-hover:0 0 0 .5px rgba(255,255,255,.12),0 4px 12px -2px rgba(0,0,0,.5);
   --px-overlay:0 0 0 .5px rgba(255,255,255,.08),0 2px 6px rgba(0,0,0,.4),0 24px 50px -20px rgba(0,0,0,.7);
+  /* Dark primary CTA: subtle cyan gradient from the bright interactive color,
+     with dark ink (mirrors the light-mode teal gradient treatment). */
+  --px-primary-grad:linear-gradient(180deg,#29d2d7,#1fb4b9);
+  --px-primary-fg:#08313a;
+}
+
+/* Dark mode: primary CTAs use dark ink on the cyan gradient. Higher specificity
+   than the per-page color:#fff rules, so it wins regardless of load order. */
+body[data-variant="praxis"][data-theme="dark"] .tbtn--run,
+body[data-variant="praxis"][data-theme="dark"] .tbtn--primary,
+body[data-variant="praxis"][data-theme="dark"] .pill-btn,
+body[data-variant="praxis"][data-theme="dark"] .btn--primary,
+body[data-variant="praxis"][data-theme="dark"] .qa,
+body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create,
+body[data-variant="praxis"][data-theme="dark"] .mz-input__send,
+body[data-variant="praxis"][data-theme="dark"] .tbtn--run .icon,
+body[data-variant="praxis"][data-theme="dark"] .tbtn--primary .icon,
+body[data-variant="praxis"][data-theme="dark"] .tbtn--primary .material-symbols-rounded,
+body[data-variant="praxis"][data-theme="dark"] .pill-btn .icon{
+  color:var(--px-primary-fg);
 }

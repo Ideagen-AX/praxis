@@ -22,7 +22,7 @@
 
 .pageheader__titlerow{display:flex;align-items:center;gap:12px;}
 .pageheader__icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;
-  justify-content:center;background:var(--ehsq-color-teal-60);color:var(--ehsq-color-white);
+  justify-content:center;background:var(--ehsq-color-pink-50);color:var(--ehsq-color-white);
   box-shadow:0 1px 2px rgba(16,36,58,.18),inset 0 .5px 0 rgba(255,255,255,.25);}
 .pageheader__icon .material-symbols-rounded{font-size:20px;}
 .pageheader__icon .icon{width:20px;height:20px;}
