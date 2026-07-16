@@ -168,7 +168,11 @@ body[data-variant="praxis"] .px-pop{border:0;box-shadow:var(--px-overlay);}
    rail and the page content.
    =================================================================== */
 .adminnav{width:var(--adminnav-w);flex-shrink:0;display:flex;flex-direction:column;min-height:0;
-  background:transparent;border-right:1px solid var(--ehsq-color-border-default);z-index:15;}
+  /* Cover the fixed dot-grid at the top and fade it in lower down, matching the
+     body (page-header solid to ~84px, toolbar fade to ~144px) so the dots don't
+     ride higher in this panel than in the page body. */
+  background:linear-gradient(to bottom, var(--px-page) 0%, var(--px-page) 84px, transparent 144px);
+  border-right:1px solid var(--ehsq-color-border-default);z-index:15;}
 .adminnav__head{padding:16px 18px 8px;}
 .adminnav__title{margin:0;font-size:1.0625rem;font-weight:700;color:var(--ehsq-color-text-primary);line-height:1.2;}
 .adminnav__sub{display:block;margin-top:2px;font-size:.75rem;color:var(--ehsq-color-text-secondary);}
