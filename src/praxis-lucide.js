@@ -60,6 +60,7 @@
     // dashboards / layout
     "space_dashboard":"layout-dashboard","dashboard":"layout-dashboard","dashboard_customize":"layout-dashboard",
     "grid_view":"layout-grid","view_module":"grid-3x3","widgets":"layout-grid","apps":"grid-3x3","cards":"gallery-horizontal-end",
+    "category":"shapes",
     "account_tree":"git-branch","hub":"share-2","explore":"compass","tour":"map-pin",
     // charts
     "analytics":"chart-column","monitoring":"chart-line","show_chart":"chart-line",

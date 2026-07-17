@@ -222,6 +222,21 @@
   }
   .mazlan-menu__chat:hover { background: rgba(55, 72, 90, 0.08); }
 
+  /* Dark: light ink on the slate menu (base colors are dark ink for the
+     light #EDF0F2 menu, which reads as washed-out on the dark slate). */
+  body[data-theme="dark"] .mazlan-menu__brand-label { color: #e4e4e7; }
+  body[data-theme="dark"] .mazlan-menu__item { color: #e4e4e7; }
+  body[data-theme="dark"] .mazlan-menu__item .material-symbols-rounded { color: #cbd2d9; }
+  body[data-theme="dark"] .mazlan-menu__item:hover { background: rgba(255, 255, 255, 0.06); }
+  body[data-theme="dark"] .mazlan-menu__item:active { background: rgba(255, 255, 255, 0.12); }
+  body[data-theme="dark"] .mazlan-menu__item--active { background: rgba(255, 255, 255, 0.10); }
+  body[data-theme="dark"] .mazlan-menu__shortcut { color: rgba(255, 255, 255, 0.4); }
+  body[data-theme="dark"] .mazlan-menu__divider { background: rgba(255, 255, 255, 0.08); }
+  body[data-theme="dark"] .mazlan-menu__section-head { color: #9ca3af; }
+  body[data-theme="dark"] .mazlan-menu__section-head:hover { color: #e4e4e7; }
+  body[data-theme="dark"] .mazlan-menu__chat { color: #cbd2d9; }
+  body[data-theme="dark"] .mazlan-menu__chat:hover { background: rgba(255, 255, 255, 0.06); }
+
   /* Header — v3 light-mode clean variant: white background, 16px padding,
      no gradient hairline, no borders on the icon buttons. Three slots:
      menu button (top-left), Mazlan brand (center-left), action icons (right). */
