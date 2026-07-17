@@ -200,29 +200,6 @@
     input.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); close(); go(); } if(e.key==='Escape' && !pop.hidden){ close(); } });
   })();
 
-  /* 5 · Mazlan drawer. */
-  (function(){
-    var btn = document.querySelector('.appbar__mazlan'), drawer = document.getElementById('ad-mz-drawer'),
-        scrim = document.getElementById('ad-mz-scrim'), closeBtn = document.getElementById('ad-mz-close');
-    if(!btn || !drawer || !scrim) return;
-    btn.setAttribute('aria-expanded','false');
-    function open(){
-      if(!isPraxis()) return;
-      scrim.hidden = false; drawer.hidden = false;
-      requestAnimationFrame(function(){ requestAnimationFrame(function(){ scrim.classList.add('is-open'); drawer.classList.add('is-open'); }); });
-      btn.setAttribute('aria-expanded','true');
-      var ta = drawer.querySelector('textarea'); if(ta) ta.focus();
-    }
-    function close(){
-      scrim.classList.remove('is-open'); drawer.classList.remove('is-open');
-      btn.setAttribute('aria-expanded','false');
-      setTimeout(function(){ scrim.hidden = true; drawer.hidden = true; }, 320);
-    }
-    btn.addEventListener('click', function(e){ e.stopPropagation(); if(drawer.hidden) open(); else close(); });
-    if(closeBtn) closeBtn.addEventListener('click', close);
-    scrim.addEventListener('click', close);
-    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !drawer.hidden){ close(); btn.focus(); } });
-    drawer.querySelectorAll('.mz-sugg').forEach(function(c){ c.addEventListener('click', function(){ var ta = drawer.querySelector('textarea'); if(ta){ ta.value = c.textContent.trim(); ta.focus(); } }); });
-    var form = document.getElementById('ad-mz-form'); if(form) form.addEventListener('submit', function(e){ e.preventDefault(); var ta = form.querySelector('textarea'); if(ta) ta.value = ''; });
-  })();
+  /* Mazlan drawer is now the shared praxis-mazlan.js component (self-wires
+     .appbar__mazlan + #mazlan-drawer). No admin-specific wiring needed. */
 })();
