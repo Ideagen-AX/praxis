@@ -134,9 +134,23 @@
   function convert() {
     injectStyle();
     tag();
+    /* Only invoke Lucide when unconverted markup actually remains — a
+       placeholder <i>/<span> that carries data-lucide but isn't an <svg> yet.
+       Lucide's generated <svg> keeps its data-lucide attribute, so calling
+       createIcons() unconditionally re-replaces every icon on the page; that
+       DOM churn retriggers our own MutationObserver, which calls convert()
+       again — an endless loop that recreates icons ~120x/sec, eating clicks
+       (mousedown/mouseup land on different nodes) and jamming the UI. The
+       guard below plus stripping data-lucide from finished SVGs break it. */
+    if (!document.querySelector('[data-lucide]:not(svg)')) return;
+    var obs = window.__praxisLucideObserver;
+    if (obs) obs.disconnect();                       // ignore our own mutations
     if (window.lucide && typeof window.lucide.createIcons === 'function') {
       window.lucide.createIcons();
     }
+    var made = document.querySelectorAll('svg[data-lucide]');
+    for (var i = 0; i < made.length; i++) made[i].removeAttribute('data-lucide');
+    if (obs && document.body) obs.observe(document.body, { childList: true, subtree: true });
   }
 
   /* ---- debounced observer so JS-rendered icons convert automatically ---- */
