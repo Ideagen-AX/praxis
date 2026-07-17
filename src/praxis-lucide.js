@@ -104,7 +104,10 @@
     s.textContent =
       "svg.material-symbols-rounded, .material-symbols-rounded > svg {" +
       "width:1em;height:1em;display:inline-block;vertical-align:middle;flex-shrink:0;}" +
-      "svg.material-symbols-rounded{stroke-width:2;}";
+      /* Lucide's default stroke is 2 (a touch heavy); thin every generated
+         icon app-wide. .lucide is on every icon regardless of source
+         (converted Material spans and hand-authored <i data-lucide>). */
+      "svg.material-symbols-rounded, svg.lucide{stroke-width:1.5;}";
     (document.head || document.documentElement).appendChild(s);
   }
 
