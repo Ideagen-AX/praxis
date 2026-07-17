@@ -330,11 +330,19 @@
       /* Edge fade overlay — same color as drawer bg, transparent in the
          center, opaque at the edges. Centered on the greeting (50%/50%)
          with a tighter visible ellipse (smaller halo). */
-      radial-gradient(ellipse 50% 47% at 50% 50%, transparent 0%, transparent 27%, var(--ehsq-color-surface-default) 90%),
+      radial-gradient(ellipse 50% 47% at 50% 26%, transparent 0%, transparent 27%, var(--ehsq-color-surface-default) 90%),
       /* Repeating dot pattern — 1.25px dots at 0.4 alpha */
       radial-gradient(circle at 2px 2px, rgba(77, 101, 127, 0.4) 1.25px, transparent 1.5px);
     background-size: 100% 100%, 20px 20px;
     background-position: 0 0, 0 0;
+  }
+  /* Dark: the edge-fade must resolve to the navy body colour, not
+     surface-default (#1c2330) — otherwise the dot region reads as a lighter
+     band and seams against the navy header/footer. */
+  body[data-theme="dark"] .mazlan-drawer__dots {
+    background-image:
+      radial-gradient(ellipse 50% 47% at 50% 26%, transparent 0%, transparent 27%, #0e1324 90%),
+      radial-gradient(circle at 2px 2px, rgba(77, 101, 127, 0.4) 1.25px, transparent 1.5px);
   }
   /* Lift body content above the dot pattern. Excludes the dots themselves
      so the > * rule doesn't override their position: absolute (both rules
@@ -359,11 +367,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     text-align: center;
-    /* Extra bottom padding offsets the header above so the greeting settles at
-       the drawer's true vertical centre (the bottom group is overlaid). */
-    padding: 32px 24px 136px;
+    /* Greeting sits near the top of the drawer (~48px below the header),
+       not vertically centred — matches the prototype's upper-weighted layout. */
+    padding: 48px 24px 24px;
     flex: 1;
     min-height: 240px;
   }
@@ -373,9 +381,9 @@
      record inline, admin) or concierge's `.mazlan-mark--xl {40px}` (workspace)
      would win by cascade order and the logo would differ per page. */
   .mazlan-drawer .mazlan-welcome__logo {
-    width: 20px;
-    height: 20px;
-    margin-bottom: 12px;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 16px;
   }
   /* The welcome mark breathes — each dot swells slightly on its own beat so
      the resting state reads as "listening" rather than parked. Amplitude is
@@ -411,32 +419,78 @@
     padding: 0 var(--ehsq-space-24);
     display: flex;
     flex-direction: column;
-    gap: var(--ehsq-space-8);
+    gap: 10px;
     background: var(--ehsq-color-surface-default);
   }
+  body[data-theme="dark"] .mazlan-suggestions { background: transparent; }
   /* The class rule above sets display:flex, which overrides the [hidden]
      attribute's UA display:none — so the grid must explicitly re-hide here
      when the conversation starts. */
   .mazlan-suggestions[hidden] { display: none; }
+  /* Header row above the cards — prototype's "A few ways I can help" label +
+     shuffle + "See all assistants" link (.welcome-view-all). */
+  .mazlan-suggestions__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 2px 0;
+  }
+  .mazlan-suggestions__label {
+    font-family: 'Gilroy', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted, #6b7280);
+  }
+  body[data-theme="dark"] .mazlan-suggestions__label { color: #9ca3af; }
+  .mazlan-suggestions__shuffle {
+    display: grid;
+    place-items: center;
+    width: 24px; height: 24px;
+    border: 0; border-radius: 6px;
+    background: none;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.45s ease;
+  }
+  .mazlan-suggestions__shuffle:hover { color: #e4e4e7; background: rgba(255,255,255,0.06); }
+  .mazlan-suggestions__shuffle .material-symbols-rounded { font-size: 15px; }
+  .mazlan-suggestions__shuffle.is-spinning { transform: rotate(180deg); }
+  .mazlan-suggestions__seeall {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Gilroy', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ehsq-color-interactive-default, #1b838b);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    transition: gap 0.15s, color 0.15s;
+  }
+  .mazlan-suggestions__seeall .material-symbols-rounded { font-size: 16px; }
+  .mazlan-suggestions__seeall:hover { gap: 6px; }
+  body[data-theme="dark"] .mazlan-suggestions__seeall { color: #29D2D7; }
+  body[data-theme="dark"] .mazlan-suggestions__seeall:hover { color: #5CE0E5; }
   .mazlan-suggestions__grid {
     display: flex;
     flex-direction: column;
-    gap: var(--ehsq-space-8);
+    gap: 8px;
     align-items: stretch;
   }
-  /* Laptop-height drawers: the welcome state's six quick-starts crowd the
-     composer. Show only the first three and tuck them closer to the input. */
-  @media (max-height: 1000px) {
-    #mazlan-suggestions-grid > :nth-child(n + 4) { display: none; }
-    .mazlan-suggestions__grid { gap: 6px; }
+  /* Match the prototype: show three curated cards, Shuffle re-rolls the set. */
+  #mazlan-suggestions-grid > :nth-child(n + 4) { display: none; }
+  @media (max-height: 780px) {
+    #mazlan-suggestions-grid > :nth-child(n + 3) { display: none; }
   }
   .mazlan-sugg {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
     max-width: 100%;
     text-align: left;
-    padding: 12px 16px;
+    padding: 14px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 14px;
     background: var(--ehsq-color-surface-default);
@@ -449,23 +503,30 @@
   /* Dark: black-alpha border/shadow vanish on the dark surface, so the cards
      read flat. Use an elevated slate chip with a light edge + real drop shadow
      so they read as floating cards. */
+  /* Dark: match the prototype's .explore-card resting treatment exactly. */
   body[data-theme="dark"] .mazlan-sugg {
-    background: var(--px-surface-2, #232c3b);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 .5px rgba(255,255,255,.05), 0 10px 26px -14px rgba(0,0,0,.6);
+    background: rgba(36, 48, 64, 0.55);
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.25), 0 7px 20px -10px rgba(0,0,0,0.42);
   }
   body[data-theme="dark"] .mazlan-sugg:hover {
-    box-shadow: 0 0 0 .5px rgba(255,255,255,.10), 0 12px 30px -12px rgba(0,0,0,.7);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3), 0 10px 26px -10px rgba(0,0,0,0.5);
   }
   .mazlan-sugg:active { transform: scale(0.99); }
+  /* Icon chip — prototype .explore-card-thumb: 48px rounded tile holding a
+     tinted glyph (our per-prompt icons stand in for its illustrations). */
   .mazlan-sugg__icon {
-    width: 18px; height: 18px;
+    width: 48px; height: 48px;
+    border-radius: 8px;
     display: grid;
     place-items: center;
     flex-shrink: 0;
+    background: rgba(16, 36, 58, 0.05);
     color: var(--ehsq-color-text-tertiary);
   }
-  .mazlan-sugg__icon .material-symbols-rounded { font-size: 16px; }
+  body[data-theme="dark"] .mazlan-sugg__icon { background: #1F2A3C; }
+  .mazlan-sugg__icon .material-symbols-rounded { font-size: 22px; }
   /* Category accent on the leading icon */
   .mazlan-sugg__icon--teal   { color: var(--ehsq-color-interactive-default); }
   .mazlan-sugg__icon--pink   { color: var(--ehsq-color-pink-60, #e30072); }
@@ -474,15 +535,17 @@
   .mazlan-sugg__icon--green  { color: #0f8a52; }
   .mazlan-sugg__icon--purple { color: #805ad5; }
   .mazlan-sugg__title {
-    font-size: var(--ehsq-type-size-base);
-    font-weight: 500;
+    font-family: 'Gilroy', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
     color: var(--ehsq-color-text-primary);
-    line-height: 1.4;
+    line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
   }
+  body[data-theme="dark"] .mazlan-sugg__title { color: #e4e4e7; }
 
   /* Conversation thread */
   .mazlan-thread { display: flex; flex-direction: column; gap: var(--ehsq-space-12); }

@@ -75,7 +75,7 @@
     "videocam":"video","photo_camera":"camera","image":"image","mic":"mic",
     "play_arrow":"play","play_circle":"circle-play","pause":"pause","volume":"volume-2",
     // system / actions
-    "refresh":"refresh-cw","restart_alt":"rotate-ccw","power_off":"power","logout":"log-out",
+    "refresh":"refresh-cw","restart_alt":"rotate-ccw","power_off":"power","logout":"log-out","shuffle":"shuffle",
     "lock":"lock","home":"house","push_pin":"pin","keep":"pin","keep_off":"pin-off",
     "auto_awesome":"sparkles","bolt":"zap","lightbulb":"lightbulb","star":"star",
     "celebration":"party-popper","local_fire_department":"flame","visibility":"eye",

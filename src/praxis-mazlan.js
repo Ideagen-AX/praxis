@@ -133,6 +133,26 @@
     if (!sec) return;
     if (mazlanDrawerHasMessages) { sec.hidden = true; return; }
     sec.hidden = false;
+    /* Header row (label + shuffle + "See all assistants"), built once above
+       the card grid — mirrors the prototype's .welcome-view-all row. */
+    if (!sec.querySelector('.mazlan-suggestions__head')) {
+      const head = document.createElement('div');
+      head.className = 'mazlan-suggestions__head';
+      head.innerHTML =
+        '<span class="mazlan-suggestions__label">A few ways I can help</span>' +
+        '<button class="mazlan-suggestions__shuffle" type="button" aria-label="Show other options" title="Shuffle"><span class="material-symbols-rounded">shuffle</span></button>' +
+        '<button class="mazlan-suggestions__seeall" type="button">See all assistants<span class="material-symbols-rounded">chevron_right</span></button>';
+      sec.insertBefore(head, sec.firstChild);
+      head.querySelector('.mazlan-suggestions__shuffle').addEventListener('click', function () {
+        const btn = head.querySelector('.mazlan-suggestions__shuffle');
+        btn.classList.remove('is-spinning'); void btn.offsetWidth; btn.classList.add('is-spinning');
+        const g = document.getElementById('mazlan-suggestions-grid');
+        if (g) Array.prototype.slice.call(g.children).sort(function () { return Math.random() - 0.5; }).forEach(function (c) { g.appendChild(c); });
+      });
+      head.querySelector('.mazlan-suggestions__seeall').addEventListener('click', function () {
+        const mb = document.getElementById('mazlan-menu-btn'); if (mb) mb.click();
+      });
+    }
     const grid = document.getElementById('mazlan-suggestions-grid');
     if (!grid) return;
     const suggestions = mzGetSuggestions();
