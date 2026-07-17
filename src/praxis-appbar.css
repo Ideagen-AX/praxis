@@ -55,7 +55,9 @@ body[data-variant="praxis"] .appbar__search-btn{background:transparent;color:var
 body[data-variant="praxis"] .appbar__search-btn:hover{background:transparent;color:var(--ehsq-color-text-primary);}
 
 /* Right-side cluster */
-.appbar__right{display:flex;align-items:center;gap:var(--ehsq-space-8);margin-left:auto;}
+/* margin-right adds a 16px inset on top of the bar's 16px padding, so the
+   Mazlan trigger + avatar sit 32px in from the page edge on every page. */
+.appbar__right{display:flex;align-items:center;gap:var(--ehsq-space-8);margin-left:auto;margin-right:var(--ehsq-space-16);}
 .appbar__ai{position:relative;}
 
 /* Mazlan pill (branded four-dot mark + label) */

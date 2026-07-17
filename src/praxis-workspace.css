@@ -119,9 +119,10 @@ body[data-theme="dark"] .appbar__action-btn{ background:rgba(255,255,255,.08); b
   box-shadow:0 0 0 .5px rgba(16,36,58,.06),0 1px 2px rgba(16,36,58,.05); }
 #mazlan-trigger:hover{ filter:none; color:var(--ehsq-color-text-primary);
   box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14); }
-body[data-theme="dark"] #mazlan-trigger{ background:rgba(255,255,255,.06); color:var(--ehsq-color-text-secondary); border:0;
-  box-shadow:0 0 0 .5px rgba(255,255,255,.10); }
-body[data-theme="dark"] #mazlan-trigger:hover{ background:rgba(255,255,255,.10); color:#fff; }
+body[data-theme="dark"] #mazlan-trigger{ background:var(--px-surface-2,#232c3b); color:var(--ehsq-color-text-secondary); border:0;
+  box-shadow:var(--ehsq-elevation-card); }
+body[data-theme="dark"] #mazlan-trigger:hover{ background:var(--px-surface-2,#232c3b); color:#fff;
+  box-shadow:0 0 0 .5px rgba(255,255,255,.12),0 6px 18px -6px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.08); }
 body[data-theme="dark"] .appbar__action-btn:hover{ background:rgba(255,255,255,.12); }
 body[data-theme="dark"] .appbar__icon-btn:hover{ background:rgba(255,255,255,.10); }
 body[data-theme="dark"] .appbar__avatar{ border-color:rgba(255,255,255,.22); }
