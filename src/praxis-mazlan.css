@@ -335,9 +335,13 @@
     min-height: 240px;
   }
   .mazlan-welcome[aria-hidden="true"] { display: none; }
-  .mazlan-welcome__logo {
-    width: 40px;
-    height: 40px;
+  /* Scoped with .mazlan-drawer so the welcome mark's size is authoritative on
+     every page — otherwise a page's generic `.mazlan-mark {width:20px}` (search/
+     record inline, admin) or concierge's `.mazlan-mark--xl {40px}` (workspace)
+     would win by cascade order and the logo would differ per page. */
+  .mazlan-drawer .mazlan-welcome__logo {
+    width: 20px;
+    height: 20px;
     margin-bottom: 12px;
   }
   /* The welcome mark breathes — each dot swells slightly on its own beat so
@@ -605,7 +609,10 @@
     border: 0;
     border-radius: 50%;
     background: transparent;
-    color: var(--ehsq-color-text-tertiary);
+    /* --ehsq-color-text-tertiary isn't defined on every page (search/record/
+       admin don't load concierge), which left the tool icons a different tint
+       per page. Use --ehsq-color-text-secondary, defined identically app-wide. */
+    color: var(--ehsq-color-text-secondary);
     cursor: pointer;
     display: grid;
     place-items: center;
