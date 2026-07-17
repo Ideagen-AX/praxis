@@ -214,38 +214,145 @@
       } else if (sugg.cat === 'Workspace') {
         actions = [{ label: 'Apply', icon: 'check', primary: true }, { label: 'Cancel', icon: 'close' }];
       }
-      appendMazlanMessage('mazlan', sugg.reply, actions);
+      appendMazlanMessage('mazlan', sugg.reply, { actions });
     }, 700);
   }
 
-  function appendMazlanMessage(role, text, actions) {
+  /* Canned demo scaffolding for the bot response anatomy (reasoning timeline,
+     sources, follow-ups) — a live integration would supply these per turn. */
+  const MZ_STEPS = [
+    { text: 'Understood your question', dur: '0.4s' },
+    { text: 'Searched your records and connected sources', dur: '1.2s' },
+    { text: 'Cross-checked the SDS + policy library', dur: '0.9s' },
+    { text: 'Composed the answer', dur: '0.6s' }
+  ];
+  const MZ_SOURCES = [
+    { title: 'ISO 45001:2018 — Occupational Health & Safety', origin: 'iso.org/standard/63787', badge: 'IS' },
+    { title: 'NIOSH Hierarchy of Controls', origin: 'cdc.gov/niosh', badge: 'NI' },
+    { title: 'WI123 — Risk Assessment Techniques', origin: 'Work instruction', badge: 'WI' }
+  ];
+  const MZ_FOLLOWUPS = ['Draft a CAPA for this', 'Show me the related records', 'Summarise the key actions'];
+
+  function mzFourDot() {
+    return '<span class="mazlan-mark mazlan-mark--sm" aria-hidden="true"><span></span><span></span><span></span><span></span></span>';
+  }
+
+  function appendMazlanMessage(role, text, opts) {
+    opts = opts || {};
     const thread = document.getElementById('mazlan-thread');
     if (!thread) return;
-    /* Once a real message exists, retire the suggestion grid so the convo
-       surface owns the space. */
+    /* Once a real message exists, retire the suggestion grid + welcome and
+       flip the drawer into its in-chat state (hides the dot grid, morphs the
+       header — see .mazlan-drawer--in-chat). */
     if (!mazlanDrawerHasMessages) {
       mazlanDrawerHasMessages = true;
       const sugg = document.getElementById('mazlan-suggestions');
       if (sugg) sugg.hidden = true;
-      /* Hide the centered welcome landing — the thread surface owns the body now */
       const welcome = document.getElementById('mazlan-welcome');
       if (welcome) welcome.setAttribute('aria-hidden', 'true');
+      const drawer = document.getElementById('mazlan-drawer');
+      if (drawer) drawer.classList.add('mazlan-drawer--in-chat');
     }
     const msg = document.createElement('div');
     msg.className = `mazlan-msg mazlan-msg--${role}`;
-    const renderedText = renderMazlanMarkdown(text);
+    if (role === 'user') {
+      /* User turn — a slate bubble with white text, no "You" label. */
+      msg.innerHTML = `<div class="mazlan-msg__bubble">${renderMazlanMarkdown(text)}</div>`;
+    } else {
+      buildMazlanBotMessage(msg, text, opts);
+    }
+    thread.appendChild(msg);
+    const body = document.getElementById('mazlan-drawer-body');
+    if (body) body.scrollTop = body.scrollHeight;
+    return msg;
+  }
+
+  /* Bot turn anatomy (copied from the v3 prototype):
+       reasoning header (mark + chevron + summary + timer) → expandable
+       timeline · container-less response text · expandable sources ·
+       follow-up pills · action tools (copy / thumbs up / thumbs down). */
+  function buildMazlanBotMessage(msg, text, opts) {
+    const steps = opts.steps || MZ_STEPS;
+    const sources = opts.sources || MZ_SOURCES;
+    const followups = opts.followups || MZ_FOLLOWUPS;
+    const timer = opts.timer || '1.8s';
+    const summary = opts.summary || `Analysed your request across ${sources.length} sources`;
+    const actions = opts.actions;
+
+    const stepsHtml = steps.map((s, i) => `
+      <div class="mazlan-reasoning__step">
+        <span class="mazlan-reasoning__dot"></span>
+        <span class="mazlan-reasoning__step-text">${mzEscapeHtml(s.text)}</span>
+        ${s.dur ? `<span class="mazlan-reasoning__dur">${mzEscapeHtml(s.dur)}</span>` : ''}
+      </div>`).join('');
+
+    const avatarsHtml = sources.map(s => `<span class="mazlan-source__avatar">${mzEscapeHtml(s.badge || '?')}</span>`).join('');
+    const sourceItemsHtml = sources.map(s => `
+      <button class="mazlan-source__item" type="button">
+        <span class="mazlan-source__avatar">${mzEscapeHtml(s.badge || '?')}</span>
+        <span class="mazlan-source__text">
+          <span class="mazlan-source__title">${mzEscapeHtml(s.title)}</span>
+          <span class="mazlan-source__origin">${mzEscapeHtml(s.origin)}</span>
+        </span>
+        <span class="material-symbols-rounded mazlan-source__arrow">chevron_right</span>
+      </button>`).join('');
+
     msg.innerHTML = `
-      <span class="mazlan-msg__who">${role === 'user' ? 'You' : 'Mazlan'}</span>
-      <div class="mazlan-msg__bubble">${renderedText}</div>
+      <div class="mazlan-reasoning">
+        <button class="mazlan-reasoning__header" type="button" aria-expanded="false">
+          <span class="mazlan-reasoning__logo">${mzFourDot()}</span>
+          <span class="material-symbols-rounded mazlan-reasoning__chev">chevron_right</span>
+          <span class="mazlan-reasoning__summary">${mzEscapeHtml(summary)}</span>
+          <span class="mazlan-reasoning__timer">${mzEscapeHtml(timer)}</span>
+        </button>
+        <div class="mazlan-reasoning__timeline"><div>${stepsHtml}</div></div>
+      </div>
+      <div class="mazlan-msg__text">${renderMazlanMarkdown(text)}</div>
       ${actions ? `<div class="mazlan-msg__actions">${actions.map(a => `
         <button class="mazlan-msg__action" type="button">
-          <span class="material-symbols-rounded">${a.icon}</span>
-          ${mzEscapeHtml(a.label)}
+          <span class="material-symbols-rounded">${a.icon}</span>${mzEscapeHtml(a.label)}
         </button>`).join('')}</div>` : ''}
-    `;
-    thread.appendChild(msg);
-    /* Wire any inline action that carries an `act` id (e.g. launch an agentic
-       task). Decorative actions (Apply/Cancel) have no `act` and stay inert. */
+      <div class="mazlan-sources">
+        <button class="mazlan-sources__toggle" type="button" aria-expanded="false">
+          <span class="material-symbols-rounded mazlan-sources__chev">chevron_right</span>
+          <span class="mazlan-sources__avatars">${avatarsHtml}</span>
+          <span class="mazlan-sources__label">${sources.length} sources</span>
+        </button>
+        <div class="mazlan-sources__list"><div>${sourceItemsHtml}</div></div>
+      </div>
+      ${followups.length ? `<div class="mazlan-followups">${followups.map(f => `
+        <button class="mazlan-followup" type="button"><span>${mzEscapeHtml(f)}</span></button>`).join('')}</div>` : ''}
+      <div class="mazlan-msg__tools">
+        <button class="mazlan-msg__tool" type="button" aria-label="Copy" title="Copy"><span class="material-symbols-rounded">content_copy</span></button>
+        <button class="mazlan-msg__tool" type="button" aria-label="Good response" title="Good response"><span class="material-symbols-rounded">thumb_up</span></button>
+        <button class="mazlan-msg__tool" type="button" aria-label="Bad response" title="Bad response"><span class="material-symbols-rounded">thumb_down</span></button>
+      </div>`;
+
+    /* Reasoning + sources are collapsible (grid-rows 0fr↔1fr like the prototype). */
+    const rHeader = msg.querySelector('.mazlan-reasoning__header');
+    const rWrap = msg.querySelector('.mazlan-reasoning');
+    rHeader.addEventListener('click', () => {
+      const open = rWrap.classList.toggle('mazlan-reasoning--open');
+      rHeader.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    const sToggle = msg.querySelector('.mazlan-sources__toggle');
+    const sWrap = msg.querySelector('.mazlan-sources');
+    sToggle.addEventListener('click', () => {
+      const open = sWrap.classList.toggle('mazlan-sources--open');
+      sToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    /* Follow-up pills send themselves as the next user turn. */
+    msg.querySelectorAll('.mazlan-followup').forEach(btn => {
+      btn.addEventListener('click', () => handleMazlanSuggestion({ text: btn.textContent.trim(), reply: 'Here’s what I found on that.' }));
+    });
+    /* Copy tool copies the response text. */
+    const copyBtn = msg.querySelector('.mazlan-msg__tool');
+    copyBtn.addEventListener('click', () => {
+      const t = msg.querySelector('.mazlan-msg__text');
+      if (t && navigator.clipboard) navigator.clipboard.writeText(t.innerText).catch(() => {});
+      mzAnnounce('Copied');
+    });
+    /* Wire any inline agentic action (e.g. Start audit-prep). */
     if (actions) {
       msg.querySelectorAll('.mazlan-msg__action').forEach((btn, i) => {
         const a = actions[i];
@@ -254,9 +361,6 @@
         }
       });
     }
-    /* Scroll to the new message */
-    const body = document.getElementById('mazlan-drawer-body');
-    if (body) body.scrollTop = body.scrollHeight;
   }
 
   /* Minimal markdown — only **bold** is supported in the demo replies. Escaped first. */
@@ -339,6 +443,7 @@
           const thread = document.getElementById('mazlan-thread');
           if (thread) thread.innerHTML = '';
           mazlanDrawerHasMessages = false;
+          document.getElementById('mazlan-drawer')?.classList.remove('mazlan-drawer--in-chat');
           const welcome = document.getElementById('mazlan-welcome');
           if (welcome) welcome.setAttribute('aria-hidden', 'false');
           const sec = document.getElementById('mazlan-suggestions');

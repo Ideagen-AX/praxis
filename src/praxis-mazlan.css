@@ -548,62 +548,158 @@
   body[data-theme="dark"] .mazlan-sugg__title { color: #e4e4e7; }
 
   /* Conversation thread */
-  .mazlan-thread { display: flex; flex-direction: column; gap: var(--ehsq-space-12); }
+  .mazlan-thread { display: flex; flex-direction: column; gap: 18px; }
   .mazlan-thread:empty { display: none; }
-  .mazlan-msg {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    max-width: 90%;
-  }
-  .mazlan-msg--user { align-self: flex-end; align-items: flex-end; }
-  .mazlan-msg--mazlan { align-self: flex-start; align-items: flex-start; }
+  .mazlan-msg { display: flex; flex-direction: column; }
+  /* User turn — slate bubble, white text, no label (prototype .msg-user). */
+  .mazlan-msg--user { align-self: flex-end; align-items: flex-end; max-width: 85%; }
   .mazlan-msg__bubble {
-    padding: var(--ehsq-space-12) var(--ehsq-space-12);
-    border-radius: 14px;
-    font-size: var(--ehsq-type-size-base);
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-family: 'Gilroy', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1.5;
-  }
-  .mazlan-msg--user .mazlan-msg__bubble {
-    background: var(--ehsq-color-interactive-default);
-    color: white;
-    border-bottom-right-radius: 4px;
-  }
-  .mazlan-msg--mazlan .mazlan-msg__bubble {
-    background: var(--ehsq-color-surface-subtle);
+    background: #ECEFF3;
     color: var(--ehsq-color-text-primary);
-    border: 1px solid var(--ehsq-color-border-subtle);
-    border-bottom-left-radius: 4px;
   }
-  .mazlan-msg__who {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ehsq-color-text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+  body[data-theme="dark"] .mazlan-msg__bubble { background: #24303c; color: #e4e4e7; }
+  /* Bot turn — full width, container-less response text. */
+  .mazlan-msg--mazlan { align-self: stretch; max-width: 100%; }
+
+  /* Reasoning — collapsible activity header + timeline (prototype .reasoning). */
+  .mazlan-reasoning { margin-top: 2px; }
+  .mazlan-reasoning__header {
+    display: flex; align-items: center; gap: 8px; width: 100%;
+    padding: 4px 0; border: 0; background: none; cursor: pointer;
+    font-family: 'Gilroy', sans-serif; font-size: 13px; font-weight: 500;
+    color: #6B7785; text-align: left;
   }
-  .mazlan-msg__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 4px;
+  .mazlan-reasoning__header:hover { color: var(--ehsq-color-text-primary); }
+  body[data-theme="dark"] .mazlan-reasoning__header { color: #9ca3af; }
+  body[data-theme="dark"] .mazlan-reasoning__header:hover { color: #e4e4e7; }
+  .mazlan-reasoning__logo { width: 20px; height: 20px; flex-shrink: 0; }
+  .mazlan-reasoning__logo .mazlan-mark { width: 20px; height: 20px; }
+  .mazlan-reasoning__chev { font-size: 18px; flex-shrink: 0; transition: transform 0.25s ease; }
+  .mazlan-reasoning--open .mazlan-reasoning__chev { transform: rotate(90deg); }
+  .mazlan-reasoning__summary { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mazlan-reasoning__timer { margin-left: auto; flex-shrink: 0; font-size: 12px; opacity: 0.55; font-variant-numeric: tabular-nums; }
+  .mazlan-reasoning__header:hover .mazlan-reasoning__timer,
+  .mazlan-reasoning--open .mazlan-reasoning__timer { opacity: 1; }
+  .mazlan-reasoning__timeline {
+    display: grid; grid-template-rows: 0fr; opacity: 0; margin-top: 0;
+    transition: grid-template-rows 0.25s ease, opacity 0.25s ease, margin-top 0.25s ease;
   }
+  .mazlan-reasoning--open .mazlan-reasoning__timeline { grid-template-rows: 1fr; opacity: 1; margin-top: 8px; }
+  .mazlan-reasoning__timeline > div { overflow: hidden; position: relative; padding-left: 22px; }
+  .mazlan-reasoning__timeline > div::before {
+    content: ''; position: absolute; left: 5px; top: 6px; bottom: 10px; width: 2px;
+    background: rgba(16, 36, 58, 0.12);
+  }
+  body[data-theme="dark"] .mazlan-reasoning__timeline > div::before { background: rgba(255, 255, 255, 0.10); }
+  .mazlan-reasoning__step { position: relative; display: flex; align-items: baseline; gap: 8px; padding: 6px 0; }
+  .mazlan-reasoning__dot {
+    position: absolute; left: -21px; top: 7px; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--ehsq-color-interactive-default);
+    box-shadow: 0 0 0 3px var(--ehsq-color-surface-default);
+  }
+  body[data-theme="dark"] .mazlan-reasoning__dot { box-shadow: 0 0 0 3px #0e1324; }
+  .mazlan-reasoning__step-text { flex: 1; font-family: 'Gilroy', sans-serif; font-size: 13px; font-weight: 500; line-height: 1.5; color: var(--ehsq-color-text-primary); }
+  body[data-theme="dark"] .mazlan-reasoning__step-text { color: #d1d5db; }
+  .mazlan-reasoning__dur { flex-shrink: 0; font-size: 11px; color: var(--ehsq-color-text-tertiary); font-variant-numeric: tabular-nums; }
+
+  /* Container-less response text (prototype .msg-bot-text). */
+  .mazlan-msg__text {
+    margin-top: 6px;
+    font-family: 'Gilroy', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ehsq-color-text-primary);
+  }
+  body[data-theme="dark"] .mazlan-msg__text { color: #d1d5db; }
+  .mazlan-msg__text strong { font-weight: 600; color: var(--ehsq-color-text-primary); }
+  body[data-theme="dark"] .mazlan-msg__text strong { color: #f4f4f5; }
+
+  /* Inline agentic actions (Start audit-prep, etc.) */
+  .mazlan-msg__actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .mazlan-msg__action {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    height: 28px;
-    padding: 0 var(--ehsq-space-8);
-    background: var(--ehsq-color-surface-default);
-    color: var(--ehsq-color-interactive-default);
-    border: 1px solid var(--ehsq-color-interactive-default);
-    border-radius: 999px;
-    font-size: var(--ehsq-type-size-sm);
-    font-weight: 600;
-    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 12px;
+    background: none; color: var(--ehsq-color-interactive-default);
+    border: 1px solid var(--ehsq-color-interactive-default); border-radius: 999px;
+    font-size: var(--ehsq-type-size-sm); font-weight: 600; cursor: pointer;
   }
-  .mazlan-msg__action:hover { background: var(--ehsq-color-teal-10); }
+  body[data-theme="dark"] .mazlan-msg__action { color: #29D2D7; border-color: rgba(41,210,215,.5); }
   .mazlan-msg__action .material-symbols-rounded { font-size: 14px; }
+
+  /* Sources — collapsible, avatar stack + expandable list (prototype .msg-sources). */
+  .mazlan-sources { padding-top: 16px; }
+  .mazlan-sources__toggle {
+    display: flex; align-items: center; gap: 6px; width: 100%; padding: 0;
+    border: 0; background: none; cursor: pointer;
+    font-family: 'Gilroy', sans-serif; font-size: 13px; font-weight: 500; color: #6B7785;
+  }
+  body[data-theme="dark"] .mazlan-sources__toggle { color: #9ca3af; }
+  body[data-theme="dark"] .mazlan-sources__toggle:hover { color: #e4e4e7; }
+  .mazlan-sources__chev { font-size: 18px; color: var(--ehsq-color-text-tertiary); transition: transform 0.2s ease; }
+  .mazlan-sources--open .mazlan-sources__chev { transform: rotate(90deg); }
+  .mazlan-sources__avatars { display: flex; align-items: center; flex-shrink: 0; }
+  .mazlan-source__avatar {
+    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--ehsq-color-surface-default);
+    background: #EDF0F2; color: #37485A;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Gilroy', sans-serif; font-size: 9px; font-weight: 700;
+  }
+  body[data-theme="dark"] .mazlan-source__avatar { border-color: #0e1324; background: #24303c; color: #cbd2d9; }
+  .mazlan-sources__avatars .mazlan-source__avatar + .mazlan-source__avatar { margin-left: -8px; }
+  .mazlan-sources__label { margin-left: 2px; }
+  .mazlan-sources__list {
+    display: grid; grid-template-rows: 0fr; opacity: 0;
+    transition: grid-template-rows 0.25s ease, opacity 0.25s ease;
+  }
+  .mazlan-sources--open .mazlan-sources__list { grid-template-rows: 1fr; opacity: 1; }
+  .mazlan-sources__list > div { overflow: hidden; }
+  .mazlan-source__item {
+    display: flex; align-items: flex-start; gap: 8px; width: 100%; padding: 12px;
+    border: 0; background: none; border-radius: 12px; cursor: pointer; text-align: left;
+    margin-top: 6px;
+  }
+  .mazlan-source__item:hover { background: rgba(16, 36, 58, 0.05); }
+  body[data-theme="dark"] .mazlan-source__item:hover { background: rgba(255, 255, 255, 0.05); }
+  .mazlan-source__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .mazlan-source__title { font-family: 'Gilroy', sans-serif; font-size: 13px; font-weight: 500; color: var(--ehsq-color-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  body[data-theme="dark"] .mazlan-source__title { color: #d1d5db; }
+  .mazlan-source__origin { font-size: 12px; color: var(--ehsq-color-text-tertiary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mazlan-source__arrow { font-size: 16px; color: var(--ehsq-color-text-tertiary); flex-shrink: 0; }
+
+  /* Follow-up pills (Stage 3 — prototype .followup-chip). */
+  .mazlan-followups { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 14px; }
+  .mazlan-followup {
+    display: inline-flex; align-items: center; max-width: 100%; text-align: left;
+    padding: 10px 14px; border: 0; border-radius: 999px; cursor: pointer;
+    font-family: 'Gilroy', sans-serif; font-size: 13px; font-weight: 500; line-height: 1.4;
+    background: rgba(16, 36, 58, 0.05); color: var(--ehsq-color-text-primary);
+    transition: background 0.15s;
+  }
+  .mazlan-followup span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mazlan-followup:hover { background: rgba(16, 36, 58, 0.09); }
+  body[data-theme="dark"] .mazlan-followup { background: rgba(255, 255, 255, 0.06); color: #d1d5db; }
+  body[data-theme="dark"] .mazlan-followup:hover { background: rgba(255, 255, 255, 0.12); }
+
+  /* Response tools — copy / thumbs up / thumbs down (prototype .msg-actions). */
+  .mazlan-msg__tools { display: flex; align-items: center; gap: 2px; margin-top: 12px; }
+  .mazlan-msg__tool {
+    display: grid; place-items: center; width: 30px; height: 30px;
+    border: 0; border-radius: 8px; background: none; cursor: pointer;
+    color: var(--ehsq-color-text-tertiary); transition: background 0.15s, color 0.15s;
+  }
+  .mazlan-msg__tool:hover { background: rgba(16, 36, 58, 0.06); color: var(--ehsq-color-text-primary); }
+  body[data-theme="dark"] .mazlan-msg__tool { color: #71717a; }
+  body[data-theme="dark"] .mazlan-msg__tool:hover { background: rgba(255, 255, 255, 0.08); color: #e4e4e7; }
+  .mazlan-msg__tool .material-symbols-rounded { font-size: 17px; }
+
+  /* In-chat: the dot-grid welcome canvas is retired once a chat begins. */
+  .mazlan-drawer--in-chat .mazlan-drawer__dots { display: none; }
 
   /* Typing indicator while Mazlan is "thinking" */
   .mazlan-typing {
