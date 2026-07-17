@@ -32,7 +32,7 @@
     bottom: 16px;
     width: min(484px, calc(100vw - 32px));
     background: var(--ehsq-color-surface-default);
-    border: 1px solid var(--ehsq-color-border-subtle);
+    border: 0;
     border-radius: 24px;
     box-shadow: -8px 16px 40px rgba(32, 42, 53, 0.18), 0 4px 12px rgba(32, 42, 53, 0.06);
     z-index: 96;
@@ -44,6 +44,24 @@
   }
   .mazlan-drawer[hidden] { display: none; }
   .mazlan-drawer.mazlan-drawer--open { transform: translateX(0); }
+
+  /* ===================================================================
+     DARK THEME — match the external Mazlan v3 prototype
+     (ideagen-workspace.vercel.app/mazlan-chatbot-v3.html):
+       drawer body = navy #0e1324, menu + composer = slate, no borders.
+     Surfaces that make up the drawer shell (head / bottom / footer) all
+     read as one navy sheet; only the composer + menu lift to slate.
+     =================================================================== */
+  body[data-theme="dark"] .mazlan-drawer,
+  body[data-theme="dark"] .mazlan-drawer__head,
+  body[data-theme="dark"] .mazlan-drawer__bottom,
+  body[data-theme="dark"] .mazlan-drawer__footer {
+    background: #0e1324;
+  }
+  body[data-theme="dark"] .mazlan-menu,
+  body[data-theme="dark"] .mazlan-menu__head {
+    background: #24303c;
+  }
 
   /* Sliding menu sub-drawer — slides in from the left over the chat surface */
   .mazlan-menu {
@@ -558,14 +576,17 @@
   .mazlan-drawer__input:focus-within {
     box-shadow: 0 2px 16px -4px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(27, 131, 139, 0.18);
   }
-  /* Dark: visible light-edge border + real shadow on the dark surface. */
+  /* Dark: composer is a flat slate fill on the navy body — no border, no
+     teal focus ring (prototype .input-box = #202b39, transparent border). */
   body[data-theme="dark"] .mazlan-drawer__input {
-    border-color: rgba(255, 255, 255, 0.10);
-    box-shadow: 0 0 0 .5px rgba(255,255,255,.05), 0 8px 22px -12px rgba(0,0,0,.55);
+    background: #202b39;
+    border-color: transparent;
+    box-shadow: none;
   }
+  body[data-theme="dark"] .mazlan-drawer__input:hover { box-shadow: none; }
   body[data-theme="dark"] .mazlan-drawer__input:focus-within {
-    border-color: rgba(41,210,215,.5);
-    box-shadow: 0 8px 22px -12px rgba(0,0,0,.6), 0 0 0 2px rgba(41,210,215,0.25);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: none;
   }
   /* Textarea — v3 typography vocabulary. No leading icon (the brand mark
      is the dark header above). */
