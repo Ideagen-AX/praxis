@@ -52,7 +52,8 @@
     "priority_high":"circle-alert","crisis_alert":"siren","report":"octagon-alert",
     "running_with_errors":"clock-alert","emergency_home":"house-plus","help":"circle-help",
     "flag":"flag","rule":"scale","policy":"shield-check","approval":"circle-check",
-    "thumb_up":"thumbs-up","thumbs_up_down":"scale","rate_review":"message-square-more",
+    "thumb_up":"thumbs-up","thumb_down":"thumbs-down","thumbs_up_down":"scale","rate_review":"message-square-more",
+    "content_copy":"copy",
     "pending_actions":"clock-arrow-down","hourglass_bottom":"hourglass","change_circle":"refresh-cw",
     // time
     "schedule":"clock","calendar_today":"calendar","calendar_month":"calendar",

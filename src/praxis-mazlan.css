@@ -701,6 +701,25 @@
   /* In-chat: the dot-grid welcome canvas is retired once a chat begins. */
   .mazlan-drawer--in-chat .mazlan-drawer__dots { display: none; }
 
+  /* Stage 4 — top fade: the conversation fades out as it scrolls under the
+     header (prototype .header-fade, #0e1324@~70%). A sticky ::before pinned
+     to the top of the scroll viewport; negative margins let content flow
+     under it instead of being pushed down. */
+  .mazlan-drawer--in-chat .mazlan-drawer__body::before {
+    content: '';
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    display: block;
+    height: 40px;
+    margin: calc(var(--ehsq-space-24) * -1) calc(var(--ehsq-space-24) * -1) -40px;
+    background: linear-gradient(to bottom, var(--ehsq-color-surface-default) 45%, transparent);
+    pointer-events: none;
+  }
+  body[data-theme="dark"] .mazlan-drawer--in-chat .mazlan-drawer__body::before {
+    background: linear-gradient(to bottom, #0e1324 45%, transparent);
+  }
+
   /* Typing indicator while Mazlan is "thinking" */
   .mazlan-typing {
     display: inline-flex;
