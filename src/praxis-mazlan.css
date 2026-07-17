@@ -289,7 +289,7 @@
     color: #2F4051;
   }
   .mazlan-drawer__head-btn .material-symbols-rounded,
-  .mazlan-drawer__menu-btn .material-symbols-rounded { font-size: 22px; }
+  .mazlan-drawer__menu-btn .material-symbols-rounded { font-size: 18px; }
   .mazlan-drawer__head-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
   .mazlan-drawer__head-spacer { flex: 1; min-width: 0; }
   .mazlan-drawer__brand { display: flex; align-items: center; gap: var(--ehsq-space-12); min-width: 0; }
@@ -487,12 +487,12 @@
   .mazlan-sugg {
     display: inline-flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     max-width: 100%;
     text-align: left;
-    padding: 14px;
+    padding: 12px;
     border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 14px;
+    border-radius: 16px;
     background: var(--ehsq-color-surface-default);
     box-shadow: 0 2px 16px -4px rgba(0, 0, 0, 0.06);
     cursor: pointer;
@@ -517,7 +517,7 @@
   /* Icon chip — prototype .explore-card-thumb: 48px rounded tile holding a
      tinted glyph (our per-prompt icons stand in for its illustrations). */
   .mazlan-sugg__icon {
-    width: 48px; height: 48px;
+    width: 36px; height: 36px;
     border-radius: 8px;
     display: grid;
     place-items: center;
@@ -526,7 +526,7 @@
     color: var(--ehsq-color-text-tertiary);
   }
   body[data-theme="dark"] .mazlan-sugg__icon { background: #1F2A3C; }
-  .mazlan-sugg__icon .material-symbols-rounded { font-size: 22px; }
+  .mazlan-sugg__icon .material-symbols-rounded { font-size: 20px; }
   /* Category accent on the leading icon */
   .mazlan-sugg__icon--teal   { color: var(--ehsq-color-interactive-default); }
   .mazlan-sugg__icon--pink   { color: var(--ehsq-color-pink-60, #e30072); }
@@ -536,8 +536,8 @@
   .mazlan-sugg__icon--purple { color: #805ad5; }
   .mazlan-sugg__title {
     font-family: 'Gilroy', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 500;
     color: var(--ehsq-color-text-primary);
     line-height: 1.3;
     white-space: nowrap;
