@@ -843,32 +843,33 @@
     background: var(--ehsq-color-surface-default);
     flex-shrink: 0;
   }
+  /* Composer edge — copies the prototype's .input-box trick: the border is
+     NOT a real border (transparent) but a box-shadow stack. A faint 0.5px
+     spread ring wraps all four edges, and an inset top-inner highlight adds a
+     brighter line along the TOP only — so the "border" reads bright at the top
+     and fades down the sides. Constant across every state (no focus ring). */
   .mazlan-drawer__input {
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding: var(--ehsq-space-16);
     background: var(--ehsq-color-surface-default);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid transparent;
     border-radius: 20px;
-    box-shadow: 0 2px 16px -4px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.3s ease-out;
+    box-shadow:
+      0 0 0 0.5px rgba(16, 36, 58, 0.06),
+      0 2px 4px rgba(16, 36, 58, 0.05),
+      0 10px 28px -12px rgba(16, 36, 58, 0.17),
+      inset 0 0.7px 0 rgba(255, 255, 255, 0.7);
   }
-  .mazlan-drawer__input:hover { box-shadow: 0 2px 16px -4px rgba(0, 0, 0, 0.10); }
-  .mazlan-drawer__input:focus-within {
-    box-shadow: 0 2px 16px -4px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(27, 131, 139, 0.18);
-  }
-  /* Dark: composer is a flat slate fill on the navy body — no border, no
-     teal focus ring (prototype .input-box = #202b39, transparent border). */
+  /* Dark: flat slate fill on the navy body; same top-down fade edge. */
   body[data-theme="dark"] .mazlan-drawer__input {
     background: #202b39;
-    border-color: transparent;
-    box-shadow: none;
-  }
-  body[data-theme="dark"] .mazlan-drawer__input:hover { box-shadow: none; }
-  body[data-theme="dark"] .mazlan-drawer__input:focus-within {
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: none;
+    box-shadow:
+      0 0 0 0.5px rgba(255, 255, 255, 0.08),
+      0 2px 4px rgba(0, 0, 0, 0.28),
+      0 12px 30px -12px rgba(0, 0, 0, 0.52),
+      inset 0 0.7px 0 rgba(255, 255, 255, 0.12);
   }
   /* Textarea — v3 typography vocabulary. No leading icon (the brand mark
      is the dark header above). */

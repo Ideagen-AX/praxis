@@ -365,7 +365,7 @@ body[data-theme="dark"] .admin-banner{background:rgba(71,102,235,.14);}
 .mazlan-mark>span:nth-child(2){right:12.5%;top:12.5%;background:#E30072;}
 .mazlan-mark>span:nth-child(3){left:12.5%;bottom:12.5%;background:#5CC9D0;}
 .mazlan-mark>span:nth-child(4){right:12.5%;bottom:12.5%;background:#1B838B;}
-body[data-theme="dark"] .mazlan-mark>span:nth-child(1){background:#fff;}
+body[data-theme="dark"] .mazlan-mark>span:nth-child(1){background:#d1d5db;}
 
 /* generic overlay rows (used by the Dashboards popout) */
 .px-menu__head{padding:8px 10px 4px;font-size:.6875rem;font-weight:700;letter-spacing:.05em;
