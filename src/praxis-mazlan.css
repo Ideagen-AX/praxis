@@ -705,6 +705,10 @@
      header (prototype .header-fade, #0e1324@~70%). A sticky ::before pinned
      to the top of the scroll viewport; negative margins let content flow
      under it instead of being pushed down. */
+  /* Drop the body's top padding in-chat so the fade sits flush against the
+     header bottom (the padding otherwise pushes it down); the thread carries
+     the top breathing room instead. */
+  .mazlan-drawer--in-chat .mazlan-drawer__body { padding-top: 0; }
   .mazlan-drawer--in-chat .mazlan-drawer__body::before {
     content: '';
     position: sticky;
@@ -713,18 +717,17 @@
     display: block;
     height: 40px;
     /* full-bleed over the body's 24px side padding; -40px bottom keeps it an
-       overlay (no layout push). No negative TOP margin — that mispositioned
-       the sticky box and clipped the first message at rest. */
+       overlay (no layout push). Sits at y=0 now the top padding is gone. */
     margin: 0 calc(var(--ehsq-space-24) * -1) -40px;
-    background: linear-gradient(to bottom, var(--ehsq-color-surface-default) 60%, transparent);
+    background: linear-gradient(to bottom, var(--ehsq-color-surface-default) 55%, transparent);
     pointer-events: none;
   }
   body[data-theme="dark"] .mazlan-drawer--in-chat .mazlan-drawer__body::before {
-    background: linear-gradient(to bottom, #0e1324 60%, transparent);
+    background: linear-gradient(to bottom, #0e1324 55%, transparent);
   }
-  /* Push the first turn below the fade so nothing is dimmed at rest — the fade
-     only bites once the conversation scrolls up under the header. */
-  .mazlan-drawer--in-chat .mazlan-thread { padding-top: 20px; }
+  /* Push the first turn clear of the flush fade so nothing is dimmed at rest —
+     the fade only bites once the conversation scrolls up under the header. */
+  .mazlan-drawer--in-chat .mazlan-thread { padding-top: 44px; }
 
   /* ===================================================================
      STAGE 5 — in-chat header: summary title, ⋮ options menu, content panel
