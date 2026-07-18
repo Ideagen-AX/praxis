@@ -60,6 +60,7 @@
     "event":"calendar","event_available":"calendar-check","event_busy":"calendar-x","history":"history",
     // dashboards / layout
     "space_dashboard":"layout-dashboard","dashboard":"layout-dashboard","dashboard_customize":"layout-dashboard",
+    "psychology":"brain","neurology":"brain","right_panel_open":"panel-right","right_panel_close":"panel-right-close",
     "grid_view":"layout-grid","view_module":"grid-3x3","widgets":"layout-grid","apps":"grid-3x3","cards":"gallery-horizontal-end",
     "category":"shapes",
     "account_tree":"git-branch","hub":"share-2","explore":"compass","tour":"map-pin",

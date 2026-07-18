@@ -252,6 +252,8 @@
       if (welcome) welcome.setAttribute('aria-hidden', 'true');
       const drawer = document.getElementById('mazlan-drawer');
       if (drawer) drawer.classList.add('mazlan-drawer--in-chat');
+      /* Header morphs to the conversation summary + options + content panel. */
+      mzSetupChatHeader(role === 'user' ? text : 'New conversation');
     }
     const msg = document.createElement('div');
     msg.className = `mazlan-msg mazlan-msg--${role}`;
@@ -409,6 +411,144 @@
     }, 800);
   }
 
+  /* ---- Stage 5: in-chat header (summary + options + content panel) ------ */
+  function mzContentItems() {
+    /* Canned "content in this chat" — a live integration would list the
+       artifacts Mazlan produced + documents the user attached. */
+    const items = [
+      { icon: 'description', title: 'Audit-prep evidence pack', meta: 'Draft · generated just now' },
+      { icon: 'fact_check', title: 'FAS-2026-0418 finding', meta: 'Record · linked' },
+      { icon: 'menu_book', title: 'ISO 45001:2018 — clause 6 excerpt', meta: 'Reference · added' }
+    ];
+    return items.map(i => `
+      <button class="mazlan-content__item" type="button">
+        <span class="mazlan-content__icon"><span class="material-symbols-rounded">${i.icon}</span></span>
+        <span class="mazlan-content__text">
+          <span class="mazlan-content__item-title">${mzEscapeHtml(i.title)}</span>
+          <span class="mazlan-content__meta">${mzEscapeHtml(i.meta)}</span>
+        </span>
+      </button>`).join('');
+  }
+
+  function mzResetChat() {
+    const thread = document.getElementById('mazlan-thread');
+    if (thread) thread.innerHTML = '';
+    mazlanDrawerHasMessages = false;
+    const drawer = document.getElementById('mazlan-drawer');
+    if (drawer) drawer.classList.remove('mazlan-drawer--in-chat', 'mazlan-drawer--content-open');
+    const more = document.getElementById('mazlan-more');
+    if (more) more.hidden = true;
+    const welcome = document.getElementById('mazlan-welcome');
+    if (welcome) welcome.setAttribute('aria-hidden', 'false');
+    const sec = document.getElementById('mazlan-suggestions');
+    if (sec) sec.hidden = false;
+    renderMazlanSuggestions();
+    const title = document.getElementById('mazlan-drawer-title');
+    if (title) { title.textContent = ''; title.classList.remove('mazlan-drawer__title--convo'); }
+  }
+
+  function mzRenameChat() {
+    const title = document.getElementById('mazlan-drawer-title');
+    if (!title) return;
+    title.setAttribute('contenteditable', 'true');
+    title.classList.add('mazlan-drawer__title--editing');
+    title.focus();
+    const sel = window.getSelection && window.getSelection();
+    if (sel && sel.selectAllChildren) sel.selectAllChildren(title);
+    const done = () => {
+      title.removeAttribute('contenteditable');
+      title.classList.remove('mazlan-drawer__title--editing');
+      title.textContent = (title.textContent || '').trim() || 'New conversation';
+      title.removeEventListener('blur', done);
+      title.removeEventListener('keydown', onKey);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); title.blur(); }
+      else if (e.key === 'Escape') { title.blur(); }
+    };
+    title.addEventListener('blur', done);
+    title.addEventListener('keydown', onKey);
+  }
+
+  /* Inject the in-chat header controls + content panel once, then set the
+     conversation summary. Kept in JS so the shared markup stays untouched. */
+  function mzSetupChatHeader(summary) {
+    const drawer = document.getElementById('mazlan-drawer');
+    if (!drawer) return;
+    const title = document.getElementById('mazlan-drawer-title');
+    if (title && !title.classList.contains('mazlan-drawer__title--editing')) {
+      title.textContent = summary;
+      title.classList.add('mazlan-drawer__title--convo');
+    }
+    if (drawer.querySelector('#mazlan-chat-options')) return;  /* inject once */
+    const actions = drawer.querySelector('.mazlan-drawer__head-actions');
+    if (!actions) return;
+
+    const optWrap = document.createElement('div');
+    optWrap.className = 'mazlan-more-wrap mazlan-chat-only';
+    optWrap.innerHTML =
+      '<button class="mazlan-drawer__head-btn" id="mazlan-chat-options" type="button" aria-label="Chat options" aria-haspopup="menu" aria-expanded="false"><span class="material-symbols-rounded">more_vert</span></button>' +
+      '<div class="mazlan-more" id="mazlan-more" role="menu" hidden>' +
+        '<button class="mazlan-more__item" type="button" role="menuitem" data-more="rename"><span class="material-symbols-rounded">edit</span>Rename</button>' +
+        '<button class="mazlan-more__item" type="button" role="menuitem" data-more="newchat"><span class="material-symbols-rounded">add</span>New chat</button>' +
+        '<button class="mazlan-more__item" type="button" role="menuitem" data-more="memory"><span class="material-symbols-rounded">psychology</span>Memory</button>' +
+        '<div class="mazlan-more__divider"></div>' +
+        '<button class="mazlan-more__item mazlan-more__item--danger" type="button" role="menuitem" data-more="delete"><span class="material-symbols-rounded">delete</span>Delete</button>' +
+      '</div>';
+
+    const contentBtn = document.createElement('button');
+    contentBtn.className = 'mazlan-drawer__head-btn mazlan-chat-only';
+    contentBtn.id = 'mazlan-content-btn';
+    contentBtn.type = 'button';
+    contentBtn.setAttribute('aria-label', 'Content in this chat');
+    contentBtn.innerHTML = '<span class="material-symbols-rounded">right_panel_open</span>';
+
+    actions.insertBefore(contentBtn, actions.firstChild);
+    actions.insertBefore(optWrap, actions.firstChild);
+
+    const panel = document.createElement('aside');
+    panel.className = 'mazlan-content';
+    panel.id = 'mazlan-content';
+    panel.setAttribute('aria-hidden', 'true');
+    panel.innerHTML =
+      '<header class="mazlan-content__head">' +
+        '<span class="mazlan-content__title">Content in this chat</span>' +
+        '<button class="mazlan-drawer__head-btn" id="mazlan-content-close" type="button" aria-label="Close"><span class="material-symbols-rounded">close</span></button>' +
+      '</header>' +
+      '<div class="mazlan-content__body">' + mzContentItems() + '</div>';
+    drawer.appendChild(panel);
+
+    /* ⋮ dropdown */
+    const optBtn = optWrap.querySelector('#mazlan-chat-options');
+    const more = optWrap.querySelector('#mazlan-more');
+    const closeMore = () => { more.hidden = true; optBtn.setAttribute('aria-expanded', 'false'); };
+    optBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = more.hidden;
+      more.hidden = !open;
+      optBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', (e) => { if (!optWrap.contains(e.target)) closeMore(); });
+    more.querySelectorAll('[data-more]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const act = btn.dataset.more;
+        closeMore();
+        if (act === 'rename') mzRenameChat();
+        else if (act === 'newchat' || act === 'delete') mzResetChat();
+        else if (act === 'memory') mzAnnounce('Conversation memory is on for this chat (prototype).');
+      });
+    });
+
+    /* Content panel toggle */
+    const toggleContent = (open) => {
+      drawer.classList.toggle('mazlan-drawer--content-open', open);
+      panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+      contentBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
+    contentBtn.addEventListener('click', () => toggleContent(!drawer.classList.contains('mazlan-drawer--content-open')));
+    panel.querySelector('#mazlan-content-close').addEventListener('click', () => toggleContent(false));
+  }
+
   /* Auto-grow the textarea up to its max-height, then it scrolls. */
   function autoGrowMazlanTextarea() {
     const t = document.getElementById('mazlan-drawer-textarea');
@@ -438,18 +578,7 @@
         const item = btn.dataset.menu;
         const labels = { newchat: 'New chat', chats: 'Chats', library: 'Library', explore: 'Explore', settings: 'Settings' };
         mzAnnounce(`${labels[item] || 'Menu'} (prototype placeholder)`);
-        if (item === 'newchat') {
-          /* Reset the conversation */
-          const thread = document.getElementById('mazlan-thread');
-          if (thread) thread.innerHTML = '';
-          mazlanDrawerHasMessages = false;
-          document.getElementById('mazlan-drawer')?.classList.remove('mazlan-drawer--in-chat');
-          const welcome = document.getElementById('mazlan-welcome');
-          if (welcome) welcome.setAttribute('aria-hidden', 'false');
-          const sec = document.getElementById('mazlan-suggestions');
-          if (sec) sec.hidden = false;
-          renderMazlanSuggestions();
-        }
+        if (item === 'newchat') mzResetChat();
         setMazlanMenuOpen(false);
       });
     });
