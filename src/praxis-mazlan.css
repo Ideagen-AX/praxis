@@ -712,13 +712,19 @@
     z-index: 4;
     display: block;
     height: 40px;
-    margin: calc(var(--ehsq-space-24) * -1) calc(var(--ehsq-space-24) * -1) -40px;
-    background: linear-gradient(to bottom, var(--ehsq-color-surface-default) 45%, transparent);
+    /* full-bleed over the body's 24px side padding; -40px bottom keeps it an
+       overlay (no layout push). No negative TOP margin — that mispositioned
+       the sticky box and clipped the first message at rest. */
+    margin: 0 calc(var(--ehsq-space-24) * -1) -40px;
+    background: linear-gradient(to bottom, var(--ehsq-color-surface-default) 60%, transparent);
     pointer-events: none;
   }
   body[data-theme="dark"] .mazlan-drawer--in-chat .mazlan-drawer__body::before {
-    background: linear-gradient(to bottom, #0e1324 45%, transparent);
+    background: linear-gradient(to bottom, #0e1324 60%, transparent);
   }
+  /* Push the first turn below the fade so nothing is dimmed at rest — the fade
+     only bites once the conversation scrolls up under the header. */
+  .mazlan-drawer--in-chat .mazlan-thread { padding-top: 20px; }
 
   /* Typing indicator while Mazlan is "thinking" */
   .mazlan-typing {
