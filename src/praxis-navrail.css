@@ -41,6 +41,9 @@
 .ehsq-navrail__btn--create:hover{ background-color:var(--ehsq-color-teal-70); }
 
 body[data-theme="dark"] .ehsq-navrail__btn{ color:var(--ehsq-color-text-secondary); }
+/* The selected item keeps its pink rect + a WHITE glyph in dark — the base
+   .btn dark rule above otherwise has enough specificity to grey it out. */
+body[data-theme="dark"] .ehsq-navrail__btn--active{ color:var(--ehsq-color-white); }
 
 /* ---- Praxis: transparent/borderless rail; buttons become neutral filled
         containers with a lit edge (matches the toolbar tools). ---- */
@@ -53,15 +56,30 @@ body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):n
   background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14);
 }
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create){
-  background:rgba(255,255,255,.06); box-shadow:0 0 0 .5px rgba(255,255,255,.10);
+  color:#c8cfd7; /* neutral-20 (light value) — a lighter glyph on the slate chip */
+  background:var(--px-surface-2,#232c3b);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06);
+}
+body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create):hover{
+  color:#fff; background:var(--px-surface-2,#232c3b);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.14),inset 0 .5px 0 rgba(255,255,255,.08);
 }
 body[data-variant="praxis"] .ehsq-navrail__link{ background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.06),0 1px 2px rgba(16,36,58,.05); }
 body[data-variant="praxis"] .ehsq-navrail__link:hover{ background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14); }
-body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__link{ background:rgba(255,255,255,.06); box-shadow:0 0 0 .5px rgba(255,255,255,.10); }
+body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__link{ background:var(--px-surface-2,#232c3b); box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06); }
 body[data-variant="praxis"] .ehsq-navrail__link img{ width:auto; height:28px; }
 body[data-variant="praxis"] .ehsq-navrail__btn--create{
   background:var(--px-primary-grad); color:#fff;
   box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),inset 0 .5px 0 rgba(255,255,255,.25);
+}
+/* Dark: Create matches the quick-action buttons — a soft translucent-teal chip
+   with a bright-teal icon (not the bold gradient CTA). */
+body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create{
+  background:rgba(41,210,215,.15); color:rgb(92,224,229);
+  box-shadow:0 0 0 .5px rgba(41,210,215,.25);
+}
+body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create:hover{
+  background:rgba(41,210,215,.22);
 }
 body[data-variant="praxis"] .ehsq-navrail__btn:focus-visible,
 body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{

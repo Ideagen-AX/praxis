@@ -34,6 +34,11 @@
 .msel__caret{ font-size:20px !important; color:var(--ehsq-color-text-secondary); flex-shrink:0; pointer-events:none;
   transition:transform var(--dur-fast,.18s) ease; }
 .msel.is-open .msel__caret{ transform:rotate(180deg); }
+/* Dark: the module label + dropdown arrow read too dark on the header pill;
+   lighten to neutral-20 (light palette value — the token remaps dark). */
+body[data-theme="dark"] .msel__input{ color:#c8cfd7; }
+body[data-theme="dark"] .msel__input::placeholder{ color:#c8cfd7; }
+body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
 
 /* ---- Scrim behind the menu — dims the WHOLE page including the app header
        (the menu is rendered at body level, above the scrim, so the header can

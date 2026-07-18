@@ -43,14 +43,21 @@ body[data-variant="praxis"][data-theme="dark"] .appbar__logo-img--ondark{display
 /* Praxis: fully-rounded floating pill; module + magnifier are borderless */
 body[data-variant="praxis"] .appbar__search{height:44px;border-radius:var(--ehsq-radius-full);overflow:visible;
   background:var(--ehsq-color-surface-default);padding:0 6px 0 4px;box-shadow:0 0 0 1px rgba(16,36,58,.08),0 1px 2px rgba(16,36,58,.05);}
-body[data-variant="praxis"][data-theme="dark"] .appbar__search{box-shadow:0 0 0 1px rgba(255,255,255,.10);}
+/* Dark: give the whole search pill the workspace components' elevation +
+   border (the card treatment) instead of a flat ring, and lift the
+   placeholder (neutral-40) + magnifier (neutral-20) out of the murk. */
+body[data-variant="praxis"][data-theme="dark"] .appbar__search{box-shadow:var(--ehsq-elevation-card);}
+body[data-variant="praxis"][data-theme="dark"] .appbar__search > input::placeholder{color:#8898a9;}
+body[data-variant="praxis"][data-theme="dark"] .appbar__search-btn{color:#c8cfd7;}
 body[data-variant="praxis"] .appbar__module{justify-content:flex-start;gap:6px;width:auto;height:56%;padding:0 16px 0 14px;
   background:transparent;border-right:1px solid var(--ehsq-color-border-default);}
 body[data-variant="praxis"] .appbar__search-btn{background:transparent;color:var(--ehsq-color-text-secondary);border-radius:var(--ehsq-radius-full);}
 body[data-variant="praxis"] .appbar__search-btn:hover{background:transparent;color:var(--ehsq-color-text-primary);}
 
 /* Right-side cluster */
-.appbar__right{display:flex;align-items:center;gap:var(--ehsq-space-8);margin-left:auto;}
+/* margin-right adds a 16px inset on top of the bar's 16px padding, so the
+   Mazlan trigger + avatar sit 32px in from the page edge on every page. */
+.appbar__right{display:flex;align-items:center;gap:var(--ehsq-space-8);margin-left:auto;margin-right:var(--ehsq-space-16);}
 .appbar__ai{position:relative;}
 
 /* Mazlan pill (branded four-dot mark + label) */
@@ -71,11 +78,12 @@ body[data-variant="praxis"] .appbar__mazlan:hover{
   box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14);
 }
 body[data-variant="praxis"][data-theme="dark"] .appbar__mazlan{
-  background:rgba(255,255,255,.06); color:var(--ehsq-color-text-secondary); border:0;
-  box-shadow:0 0 0 .5px rgba(255,255,255,.10);
+  background:var(--px-surface-2,#232c3b); color:var(--ehsq-color-text-secondary); border:0;
+  box-shadow:var(--ehsq-elevation-card);
 }
 body[data-variant="praxis"][data-theme="dark"] .appbar__mazlan:hover{
-  background:rgba(255,255,255,.10); color:#fff;
+  background:var(--px-surface-2,#232c3b); color:#fff;
+  box-shadow:0 0 0 .5px rgba(255,255,255,.12),0 6px 18px -6px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.08);
 }
 
 /* Avatar */
