@@ -203,19 +203,15 @@
     /* Treat a suggestion click as if the user sent that message, with the
        pre-canned Mazlan reply queued up. */
     appendMazlanMessage('user', sugg.text);
-    showMazlanTyping();
-    setTimeout(() => {
-      hideMazlanTyping();
-      /* Some suggestions offer an action that kicks off a full agentic task.
-         The reply presents the action — the user decides when to start it. */
-      let actions = null;
-      if (sugg.action === 'agentic-boeing') {
-        actions = [{ label: 'Start audit-prep', icon: 'arrow_forward', primary: true, act: 'agentic-boeing' }];
-      } else if (sugg.cat === 'Workspace') {
-        actions = [{ label: 'Apply', icon: 'check', primary: true }, { label: 'Cancel', icon: 'close' }];
-      }
-      appendMazlanMessage('mazlan', sugg.reply, { actions });
-    }, 700);
+    /* Some suggestions offer an action that kicks off a full agentic task.
+       The reply presents the action — the user decides when to start it. */
+    let actions = null;
+    if (sugg.action === 'agentic-boeing') {
+      actions = [{ label: 'Start audit-prep', icon: 'arrow_forward', primary: true, act: 'agentic-boeing' }];
+    } else if (sugg.cat === 'Workspace') {
+      actions = [{ label: 'Apply', icon: 'check', primary: true }, { label: 'Cancel', icon: 'close' }];
+    }
+    appendMazlanMessage('mazlan', sugg.reply, { actions });
   }
 
   /* Canned demo scaffolding for the bot response anatomy (reasoning timeline,
@@ -403,12 +399,8 @@
     appendMazlanMessage('user', text);
     textarea.value = '';
     textarea.style.height = '';
-    showMazlanTyping();
     /* Canned generic reply — a real integration would route to the agent. */
-    setTimeout(() => {
-      hideMazlanTyping();
-      appendMazlanMessage('mazlan', `Working on **"${text}"** — I'd look across your records, draft what's needed, and bring it back for you to confirm. (Prototype response — the live integration would route this to the agent.)`);
-    }, 800);
+    appendMazlanMessage('mazlan', `Working on **"${text}"** — I'd look across your records, draft what's needed, and bring it back for you to confirm. (Prototype response — the live integration would route this to the agent.)`);
   }
 
   /* ---- Stage 5: in-chat header (summary + options + content panel) ------ */
