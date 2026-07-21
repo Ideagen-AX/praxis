@@ -117,3 +117,34 @@ body[data-variant="praxis"][data-theme="dark"] .tbtn--primary .material-symbols-
 body[data-variant="praxis"][data-theme="dark"] .pill-btn .icon{
   color:var(--px-primary-fg);
 }
+
+/* ---- Checkboxes ----------------------------------------------------------
+   Custom appearance so the UNFILLED box takes the card surface (--px-surface:
+   slate in dark, white in light) — it reads as part of the card, showing only
+   a hairline, instead of a bright system box. Checked fills with the pink
+   selection accent used app-wide. Excludes the toggle switches (.switch),
+   whose <input> is a hidden full-size hit target. */
+body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *){
+  -webkit-appearance:none; appearance:none; margin:0; flex-shrink:0;
+  width:16px; height:16px; border-radius:4px;
+  border:1.5px solid var(--ehsq-color-border-default);
+  background:var(--px-surface);
+  cursor:pointer; display:inline-grid; place-content:center;
+  transition:background var(--ehsq-motion-fast,120ms) var(--ehsq-ease-default),
+             border-color var(--ehsq-motion-fast,120ms) var(--ehsq-ease-default);
+}
+body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):hover{
+  border-color:var(--ehsq-color-text-tertiary);
+}
+body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):checked{
+  background:var(--ehsq-color-pink-60,#e30072);
+  border-color:var(--ehsq-color-pink-60,#e30072);
+}
+body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):checked::after{
+  content:''; width:4px; height:8px; margin-top:-1px;
+  border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg);
+}
+body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):focus-visible{
+  outline:2px solid color-mix(in srgb, var(--ehsq-color-interactive-default) 60%, transparent);
+  outline-offset:2px;
+}
