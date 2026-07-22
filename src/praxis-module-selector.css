@@ -39,6 +39,9 @@
 body[data-theme="dark"] .msel__input{ color:#c8cfd7; }
 body[data-theme="dark"] .msel__input::placeholder{ color:#c8cfd7; }
 body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
+/* "All modules" is selected by default; its teal-10 chip glares in dark — use a
+   translucent-teal chip with bright-teal glyph (the dark teal-chip convention). */
+body[data-theme="dark"] .msel__menu .cn-row--selected .cn-row__icon{ background:rgba(41,210,215,.15); color:rgb(92,224,229); }
 
 /* ---- Scrim behind the menu — dims the WHOLE page including the app header
        (the menu is rendered at body level, above the scrim, so the header can
@@ -93,9 +96,9 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
 /* Group headers read as section labels, NOT tiles — a solid tone marker + an
    uppercase, tracked title in the solution colour, clearly distinct from the
    pale-tinted, sentence-case tiles below. Left edge still aligns with tiles. */
-.msel__menu .cn-group__head{ padding:0 10px; gap:8px; height:24px; margin-bottom:6px; }
-.msel__menu .cn-group__icon{ width:22px; height:22px; border-radius:6px; background:var(--cn-tone); color:#fff; }
-.msel__menu .cn-group__icon .material-symbols-rounded{ font-size:15px; }
+.msel__menu .cn-group__head{ padding:0 10px; gap:8px; height:32px; margin-bottom:6px; }
+.msel__menu .cn-group__icon{ width:32px; height:32px; border-radius:8px; background:var(--cn-tone); color:#fff; }
+.msel__menu .cn-group__icon .material-symbols-rounded{ font-size:20px; }
 .msel__menu .cn-group__title{ text-transform:uppercase; font-size:11px; font-weight:800; letter-spacing:.06em; color:var(--cn-tone); }
 
 /* "All modules" checkbox sits next to the label, not pushed to the far right. */
