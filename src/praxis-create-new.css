@@ -232,7 +232,7 @@
 .cn-row__icon .material-symbols-rounded{ font-size:18px; }
 .cn-row--selected .cn-row__icon{ background:var(--ehsq-color-teal-10); color:var(--ehsq-color-teal-80); }
 .cn-row__label{ font-size:14px; font-weight:600; color:var(--ehsq-color-text-primary); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.cn-row__check{ margin-left:auto; font-size:22px !important; color:var(--ehsq-color-border-strong, #c8cfd7); flex-shrink:0; }
+.cn-row__check{ margin-left:auto; font-size: 24px!important; color:var(--ehsq-color-border-strong, #c8cfd7); flex-shrink:0; }
 .cn-row--selected .cn-row__check{ color:var(--ehsq-color-teal-70); }
 
 /* ---- Narrow screens (≤768px): dock the flyout to a full-width bottom sheet;
