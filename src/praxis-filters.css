@@ -426,3 +426,34 @@
 .qfilter__row--selected .qfilter__check > *,
 .select-menu__opt.is-checked .select-menu__check > *,
 .select-menu__opt.is-mixed .select-menu__check > * { opacity: 1; }
+
+/* ---------------------------------------------------------------------
+   Quick-filter card spacing
+
+   The source stylesheet leaned on its host page's global `ul, ol { margin:0;
+   padding:0; list-style:none }` reset. search-page.html doesn't load
+   concierge-base.css, so the card's <ul> kept UA defaults — a 40px inline
+   start padding that pushed every checkbox 44px right of the card title, plus
+   14px block margins that made the vertical rhythm lumpy. Reset it here so the
+   component doesn't depend on the host having a reset at all.
+   --------------------------------------------------------------------- */
+.qfilter__list { margin: 0; padding: 0; list-style: none; }
+
+/* Rows: content aligns flush with the card title, while the hover background
+   still bleeds into the card padding so the target doesn't look cramped. */
+.qfilter__row { padding: var(--s-4); margin-inline: calc(var(--s-4) * -1); }
+
+/* Value labels at 14px, matching the card title */
+.qfilter__row { font-size: var(--t-base); }
+
+/* "See More" keeps its own even spacing; the cards are equal-height grid items,
+   so it stays bottom-anchored across the row rather than floating mid-card. */
+.qfilter__more { padding: var(--s-4); margin-inline: calc(var(--s-4) * -1); text-align: left; }
+
+/* ---------------------------------------------------------------------
+   Page gutter — the strip and the chip bar line up with whatever inset the
+   host uses for its page header / toolbar / results. Defaults to flush so the
+   component drops into any container; the host opts in.
+   --------------------------------------------------------------------- */
+.quick-filters,
+.filter-chips { padding-inline: var(--praxis-filters-gutter, 0); }
