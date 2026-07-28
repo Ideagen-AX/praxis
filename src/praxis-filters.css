@@ -457,3 +457,26 @@
    --------------------------------------------------------------------- */
 .quick-filters,
 .filter-chips { padding-inline: var(--praxis-filters-gutter, 0); }
+
+/* ---------------------------------------------------------------------
+   Quick-filter card head
+
+   Same class of leak as the <ul> above: .qfilter__title is an <h3> and the
+   source relied on the host's global heading reset. Without it the UA's
+   `margin: 1em 0` added 14px above AND below the title — pushing it 27px down
+   from the card top and opening a 22px gulf before the first value, which is
+   what was forcing the cards tall. The close button likewise inherited the
+   host's 36px .icon-btn instead of the intended 20px --xs size.
+   --------------------------------------------------------------------- */
+.qfilter__title { margin: 0; }
+.qfilter__close { width: 20px; height: 20px; flex-shrink: 0; padding: 0; }
+.qfilter__close .material-symbols-rounded,
+.qfilter__close svg { width: 16px; height: 16px; font-size: 16px; }
+
+/* Head sits tight to the top; values follow close behind it */
+.qfilter { padding: var(--s-12) var(--s-12) var(--s-12) var(--s-16); gap: var(--s-4); }
+.qfilter__head { align-items: flex-start; }
+
+/* Rows realign to the card's roomier left padding */
+.qfilter__row,
+.qfilter__more { margin-inline: calc(var(--s-4) * -1); }

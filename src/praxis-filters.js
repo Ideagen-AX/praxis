@@ -1427,10 +1427,16 @@ window.PraxisFilters = (function () {
   // Distributions are computed live from the host's records for any field that
   // has an accessor; QF_PRESETS above only covers the CAPA showcase fields.
 
+  // A card shows this many values before collapsing the rest behind "See More"
+  const QF_LIMIT = 6;
+  const quickExpanded = new Set();   // filter names currently showing every value
+
+  // Returns the FULL distribution; the card decides how much of it to show, so
+  // it can tell whether there's anything left to reveal.
   function quickRowsFor(name) {
     const get = accessorFor(name);
     if (get) {
-      const counts = countBy(RECORDS, get).slice(0, 6);
+      const counts = countBy(RECORDS, get);
       if (counts.length) return counts;         // live [value, count] pairs
     }
     // no backing data — fall back to the showcase distribution, else the control
@@ -1439,7 +1445,12 @@ window.PraxisFilters = (function () {
 
   function quickCardHtml(name) {
     const f = filterByName[name] || { name, type: 'list' };
-    const rows = quickRowsFor(name);
+    const all = quickRowsFor(name);
+    // "See More" only earns its place when values are actually hidden — a card
+    // whose whole distribution fits shouldn't offer to expand nothing.
+    const expanded = quickExpanded.has(name);
+    const hidden = all ? Math.max(0, all.length - QF_LIMIT) : 0;
+    const rows = all && !expanded ? all.slice(0, QF_LIMIT) : all;
     const body = rows
       ? `<ul class="qfilter__list">${rows.map(([v, n]) => `
             <li class="qfilter__row${valuesOf(name).includes(v) ? ' qfilter__row--selected' : ''}" data-value="${escapeHtml(v)}">
@@ -1447,7 +1458,8 @@ window.PraxisFilters = (function () {
               <span class="qfilter__row-label">${escapeHtml(v)} (${n.toLocaleString()})</span>
             </li>`).join('')}
          </ul>
-         <button class="qfilter__more">See More</button>`
+         ${hidden ? `<button class="qfilter__more" type="button" data-action="toggle-quick-more"
+              aria-expanded="${expanded}">${expanded ? 'See Less' : `See More (${hidden})`}</button>` : ''}`
       : `<div class="qfilter__controls">${controlsHtml(f)}</div>`;
     return `
       <article class="qfilter" data-filter-name="${escapeHtml(name)}" data-filter-type="${f.type}">
@@ -1475,10 +1487,18 @@ window.PraxisFilters = (function () {
     updateRestoreDefaultsVisibility();
   }
 
+  bind('[data-action="toggle-quick-more"]', 'click', (e, btn) => {
+    e.stopPropagation();
+    const name = btn.closest('.qfilter')?.dataset.filterName;
+    if (!name) return;
+    if (quickExpanded.has(name)) quickExpanded.delete(name); else quickExpanded.add(name);
+    renderQuickFilters();
+  });
+
   bind('[data-action="unpin-quick"]', 'click', (e, btn) => {
     e.stopPropagation();
     const name = btn.closest('.qfilter')?.dataset.filterName;
-    if (name) setQuickFilter(name, false);
+    if (name) { quickExpanded.delete(name); setQuickFilter(name, false); }
   });
 
   // Clicking a distribution row in a quick card toggles that value (multi-select)
