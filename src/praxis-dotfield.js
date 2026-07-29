@@ -32,10 +32,11 @@ window.PraxisDotField = (function(){
     {key:'restAlpha', label:'Resting brightness',min:0,  max:0.6,step:0.02,def:0.18},
     {key:'teal',      label:'Signature A',        type:'color', def:'#29d2d7'},
     {key:'magenta',   label:'Signature B',        type:'color', def:'#e30072'},
+    // shared origin — the dot field, the glow and the ring all key off this one point
+    {key:'originX',   label:'Origin X (shared)', min:0,  max:1,  step:0.01,def:0.5, rebuild:true},
+    {key:'originY',   label:'Origin Y (shared)', min:0,  max:1,  step:0.01,def:0.5, rebuild:true},
     {key:'glow',      label:'Glow intensity',    min:0,  max:2.5,step:0.05,def:1},
     {key:'glowSize',  label:'Glow size',         min:0.1,max:1.2,step:0.02,def:0.44},
-    {key:'glowX',     label:'Glow position X',   min:0,  max:1,  step:0.02,def:0.5},
-    {key:'glowY',     label:'Glow position Y',   min:0,  max:1,  step:0.02,def:0.52},
     {key:'glowSpread',label:'Glow spread',       min:0,  max:0.6,step:0.02,def:0.16},
     {key:'glowBalance',label:'Glow balance A↔B', min:0,  max:1,  step:0.05,def:0.5},
     {key:'ring',      label:'Sphere ring',       min:0,  max:1,  step:0.05,def:1},
@@ -125,10 +126,15 @@ window.PraxisDotField = (function(){
 
   function defaults(list){ var o={}; for(var i=0;i<list.length;i++){ o[list[i].key]=list[i].def; } return o; }
 
+  // glow used to carry its own centre; it now shares the field origin. Saved configs
+  // from before that change still name the old keys, so fold them onto the origin.
+  var LEGACY={ glowX:'originX', glowY:'originY' };
+  function unlegacy(src){ var o={}; for(var k in src){ o[LEGACY[k]||k]=src[k]; } return o; }
+
   /* ---- Field ---- */
   function Field(canvas, opts){
     this.canvas=canvas; this.ctx=canvas.getContext('2d');
-    this.g = Object.assign(defaults(GLOBAL), (opts&&opts.global)||{});
+    this.g = Object.assign(defaults(GLOBAL), unlegacy((opts&&opts.global)||{}));
     this.tealRGB=hex(this.g.teal); this.magRGB=hex(this.g.magenta);
     this.mode='wave'; this.p=defaults(MODES.wave.controls);
     this.dots=[]; this.nodes=[]; this.pairs=[];
@@ -150,10 +156,16 @@ window.PraxisDotField = (function(){
     var W=Math.max(1, Math.round(r.width)), H=Math.max(1, Math.round(r.height));
     var dpr=Math.min(window.devicePixelRatio||1, 2);
     c.width=W*dpr; c.height=H*dpr; this.ctx.setTransform(dpr,0,0,dpr,0,0);
-    this.W=W; this.H=H; this.cx=W/2; this.cy=H*0.46; this.maxDist=Math.hypot(W,H);
+    this.W=W; this.H=H; this._origin(); this.maxDist=Math.hypot(W,H);
     this._fx=(0.62*W)*(0.62*W); this._fy=(0.60*H)*(0.60*H);  // radial edge-fade denominators
     var ex=(this.g.fadeExtent||1); ex*=ex; this._ext2=ex; this._fxE=this._fx*ex; this._fyE=this._fy*ex;
     this._build();
+  };
+
+  // the single point everything radiates from: dot dist/angle, edge fade, glow and ring
+  Field.prototype._origin=function(){
+    var ox=this.g.originX, oy=this.g.originY;
+    this.cx=this.W*(ox==null?0.5:ox); this.cy=this.H*(oy==null?0.5:oy);
   };
 
   Field.prototype._build=function(){
@@ -191,7 +203,7 @@ window.PraxisDotField = (function(){
     var W=this.W,H=this.H, cv=document.createElement('canvas'); cv.width=W; cv.height=H;
     var g=cv.getContext('2d'); g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='middle';
     g.font='700 '+Math.min(W*0.13,150)+'px Gilroy,"Segoe UI",sans-serif';
-    g.fillText(this.p.text||'ideagen', W/2, Math.round(H*0.42));
+    g.fillText(this.p.text||'ideagen', this.cx, Math.round(this.cy));
     var img=g.getImageData(0,0,W,H).data, minx=W, maxx=0;
     for(var i=0;i<this.dots.length;i++){ var d=this.dots[i];
       d.inLogo = img[((d.y*W)+d.x)*4+3] > 100;
@@ -213,7 +225,9 @@ window.PraxisDotField = (function(){
     if(this.mode==='organic' && k==='count') this._buildOrganic();
     if(this.mode==='logo' && k==='text') this._computeLogo();
     return this; };
-  Field.prototype.setGlobal=function(k,v){ this.g[k]=v;
+  Field.prototype.setGlobal=function(k,v){
+    k=LEGACY[k]||k; this.g[k]=v;
+    if(k==='originX'||k==='originY') this._origin();
     if(k==='teal') this.tealRGB=hex(v);
     if(k==='magenta') this.magRGB=hex(v);
     if(k==='fadeExtent'){ var ex=(v||1); ex*=ex; this._ext2=ex; this._fxE=this._fx*ex; this._fyE=this._fy*ex; }
@@ -254,20 +268,22 @@ window.PraxisDotField = (function(){
   // login's network-globe). Drawn on the canvas so it's lab-tunable and unmasked.
   Field.prototype._bg=function(){
     var c=this.ctx, W=this.W, H=this.H, g=this.g, t=this.tealRGB, m=this.magRGB, big=Math.max(W,H);
+    var ox=this.cx, oy=this.cy;   // shared origin — same point the renderers radiate from
     c.globalAlpha=1;
     if(g.glow>0){
-      var gx=W*(g.glowX==null?0.5:g.glowX), gy=(g.glowY==null?0.52:g.glowY), spread=(g.glowSpread==null?0.16:g.glowSpread);
-      var tY=H*(gy-spread/2), mY=H*(gy+spread/2), rad=big*(g.glowSize==null?0.44:g.glowSize);
+      var gx=ox, spread=(g.glowSpread==null?0.16:g.glowSpread);
+      // the two signature lobes straddle the origin symmetrically, so their midpoint stays on it
+      var tY=oy-H*spread/2, mY=oy+H*spread/2, rad=big*(g.glowSize==null?0.44:g.glowSize);
       var bal=(g.glowBalance==null?0.5:g.glowBalance), tealI=0.11*g.glow*(1-bal)*2, magI=0.08*g.glow*bal*2;
       if(tealI>0.002){ var gr=c.createRadialGradient(gx,tY,0,gx,tY,rad);
         gr.addColorStop(0,'rgba('+(t[0]|0)+','+(t[1]|0)+','+(t[2]|0)+','+tealI.toFixed(3)+')'); gr.addColorStop(1,'rgba('+(t[0]|0)+','+(t[1]|0)+','+(t[2]|0)+',0)');
         c.fillStyle=gr; c.fillRect(0,0,W,H); }
-      if(magI>0.002){ var g2=c.createRadialGradient(gx,mY,0,gx,mY,rad*1.05);
+      if(magI>0.002){ var g2=c.createRadialGradient(gx,mY,0,gx,mY,rad);
         g2.addColorStop(0,'rgba('+(m[0]|0)+','+(m[1]|0)+','+(m[2]|0)+','+magI.toFixed(3)+')'); g2.addColorStop(1,'rgba('+(m[0]|0)+','+(m[1]|0)+','+(m[2]|0)+',0)');
         c.fillStyle=g2; c.fillRect(0,0,W,H); }
     }
     if(g.ring>0){
-      var R=Math.min(W,H)*0.5*g.ringSize, cx=W*0.5, cy=H*0.5;
+      var R=Math.min(W,H)*0.5*g.ringSize, cx=ox, cy=oy;
       var rg=c.createRadialGradient(cx,cy,R*0.72,cx,cy,R*1.06);
       rg.addColorStop(0,'rgba('+(t[0]|0)+','+(t[1]|0)+','+(t[2]|0)+',0)'); rg.addColorStop(0.85,'rgba('+(t[0]|0)+','+(t[1]|0)+','+(t[2]|0)+','+(0.05*g.ring).toFixed(3)+')'); rg.addColorStop(1,'rgba('+(t[0]|0)+','+(t[1]|0)+','+(t[2]|0)+',0)');
       c.fillStyle=rg; c.beginPath(); c.arc(cx,cy,R*1.06,0,TAU); c.fill();

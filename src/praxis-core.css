@@ -38,6 +38,7 @@ body[data-variant="praxis"]{
   --px-page:#F0F2F4; --px-surface:#ffffff; --px-surface-2:#F4F6F8; --px-tool:#ffffff;
   --px-drawer:#ffffff;  /* shared drawer/panel surface (Mazlan + filter); dark deepens to navy */
   --px-chip:#EEF1F4; --px-glass:rgba(255,255,255,.82); --px-hover:rgba(16,36,58,.025); --px-dot:rgba(16,36,58,.11);
+  --px-scroll:rgba(16,36,58,.28); --px-scroll-hover:rgba(16,36,58,.45);
   --praxis-card:0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7);
   --px-tool-shadow:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05);
   --px-tool-shadow-hover:0 0 0 .5px rgba(16,36,58,.09),0 2px 8px -2px rgba(16,36,58,.16);
@@ -101,6 +102,7 @@ body[data-variant="praxis"][data-theme="dark"]{
   --px-page:#11161f; --px-surface:#1c2330; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
   --px-drawer:#0e1324;  /* deep navy — matches the external Mazlan prototype */
   --px-chip:rgba(255,255,255,.07); --px-glass:rgba(26,32,45,.72); --px-hover:rgba(255,255,255,.05); --px-dot:rgba(255,255,255,.09);
+  --px-scroll:rgba(255,255,255,.26); --px-scroll-hover:rgba(255,255,255,.42);
   --px-edge:rgba(255,255,255,.08);
   --praxis-card:0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07);
   --px-tool-shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35);
@@ -162,3 +164,25 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):f
   outline:2px solid color-mix(in srgb, var(--ehsq-color-interactive-default) 60%, transparent);
   outline-offset:2px;
 }
+
+
+/* =====================================================================
+   Scrollbars — hidden until the scrolling element is hovered
+
+   Uses the standard scrollbar-color only. It's an inherited property, so
+   setting it on :root reaches every element without a universal selector, and
+   Chrome/Firefox keep their overlay scrollbars — which means nothing reserves
+   a gutter and no layout shifts when the thumb appears. (Declaring
+   ::-webkit-scrollbar or scrollbar-width would switch those elements to
+   classic scrollbars and permanently narrow the content.)
+
+   :focus-within is included so keyboard users, who never trigger :hover, still
+   get the position indicator while arrowing through a scrolled region.
+   ===================================================================== */
+:root{ scrollbar-color: transparent transparent; }
+*:hover, *:focus-within{ scrollbar-color: var(--px-scroll) transparent; }
+
+/* Safari has no scrollbar-color yet, but its overlay scrollbars already fade
+   out on their own, so it needs nothing here. Engines with classic scrollbars
+   and no scrollbar-color support fall back to always-visible, which is the
+   safe direction — the content stays reachable. */

@@ -25,6 +25,10 @@
   var MAT2LUCIDE = {
     // navigation / chrome
     "search":"search","close":"x","clear":"x","menu":"menu","settings":"settings",
+    // home dashboard (index.html): component-header icons
+    "assignment":"clipboard-list","lab_profile":"file-chart-column","stacked_line_chart":"chart-area",
+    // filter system (praxis-filters.js): field-type icons + panel affordances
+    "notes":"text","list":"list","instant_mix":"sliders-horizontal","drag_indicator":"grip-vertical",
     "check":"check","add":"plus","add_box":"square-plus","add_circle":"circle-plus",
     "remove":"minus","arrow_back":"arrow-left","arrow_forward":"arrow-right",
     "arrow_upward":"arrow-up","arrow_drop_down":"chevron-down","arrow_right_alt":"move-right",
