@@ -146,11 +146,14 @@
 .cn-group__icon .material-symbols-rounded{ font-size:16px; }
 .cn-group__title{ font-size:13px; font-weight:700; letter-spacing:.01em; color:var(--ehsq-color-text-primary); }
 
-/* PREVIEW: Module Selector's section-label group headers applied to Create New
-   (solid tone marker + uppercase tracked title in the solution colour). */
-.cn-flyout .cn-group__head{ gap:8px; height:24px; }
-.cn-flyout .cn-group__icon{ width:22px; height:22px; border-radius:6px; background:var(--cn-tone); color:#fff; }
-.cn-flyout .cn-group__icon .material-symbols-rounded{ font-size:15px; }
+/* Module Selector's section-label group headers applied to Create New
+   (solid tone marker + uppercase tracked title in the solution colour).
+   Sizes are kept in step with .msel__menu .cn-group__* in
+   praxis-module-selector.css — 32px marker, 20px glyph, 32px head — so the two
+   menus read as the same component. */
+.cn-flyout .cn-group__head{ gap:8px; height:32px; }
+.cn-flyout .cn-group__icon{ width:32px; height:32px; border-radius:8px; background:var(--cn-tone); color:#fff; }
+.cn-flyout .cn-group__icon .material-symbols-rounded{ font-size:20px; }
 .cn-flyout .cn-group__title{ text-transform:uppercase; font-size:11px; font-weight:800; letter-spacing:.06em; color:var(--cn-tone); }
 
 /* Solution tones (icons take a brand color per solution) */
