@@ -733,19 +733,17 @@ window.PraxisFilters = (function () {
   // =================================================================
   bind('[data-action="toggle-filter-panel"]', 'click', (e, btn) => {
     const panel = document.getElementById('quick-filters');
+    if (!panel) return;
+    // the caret rotation hangs off the container, but a host is free to place the
+    // toggle outside one — so treat it as optional rather than assuming it
     const controls = btn.closest('.filter-controls');
+    const label = btn.querySelector('.filter-toggle__label');
     const collapsed = panel.hasAttribute('data-collapsed');
-    if (collapsed) {
-      panel.removeAttribute('data-collapsed');
-      controls.removeAttribute('data-collapsed');
-      btn.setAttribute('aria-expanded', 'true');
-      btn.querySelector('.filter-toggle__label').textContent = 'Hide Filters';
-    } else {
-      panel.setAttribute('data-collapsed', '');
-      controls.setAttribute('data-collapsed', '');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.querySelector('.filter-toggle__label').textContent = 'Show Filters';
-    }
+    panel.toggleAttribute('data-collapsed', !collapsed);
+    if (controls) controls.toggleAttribute('data-collapsed', !collapsed);
+    btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+    // keep whatever noun the host used ("Filters", "Quick Filters", ...)
+    if (label) label.textContent = label.textContent.replace(/^(Hide|Show)\b/, collapsed ? 'Hide' : 'Show');
   });
 
   // =================================================================
