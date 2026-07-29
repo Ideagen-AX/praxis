@@ -7,7 +7,10 @@
    content rhythm (workspace 32px, record 24px, search 20px). Header icons
    use the Material Symbols font (loaded on every page).
    ===================================================================== */
-.pageheader{position:relative;padding:16px var(--ph-pad-x,24px) 10px;background:var(--px-page);}
+/* No top padding: the breadcrumb sits directly under the app bar, which already
+   carries its own vertical space. --ph-pad-top is here for any page that needs
+   it back. */
+.pageheader{position:relative;padding:var(--ph-pad-top,0) var(--ph-pad-x,24px) 10px;background:var(--px-page);}
 .pageheader::after{content:"";position:absolute;left:var(--ph-pad-x,24px);right:var(--ph-pad-x,24px);
   bottom:0;height:1px;background:var(--ehsq-color-border-default);}
 
