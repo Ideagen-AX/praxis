@@ -155,17 +155,21 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):f
 /* =====================================================================
    Scrollbars — hidden until the scrolling element is hovered
 
-   Uses the standard scrollbar-color only. It's an inherited property, so
-   setting it on :root reaches every element without a universal selector, and
-   Chrome/Firefox keep their overlay scrollbars — which means nothing reserves
-   a gutter and no layout shifts when the thumb appears. (Declaring
-   ::-webkit-scrollbar or scrollbar-width would switch those elements to
-   classic scrollbars and permanently narrow the content.)
+   Uses the standard scrollbar-color only — the one scrollbar property that
+   doesn't change the gutter, so Chrome/Firefox keep their overlay scrollbars
+   and nothing reflows when the thumb appears. (Declaring ::-webkit-scrollbar
+   or scrollbar-width would switch those elements to classic scrollbars and
+   permanently narrow the content.)
 
    :focus-within is included so keyboard users, who never trigger :hover, still
    get the position indicator while arrowing through a scrolled region.
    ===================================================================== */
-:root{ scrollbar-color: transparent transparent; }
+/* The reset has to land on every element, not just :root. scrollbar-color is
+   inherited, so a single :root declaration lets a hovered ancestor cascade its
+   revealed value into every descendant — hover anywhere and the whole page's
+   scrollbars light up. Declaring it on * re-breaks that inheritance at each
+   level, so an element is only revealed when it is itself under the pointer. */
+*{ scrollbar-color: transparent transparent; }
 *:hover, *:focus-within{ scrollbar-color: var(--px-scroll) transparent; }
 
 /* Safari has no scrollbar-color yet, but its overlay scrollbars already fade
