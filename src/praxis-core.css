@@ -45,6 +45,16 @@ body[data-variant="praxis"]{
   --px-overlay:0 0 0 .5px rgba(16,36,58,.06),0 2px 6px rgba(16,36,58,.06),0 18px 38px -16px rgba(16,36,58,.18);
   --px-edge:rgba(255,255,255,.6);
 
+  /* Elevation TIERS — a single card shadow can't express hierarchy, so a page
+     of cards reads as one flat plane. These flank --praxis-card (unchanged, so
+     nothing that already uses it moves) to give a page a subject and a support
+     cast. Additive only; opt in per component.
+       rail   ← recedes: tighter, shallower, no long throw
+       card   ← --praxis-card, the default
+       raised ← the subject: wider spread, longer throw, brighter lit edge */
+  --px-card-rail:0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6);
+  --px-card-raised:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85);
+
   /* primary button — refined teal with lit edge (used by Submit / Create New /
      Reassign task on the record page and the quick-actions on the workspace) */
   --px-primary-grad:linear-gradient(180deg,#1f8f97,#1b838b);
@@ -98,6 +108,10 @@ body[data-variant="praxis"][data-theme="dark"]{
   --px-tool-shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35);
   --px-tool-shadow-hover:0 0 0 .5px rgba(255,255,255,.12),0 4px 12px -2px rgba(0,0,0,.5);
   --px-overlay:0 0 0 .5px rgba(255,255,255,.08),0 2px 6px rgba(0,0,0,.4),0 24px 50px -20px rgba(0,0,0,.7);
+  /* Elevation tiers, dark: depth carried by shadow density + edge light, since
+     dark surfaces can't lean on a cast shadow the way light ones do. */
+  --px-card-rail:0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.30),inset 0 .5px 0 rgba(255,255,255,.05);
+  --px-card-raised:0 0 0 .5px rgba(255,255,255,.11),0 1px 2px rgba(0,0,0,.45),0 4px 10px -3px rgba(0,0,0,.40),0 32px 60px -24px rgba(0,0,0,.75),inset 0 .5px 0 rgba(255,255,255,.10);
   /* Dark primary CTA: subtle cyan gradient from the bright interactive color,
      with dark ink (mirrors the light-mode teal gradient treatment). */
   --px-primary-grad:linear-gradient(180deg,#29d2d7,#1fb4b9);
