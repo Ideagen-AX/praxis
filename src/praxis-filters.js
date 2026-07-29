@@ -40,8 +40,12 @@ window.PraxisFilters = (function () {
   }
 
   // ================= FIELD / OPTION CONFIG (ported CAPA model) =================
-  const PEOPLE_NAMES = ['Ballari, Jhansi', 'Putta, Aravind', 'Slaughter, Nicholas', 'Garige, Pushkarini', 'Lance, Isaac', 'Kotapati, Mounica', 'Reddy, Sandeep', 'Patel, Anil', 'Chen, Lily', 'EHS Coordinator Team', 'Case Management Team', 'Unassigned'];
-  const DEPARTMENT_TREE = [
+  // These are the CAPA vocabularies the port shipped with. A host whose records
+  // use a different domain replaces them via init({ options, tree }) — otherwise
+  // its menus offer values its data has never heard of, and every selection
+  // returns nothing. `let` rather than `const` so init can swap them.
+  let PEOPLE_NAMES = ['Ballari, Jhansi', 'Putta, Aravind', 'Slaughter, Nicholas', 'Garige, Pushkarini', 'Lance, Isaac', 'Kotapati, Mounica', 'Reddy, Sandeep', 'Patel, Anil', 'Chen, Lily', 'EHS Coordinator Team', 'Case Management Team', 'Unassigned'];
+  let DEPARTMENT_TREE = [
     { name: 'Operations', children: ['Production', 'Logistics'] },
     { name: 'Maintenance', children: ['Mechanical Maintenance', 'Electrical Maintenance'] },
     { name: 'Safety', children: ['Process Safety', 'Industrial Hygiene'] },
@@ -49,17 +53,17 @@ window.PraxisFilters = (function () {
     { name: 'Environmental', children: [] },
     { name: 'Engineering', children: [] },
   ];
-  const DEPARTMENTS = DEPARTMENT_TREE.flatMap(d => [d.name, ...d.children]);
-  const DEPT_PARENT = {};
+  let DEPARTMENTS = DEPARTMENT_TREE.flatMap(d => [d.name, ...d.children]);
+  let DEPT_PARENT = {};
   DEPARTMENT_TREE.forEach(d => d.children.forEach(c => { DEPT_PARENT[c] = d.name; }));
-  const SITES = ['HYD Plant 1', 'HYD Plant 2', 'WPDCG', 'DEN Plant 1', 'DEN Plant 2', 'DEN Plant 3', 'BOS Operations', 'ATL Corporate', 'ATL Lab'];
-  const TASKS = ['Investigate Root Cause', 'Define Corrective Action', 'Implement Action', 'Verify Effectiveness', 'Awaiting Review', 'Closeout Approval'];
-  const ACTION_TYPES = ['Corrective Action', 'Preventive Action', 'Containment', 'Root Cause Action', 'Verification', 'Effectiveness Check'];
-  const PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
+  let SITES = ['HYD Plant 1', 'HYD Plant 2', 'WPDCG', 'DEN Plant 1', 'DEN Plant 2', 'DEN Plant 3', 'BOS Operations', 'ATL Corporate', 'ATL Lab'];
+  let TASKS = ['Investigate Root Cause', 'Define Corrective Action', 'Implement Action', 'Verify Effectiveness', 'Awaiting Review', 'Closeout Approval'];
+  let ACTION_TYPES = ['Corrective Action', 'Preventive Action', 'Containment', 'Root Cause Action', 'Verification', 'Effectiveness Check'];
+  let PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
   const READ_OPTS = ['All', 'Unread'];
-  const STATUS_OPTS = ['Open', 'Closed', 'Cancelled'];
+  let STATUS_OPTS = ['Open', 'Closed', 'Cancelled'];
   const GENERIC_OPTS = ['Option A', 'Option B', 'Option C', 'Option D'];
-  const FILTER_OPTIONS = {
+  let FILTER_OPTIONS = {
     'Department': DEPARTMENTS, 'Site': SITES, 'Current Task': TASKS, 'Current Assignee': PEOPLE_NAMES,
     'Action Type': ACTION_TYPES, 'Priority': PRIORITIES, 'Action Owner': PEOPLE_NAMES, 'Effectiveness Owner': PEOPLE_NAMES,
     'Cost Owner': PEOPLE_NAMES, 'Verifier': PEOPLE_NAMES, 'Originator': PEOPLE_NAMES, 'Signer': PEOPLE_NAMES,
@@ -67,7 +71,24 @@ window.PraxisFilters = (function () {
     'Comment – By': PEOPLE_NAMES, 'Status': STATUS_OPTS, 'Read Status': READ_OPTS,
   };
   function getOptionsForFilter(name) { return FILTER_OPTIONS[name] || GENERIC_OPTS; }
-  const FILTER_TREES = { 'Department': DEPARTMENT_TREE };
+
+  // Rebuild what's derived from the vocabularies above, after init swaps them
+  function rebuildVocab() {
+    DEPARTMENTS = DEPARTMENT_TREE.flatMap(d => [d.name, ...d.children]);
+    DEPT_PARENT = {};
+    DEPARTMENT_TREE.forEach(d => d.children.forEach(c => { DEPT_PARENT[c] = d.name; }));
+    FILTER_TREES = { 'Department': DEPARTMENT_TREE };
+    // the people/site/task lists feed several field names apiece
+    const P = PEOPLE_NAMES;
+    Object.assign(FILTER_OPTIONS, {
+      'Department': DEPARTMENTS, 'Site': SITES, 'Current Task': TASKS, 'Action Type': ACTION_TYPES,
+      'Priority': PRIORITIES, 'Status': STATUS_OPTS,
+      'Current Assignee': P, 'Action Owner': P, 'Effectiveness Owner': P, 'Cost Owner': P,
+      'Verifier': P, 'Originator': P, 'Signer': P, 'Tracker Owner': P,
+      'Action Item Completed By': P, 'Completed By': P, 'Comment – By': P,
+    });
+  }
+  let FILTER_TREES = { 'Department': DEPARTMENT_TREE };
   const deptChildren = (name) => DEPARTMENT_TREE.find(d => d.name === name)?.children || [];
   function deptState(values, name) {
     if (values.includes(name) || values.includes(DEPT_PARENT[name])) return 'on';
@@ -2365,6 +2386,18 @@ window.PraxisFilters = (function () {
     scopeChip = opts.scopeChip || null;   // omitted entirely when the host has no fixed scope
     exampleTree = opts.exampleTree || null;
     if (opts.parseDate) parseDate = opts.parseDate;
+    // Swap the value vocabularies for ones that match the host's records, so the
+    // menus only ever offer values that can actually match something.
+    if (opts.people)      PEOPLE_NAMES    = opts.people.slice();
+    if (opts.sites)       SITES           = opts.sites.slice();
+    if (opts.tasks)       TASKS           = opts.tasks.slice();
+    if (opts.actionTypes) ACTION_TYPES    = opts.actionTypes.slice();
+    if (opts.priorities)  PRIORITIES      = opts.priorities.slice();
+    if (opts.statuses)    STATUS_OPTS     = opts.statuses.slice();
+    if (opts.tree)        DEPARTMENT_TREE = opts.tree.map(d => ({ name: d.name, children: (d.children || []).slice() }));
+    rebuildVocab();
+    // anything else the host wants to override outright, by field name
+    if (opts.options) Object.assign(FILTER_OPTIONS, opts.options);
     // v1.5 is modal-only; the centered-modal rules are gated on this attribute.
     // Owned here so a host page can't forget it (it can still pre-set its own).
     if (!document.documentElement.hasAttribute('data-filter-mode')) {
