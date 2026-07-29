@@ -26,6 +26,7 @@
     // navigation / chrome
     "search":"search","close":"x","clear":"x","menu":"menu","settings":"settings",
     // home dashboard (index.html): component-header icons
+    "arrow_circle_right":"circle-arrow-right",
     "assignment":"clipboard-list","lab_profile":"file-chart-column","stacked_line_chart":"chart-area",
     // filter system (praxis-filters.js): field-type icons + panel affordances
     "notes":"text","list":"list","instant_mix":"sliders-horizontal","drag_indicator":"grip-vertical",
