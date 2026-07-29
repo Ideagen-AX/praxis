@@ -115,11 +115,7 @@
     }
     function render(){
       var f = filter.trim().toLowerCase();
-      var allSel = selected.size === 0;
-      var html = '<button class="cn-row msel-all' + (allSel ? ' cn-row--selected' : '') + '" type="button" role="option" aria-selected="' + allSel + '" data-msel-all>'
-        + '<span class="cn-row__icon"><span class="material-symbols-rounded">apps</span></span>'
-        + '<span class="cn-row__label">All modules</span>'
-        + '<span class="cn-row__check material-symbols-rounded">' + (allSel ? 'check_box' : 'check_box_outline_blank') + '</span></button>';
+      var html = '';   // module rows only — an empty selection already means All
       var groups = CREATE_CATALOG.map(function(g){
         var items = g.items.filter(function(i){ return !f || i.label.toLowerCase().indexOf(f) >= 0 || g.group.toLowerCase().indexOf(f) >= 0; });
         if(!items.length) return '';
@@ -156,8 +152,7 @@
     filterInput.addEventListener('click', function(e){ e.stopPropagation(); });
     menu.addEventListener('click', function(e){
       e.stopPropagation();
-      if(e.target.closest('[data-msel-all]')){ selected.clear(); }
-      else { var it = e.target.closest('[data-msel]'); if(!it) return; var id = it.dataset.msel; if(selected.has(id)) selected.delete(id); else selected.add(id); }
+      var it = e.target.closest('[data-msel]'); if(!it) return; var id = it.dataset.msel; if(selected.has(id)) selected.delete(id); else selected.add(id);
       syncInput(); render(); filterInput.focus();
     });
     document.addEventListener('click', function(e){ if(open && !trigger.contains(e.target) && !menu.contains(e.target)) closeMenu(); });
