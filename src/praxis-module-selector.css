@@ -127,3 +127,13 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
 @media (max-width:480px){
   .msel{ max-width:96px; }
 }
+
+/* Clear — the route back to "All" once modules are picked. Hidden while the
+   selection is already empty, since "All" is what an empty selection means. */
+.msel__clear{
+  margin-left:auto; font:inherit; font-size:13px; font-weight:600;
+  color:var(--ehsq-color-text-link); background:transparent; border:0;
+  padding:4px 8px; border-radius:var(--ehsq-radius-sm); cursor:pointer;
+}
+.msel__clear:hover{ background:var(--px-hover); }
+.msel__clear[hidden]{ display:none; }
