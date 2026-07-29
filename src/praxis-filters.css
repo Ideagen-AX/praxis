@@ -102,8 +102,34 @@
 .filter-chips .chip:hover { background: var(--ehsq-color-neutral-20); }
 .filter-chips .chip strong { color: inherit; font-weight: 600; margin-left: 2px; }
 .filter-chips .chip__close { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; color: inherit; font-size: 24px !important; }
-.filter-chips .chip--clear { background: var(--px-surface); border: 1px solid var(--ehsq-color-red-60); color: var(--ehsq-color-red-60); padding: 0 var(--s-16); }
-.filter-chips .chip--clear:hover { background: var(--ehsq-color-red-10); }
+/* Clear all reads as a destructive tool button rather than an outlined chip:
+   soft translucent red over the page, a subtle vertical gradient, a lit top edge
+   and the same elevation as the toolbar buttons. */
+.filter-chips .chip--clear {
+  padding: 0 var(--s-16);
+  color: var(--ehsq-color-red-60);
+  border: 1px solid rgba(226, 45, 56, .24);
+  background: linear-gradient(180deg, rgba(226, 45, 56, .09), rgba(226, 45, 56, .17));
+  box-shadow: var(--px-tool-shadow), inset 0 .5px 0 rgba(255, 255, 255, .6);
+  transition: background var(--d-fast) var(--ease-default), box-shadow var(--d-fast) var(--ease-default);
+}
+.filter-chips .chip--clear:hover {
+  background: linear-gradient(180deg, rgba(226, 45, 56, .15), rgba(226, 45, 56, .24));
+  box-shadow: var(--px-tool-shadow-hover), inset 0 .5px 0 rgba(255, 255, 255, .6);
+}
+.filter-chips .chip--clear:active { background: linear-gradient(180deg, rgba(226, 45, 56, .2), rgba(226, 45, 56, .28)); }
+/* Dark: the lit edge flips to white-on-dark and the tint carries more weight,
+   since a 9% red over a navy surface all but disappears. */
+body[data-theme="dark"] .filter-chips .chip--clear {
+  color: #ff8b93;
+  border-color: rgba(255, 139, 147, .28);
+  background: linear-gradient(180deg, rgba(255, 139, 147, .12), rgba(255, 139, 147, .2));
+  box-shadow: var(--px-tool-shadow), inset 0 .5px 0 rgba(255, 255, 255, .08);
+}
+body[data-theme="dark"] .filter-chips .chip--clear:hover {
+  background: linear-gradient(180deg, rgba(255, 139, 147, .18), rgba(255, 139, 147, .28));
+  box-shadow: var(--px-tool-shadow-hover), inset 0 .5px 0 rgba(255, 255, 255, .08);
+}
 .filter-chips .chip--clear .material-symbols-rounded { font-size: 24px; width: 24px; height: 24px; }
 .drawer-scrim { position: fixed; inset: 0px; background: rgba(32, 42, 53, 0.5); z-index: 80; opacity: 0; transition: opacity var(--d-normal) var(--ease-default); }
 .drawer-scrim[data-open] { opacity: 1; }
