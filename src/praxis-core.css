@@ -333,19 +333,23 @@ body[data-variant="praxis"] .viewswitch__btn--active:hover{
    body[data-variant] .btn--primary and lost on source order.
    ===================================================================== */
 body[data-variant="praxis"][data-theme="dark"]
-  :where(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
+  :is(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
   :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn){
   background:var(--px-primary-soft);
   color:var(--px-primary-soft-fg);
   box-shadow:var(--px-primary-soft-shadow-sm);
 }
+/* All three parts are :is(), not :where(): the older "dark ink on cyan" rule
+   above reaches these icons at (0,4,1) via `[data-theme] .tbtn--primary .icon`,
+   and a zero-specificity :where() chain lost to it — the glyphs went
+   near-black on the dark chip and read as missing. */
 body[data-variant="praxis"][data-theme="dark"]
-  :where(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
-  :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn) :where(.icon, svg, .material-symbols-rounded){
+  :is(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
+  :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn) :is(.icon, svg, .material-symbols-rounded){
   color:var(--px-primary-soft-fg);
 }
 body[data-variant="praxis"][data-theme="dark"]
-  :where(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
+  :is(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
   :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn):hover{
   background:var(--px-primary-soft-hover);
   color:var(--px-primary-soft-fg);

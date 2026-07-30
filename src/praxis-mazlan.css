@@ -296,6 +296,14 @@
     background: #F0F2F4;
     color: #2F4051;
   }
+  /* Dark: there was no dark hover at all, so the light #F0F2F4 applied and the
+     button flashed near-white. Matches the Mazlan prototype's dark header
+     buttons — a translucent white wash, not a fill. */
+  body[data-theme="dark"] .mazlan-drawer__head-btn:hover,
+  body[data-theme="dark"] .mazlan-drawer__menu-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #e4e4e7;
+  }
   .mazlan-drawer__head-btn .material-symbols-rounded,
   .mazlan-drawer__menu-btn .material-symbols-rounded { font-size: 18px; }
   .mazlan-drawer__head-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
