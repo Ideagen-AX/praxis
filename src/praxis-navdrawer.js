@@ -33,6 +33,20 @@
     return l.trim();
   }
 
+  /* Which item is the page in view? The rail marks it with a class on some
+     pages and not others, so fall back to matching the link target against the
+     current filename. */
+  var here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  function isCurrent(el) {
+    if (el.classList.contains('ehsq-navrail__btn--active') ||
+        el.classList.contains('ehsq-navrail__link--active') ||
+        el.getAttribute('aria-current') === 'page') return true;
+    var href = el.getAttribute && el.getAttribute('href');
+    if (!href) return false;
+    var target = href.split('?')[0].split('#')[0].split('/').pop().toLowerCase();
+    return !!target && target === here;
+  }
+
   var items = [];
   /* Create leads the list as a filled action — that's how the Mazlan drawer is
      built, and it makes the drawer self-sufficient on pages that have no
@@ -49,9 +63,7 @@
     items.push({
       label: label,
       href: el.tagName === 'A' ? el.getAttribute('href') : null,
-      active: el.classList.contains('ehsq-navrail__btn--active') ||
-              el.classList.contains('ehsq-navrail__link--active') ||
-              el.getAttribute('aria-current') === 'page',
+      active: isCurrent(el),
       /* Clone the glyph rather than re-deriving it. praxis-lucide.js may have
          already swapped a Material ligature for an SVG, and cloning captures
          whichever form is live at this moment. */
@@ -70,7 +82,7 @@
       if (!label) return;
       adminItems.push({
         label: label, href: a.getAttribute('href'),
-        active: a.getAttribute('aria-current') === 'page' || /\bis-active\b|--active/.test(a.className),
+        active: isCurrent(a),
         glyph: (a.querySelector('svg, i, .material-symbols-rounded') || {}).outerHTML || '',
         source: a
       });
