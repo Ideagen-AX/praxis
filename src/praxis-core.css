@@ -292,14 +292,25 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):f
 body[data-variant="praxis"] :where(
   .tbtn, .viewswitch__btn, .pager__btn, .icon-btn, .filter-toggle,
   .ehsq-navrail__btn, .ehsq-navrail__link, .card__link, .rep__pin, .cn-item
-):not(:disabled):not([aria-disabled="true"]):hover{
+):not(:disabled):not([aria-disabled="true"]):not(.ehsq-navrail__btn--active):hover{
   background-color:var(--px-hover-btn);
+}
+
+/* The active rail item is a filled pink square. The generic hover above was
+   repainting it with the surface colour, so it went white on hover and its
+   white glyph all but disappeared. It keeps its fill and shifts one step
+   lighter instead — pink-40, the tint above pink-50. */
+body[data-variant="praxis"] .ehsq-navrail__btn--active:hover{
+  background-color:var(--ehsq-color-pink-40,#ed5ea6);
+  background-image:none;
+  color:var(--ehsq-color-white);
+  box-shadow:none;
 }
 /* The tools and rail buttons are raised on their own surface, so a flat wash
    would erase them — tint over the surface and deepen the shadow instead. */
 body[data-variant="praxis"] .tbtn:not(.tbtn--run):not(:disabled):hover,
 body[data-variant="praxis"] .pager__btn:not(.pager__btn--active):not(:disabled):hover,
-body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):hover,
+body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active):hover,
 body[data-variant="praxis"] .ehsq-navrail__link:hover{
   background-color:var(--px-surface);
   background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
