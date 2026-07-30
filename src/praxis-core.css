@@ -168,7 +168,7 @@ body[data-variant="praxis"][data-theme="dark"]{
 }
 
 /* Dark mode: primary CTAs use dark ink on the cyan gradient. Higher specificity
-   than the per-page color:#fff rules, so it wins regardless of load order. */
+   than the per-page color:var(--ehsq-color-white) rules, so it wins regardless of load order. */
 body[data-variant="praxis"][data-theme="dark"] .tbtn--run,
 body[data-variant="praxis"][data-theme="dark"] .tbtn--primary,
 body[data-variant="praxis"][data-theme="dark"] .pill-btn,
@@ -207,7 +207,7 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):c
 }
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):checked::after{
   content:''; width:4px; height:8px; margin-top:-1px;
-  border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg);
+  border:solid var(--ehsq-color-white); border-width:0 2px 2px 0; transform:rotate(45deg);
 }
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):focus-visible{
   outline:2px solid color-mix(in srgb, var(--ehsq-color-interactive-default) 60%, transparent);

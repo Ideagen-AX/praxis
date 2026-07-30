@@ -329,7 +329,7 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
 .filter-view-switch__opt.is-active { background: var(--ehsq-color-teal-60); color: rgb(255, 255, 255); box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 2px; }
 .filter-view-switch__opt.is-active:hover { color: rgb(255, 255, 255); }
 .filter-view-switch__opt .material-symbols-rounded { font-size: 18px; }
-.custom-builder { position: absolute; inset: 0px; z-index: 3; background: var(--color-surface, #fff); display: flex; flex-direction: column; }
+.custom-builder { position: absolute; inset: 0px; z-index: 3; background: var(--color-surface, var(--ehsq-color-white)); display: flex; flex-direction: column; }
 .custom-builder[hidden] { display: none; }
 .custom-builder__head { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-16); padding: var(--s-12) var(--s-16); }
 .custom-builder__head::after { content: ""; position: absolute; left: var(--s-16); right: var(--s-16); bottom: 0px; height: 1px; background: var(--ehsq-color-neutral-20); }

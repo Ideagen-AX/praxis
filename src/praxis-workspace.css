@@ -57,7 +57,7 @@ body[data-theme="dark"] .appbar__logo-img--ondark{ display:block; }
   color:var(--ehsq-color-text-primary); text-decoration:none;
 }
 .appswitch__item:hover{ background:var(--ehsq-color-neutral-05); text-decoration:none; }
-.appswitch__item--active{ color:var(--ehsq-color-text-link,#1B838B); font-weight:600; }
+.appswitch__item--active{ color:var(--ehsq-color-text-link,var(--ehsq-color-teal-60)); font-weight:600; }
 body[data-theme="dark"] .appswitch__trigger:hover{ background:rgba(255,255,255,.08); }
 body[data-theme="dark"] .appswitch__item:hover{ background:rgba(255,255,255,.06); }
 
@@ -121,7 +121,7 @@ body[data-theme="dark"] .appbar__action-btn{ background:rgba(255,255,255,.08); b
   box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14); }
 body[data-theme="dark"] #mazlan-trigger{ background:var(--px-surface-2,#232c3b); color:var(--ehsq-color-text-secondary); border:0;
   box-shadow:var(--ehsq-elevation-card); }
-body[data-theme="dark"] #mazlan-trigger:hover{ background:var(--px-surface-2,#232c3b); color:#fff;
+body[data-theme="dark"] #mazlan-trigger:hover{ background:var(--px-surface-2,#232c3b); color:var(--ehsq-color-white);
   box-shadow:0 0 0 .5px rgba(255,255,255,.12),0 6px 18px -6px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.08); }
 body[data-theme="dark"] .appbar__action-btn:hover{ background:rgba(255,255,255,.12); }
 body[data-theme="dark"] .appbar__icon-btn:hover{ background:rgba(255,255,255,.10); }
@@ -185,7 +185,7 @@ body[data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.
 
 /* Theme toggle — inline moon/sun SVGs that swap by [data-theme] (same as the record page) */
 .gl-theme-btn{ color:rgba(255,255,255,.85); }
-.gl-theme-btn:hover{ color:#fff; }
+.gl-theme-btn:hover{ color:var(--ehsq-color-white); }
 .gl-theme-btn .gl-sun{ display:none; }
 body[data-theme="dark"] .gl-theme-btn .gl-moon{ display:none; }
 body[data-theme="dark"] .gl-theme-btn .gl-sun{ display:block; }

@@ -95,7 +95,7 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
    uppercase, tracked title in the solution colour, clearly distinct from the
    pale-tinted, sentence-case tiles below. Left edge still aligns with tiles. */
 .msel__menu .cn-group__head{ padding:0 10px; gap:8px; height:32px; margin-bottom:6px; }
-.msel__menu .cn-group__icon{ width:32px; height:32px; border-radius:8px; background:var(--cn-tone); color:#fff; }
+.msel__menu .cn-group__icon{ width:32px; height:32px; border-radius:8px; background:var(--cn-tone); color:var(--ehsq-color-white); }
 .msel__menu .cn-group__icon .material-symbols-rounded{ font-size:20px; }
 .msel__menu .cn-group__title{ text-transform:uppercase; font-size:11px; font-weight:800; letter-spacing:.06em; color:var(--cn-tone); }
 
