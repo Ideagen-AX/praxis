@@ -75,11 +75,14 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create{
 /* Dark: Create matches the quick-action buttons — a soft translucent-teal chip
    with a bright-teal icon (not the bold gradient CTA). */
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create{
-  background:rgba(41,210,215,.15); color:rgb(92,224,229);
-  box-shadow:0 0 0 .5px rgba(41,210,215,.25);
+  background:var(--px-primary-soft); color:var(--px-primary-soft-fg);
+  box-shadow:var(--px-primary-soft-shadow);
+  transition:background var(--ehsq-motion-fast) var(--ehsq-ease-default),
+             box-shadow var(--ehsq-motion-fast) var(--ehsq-ease-default),
+             transform 150ms var(--ehsq-ease-default);
 }
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create:hover{
-  background:rgba(41,210,215,.22);
+  background:var(--px-primary-soft-hover); box-shadow:var(--px-primary-soft-shadow-hover);
 }
 body[data-variant="praxis"] .ehsq-navrail__btn:focus-visible,
 body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{

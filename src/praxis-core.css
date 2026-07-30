@@ -116,6 +116,21 @@ body[data-variant="praxis"][data-theme="dark"]{
      with dark ink (mirrors the light-mode teal gradient treatment). */
   --px-primary-grad:linear-gradient(180deg,#29d2d7,#1fb4b9);
   --px-primary-fg:#08313a;
+  /* The light --px-primary-shadow is built from navy (rgba(16,36,58,…)) and a
+     white lit edge — on a dark page the navy is invisible, so bold CTAs were
+     wearing a shadow that did nothing. Same four layers, retuned: hairline,
+     contact shadow, coloured ambient glow, lit top edge. */
+  --px-primary-shadow:0 0 0 .5px rgba(41,210,215,.30),0 1px 2px rgba(0,0,0,.45),0 8px 18px -8px rgba(41,210,215,.45),inset 0 1px 0 rgba(255,255,255,.22);
+
+  /* Soft primary — the translucent-teal treatment the quick actions and the
+     nav-rail Create button use in dark instead of the bold cyan CTA. Same
+     construction as the light primary so it reads as a raised object: a
+     top-lit gradient, a hairline border, a contact shadow and a teal glow. */
+  --px-primary-soft:linear-gradient(180deg,rgba(41,210,215,.20) 0%,rgba(41,210,215,.10) 100%);
+  --px-primary-soft-fg:#5CE0E5;
+  --px-primary-soft-shadow:0 0 0 .5px rgba(41,210,215,.32),0 1px 2px rgba(0,0,0,.40),0 8px 18px -10px rgba(41,210,215,.40),inset 0 1px 0 rgba(255,255,255,.12);
+  --px-primary-soft-hover:linear-gradient(180deg,rgba(41,210,215,.28) 0%,rgba(41,210,215,.15) 100%);
+  --px-primary-soft-shadow-hover:0 0 0 .5px rgba(41,210,215,.44),0 1px 2px rgba(0,0,0,.40),0 10px 22px -10px rgba(41,210,215,.55),inset 0 1px 0 rgba(255,255,255,.16);
 }
 
 /* Dark mode: primary CTAs use dark ink on the cyan gradient. Higher specificity
