@@ -130,13 +130,19 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 }
 
 /* ---- Drawer -------------------------------------------------------------
-   Styled after the Mazlan prototype's nav-menu-drawer (concierge-base.css):
-   brand block in the head, a filled Create item at the top, pink-tinted active
-   row, 32px icon wells, 280px wide.
+   Styled after the Mazlan prototype's nav-menu-drawer, with one structural
+   difference: the highlight lives on the ICON WELL, not the row. The rail
+   marks state on a 40px button, so carrying that into the drawer keeps the
+   two forms recognisably the same control — and it stops a long label from
+   dragging a block of colour across the panel.
+
+   The surface is a fixed slate (rgb(36,48,60)) in both themes rather than
+   --px-surface: the drawer is chrome over the page, not a page surface, and a
+   constant panel colour reads the same wherever it's opened from.
    ------------------------------------------------------------------------ */
 .px-navdrawer__scrim{
   position:fixed; inset:0; z-index:140;
-  background:rgba(32,42,53,.45); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
+  background:rgba(16,22,30,.55); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
   opacity:0; transition:opacity 200ms var(--ehsq-ease-default);
 }
 .px-navdrawer__scrim.is-open{ opacity:1; }
@@ -145,8 +151,8 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 .px-navdrawer{
   position:fixed; top:0; left:0; bottom:0; z-index:141;
   width:280px; max-width:85vw; display:flex; flex-direction:column;
-  background:var(--ehsq-color-surface-default); color:var(--ehsq-color-text-primary);
-  box-shadow:4px 0 20px rgba(0,0,0,.22);
+  background:rgb(36,48,60); color:#e7ebf1;
+  box-shadow:4px 0 20px rgba(0,0,0,.32);
   transform:translateX(-100%); transition:transform 220ms var(--ehsq-ease-default);
 }
 .px-navdrawer.is-open{ transform:none; }
@@ -158,57 +164,67 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 .px-navdrawer__head{
   display:flex; align-items:center; justify-content:space-between;
   height:var(--appbar-h, 64px); padding:0 12px 0 16px; flex-shrink:0;
-  border-bottom:1px solid var(--ehsq-color-border-default);
+  border-bottom:1px solid rgba(255,255,255,.10);
 }
 .px-navdrawer__brand{
   display:flex; align-items:center; gap:12px;
-  font-size:.9375rem; font-weight:700; color:var(--ehsq-color-text-primary);
+  font-size:.9375rem; font-weight:700; color:#fff;
 }
 .px-navdrawer__brand svg{ width:28px; height:32px; display:block; flex-shrink:0; }
 .px-navdrawer__close{
   width:40px; height:40px; display:grid; place-items:center;
   background:transparent; border:0; border-radius:var(--ehsq-radius-md);
-  color:var(--ehsq-color-text-secondary); cursor:pointer;
+  color:rgba(255,255,255,.72); cursor:pointer;
   transition:background-color var(--ehsq-motion-fast), transform 150ms var(--ehsq-ease-default);
 }
-.px-navdrawer__close:hover{ background:var(--ehsq-color-surface-subtle); color:var(--ehsq-color-text-primary); }
+.px-navdrawer__close:hover{ background:rgba(255,255,255,.10); color:#fff; }
 .px-navdrawer__close:active{ transform:scale(.95); }
 .px-navdrawer__close .material-symbols-rounded{ font-size:22px; }
 
 .px-navdrawer__list{
-  flex:1; overflow-y:auto; padding:8px; margin:0; list-style:none;
-  display:flex; flex-direction:column; gap:2px;
+  flex:1; overflow-y:auto; padding:10px 8px 20px; margin:0; list-style:none;
+  display:flex; flex-direction:column; gap:4px;
 }
+/* The row is a hit target and a label holder; it carries no fill of its own. */
 .px-navdrawer__item{
   display:flex; align-items:center; gap:12px; width:100%;
-  /* 48px keeps every row past the WCAG 2.5.8 minimum. */
-  min-height:48px; padding:12px;
-  border:0; background:transparent; border-radius:var(--ehsq-radius-md);
+  min-height:48px; padding:4px 8px;
+  border:0; background:transparent; border-radius:10px;
   font:inherit; font-size:.875rem; font-weight:600; text-align:left;
-  color:var(--ehsq-color-text-primary); text-decoration:none; cursor:pointer;
-  transition:background-color var(--ehsq-motion-fast), transform 150ms var(--ehsq-ease-default);
+  color:rgba(255,255,255,.86); text-decoration:none; cursor:pointer;
+  transition:background-color var(--ehsq-motion-fast), color var(--ehsq-motion-fast),
+             transform 150ms var(--ehsq-ease-default);
 }
-.px-navdrawer__item:hover{ background:var(--ehsq-color-surface-subtle); text-decoration:none; }
+.px-navdrawer__item:hover{ background:rgba(255,255,255,.06); color:#fff; text-decoration:none; }
 .px-navdrawer__item:active{ transform:scale(.98); }
 .px-navdrawer__item:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-2px; }
-.px-navdrawer__item--active,
-.px-navdrawer__item--active:hover{
-  background:var(--ehsq-color-pink-10,#fde6f1); color:var(--ehsq-color-pink-70,#c10061);
-}
-/* Create leads the list as a filled action, as it does in the Mazlan drawer. */
-.px-navdrawer__item--create{
-  background:var(--ehsq-color-interactive-default); color:var(--ehsq-color-text-inverse,#fff);
-  margin-bottom:4px;
-}
-.px-navdrawer__item--create:hover{ background:var(--ehsq-color-interactive-hover); }
-body[data-theme="dark"] .px-navdrawer__item--create{ color:var(--px-primary-fg); }
 
+/* The icon well is the state carrier — same 40px square the rail uses. */
 .px-navdrawer__icon{
-  width:32px; height:32px; display:grid; place-items:center; flex-shrink:0; color:inherit;
+  width:40px; height:40px; flex-shrink:0; border-radius:var(--ehsq-radius-md);
+  display:grid; place-items:center;
+  background:rgba(255,255,255,.07); color:rgba(255,255,255,.78);
+  transition:background-color var(--ehsq-motion-fast), color var(--ehsq-motion-fast);
 }
-.px-navdrawer__icon svg{ width:22px; height:22px; }
-.px-navdrawer__icon img{ width:22px; height:auto; }
-.px-navdrawer__icon .material-symbols-rounded{ font-size:22px; }
+.px-navdrawer__item:hover .px-navdrawer__icon{ background:rgba(255,255,255,.12); color:#fff; }
+.px-navdrawer__icon svg{ width:20px; height:20px; }
+.px-navdrawer__icon img{ width:20px; height:auto; }
+.px-navdrawer__icon .material-symbols-rounded{ font-size:20px; }
+
+/* Active page: pink on the icon only, matching the rail's active button. */
+.px-navdrawer__item--active{ color:#fff; }
+.px-navdrawer__item--active .px-navdrawer__icon,
+.px-navdrawer__item--active:hover .px-navdrawer__icon{
+  background:var(--ehsq-color-pink-50); color:var(--ehsq-color-white);
+}
+/* Create: the rail's own treatment, on the icon well. */
+.px-navdrawer__item--create .px-navdrawer__icon{
+  background:var(--px-primary-grad); color:var(--ehsq-color-white);
+  box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),
+             inset 0 .5px 0 rgba(255,255,255,.25);
+}
+.px-navdrawer__item--create:hover .px-navdrawer__icon{ filter:brightness(1.06); }
+
 .px-navdrawer__label{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 .px-navdrawer__group{
