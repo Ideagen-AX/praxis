@@ -9,12 +9,20 @@
      ============================================================ */
   .mazlan-scrim {
     position: fixed;
-    top: var(--appbar-height, 64px);
+    /* Full-viewport, including the app header. The scrim used to start below
+       the header, which left the top bar undimmed and reading as still-live
+       while the drawer was open. The drawer itself stays anchored below the
+       header — only the dimming extends over it. */
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: rgba(32, 42, 53, 0.25);
-    z-index: 95;
+    /* Above the app bar: most pages put it at 30, but the Contextual Awareness
+       workspace's is fixed at 100 (concierge-base.css), so the scrim has to
+       clear that to dim it. Still below Create New (119) and the module
+       selector (125), which are never open at the same time. */
+    z-index: 105;
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
     opacity: 0;
@@ -27,7 +35,7 @@
     /* Floats with margin from edges so all four 24px corners are visible.
        Anchored below the top bar; calc keeps it inset from top/right/bottom. */
     position: fixed;
-    top: calc(var(--appbar-height, 64px) + 16px);
+    top: calc(var(--appbar-height, var(--appbar-h, 64px)) + 16px);
     right: 16px;
     bottom: 16px;
     width: min(484px, calc(100vw - 32px));
@@ -35,7 +43,7 @@
     border: 0;
     border-radius: 24px;
     box-shadow: -8px 16px 40px rgba(32, 42, 53, 0.18), 0 4px 12px rgba(32, 42, 53, 0.06);
-    z-index: 96;
+    z-index: 106;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -102,7 +110,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 18px;
     font-weight: 500;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
     letter-spacing: 0.02em;
   }
   .mazlan-menu__divider {
@@ -129,7 +137,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
     cursor: pointer;
     text-align: left;
     letter-spacing: 0.02em;
@@ -142,7 +150,7 @@
   .mazlan-menu__item .material-symbols-rounded {
     flex-shrink: 0;
     font-size: 20px;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
   }
   .mazlan-menu__new-cube {
     width: 20px;
@@ -154,7 +162,7 @@
     flex-shrink: 0;
   }
   .mazlan-menu__new-cube .material-symbols-rounded {
-    color: #fff !important;
+    color: var(--ehsq-color-white) !important;
     font-size: 16px !important;
   }
   .mazlan-menu__shortcut {
@@ -188,10 +196,9 @@
     font-size: 12px;
     font-weight: 600;
     color: rgba(55, 72, 90, 0.62);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing:normal;
   }
-  .mazlan-menu__section-head:hover { color: #37485A; }
+  .mazlan-menu__section-head:hover { color: var(--ehsq-color-neutral-80); }
   .mazlan-menu__section-head .material-symbols-rounded {
     font-size: 14px;
     flex-shrink: 0;
@@ -212,7 +219,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 13px;
     font-weight: 500;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
     cursor: pointer;
     text-align: left;
     overflow: hidden;
@@ -262,7 +269,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 18px;
     font-weight: 500;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
     letter-spacing: 0.02em;
   }
   /* Icon-only header buttons — no border, no fill, just hover bg */
@@ -287,6 +294,14 @@
   .mazlan-drawer__menu-btn:hover {
     background: #F0F2F4;
     color: #2F4051;
+  }
+  /* Dark: there was no dark hover at all, so the light #F0F2F4 applied and the
+     button flashed near-white. Matches the Mazlan prototype's dark header
+     buttons — a translucent white wash, not a fill. */
+  body[data-theme="dark"] .mazlan-drawer__head-btn:hover,
+  body[data-theme="dark"] .mazlan-drawer__menu-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #e4e4e7;
   }
   .mazlan-drawer__head-btn .material-symbols-rounded,
   .mazlan-drawer__menu-btn .material-symbols-rounded { font-size: 18px; }
@@ -337,7 +352,7 @@
     background-position: 0 0, 0 0;
   }
   /* Dark: the edge-fade must resolve to the navy body colour, not
-     surface-default (#1c2330) — otherwise the dot region reads as a lighter
+     surface-default (#192336) — otherwise the dot region reads as a lighter
      band and seams against the navy header/footer. */
   body[data-theme="dark"] .mazlan-drawer__dots {
     background-image:
@@ -463,7 +478,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: var(--ehsq-color-interactive-default, #1b838b);
+    color: var(--ehsq-color-interactive-default, var(--ehsq-color-teal-60));
     background: none;
     border: 0;
     cursor: pointer;
@@ -646,7 +661,7 @@
   .mazlan-source__avatar {
     width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
     border: 2px solid var(--ehsq-color-surface-default);
-    background: #EDF0F2; color: #37485A;
+    background: #EDF0F2; color: var(--ehsq-color-neutral-80);
     display: flex; align-items: center; justify-content: center;
     font-family: 'Gilroy', sans-serif; font-size: 9px; font-weight: 700;
   }
@@ -950,6 +965,10 @@
   .mazlan-drawer__primary:hover { background: var(--ehsq-color-interactive-hover, #167077); }
   .mazlan-drawer__primary:active { transform: scale(0.93); }
   .mazlan-drawer__primary .material-symbols-rounded { font-size: 20px; }
+  /* Dark: --ehsq-color-interactive-default brightens to cyan, and a white glyph
+     on it glares. Dark ink instead — the same --px-primary-fg the other CTAs
+     use on the bright cyan in dark. */
+  body[data-theme="dark"] .mazlan-drawer__primary { color: var(--px-primary-fg, #08313a); }
 
   /* Scope picker — pill that names the search scope (workspace / site / network) */
   .mazlan-scope-btn {

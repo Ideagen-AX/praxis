@@ -7,7 +7,10 @@
    content rhythm (workspace 32px, record 24px, search 20px). Header icons
    use the Material Symbols font (loaded on every page).
    ===================================================================== */
-.pageheader{position:relative;padding:16px var(--ph-pad-x,24px) 10px;background:var(--px-page);}
+/* No top padding: the breadcrumb sits directly under the app bar, which already
+   carries its own vertical space. --ph-pad-top is here for any page that needs
+   it back. */
+.pageheader{position:relative;padding:var(--ph-pad-top,0) var(--ph-pad-x,24px) 10px;background:var(--px-page);}
 .pageheader::after{content:"";position:absolute;left:var(--ph-pad-x,24px);right:var(--ph-pad-x,24px);
   bottom:0;height:1px;background:var(--ehsq-color-border-default);}
 
@@ -21,9 +24,15 @@
 .breadcrumb .material-symbols-rounded{font-size:18px;line-height:1;}
 
 .pageheader__titlerow{display:flex;align-items:center;gap:12px;}
+/* Neutral, not pink: the pink read as a call to action rather than a type
+   marker. A light chip one step off the page with a slate glyph — enough to
+   separate from the background without competing with the title. */
 .pageheader__icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;
-  justify-content:center;background:var(--ehsq-color-pink-50);color:var(--ehsq-color-white);
-  box-shadow:0 1px 2px rgba(16,36,58,.18),inset 0 .5px 0 rgba(255,255,255,.25);}
+  justify-content:center;background:var(--px-surface-2,#f4f6f8);color:var(--ehsq-color-neutral-90,#2f4051);
+  box-shadow:0 0 0 .5px rgba(16,36,58,.10),0 1px 2px rgba(16,36,58,.06),inset 0 1px 0 rgba(255,255,255,.9);}
+body[data-theme="dark"] .pageheader__icon{
+  background:var(--px-surface-2);color:#e7ebf1;
+  box-shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);}
 .pageheader__icon .material-symbols-rounded{font-size:20px;}
 .pageheader__icon .icon{width:20px;height:20px;}
 .pageheader__title{margin:0;font-size:var(--ehsq-type-size-xl);font-weight:700;line-height:1.25;

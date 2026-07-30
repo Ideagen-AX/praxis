@@ -268,11 +268,13 @@ window.PraxisFilters = (function () {
   function renderChips() {
     const bar = $('[data-chips]');
     if (!bar) return;
+    // Clear all only appears once there's something to clear — an always-on
+    // destructive control against an empty chip bar reads as a filter itself.
     const fixedChips = `
-      <button class="chip chip--clear" data-action="clear-all">
+      ${hasActiveFilters() ? `<button class="chip chip--clear" data-action="clear-all">
         <span class="material-symbols-rounded">close</span>
         Clear all
-      </button>
+      </button>` : ''}
       ${scopeChip ? `<button class="chip" data-fixed>
         ${escapeHtml(scopeChip.label)}: <strong>${escapeHtml(scopeChip.value)}</strong>
         <span class="material-symbols-rounded chip__close">close</span>
@@ -301,7 +303,10 @@ window.PraxisFilters = (function () {
         <span class="material-symbols-rounded chip__close">close</span>
       </button>`;
     }).join('');
-    bar.innerHTML = fixedChips + treeChips + filterChips;
+    // .trim(): with nothing applied the three parts are template-literal
+    // whitespace rather than '', which is enough to defeat :empty — and the
+    // host collapses the bar's padding on :empty.
+    bar.innerHTML = (fixedChips + treeChips + filterChips).trim();
     // Mirror active values into their drawer sections + quick-card highlights
     renderRowChips();
     syncQuickSelection();
@@ -733,19 +738,17 @@ window.PraxisFilters = (function () {
   // =================================================================
   bind('[data-action="toggle-filter-panel"]', 'click', (e, btn) => {
     const panel = document.getElementById('quick-filters');
+    if (!panel) return;
+    // the caret rotation hangs off the container, but a host is free to place the
+    // toggle outside one — so treat it as optional rather than assuming it
     const controls = btn.closest('.filter-controls');
+    const label = btn.querySelector('.filter-toggle__label');
     const collapsed = panel.hasAttribute('data-collapsed');
-    if (collapsed) {
-      panel.removeAttribute('data-collapsed');
-      controls.removeAttribute('data-collapsed');
-      btn.setAttribute('aria-expanded', 'true');
-      btn.querySelector('.filter-toggle__label').textContent = 'Hide Filters';
-    } else {
-      panel.setAttribute('data-collapsed', '');
-      controls.setAttribute('data-collapsed', '');
-      btn.setAttribute('aria-expanded', 'false');
-      btn.querySelector('.filter-toggle__label').textContent = 'Show Filters';
-    }
+    panel.toggleAttribute('data-collapsed', !collapsed);
+    if (controls) controls.toggleAttribute('data-collapsed', !collapsed);
+    btn.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+    // keep whatever noun the host used ("Filters", "Quick Filters", ...)
+    if (label) label.textContent = label.textContent.replace(/^(Hide|Show)\b/, collapsed ? 'Hide' : 'Show');
   });
 
   // =================================================================

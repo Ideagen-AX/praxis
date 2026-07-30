@@ -106,9 +106,46 @@ body[data-theme="dark"] .filter-chips .chip { background: var(--ehsq-color-neutr
 body[data-theme="dark"] .filter-chips .chip:hover { background: var(--ehsq-color-neutral-80); }
 .filter-chips .chip strong { color: inherit; font-weight: 600; margin-left: 2px; }
 .filter-chips .chip__close { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; color: inherit; font-size: 24px !important; }
-.filter-chips .chip--clear { background: var(--px-surface); border: 1px solid var(--ehsq-color-red-60); color: var(--ehsq-color-red-60); padding: 0 var(--s-16); }
-.filter-chips .chip--clear:hover { background: var(--ehsq-color-red-10); }
-.filter-chips .chip--clear .material-symbols-rounded { font-size: 24px; width: 24px; height: 24px; }
+/* Clear all reads as a destructive tool button rather than an outlined chip:
+   soft translucent red over the page, a subtle vertical gradient, a lit top edge
+   and the same elevation as the toolbar buttons. */
+.filter-chips .chip--clear {
+  padding: 0 var(--s-16);
+  color: var(--ehsq-color-red-60);
+  border: 0;
+  background: linear-gradient(180deg, rgba(226, 45, 56, .09), rgba(226, 45, 56, .17));
+  box-shadow: var(--px-tool-shadow), inset 0 .5px 0 rgba(255, 255, 255, .6);
+  transition: background var(--d-fast) var(--ease-default), box-shadow var(--d-fast) var(--ease-default);
+}
+.filter-chips .chip--clear:hover {
+  background: linear-gradient(180deg, rgba(226, 45, 56, .15), rgba(226, 45, 56, .24));
+  box-shadow: var(--px-tool-shadow-hover), inset 0 .5px 0 rgba(255, 255, 255, .6);
+}
+.filter-chips .chip--clear:active { background: linear-gradient(180deg, rgba(226, 45, 56, .2), rgba(226, 45, 56, .28)); }
+/* The bar's generic .chip__close is 24px; Clear all's leading × is a label
+   glyph rather than a dismiss target, so it sits a size down. */
+.filter-chips .chip--clear .material-symbols-rounded,
+.filter-chips .chip--clear svg {
+  /* inline-flex, not inline: width/height are ignored on a non-replaced inline
+     box, so the glyph kept its 24px em square. Covers the SVG too — the Lucide
+     converter swaps these ligatures at runtime. */
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; min-width: 20px;
+  font-size: 20px !important; line-height: 1;
+}
+/* Dark: the lit edge flips to white-on-dark and the tint carries more weight,
+   since a 9% red over a navy surface all but disappears. */
+body[data-theme="dark"] .filter-chips .chip--clear {
+  color: #ff8b93;
+  border-color: rgba(255, 139, 147, .28);
+  background: linear-gradient(180deg, rgba(255, 139, 147, .12), rgba(255, 139, 147, .2));
+  box-shadow: var(--px-tool-shadow), inset 0 .5px 0 rgba(255, 255, 255, .08);
+}
+body[data-theme="dark"] .filter-chips .chip--clear:hover {
+  background: linear-gradient(180deg, rgba(255, 139, 147, .18), rgba(255, 139, 147, .28));
+  box-shadow: var(--px-tool-shadow-hover), inset 0 .5px 0 rgba(255, 255, 255, .08);
+}
+/* (was a 24px re-declaration here — the size now lives in the block above) */
 .drawer-scrim { position: fixed; inset: 0px; background: rgba(32, 42, 53, 0.5); z-index: 80; opacity: 0; transition: opacity var(--d-normal) var(--ease-default); }
 .drawer-scrim[data-open] { opacity: 1; }
 .filter-drawer { position: fixed; top: var(--s-24); right: var(--s-24); bottom: var(--s-24); width: min(480px, calc(100% - 2 * var(--s-24))); background: var(--color-surface); z-index: 90; display: flex; flex-direction: column; transform: translateX(calc(100% + var(--s-24))); transition: transform var(--d-slow) var(--ease-out); box-shadow: rgba(32, 42, 53, 0.24) 0px 24px 64px, rgba(32, 42, 53, 0.12) 0px 8px 24px; border-radius: 20px; overflow: hidden; }
@@ -296,7 +333,7 @@ body[data-theme="dark"] .filter-chips .chip:hover { background: var(--ehsq-color
 .filter-view-switch__opt.is-active { background: var(--ehsq-color-teal-60); color: rgb(255, 255, 255); box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 2px; }
 .filter-view-switch__opt.is-active:hover { color: rgb(255, 255, 255); }
 .filter-view-switch__opt .material-symbols-rounded { font-size: 18px; }
-.custom-builder { position: absolute; inset: 0px; z-index: 3; background: var(--color-surface, #fff); display: flex; flex-direction: column; }
+.custom-builder { position: absolute; inset: 0px; z-index: 3; background: var(--color-surface, var(--ehsq-color-white)); display: flex; flex-direction: column; }
 .custom-builder[hidden] { display: none; }
 .custom-builder__head { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-16); padding: var(--s-12) var(--s-16); }
 .custom-builder__head::after { content: ""; position: absolute; left: var(--s-16); right: var(--s-16); bottom: 0px; height: 1px; background: var(--ehsq-color-neutral-20); }
@@ -309,7 +346,7 @@ body[data-theme="dark"] .filter-chips .chip:hover { background: var(--ehsq-color
 .cf-group--d0 { background: rgb(255, 255, 255); }
 .cf-group .cf-group { margin-top: 0px; }
 .cf-group__bar { display: flex; align-items: center; gap: var(--s-8); padding-bottom: var(--s-8); }
-.cf-group__hint { font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ehsq-color-neutral-40); flex: 1 1 0%; }
+.cf-group__hint { font-size: var(--t-xs); font-weight: 700; letter-spacing:normal; color: var(--ehsq-color-neutral-40); flex: 1 1 0%; }
 .cf-group__children { display: flex; flex-direction: column; gap: var(--s-8); }
 .cf-empty { font-size: var(--t-sm); color: var(--ehsq-color-neutral-50); padding: var(--s-8); }
 .cf-join { align-self: flex-start; display: inline-flex; gap: 2px; padding: 2px; margin-left: var(--s-12); background: var(--ehsq-color-neutral-10); border-radius: var(--r-full); }
@@ -353,7 +390,7 @@ body[data-theme="dark"] .filter-chips .chip:hover { background: var(--ehsq-color
 .cf-group__add .material-symbols-rounded { font-size: 16px; }
 .filter-expr { flex-shrink: 0; border-top: 1px solid var(--ehsq-color-neutral-20); padding: var(--s-8) var(--s-16); background: var(--ehsq-color-neutral-05); max-height: 110px; overflow-y: auto; }
 .filter-expr[hidden] { display: none; }
-.filter-expr__label { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ehsq-color-neutral-50); }
+.filter-expr__label { font-size: 10px; font-weight: 700; letter-spacing:normal; color: var(--ehsq-color-neutral-50); }
 .filter-expr__body { font-size: var(--t-sm); line-height: 1.7; color: var(--ehsq-color-neutral-90); margin-top: 2px; }
 .cfx-bool { font-weight: 800; font-size: var(--t-xs); padding: 1px 7px; border-radius: var(--r-full); }
 .cfx-bool--and { background: var(--ehsq-color-teal-10); color: var(--ehsq-color-teal-80); }
