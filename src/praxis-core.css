@@ -84,7 +84,7 @@ body[data-variant="praxis"]{
 /* ---- base DARK: recolors token-driven styles (covers Miramar too) ---- */
 body[data-theme="dark"]{
   color-scheme:dark;
-  --ehsq-color-surface-default:#1c2330; --ehsq-color-surface-subtle:#161c27;
+  --ehsq-color-surface-default:#192336; --ehsq-color-surface-subtle:#161c27;
   --ehsq-color-neutral-05:#10151e; --ehsq-color-neutral-10:#222b39;
   --ehsq-color-neutral-15:#2a3342; --ehsq-color-neutral-20:#3a4556;
   --ehsq-color-border-default:rgba(255,255,255,.10);
@@ -95,11 +95,11 @@ body[data-theme="dark"]{
 body[data-variant="praxis"][data-theme="dark"]{
   --ehsq-color-text-primary:#e7ebf1; --ehsq-color-text-secondary:#9aa7b4;
   --ehsq-color-border-default:rgba(255,255,255,.10);
-  --ehsq-color-surface-default:#1c2330; --ehsq-color-surface-subtle:#161c27;
+  --ehsq-color-surface-default:#192336; --ehsq-color-surface-subtle:#161c27;
   --ehsq-color-interactive-default:#29D2D7; --ehsq-color-text-link:#5CE0E5;
   /* Solution accents brighten on dark so they read on tinted chips */
   --ehsq-color-blue-60:#7a93e0; --ehsq-color-orange-60:#ffa94d; --ehsq-color-purple-60:#b088e8;
-  --px-page:rgb(14,19,36); --px-surface:#1c2330; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
+  --px-page:rgb(14,19,36); --px-surface:#192336; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
   --px-drawer:#0e1324;  /* deep navy — matches the external Mazlan prototype */
   --px-chip:rgba(255,255,255,.07); --px-glass:rgba(26,32,45,.72); --px-hover:rgba(255,255,255,.05); --px-dot:rgba(255,255,255,.09);
   --px-scroll:rgba(255,255,255,.26); --px-scroll-hover:rgba(255,255,255,.42);
