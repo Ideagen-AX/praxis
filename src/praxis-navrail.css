@@ -97,3 +97,100 @@ body[data-variant="praxis"] .ehsq-navrail__btn:focus-visible,
 body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
   outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--ehsq-color-interactive-default) 22%, transparent);
 }
+
+/* ============================================================================
+   PHONE: the rail becomes a drawer  (see praxis-navdrawer.js)
+   ============================================================================
+   At 56px the icon rail costs a sixth of a 360px viewport and its items carry
+   no labels. Below 640px it's hidden and the same destinations appear in a
+   drawer opened from a hamburger in the app bar's left corner — with labels.
+   ========================================================================= */
+.px-navtoggle{ display:none; }
+
+@media (max-width:640px){
+  .ehsq-navrail{ display:none !important; }
+  /* Pages offset their content by the rail width in several different ways
+     (margin-left, padding-left, a grid column). Zeroing the token covers all
+     of them at once. */
+  body{ --navrail-w:0px; }
+
+  .px-navtoggle{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:40px; height:40px; flex-shrink:0; margin-right:2px;
+    border:0; border-radius:var(--ehsq-radius-md); background:transparent;
+    color:var(--ehsq-color-text-secondary); cursor:pointer;
+    transition:background-color var(--ehsq-motion-fast) var(--ehsq-ease-default),
+               transform 150ms var(--ehsq-ease-default);
+  }
+  .px-navtoggle:hover{ background-color:var(--px-hover-btn); color:var(--ehsq-color-text-primary); }
+  .px-navtoggle:active{ transform:scale(.95); }
+  .px-navtoggle:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:2px; }
+  .px-navtoggle .material-symbols-rounded{ font-size:24px; }
+  .px-navtoggle svg{ width:24px; height:24px; }
+}
+
+/* ---- Drawer ---- */
+.px-navdrawer__scrim{
+  position:fixed; inset:0; z-index:140;
+  background:rgba(32,42,53,.45); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
+  opacity:0; transition:opacity 200ms var(--ehsq-ease-default);
+}
+.px-navdrawer__scrim.is-open{ opacity:1; }
+.px-navdrawer__scrim[hidden]{ display:none; }
+
+.px-navdrawer{
+  position:fixed; top:0; left:0; bottom:0; z-index:141;
+  width:min(300px, 84vw); display:flex; flex-direction:column;
+  background:var(--px-surface); color:var(--ehsq-color-text-primary);
+  box-shadow:8px 0 32px rgba(16,36,58,.22), 0 0 0 .5px rgba(16,36,58,.10);
+  transform:translateX(-100%); transition:transform 220ms var(--ehsq-ease-default);
+}
+.px-navdrawer.is-open{ transform:none; }
+.px-navdrawer[hidden]{ display:none; }
+body[data-theme="dark"] .px-navdrawer{
+  box-shadow:8px 0 32px rgba(0,0,0,.55), 0 0 0 .5px rgba(255,255,255,.08);
+}
+@media (prefers-reduced-motion: reduce){
+  .px-navdrawer, .px-navdrawer__scrim{ transition:none; }
+}
+
+.px-navdrawer__head{
+  display:flex; align-items:center; justify-content:space-between;
+  height:64px; padding:0 8px 0 20px; flex-shrink:0;
+  border-bottom:1px solid var(--ehsq-color-border-default);
+}
+.px-navdrawer__title{ font-size:.9375rem; font-weight:700; }
+.px-navdrawer__close{
+  display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px;
+  border:0; background:transparent; border-radius:var(--ehsq-radius-md);
+  color:var(--ehsq-color-text-secondary); cursor:pointer;
+  transition:background-color var(--ehsq-motion-fast), transform 150ms var(--ehsq-ease-default);
+}
+.px-navdrawer__close:hover{ background:var(--px-hover-btn); color:var(--ehsq-color-text-primary); }
+.px-navdrawer__close:active{ transform:scale(.95); }
+.px-navdrawer__close .material-symbols-rounded{ font-size:22px; }
+
+.px-navdrawer__list{ list-style:none; margin:0; padding:10px 10px 20px; overflow-y:auto; flex:1; }
+.px-navdrawer__item{
+  display:flex; align-items:center; gap:14px; width:100%;
+  /* 48px: comfortably past the 24px WCAG 2.5.8 minimum, and a normal phone
+     row height. */
+  min-height:48px; padding:0 12px; margin:2px 0;
+  border:0; background:transparent; border-radius:10px;
+  font:inherit; font-size:.9375rem; font-weight:600; text-align:left;
+  color:var(--ehsq-color-text-primary); text-decoration:none; cursor:pointer;
+  transition:background-color var(--ehsq-motion-fast), transform 150ms var(--ehsq-ease-default);
+}
+.px-navdrawer__item:hover{ background:var(--px-hover-btn); text-decoration:none; }
+.px-navdrawer__item:active{ transform:scale(.98); }
+.px-navdrawer__item:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-2px; }
+.px-navdrawer__item--active{ background:var(--px-chip); color:var(--ehsq-color-pink-60); }
+
+.px-navdrawer__icon{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:24px; height:24px; flex-shrink:0; color:inherit;
+}
+.px-navdrawer__icon svg{ width:22px; height:22px; }
+.px-navdrawer__icon img{ width:22px; height:auto; }
+.px-navdrawer__icon .material-symbols-rounded{ font-size:22px; }
+.px-navdrawer__label{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
