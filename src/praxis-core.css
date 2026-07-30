@@ -82,7 +82,19 @@ body[data-variant="praxis"]{
   --px-dot-clear:192px;
   background-color:var(--px-page);
   background-image:
-    linear-gradient(to right, var(--px-page), transparent 7%, transparent 93%, var(--px-page)),
+    /* The horizontal fade is symmetric about the CONTENT area, not the
+       viewport. Left of the rail's right edge is fully covered — the Praxis
+       rail is transparent, so dots would otherwise run behind it — then the
+       fade spans the same 7% the right edge uses, measured from that edge
+       rather than from x=0. Before this, the left fade ran 0→7% of the
+       viewport, so the rail ate half of it and the visible ramp was half the
+       width of the one on the right. */
+    linear-gradient(to right,
+      var(--px-page) 0,
+      var(--px-page) var(--navrail-w, 56px),
+      transparent calc(var(--navrail-w, 56px) + 7%),
+      transparent 93%,
+      var(--px-page) 100%),
     linear-gradient(to bottom, var(--px-page) 0, var(--px-page) var(--px-dot-clear),
                     transparent calc(var(--px-dot-clear) + 48px)),
     radial-gradient(circle, var(--px-dot) 1px, transparent 1px);

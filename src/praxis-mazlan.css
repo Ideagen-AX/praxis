@@ -958,6 +958,10 @@
   .mazlan-drawer__primary:hover { background: var(--ehsq-color-interactive-hover, #167077); }
   .mazlan-drawer__primary:active { transform: scale(0.93); }
   .mazlan-drawer__primary .material-symbols-rounded { font-size: 20px; }
+  /* Dark: --ehsq-color-interactive-default brightens to cyan, and a white glyph
+     on it glares. Dark ink instead — the same --px-primary-fg the other CTAs
+     use on the bright cyan in dark. */
+  body[data-theme="dark"] .mazlan-drawer__primary { color: var(--px-primary-fg, #08313a); }
 
   /* Scope picker — pill that names the search scope (workspace / site / network) */
   .mazlan-scope-btn {
