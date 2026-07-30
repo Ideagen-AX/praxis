@@ -417,3 +417,63 @@ body[data-variant="praxis"][data-theme="dark"] :is(
 }
 .px-skip:focus-visible, .px-skip:focus{ transform:none; outline:2px solid var(--ehsq-color-teal-50); outline-offset:2px; }
 @media (prefers-reduced-motion: reduce){ .px-skip{ transition:none; } }
+
+/* ============================================================================
+   PHONE GUTTER — one value for the app bar, the page header and the content
+   ============================================================================
+   These three were set independently and none of them agreed. Measured at
+   390px before this rule:
+
+     app bar        8px left  / 24px right   (its own padding, plus a 16px
+                                              margin-right on the right cluster)
+     page header    16-84px   / 0            (--ph-pad-x, set per page: 20, 24,
+                                              32, and 84 on admin)
+     content        10-24px                  (--home-gutter, --sp-gutter, or a
+                                              hardcoded padding per family)
+
+   --px-gutter is now the single source below 640px. Everything else derives
+   from it, so the three edges line up on every page and there's one number to
+   change.
+
+   Specificity note: these need body[data-variant="praxis"] because
+   praxis-core.css loads BEFORE each page's own <style>, and the per-page
+   `.pageheader{--ph-pad-x:24px}` rules would otherwise win on source order.
+   ========================================================================= */
+@media (max-width:640px){
+  body[data-variant="praxis"]{ --px-gutter:16px; }
+
+  /* App bar. The right-hand cluster carried an extra margin-right on top of
+     the bar's padding, which is what made the bar asymmetric — 8 left, 24
+     right. The padding alone sets the inset now. */
+  body[data-variant="praxis"] .appbar{ padding-inline:var(--px-gutter); }
+  body[data-variant="praxis"] .appbar__right{ margin-right:0; }
+
+  /* Page header. Also feeds .admin-body and .rm-body, which already derive
+     their padding from --ph-pad-x, so those align for free. */
+  /* Both the token AND the padding: most pages derive their page-header inset
+     from --ph-pad-x, but a few (the record variants) declare padding directly,
+     so the token alone doesn't reach them. */
+  body[data-variant="praxis"] .pageheader{ --ph-pad-x:var(--px-gutter); padding-inline:var(--px-gutter); }
+
+  /* The admin side nav is 60px of unlabelled icons at this width — unusable,
+     and it offsets the page header and content so they can't line up with the
+     full-width app bar. Hidden here; its destinations are folded into the nav
+     drawer instead (praxis-navdrawer.js), so nothing becomes unreachable. */
+  body[data-variant="praxis"] .adminnav{ display:none !important; }
+
+  /* The page switcher duplicates what the nav drawer and the profile menu both
+     offer, and at 390px it pushed the app bar's right cluster 7px past the
+     viewport on the record variants. */
+  body[data-variant="praxis"] .appswitch{ display:none !important; }
+
+  /* Content, per page family. The two tokens come first so anything else
+     derived from them follows. */
+  body[data-variant="praxis"]{ --home-gutter:var(--px-gutter); --sp-gutter:var(--px-gutter); }
+  body[data-variant="praxis"] .home,
+  body[data-variant="praxis"] .view,
+  body[data-variant="praxis"] .record,
+  body[data-variant="praxis"] .ws-body,
+  body[data-variant="praxis"] .admin-body,
+  body[data-variant="praxis"] .rm-body,
+  body[data-variant="praxis"] .demo{ padding-inline:var(--px-gutter); }
+}

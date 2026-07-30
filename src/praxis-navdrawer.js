@@ -52,7 +52,25 @@
       source: el
     });
   });
-  if (!items.length) return;
+  /* The admin side nav is hidden at this width too (it's 60px of unlabelled
+     icons and it breaks the gutter alignment). Fold its destinations in under
+     a heading so nothing becomes unreachable. */
+  var adminNav = document.querySelector('.adminnav');
+  var adminItems = [];
+  if (adminNav) {
+    adminNav.querySelectorAll('a[href]').forEach(function (a) {
+      var label = (a.textContent || '').trim() || labelFor(a);
+      if (!label) return;
+      adminItems.push({
+        label: label, href: a.getAttribute('href'),
+        active: a.getAttribute('aria-current') === 'page' || /\bis-active\b|--active/.test(a.className),
+        glyph: (a.querySelector('svg, i, .material-symbols-rounded') || {}).outerHTML || '',
+        source: a
+      });
+    });
+  }
+
+  if (!items.length && !adminItems.length) return;
 
   /* ---- build ----------------------------------------------------------- */
   var scrim = document.createElement('div');
@@ -90,6 +108,26 @@
     li.appendChild(node);
     list.appendChild(li);
   });
+
+  if (adminItems.length) {
+    var head = document.createElement('li');
+    head.className = 'px-navdrawer__group';
+    head.textContent = 'Admin';
+    list.appendChild(head);
+    adminItems.forEach(function (it) {
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.className = 'px-navdrawer__item' + (it.active ? ' px-navdrawer__item--active' : '');
+      a.href = it.href;
+      if (it.active) a.setAttribute('aria-current', 'page');
+      a.innerHTML = '<span class="px-navdrawer__icon" aria-hidden="true">' + it.glyph + '</span>' +
+                    '<span class="px-navdrawer__label"></span>';
+      a.querySelector('.px-navdrawer__label').textContent = it.label;
+      a.addEventListener('click', close);
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  }
 
   var toggle = document.createElement('button');
   toggle.className = 'px-navtoggle';
