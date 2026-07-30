@@ -112,6 +112,7 @@ body[data-theme="dark"]{
   --ehsq-color-neutral-15:#2a3342; --ehsq-color-neutral-20:#3a4556;
   --ehsq-color-border-default:rgba(255,255,255,.10);
   --ehsq-color-text-primary:#e7ebf1; --ehsq-color-text-secondary:#9aa7b4; --ehsq-color-text-disabled:#62707e;
+  --ehsq-color-text-tertiary:#8b98a6;  /* 4.6:1 on the dark card (was 3.65:1) */
 }
 
 /* ---- Praxis DARK: Mazlan dark surfaces + materials ---- */
@@ -314,6 +315,31 @@ body[data-variant="praxis"] .viewswitch__btn--active:hover{
 
 
 /* =====================================================================
+   CANONICAL PRIMARY BUTTON — one definition for the whole application.
+
+   Before this, the primary CTA rendered four different ways: the search
+   toolbar's treatment (40px, 18px padding, radius 10, gradient + lit-edge
+   shadow), the record pages' near-copy with 16px padding and a vestigial 1px
+   border, the inspection variant 4px shorter than everything else, and
+   Contextual Awareness's flat teal fill that never received the Praxis
+   treatment at all.
+
+   The search treatment wins: it was the majority and the most refined. This
+   rule is the single source; the per-page copies are deleted.
+
+   :is() not :where() — this sheet loads before the page styles, so it needs
+   real specificity to win on source order (see 7.1).
+   ===================================================================== */
+body[data-variant="praxis"] :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn){
+  height:40px; padding:0 18px; border:0; border-radius:10px;
+  background:var(--px-primary-grad); color:var(--px-primary-fg);
+  box-shadow:var(--px-primary-shadow);
+}
+body[data-variant="praxis"] :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn):hover{
+  filter:brightness(1.06); background:var(--px-primary-grad);
+}
+
+/* =====================================================================
    Toolbar primaries — one treatment everywhere.
 
    Light already agreed: every toolbar CTA renders the teal --px-primary-grad.
@@ -356,3 +382,19 @@ body[data-variant="praxis"][data-theme="dark"]
   box-shadow:var(--px-primary-soft-shadow-sm-hover);
   filter:none;
 }
+
+/* =====================================================================
+   WCAG 1.4.3 — dark ink on the bright cyan fill
+
+   In dark, --ehsq-color-interactive-default brightens to #29D2D7, a LIGHT
+   colour (luminance .55). Anything using it as a FILL with white text
+   measures 1.86:1 against a 4.5 minimum. Selected segments, count badges and
+   the workspace Create button all did.
+
+   --px-primary-fg is the token the rest of the app already uses for exactly
+   this: dark ink on cyan, 12.4:1.
+   ===================================================================== */
+body[data-variant="praxis"][data-theme="dark"] :is(
+  .capa-prio__step--active, .subtab__count,
+  .nav-menu-drawer__item--active, .nav-menu-drawer__item--active span
+){ color:var(--px-primary-fg); }
