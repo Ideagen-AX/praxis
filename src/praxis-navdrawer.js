@@ -10,9 +10,8 @@
    so a rail change propagates automatically and there is nothing to keep in
    sync across 20+ pages. Labels come from each item's aria-label / title.
 
-   The rail's Create button is deliberately excluded: Create New is already
-   reachable from the app bar on phones, and duplicating it in the drawer would
-   give the same action two entry points one tap apart.
+   Create leads the list as a filled action, matching the Mazlan drawer, so the
+   drawer is self-sufficient on pages with no in-page Create button.
 
    Self-wiring: include the script, nothing else. It no-ops on pages with no
    nav rail.
@@ -35,8 +34,16 @@
   }
 
   var items = [];
+  /* Create leads the list as a filled action — that's how the Mazlan drawer is
+     built, and it makes the drawer self-sufficient on pages that have no
+     in-page Create button. */
+  var createBtn = rail.querySelector('.ehsq-navrail__btn--create');
+  if (createBtn) items.push({
+    label: 'Create new', href: null, active: false, create: true,
+    glyph: '<span class="material-symbols-rounded">add</span>', source: createBtn
+  });
   rail.querySelectorAll('.ehsq-navrail__link, .ehsq-navrail__btn').forEach(function (el) {
-    if (el.classList.contains('ehsq-navrail__btn--create')) return;   // see header note
+    if (el.classList.contains('ehsq-navrail__btn--create')) return;   // added above
     var label = labelFor(el);
     if (!label) return;
     items.push({
@@ -81,9 +88,18 @@
   drawer.className = 'px-navdrawer';
   drawer.setAttribute('aria-label', 'Primary navigation');
   drawer.hidden = true;
+  /* Brand block in the head, matching the Mazlan drawer. The mark is the
+     product logo from the nav rail when it's there, else the gradient hex. */
+  var BRAND_MARK =
+    '<svg viewBox="0 0 34.64 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+      '<path d="M0 10V30L17.32 40L34.64 30V10L17.32 0L0 10Z" fill="url(#px-nav-grad)"/>' +
+      '<path opacity="0.2" d="M0 30L17.32 40L34.64 30V10L0 30Z" fill="white"/>' +
+      '<defs><linearGradient id="px-nav-grad" x1="3.66" y1="33.66" x2="30.98" y2="6.34" gradientUnits="userSpaceOnUse">' +
+        '<stop stop-color="#E2408E"/><stop offset="0.998" stop-color="#45BBCE"/>' +
+      '</linearGradient></defs></svg>';
   drawer.innerHTML =
     '<div class="px-navdrawer__head">' +
-      '<span class="px-navdrawer__title">Navigation</span>' +
+      '<div class="px-navdrawer__brand">' + BRAND_MARK + '<span>EHSQ Enterprise</span></div>' +
       '<button class="px-navdrawer__close" type="button" aria-label="Close navigation">' +
         '<span class="material-symbols-rounded">close</span></button>' +
     '</div><ul class="px-navdrawer__list"></ul>';
@@ -92,7 +108,8 @@
   items.forEach(function (it) {
     var li = document.createElement('li');
     var node = document.createElement(it.href ? 'a' : 'button');
-    node.className = 'px-navdrawer__item' + (it.active ? ' px-navdrawer__item--active' : '');
+    node.className = 'px-navdrawer__item' + (it.active ? ' px-navdrawer__item--active' : '')
+                   + (it.create ? ' px-navdrawer__item--create' : '');
     if (it.href) { node.href = it.href; } else { node.type = 'button'; }
     if (it.active) node.setAttribute('aria-current', 'page');
     node.innerHTML = '<span class="px-navdrawer__icon" aria-hidden="true">' + it.glyph + '</span>' +
