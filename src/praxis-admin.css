@@ -302,11 +302,16 @@ body[data-theme="dark"] .admin-pill--lock{background:rgba(226,45,56,.18);color:#
 .admin-drill__date .admin-field__label{margin-bottom:4px;}
 .admin-drill__stats{flex:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;}
 .admin-stat{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;}
-.admin-stat__btn{width:100%;min-height:52px;border:0;border-radius:10px;padding:0 14px;background:var(--ehsq-color-neutral-90);
-  color:var(--ehsq-color-white);font:inherit;font-weight:700;font-size: 0.875rem;line-height:1.2;
-  box-shadow:0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),inset 0 .5px 0 rgba(255,255,255,.15);
-  display:flex;align-items:center;justify-content:center;transition:filter var(--ehsq-motion-fast);}
-.admin-stat__btn:hover{filter:brightness(1.08);}
+/* Light tool button, not a filled slate slab: these are navigation into a
+   report, not primary actions, and a column of dark blocks dominated the page. */
+.admin-stat__btn{width:100%;height:40px;min-height:40px;border:0;border-radius:10px;padding:0 14px;
+  background:var(--px-surface);color:var(--ehsq-color-text-primary);
+  font:inherit;font-weight:600;font-size: 0.875rem;line-height:1.2;
+  box-shadow:var(--px-tool-shadow);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  transition:background var(--ehsq-motion-fast),box-shadow var(--ehsq-motion-fast),transform 150ms var(--ehsq-ease-default);}
+.admin-stat__btn:hover{background:var(--px-surface);box-shadow:var(--px-tool-shadow-hover);}
+.admin-stat__btn:active{transform:scale(.97);}
 body[data-theme="dark"] .admin-stat__btn{background:var(--px-surface-2);color:var(--ehsq-color-text-primary);box-shadow:var(--px-tool-shadow);}
 .admin-stat__metric{font-size:.8125rem;color:var(--ehsq-color-text-secondary);}
 .admin-stat__metric b{color:var(--ehsq-color-text-primary);font-weight:700;}
@@ -441,4 +446,34 @@ body[data-variant="praxis"][data-theme="dark"] .ss-pop{background:rgba(26,32,45,
 @media (max-width:480px){
   .admin-grid--4,.admin-grid--6,.admin-drill__stats{grid-template-columns:1fr;}
   .appswitch{display:none;}
+}
+
+
+/* ---------------------------------------------------------------------
+   Admin tables — same treatment as the search table: the header carries no
+   fill (the rule and the weight do the work) and the body is zebra striped.
+   --------------------------------------------------------------------- */
+.admin-table thead th{ background:var(--px-surface); }
+.admin-table tbody tr:nth-child(even){ background:var(--px-hover-btn); }
+body[data-theme="dark"] .admin-table thead th{ background:var(--px-surface); }
+body[data-theme="dark"] .admin-table tbody tr:nth-child(even){ background:rgba(255,255,255,.035); }
+
+
+/* ---- Workspace flyout ------------------------------------------------- */
+.ws-pop{ max-height:min(70vh,560px); overflow-y:auto; }
+.ws-item__badge{
+  margin-left:auto; flex-shrink:0; padding:3px 9px; border-radius:999px;
+  font-size:.6875rem; font-weight:700;
+  background:var(--ehsq-color-teal-10); color:var(--ehsq-color-teal-80);
+}
+body[data-theme="dark"] .ws-item__badge{ background:rgba(41,210,215,.16); color:var(--ehsq-color-text-link); }
+/* The current workspace read as a white block in dark — --ehsq-color-teal-10
+   is a light tint that isn't remapped. Pink, matching how selection is marked
+   elsewhere in the app. */
+body[data-theme="dark"] .ws-item--home .ws-item__icon{
+  background:rgba(227,0,114,.18); color:#ff5aa8;
+}
+body[data-theme="dark"] .ws-item--home{ background:rgba(227,0,114,.10); }
+body[data-theme="dark"] .ws-item--home .ws-item__badge{
+  background:rgba(227,0,114,.18); color:#ff5aa8;
 }
