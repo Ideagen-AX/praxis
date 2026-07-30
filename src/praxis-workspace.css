@@ -289,10 +289,10 @@ body[data-theme="dark"]{
 }
 body[data-theme="dark"]{ color:var(--ehsq-color-text-primary); }
 body[data-theme="dark"] .page{
-  background-color:#11161f;
+  background-color:var(--px-page);
   background-image:
-    linear-gradient(to right, #11161f, transparent 7%, transparent 93%, #11161f),
-    linear-gradient(to bottom, #11161f, transparent 10%),
+    linear-gradient(to right, var(--px-page), transparent 7%, transparent 93%, var(--px-page)),
+    linear-gradient(to bottom, var(--px-page), transparent 10%),
     radial-gradient(circle, rgba(255,255,255,.06) 1px, transparent 1px);
   background-size:100% 100%, 100% 100%, 18px 18px;
   background-repeat:no-repeat, no-repeat, repeat;

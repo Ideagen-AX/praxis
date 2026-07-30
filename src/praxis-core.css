@@ -99,7 +99,7 @@ body[data-variant="praxis"][data-theme="dark"]{
   --ehsq-color-interactive-default:#29D2D7; --ehsq-color-text-link:#5CE0E5;
   /* Solution accents brighten on dark so they read on tinted chips */
   --ehsq-color-blue-60:#7a93e0; --ehsq-color-orange-60:#ffa94d; --ehsq-color-purple-60:#b088e8;
-  --px-page:#11161f; --px-surface:#1c2330; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
+  --px-page:rgb(14,19,36); --px-surface:#1c2330; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
   --px-drawer:#0e1324;  /* deep navy — matches the external Mazlan prototype */
   --px-chip:rgba(255,255,255,.07); --px-glass:rgba(26,32,45,.72); --px-hover:rgba(255,255,255,.05); --px-dot:rgba(255,255,255,.09);
   --px-scroll:rgba(255,255,255,.26); --px-scroll-hover:rgba(255,255,255,.42);
@@ -190,3 +190,34 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):f
    out on their own, so it needs nothing here. Engines with classic scrollbars
    and no scrollbar-color support fall back to always-visible, which is the
    safe direction — the content stays reachable. */
+
+/* =====================================================================
+   Press feedback — buttons shrink slightly while held
+
+   Follows the Mazlan prototype: hover lifts, press returns to the baseline and
+   scales down, around 150ms. Small controls take 0.95 and larger ones 0.97
+   there, so the travel reads the same at both sizes; the split below is by
+   footprint rather than by component.
+
+   Written with :where() so every selector here sits at specificity 0. A
+   component that wants different press behaviour — or none — overrides it with
+   any class rule, without needing !important or a more specific selector.
+   ===================================================================== */
+@media (prefers-reduced-motion: no-preference){
+  :where(button, [role="button"], .btn, a.btn, .tbtn, .qa, .pill-btn, .icon-btn,
+         .ehsq-navrail__btn, .card__link, .rep__pin, .segswitch > button){
+    transition: transform 150ms var(--ehsq-ease-default, cubic-bezier(.32,.72,0,1));
+  }
+  /* Small controls: icon buttons and compact pills */
+  :where(button, [role="button"], .icon-btn, .card__link, .rep__pin,
+         .ehsq-navrail__btn, .segswitch > button):active:not(:disabled):not([aria-disabled="true"]){
+    transform: scale(.95);
+  }
+  /* Larger surfaces travel less, or the shrink reads as a jump */
+  :where(.btn, a.btn, .tbtn, .qa, .pill-btn):active:not(:disabled):not([aria-disabled="true"]){
+    transform: scale(.97);
+  }
+  /* Anything that already moves on press keeps its own treatment — these carry a
+     lift or offset that scaling would fight. */
+  :where(.upnext__open, .lg-btn):active{ transform: scale(.97); }
+}

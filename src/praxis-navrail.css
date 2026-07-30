@@ -30,7 +30,7 @@
   display:flex; align-items:center; justify-content:center; width:40px; height:40px;
   padding:0; gap:0; border:0; background:transparent; border-radius:var(--ehsq-radius-md);
   color:var(--ehsq-color-neutral-70); cursor:pointer;
-  transition:background-color var(--ehsq-motion-fast) var(--ehsq-ease-default);
+  transition:background-color var(--ehsq-motion-fast) var(--ehsq-ease-default), transform 150ms var(--ehsq-ease-default);
 }
 .ehsq-navrail__btn:hover{ background-color:var(--ehsq-color-neutral-20); }
 .ehsq-navrail__btn:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:2px; }
