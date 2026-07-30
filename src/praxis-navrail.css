@@ -230,3 +230,102 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 .px-navdrawer__group{
   padding:16px 12px 4px; font-size:11px; font-weight:800; letter-spacing:normal; color:var(--ehsq-color-text-tertiary);
 }
+
+/* =====================================================================
+   WORKSPACE / DASHBOARD FLYOUT — item states
+   The flyout is a nav-rail surface, so its states are defined here next to
+   the rail's own, and it borrows the same two markers the rail already uses:
+   pink fill on the icon well for "this is what you're looking at", and the
+   primary-action gradient on the icon well for the create affordance. Both
+   land on the icon, never the label.
+
+   Base layout/colour for .ws-item lives in praxis-admin.css and (duplicated)
+   in the record/search page <style> blocks; these rules are deliberately
+   scoped one level deeper (.ws-pop) so they win over both without either
+   copy needing to change. Pink tokens carry literal fallbacks because the
+   record and search pages don't load a stylesheet that defines them.
+   ===================================================================== */
+
+/* ---- Panel ------------------------------------------------------------
+   .ws-pop and not .px-pop: the other popovers sharing .px-pop (search
+   suggestions, module selector) keep their own treatment. Kept at single-class
+   specificity deliberately — the record and search pages carry their own
+   .ws-pop copy including a phone-width override that switches it to a fixed
+   bottom sheet, and those declarations come later, so they must still win. */
+.ws-pop{position:absolute;z-index:200;top:0;left:calc(100% + 8px);width:300px;
+  max-height:min(70vh,560px);overflow-y:auto;padding:6px;border-radius:12px;
+  background:var(--ehsq-color-surface-default);border:1px solid var(--ehsq-color-border-default);
+  box-shadow:var(--ehsq-elevation-4);}
+.ws-pop[hidden]{display:none;}
+body[data-variant="praxis"] .ws-pop{
+  background:color-mix(in srgb, var(--px-surface) 60%, transparent);
+  -webkit-backdrop-filter:saturate(1.35) blur(16px);backdrop-filter:saturate(1.35) blur(16px);
+  border:0;box-shadow:var(--px-overlay), inset 0 .5px 0 var(--px-edge);
+  border-radius:14px;padding:10px;transform-origin:top left;}
+body[data-variant="praxis"] .ws-pop .px-menu__head{
+  font-size:16px;font-weight:700;letter-spacing:0;text-transform:none;
+  color:var(--ehsq-color-text-primary);padding:6px 8px 12px;}
+
+/* ---- Base component ---------------------------------------------------
+   index.html loads neither praxis-admin.css nor an inline copy, so its
+   dashboard flyout rendered as bare links. These are the same values the
+   other two copies carry, at plain specificity, so pages that do define
+   their own still win and nothing there changes. */
+.ws-pop .ws-item{display:flex;align-items:center;gap:12px;width:100%;padding:8px 10px;border:0;
+  background:transparent;border-radius:10px;cursor:pointer;text-align:left;font-family:inherit;
+  color:var(--ehsq-color-text-primary);text-decoration:none;}
+.ws-pop .ws-item:hover{background:var(--px-hover);text-decoration:none;}
+.ws-pop .ws-item:focus-visible{outline:2px solid var(--ehsq-color-teal-50);outline-offset:-2px;}
+.ws-pop .ws-item__icon{width:34px;height:34px;flex-shrink:0;border-radius:9px;display:flex;
+  align-items:center;justify-content:center;
+  background:var(--ehsq-color-neutral-10);color:var(--ehsq-color-text-secondary);}
+.ws-pop .ws-item__icon .icon{width:19px;height:19px;}
+.ws-pop .ws-item__text{display:flex;flex-direction:column;min-width:0;flex:1;}
+.ws-pop .ws-item__name{font-size:.875rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ws-pop .ws-item__sub{font-size:.75rem;color:var(--ehsq-color-text-secondary);}
+.ws-pop .ws-item__badge{margin-left:auto;flex-shrink:0;padding:3px 9px;border-radius:999px;
+  font-size:.6875rem;font-weight:700;}
+
+/* ---- Current workspace ------------------------------------------------
+   Only the dashboard actually in view is marked, via .ws-item--current.
+   This used to be conflated with .ws-item--home in dark mode, which lit the
+   home entry pink on pages where no dashboard was on screen at all. Home is
+   a property of the workspace; current is a property of the view. */
+body[data-variant="praxis"] .ws-pop .ws-item--current .ws-item__icon,
+body[data-variant="praxis"] .ws-pop .ws-item--current:hover .ws-item__icon{
+  background:var(--ehsq-color-pink-50,#e82e8b);
+  color:var(--ehsq-color-white,#fff);
+  box-shadow:none;
+}
+/* Undo the dark-mode pink that .ws-item--home used to claim (praxis-admin.css) —
+   the fill now tracks .ws-item--current in both themes. */
+body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--home:not(.ws-item--current) .ws-item__icon{
+  background:var(--px-surface); color:var(--ehsq-color-text-secondary);
+}
+body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--home:not(.ws-item--current){
+  background:transparent;
+}
+body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--home:not(.ws-item--current):hover{
+  background:var(--px-hover);
+}
+
+/* ---- Home badge -------------------------------------------------------
+   Light pink in both themes: it labels the home workspace, it isn't a
+   selected state, so it stays a tint rather than the solid pink above. */
+body[data-variant="praxis"] .ws-pop .ws-item__badge{
+  background:var(--ehsq-color-pink-10,#fce6f1);
+  color:var(--ehsq-color-pink-60,#e30072);
+}
+body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item__badge{
+  background:rgba(227,0,114,.18); color:#ff8ac2;
+}
+
+/* ---- New dashboard ----------------------------------------------------
+   The rail's create treatment, on the icon well — identical to
+   .px-navdrawer__item--create above so the two read as the same action. */
+body[data-variant="praxis"] .ws-pop .ws-item--new .ws-item__icon{
+  background:var(--px-primary-grad); color:var(--ehsq-color-white,#fff);
+  box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),
+             inset 0 .5px 0 rgba(255,255,255,.25);
+}
+body[data-variant="praxis"] .ws-pop .ws-item--new:hover .ws-item__icon{ filter:brightness(1.06); }
