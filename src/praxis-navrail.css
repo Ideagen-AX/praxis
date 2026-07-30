@@ -83,13 +83,15 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create{
    with a bright-teal icon (not the bold gradient CTA). */
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create{
   background:var(--px-primary-soft); color:var(--px-primary-soft-fg);
-  box-shadow:var(--px-primary-soft-shadow);
+  /* -sm: the full soft shadow's ambient glow was too heavy for a 40px chip.
+     Same level the quick actions use, so all three primaries match. */
+  box-shadow:var(--px-primary-soft-shadow-sm);
   transition:background var(--ehsq-motion-fast) var(--ehsq-ease-default),
              box-shadow var(--ehsq-motion-fast) var(--ehsq-ease-default),
              transform 150ms var(--ehsq-ease-default);
 }
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create:hover{
-  background:var(--px-primary-soft-hover); box-shadow:var(--px-primary-soft-shadow-hover);
+  background:var(--px-primary-soft-hover); box-shadow:var(--px-primary-soft-shadow-sm-hover);
 }
 body[data-variant="praxis"] .ehsq-navrail__btn:focus-visible,
 body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
