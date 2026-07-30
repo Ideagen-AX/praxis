@@ -71,14 +71,33 @@
   if (!tools.length && !optionParts.length) return;
 
   /* Remember each node's origin so it can be put back verbatim. */
+  /* Position is fixed for the life of the page, so it's captured once. Visible
+     state is not — the fields panel is open in table mode and closed in list
+     mode — so that's re-captured on every collapse, in captureState(). */
   function remember(el) {
     if (el.__pxHome) return;
-    el.__pxHome = { parent: el.parentNode, next: el.nextSibling };
+    /* Position AND state. These panels are hidden on the page until their own
+       toolbar control opens them; the drawer un-hides them to use as content,
+       and without recording the original state they came back visible — which
+       is how the Explore and Options panels ended up on the desktop page in
+       table mode. */
+    el.__pxHome = {
+      parent: el.parentNode, next: el.nextSibling,
+      hidden: el.hasAttribute('hidden'),
+      collapsed: el.classList.contains('is-collapsed')
+    };
+  }
+  function captureState(el) {
+    if (!el.__pxHome) return;
+    el.__pxHome.hidden = el.hasAttribute('hidden');
+    el.__pxHome.collapsed = el.classList.contains('is-collapsed');
   }
   function restore(el) {
     var h = el.__pxHome;
     if (!h || !h.parent) return;
     h.parent.insertBefore(el, h.next);
+    if (h.hidden) el.setAttribute('hidden', ''); else el.removeAttribute('hidden');
+    el.classList.toggle('is-collapsed', !!h.collapsed);
   }
   tools.forEach(remember);
   optionParts.forEach(function (p) { remember(p.el); });
@@ -149,6 +168,10 @@
   function enter() {
     if (compact) return;
     compact = true;
+    // snapshot what's open right now, so the round trip returns to this state
+    // rather than to whatever was true when the page first loaded
+    tools.forEach(captureState);
+    optionParts.forEach(function (p) { captureState(p.el); });
 
     tools.forEach(function (el) { toolsPop.appendChild(el); });
     if (tools.length) bar.appendChild(toolsWrap);
@@ -226,10 +249,14 @@
     if (!compact) return;
     compact = false;
     closeTools(); closeOptions();
+    /* Strip the injected labels first. Restoring moves the view switch back
+       into the toolbar, and anything still attached to it goes along — which
+       is how the mode labels ended up breaking the desktop toolbar. Query the
+       document, not the drawer, so it can't matter where they are. */
+    [].slice.call(document.querySelectorAll('.tb-viewlabel')).forEach(function (n) { n.remove(); });
     tools.forEach(restore);
     optionParts.forEach(function (p) { restore(p.el); });
-    // strip everything the drawer added, so a re-entry rebuilds cleanly
-    [].slice.call(drawerBody.querySelectorAll('.tb-viewlabel')).forEach(function (n) { n.remove(); });
+    // whatever the drawer built is disposable; a re-entry rebuilds it
     drawerBody.innerHTML = '';
     tabStrip.innerHTML = '';
     if (toolsWrap.parentNode === bar) bar.removeChild(toolsWrap);
