@@ -311,3 +311,44 @@ body[data-variant="praxis"] .pager__btn:disabled:hover{
 body[data-variant="praxis"] .viewswitch__btn--active:hover{
   background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
 }
+
+
+/* =====================================================================
+   Toolbar primaries — one treatment everywhere.
+
+   Light already agreed: every toolbar CTA renders the teal --px-primary-grad.
+   Dark had drifted three ways — Run on search used the soft chip, Submit and
+   New Report used the bold cyan CTA, and the inspection variant had no dark
+   treatment at all and was still painting the light-mode teal on a dark page.
+
+   The soft chip wins because it's what the quick actions and the nav-rail
+   Create button already use: a toolbar CTA sits among neutral tools, and the
+   bold cyan made it shout across the whole bar.
+
+   Scoped to toolbars on purpose — the login button and in-dialog CTAs are
+   isolated on their own surfaces, where the bold treatment still reads right.
+
+   :is() rather than :where() on the button classes: :where() contributes zero
+   specificity, which tied this with record-page.html's own
+   body[data-variant] .btn--primary and lost on source order.
+   ===================================================================== */
+body[data-variant="praxis"][data-theme="dark"]
+  :where(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
+  :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn){
+  background:var(--px-primary-soft);
+  color:var(--px-primary-soft-fg);
+  box-shadow:var(--px-primary-soft-shadow-sm);
+}
+body[data-variant="praxis"][data-theme="dark"]
+  :where(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
+  :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn) :where(.icon, svg, .material-symbols-rounded){
+  color:var(--px-primary-soft-fg);
+}
+body[data-variant="praxis"][data-theme="dark"]
+  :where(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
+  :is(.btn--primary, .tbtn--primary, .tbtn--run, .pill-btn):hover{
+  background:var(--px-primary-soft-hover);
+  color:var(--px-primary-soft-fg);
+  box-shadow:var(--px-primary-soft-shadow-sm-hover);
+  filter:none;
+}
