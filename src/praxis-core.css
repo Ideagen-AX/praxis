@@ -38,6 +38,9 @@ body[data-variant="praxis"]{
   --px-page:#F0F2F4; --px-surface:#ffffff; --px-surface-2:#F4F6F8; --px-tool:#ffffff;
   --px-drawer:#ffffff;  /* shared drawer/panel surface (Mazlan + filter); dark deepens to navy */
   --px-chip:#EEF1F4; --px-glass:rgba(255,255,255,.82); --px-hover:rgba(16,36,58,.025); --px-dot:rgba(16,36,58,.11);
+  /* --px-hover is 2.5% — deliberately faint for large row targets, but invisible
+     on a small raised tool. Buttons use this stronger wash instead. */
+  --px-hover-btn:rgba(16,36,58,.075);
   --px-scroll:rgba(16,36,58,.28); --px-scroll-hover:rgba(16,36,58,.45);
   --praxis-card:0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7);
   --px-tool-shadow:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05);
@@ -71,13 +74,21 @@ body[data-variant="praxis"]{
 
   /* dotted-grid page texture — faded at left/right edges (page-color gradient
      over the dots). Fixed to the viewport so it reads as page material. */
+  /* Dots stop short of the top chrome: the grid running up behind the toolbar
+     and page header made them read as part of the header rather than the page.
+     Page colour is composited over the dots down to --px-dot-clear, then fades
+     out over 48px. Fixed attachment, so the stop is a viewport coordinate and
+     pages set it to their own chrome height. */
+  --px-dot-clear:192px;
   background-color:var(--px-page);
   background-image:
     linear-gradient(to right, var(--px-page), transparent 7%, transparent 93%, var(--px-page)),
+    linear-gradient(to bottom, var(--px-page) 0, var(--px-page) var(--px-dot-clear),
+                    transparent calc(var(--px-dot-clear) + 48px)),
     radial-gradient(circle, var(--px-dot) 1px, transparent 1px);
-  background-size:100% 100%, 18px 18px;
-  background-repeat:no-repeat, repeat;
-  background-attachment:fixed, fixed;
+  background-size:100% 100%, 100% 100%, 18px 18px;
+  background-repeat:no-repeat, no-repeat, repeat;
+  background-attachment:fixed, fixed, fixed;
   color:var(--ehsq-color-text-primary);
 }
 
@@ -102,6 +113,7 @@ body[data-variant="praxis"][data-theme="dark"]{
   --px-page:rgb(14,19,36); --px-surface:#192336; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
   --px-drawer:#0e1324;  /* deep navy — matches the external Mazlan prototype */
   --px-chip:rgba(255,255,255,.07); --px-glass:rgba(26,32,45,.72); --px-hover:rgba(255,255,255,.05); --px-dot:rgba(255,255,255,.09);
+  --px-hover-btn:rgba(255,255,255,.10);
   --px-scroll:rgba(255,255,255,.26); --px-scroll-hover:rgba(255,255,255,.42);
   --px-edge:rgba(255,255,255,.08);
   --praxis-card:0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07);
@@ -126,10 +138,15 @@ body[data-variant="praxis"][data-theme="dark"]{
      nav-rail Create button use in dark instead of the bold cyan CTA. Same
      construction as the light primary so it reads as a raised object: a
      top-lit gradient, a hairline border, a contact shadow and a teal glow. */
-  --px-primary-soft:linear-gradient(180deg,rgba(41,210,215,.20) 0%,rgba(41,210,215,.10) 100%);
+  /* Opaque, not translucent: these sit directly on the page and the dot grid
+     was reading through them. The stops are the exact composite of the old
+     20%/10% cyan over --px-page, so the colour is unchanged — only the page
+     behind it stops showing. (Tuned for the page; a soft-primary button on a
+     card would need its own composite.) */
+  --px-primary-soft:linear-gradient(180deg,rgb(19,57,72) 0%,rgb(17,38,54) 100%);
   --px-primary-soft-fg:#5CE0E5;
   --px-primary-soft-shadow:0 0 0 .5px rgba(41,210,215,.32),0 1px 2px rgba(0,0,0,.40),0 8px 18px -10px rgba(41,210,215,.40),inset 0 1px 0 rgba(255,255,255,.12);
-  --px-primary-soft-hover:linear-gradient(180deg,rgba(41,210,215,.28) 0%,rgba(41,210,215,.15) 100%);
+  --px-primary-soft-hover:linear-gradient(180deg,rgb(22,72,86) 0%,rgb(18,48,63) 100%);
   --px-primary-soft-shadow-hover:0 0 0 .5px rgba(41,210,215,.44),0 1px 2px rgba(0,0,0,.40),0 10px 22px -10px rgba(41,210,215,.55),inset 0 1px 0 rgba(255,255,255,.16);
   /* Quieter variant for rows of soft-primary buttons — four quick actions side
      by side against the page pooled the full ambient glow into a continuous
@@ -240,4 +257,45 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):f
   /* Anything that already moves on press keeps its own treatment — these carry a
      lift or offset that scaling would fight. */
   :where(.upnext__open, .lg-btn):active{ transform: scale(.97); }
+}
+
+
+/* =====================================================================
+   HOVER — every control shifts its background, not just its glyph.
+
+   Several families only recoloured their icon on hover: the toolbar tools,
+   the view switch, the pager, the nav-rail buttons. An icon-only change reads
+   as a rendering artefact rather than a target, and it disappears entirely for
+   anyone who isn't looking straight at the glyph.
+
+   Prefixed with body[data-variant="praxis"] purely for specificity — this
+   sheet loads before the page stylesheets that declare the bare `.tbtn:hover`
+   rules, so a plain class selector here would lose on source order.
+
+   Excluded: controls whose hover is already a background change (primary CTAs,
+   the selected segswitch option, the rail's Create button), and disabled or
+   already-selected states, which shouldn't invite a click.
+   ===================================================================== */
+body[data-variant="praxis"] :where(
+  .tbtn, .viewswitch__btn, .pager__btn, .icon-btn, .filter-toggle,
+  .ehsq-navrail__btn, .ehsq-navrail__link, .card__link, .rep__pin, .cn-item
+):not(:disabled):not([aria-disabled="true"]):hover{
+  background-color:var(--px-hover-btn);
+}
+/* The tools and rail buttons are raised on their own surface, so a flat wash
+   would erase them — tint over the surface and deepen the shadow instead. */
+body[data-variant="praxis"] .tbtn:not(.tbtn--run):not(:disabled):hover,
+body[data-variant="praxis"] .pager__btn:not(.pager__btn--active):not(:disabled):hover,
+body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):hover,
+body[data-variant="praxis"] .ehsq-navrail__link:hover{
+  background-color:var(--px-surface);
+  background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
+  box-shadow:var(--px-tool-shadow-hover);
+}
+body[data-variant="praxis"] .pager__btn:disabled:hover{
+  background-image:none; background-color:var(--px-surface); box-shadow:none;
+}
+/* Already-selected options keep their raised treatment; only the wash changes. */
+body[data-variant="praxis"] .viewswitch__btn--active:hover{
+  background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
 }
