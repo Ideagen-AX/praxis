@@ -345,7 +345,7 @@
     background-position: 0 0, 0 0;
   }
   /* Dark: the edge-fade must resolve to the navy body colour, not
-     surface-default (#1c2330) — otherwise the dot region reads as a lighter
+     surface-default (#192336) — otherwise the dot region reads as a lighter
      band and seams against the navy header/footer. */
   body[data-theme="dark"] .mazlan-drawer__dots {
     background-image:

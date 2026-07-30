@@ -277,7 +277,7 @@ body[data-theme="dark"] .persona-picker--in-menu .persona-popover{
    ===================================================================== */
 body[data-theme="dark"]{
   color-scheme:dark;
-  --ehsq-color-surface-default:#1c2330;
+  --ehsq-color-surface-default:#192336;
   --ehsq-color-surface-subtle:#12161f;
   --ehsq-color-neutral-05:#12161f;
   --ehsq-color-neutral-10:#222b39;
@@ -298,7 +298,7 @@ body[data-theme="dark"] .page{
   background-repeat:no-repeat, no-repeat, repeat;
 }
 body[data-theme="dark"] .card{
-  background:#1c2330;
+  background:#192336;
   box-shadow:0 0 0 .5px rgba(255,255,255,.08), 0 1px 2px rgba(0,0,0,.4),
              0 16px 40px -18px rgba(0,0,0,.6), inset 0 .5px 0 rgba(255,255,255,.07);
 }
