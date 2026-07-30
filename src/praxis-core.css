@@ -131,6 +131,11 @@ body[data-variant="praxis"][data-theme="dark"]{
   --px-primary-soft-shadow:0 0 0 .5px rgba(41,210,215,.32),0 1px 2px rgba(0,0,0,.40),0 8px 18px -10px rgba(41,210,215,.40),inset 0 1px 0 rgba(255,255,255,.12);
   --px-primary-soft-hover:linear-gradient(180deg,rgba(41,210,215,.28) 0%,rgba(41,210,215,.15) 100%);
   --px-primary-soft-shadow-hover:0 0 0 .5px rgba(41,210,215,.44),0 1px 2px rgba(0,0,0,.40),0 10px 22px -10px rgba(41,210,215,.55),inset 0 1px 0 rgba(255,255,255,.16);
+  /* Quieter variant for rows of soft-primary buttons — four quick actions side
+     by side against the page pooled the full ambient glow into a continuous
+     band. Same hairline and lit edge, glow reduced to a hint. */
+  --px-primary-soft-shadow-sm:0 0 0 .5px rgba(41,210,215,.28),0 1px 2px rgba(0,0,0,.28),0 4px 10px -8px rgba(41,210,215,.22),inset 0 1px 0 rgba(255,255,255,.10);
+  --px-primary-soft-shadow-sm-hover:0 0 0 .5px rgba(41,210,215,.40),0 1px 2px rgba(0,0,0,.28),0 6px 14px -8px rgba(41,210,215,.32),inset 0 1px 0 rgba(255,255,255,.14);
 }
 
 /* Dark mode: primary CTAs use dark ink on the cyan gradient. Higher specificity
