@@ -110,7 +110,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 18px;
     font-weight: 500;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
     letter-spacing: 0.02em;
   }
   .mazlan-menu__divider {
@@ -137,7 +137,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
     cursor: pointer;
     text-align: left;
     letter-spacing: 0.02em;
@@ -150,7 +150,7 @@
   .mazlan-menu__item .material-symbols-rounded {
     flex-shrink: 0;
     font-size: 20px;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
   }
   .mazlan-menu__new-cube {
     width: 20px;
@@ -162,7 +162,7 @@
     flex-shrink: 0;
   }
   .mazlan-menu__new-cube .material-symbols-rounded {
-    color: #fff !important;
+    color: var(--ehsq-color-white) !important;
     font-size: 16px !important;
   }
   .mazlan-menu__shortcut {
@@ -199,7 +199,7 @@
     text-transform: uppercase;
     letter-spacing: 0.04em;
   }
-  .mazlan-menu__section-head:hover { color: #37485A; }
+  .mazlan-menu__section-head:hover { color: var(--ehsq-color-neutral-80); }
   .mazlan-menu__section-head .material-symbols-rounded {
     font-size: 14px;
     flex-shrink: 0;
@@ -220,7 +220,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 13px;
     font-weight: 500;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
     cursor: pointer;
     text-align: left;
     overflow: hidden;
@@ -270,7 +270,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 18px;
     font-weight: 500;
-    color: #37485A;
+    color: var(--ehsq-color-neutral-80);
     letter-spacing: 0.02em;
   }
   /* Icon-only header buttons — no border, no fill, just hover bg */
@@ -479,7 +479,7 @@
     font-family: 'Gilroy', sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: var(--ehsq-color-interactive-default, #1b838b);
+    color: var(--ehsq-color-interactive-default, var(--ehsq-color-teal-60));
     background: none;
     border: 0;
     cursor: pointer;
@@ -662,7 +662,7 @@
   .mazlan-source__avatar {
     width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
     border: 2px solid var(--ehsq-color-surface-default);
-    background: #EDF0F2; color: #37485A;
+    background: #EDF0F2; color: var(--ehsq-color-neutral-80);
     display: flex; align-items: center; justify-content: center;
     font-family: 'Gilroy', sans-serif; font-size: 9px; font-weight: 700;
   }
