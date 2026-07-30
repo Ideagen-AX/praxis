@@ -196,8 +196,7 @@
     font-size: 12px;
     font-weight: 600;
     color: rgba(55, 72, 90, 0.62);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing:normal;
   }
   .mazlan-menu__section-head:hover { color: var(--ehsq-color-neutral-80); }
   .mazlan-menu__section-head .material-symbols-rounded {
