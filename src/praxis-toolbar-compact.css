@@ -1,0 +1,115 @@
+/* ============================================================================
+   Praxis compact toolbar — tablet form (see praxis-toolbar-compact.js)
+   ============================================================================
+   Below 1024px the page toolbar keeps only the back button and the primary
+   action; everything else moves into a Tools dropdown, and the display
+   controls into an Options drawer.
+   ========================================================================= */
+
+/* The compact bar only exists in compact mode; the script fills it there. */
+.tb-compact{ display:none; }
+
+@media (max-width:1024px){
+  /* The original toolbar keeps the back button and the primary CTA. Its other
+     children have been moved out by the script, so it collapses naturally. */
+  body.tb-is-compact .toolbar{ flex-wrap:nowrap; gap:8px; }
+  body.tb-is-compact .toolbar__spacer{ display:none; }
+
+  .tb-compact{
+    display:flex; align-items:center; gap:8px; flex-shrink:0;
+    padding:0 var(--px-gutter, var(--ph-pad-x, 24px)) 10px;
+  }
+  .tb-compact__menu{ position:relative; }
+  .tb-compact__btn{ gap:8px; }
+  .tb-compact__caret{ font-size:18px !important; margin-left:-2px; opacity:.7; }
+
+  /* ---- Tools dropdown ---- */
+  .tb-compact__pop{
+    position:absolute; top:calc(100% + 6px); left:0; z-index:120;
+    min-width:220px; max-width:min(320px, calc(100vw - 32px));
+    display:flex; flex-direction:column; gap:2px; padding:6px;
+    background:var(--px-surface); border-radius:12px; box-shadow:var(--px-overlay);
+  }
+  .tb-compact__pop[hidden]{ display:none; }
+  /* The tools inside are the page's own buttons, restyled as menu rows so a
+     row of pills reads as a list. */
+  .tb-compact__pop > *{
+    width:100% !important; height:auto !important; min-height:44px;
+    justify-content:flex-start !important;
+    border-radius:8px !important; box-shadow:none !important;
+    background:transparent !important;
+  }
+  .tb-compact__pop > *:hover{ background:var(--px-hover-btn) !important; }
+  /* .tb-menu wrappers hold their own trigger; let it fill the row. */
+  .tb-compact__pop .tb-menu > .tbtn{ width:100%; justify-content:flex-start; }
+
+  /* ---- Options drawer ---- */
+  .tb-options__scrim{
+    position:fixed; inset:0; z-index:150;
+    background:rgba(32,42,53,.45); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
+    opacity:0; transition:opacity 200ms var(--ehsq-ease-default);
+  }
+  .tb-options__scrim.is-open{ opacity:1; }
+  .tb-options__scrim[hidden]{ display:none; }
+
+  .tb-options{
+    position:fixed; top:0; right:0; bottom:0; z-index:151;
+    width:min(380px, 88vw); display:flex; flex-direction:column;
+    background:var(--ehsq-color-surface-default); color:var(--ehsq-color-text-primary);
+    box-shadow:-4px 0 20px rgba(0,0,0,.22);
+    transform:translateX(100%); transition:transform 220ms var(--ehsq-ease-default);
+  }
+  .tb-options.is-open{ transform:none; }
+  .tb-options[hidden]{ display:none; }
+}
+
+/* Kept outside the query so the drawer still animates correctly if the
+   viewport is resized while it's open. */
+@media (prefers-reduced-motion: reduce){
+  .tb-options, .tb-options__scrim{ transition:none; }
+}
+
+.tb-options__head{
+  display:flex; align-items:center; justify-content:space-between;
+  height:var(--appbar-h, 64px); padding:0 12px 0 20px; flex-shrink:0;
+  border-bottom:1px solid var(--ehsq-color-border-default);
+}
+.tb-options__title{ font-size:.9375rem; font-weight:700; }
+.tb-options__close{
+  width:40px; height:40px; display:grid; place-items:center;
+  border:0; background:transparent; border-radius:var(--ehsq-radius-md);
+  color:var(--ehsq-color-text-secondary); cursor:pointer;
+  transition:background-color var(--ehsq-motion-fast), transform 150ms var(--ehsq-ease-default);
+}
+.tb-options__close:hover{ background:var(--px-hover-btn); color:var(--ehsq-color-text-primary); }
+.tb-options__close:active{ transform:scale(.95); }
+.tb-options__close .material-symbols-rounded{ font-size:22px; }
+
+.tb-options__body{ flex:1; overflow-y:auto; padding:16px 20px 28px; display:flex; flex-direction:column; gap:12px; }
+/* Section label above each moved-in panel. */
+.tb-options__section{
+  font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--ehsq-color-text-tertiary); padding:10px 0 0;
+}
+/* The moved controls were laid out for a horizontal bar; stack them. */
+.tb-options__body .toolbar__sortlabel{ font-size:11px; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--ehsq-color-text-tertiary); padding-top:2px; }
+.tb-options__body .sortmenu,
+.tb-options__body .viewswitch{ width:100%; }
+.tb-options__body .viewswitch{ display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; }
+.tb-options__body .viewswitch__btn{ width:100%; }
+.tb-options__body > *{ flex-shrink:0; }
+
+/* A moved-in panel brings its own card chrome — surface, border, shadow, its
+   own title and collapse chevron. Inside the drawer that reads as a card in a
+   card, and the section label above it already names it. Flatten it. */
+.tb-options__body #fieldsPanel,
+.tb-options__body #chartPanel,
+.tb-options__body #explorePanel{
+  background:transparent !important; box-shadow:none !important; border:0 !important;
+  border-radius:0 !important; padding:0 !important; width:100% !important;
+  max-width:none !important; min-width:0 !important; position:static !important;
+}
+/* Their own headers duplicate the drawer's section label. */
+.tb-options__body :is(#fieldsPanel, #chartPanel, #explorePanel)
+  :is(.fields__head, .panel__head, .exp-head, [class$="__head"]):first-child{ display:none; }
