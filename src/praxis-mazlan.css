@@ -9,12 +9,20 @@
      ============================================================ */
   .mazlan-scrim {
     position: fixed;
-    top: var(--appbar-height, 64px);
+    /* Full-viewport, including the app header. The scrim used to start below
+       the header, which left the top bar undimmed and reading as still-live
+       while the drawer was open. The drawer itself stays anchored below the
+       header — only the dimming extends over it. */
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background: rgba(32, 42, 53, 0.25);
-    z-index: 95;
+    /* Above the app bar: most pages put it at 30, but the Contextual Awareness
+       workspace's is fixed at 100 (concierge-base.css), so the scrim has to
+       clear that to dim it. Still below Create New (119) and the module
+       selector (125), which are never open at the same time. */
+    z-index: 105;
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
     opacity: 0;
@@ -27,7 +35,7 @@
     /* Floats with margin from edges so all four 24px corners are visible.
        Anchored below the top bar; calc keeps it inset from top/right/bottom. */
     position: fixed;
-    top: calc(var(--appbar-height, 64px) + 16px);
+    top: calc(var(--appbar-height, var(--appbar-h, 64px)) + 16px);
     right: 16px;
     bottom: 16px;
     width: min(484px, calc(100vw - 32px));
@@ -35,7 +43,7 @@
     border: 0;
     border-radius: 24px;
     box-shadow: -8px 16px 40px rgba(32, 42, 53, 0.18), 0 4px 12px rgba(32, 42, 53, 0.06);
-    z-index: 96;
+    z-index: 106;
     display: flex;
     flex-direction: column;
     overflow: hidden;
