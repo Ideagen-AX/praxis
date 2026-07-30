@@ -82,7 +82,14 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
 /* ---- Filter field — narrows the module list; lives inside the menu, below
        the title (the trigger field is display-only). Reuses the Create New
        search pill (.cn-find); only the spacing below the title is bespoke. ---- */
-.msel__filter{ margin:0 0 16px; }
+/* The menu is a flex column with max-height:min(96vh,1040px). A flex item's
+   default flex-shrink:1 means the filter gets compressed below its 38px height
+   whenever the module list overflows — so on a short viewport the input looked
+   squashed, and the amount varied with the window. Pinning the fixed-height
+   chrome (title row + filter) means the list absorbs all the overflow and the
+   input is always 38px, at any viewport height. */
+.msel__filter{ margin:0 0 16px; flex:0 0 auto; }
+.msel__titlebar{ flex:0 0 auto; }
 
 /* ---- "All modules" row at the top ---- */
 
