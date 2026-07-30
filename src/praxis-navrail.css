@@ -51,8 +51,14 @@ body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):n
   color:var(--ehsq-color-text-secondary);
   background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.06),0 1px 2px rgba(16,36,58,.05);
 }
+/* Hover shifts the fill, not just the glyph — the shadow-only version read as
+   a rendering artefact. The wash rides over the surface so the button keeps
+   reading as raised. (This rule outranks the shared pass in praxis-core.css,
+   and its `background` shorthand would reset the image anyway.) */
 body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create):hover{
-  background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14);
+  background-color:var(--px-surface);
+  background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
+  box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14);
 }
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create){
   color:#c8cfd7; /* neutral-20 (light value) — a lighter glyph on the slate chip */
@@ -60,11 +66,13 @@ body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navr
   box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06);
 }
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create):hover{
-  color:#fff; background:var(--px-surface-2,#232c3b);
+  color:#fff;
+  background-color:var(--px-surface-2,#232c3b);
+  background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
   box-shadow:0 0 0 .5px rgba(255,255,255,.14),inset 0 .5px 0 rgba(255,255,255,.08);
 }
 body[data-variant="praxis"] .ehsq-navrail__link{ background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.06),0 1px 2px rgba(16,36,58,.05); }
-body[data-variant="praxis"] .ehsq-navrail__link:hover{ background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14); }
+body[data-variant="praxis"] .ehsq-navrail__link:hover{ background-color:var(--px-surface); background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn)); box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14); }
 body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__link{ background:var(--px-surface-2,#232c3b); box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06); }
 body[data-variant="praxis"] .ehsq-navrail__link img{ width:auto; height:28px; }
 body[data-variant="praxis"] .ehsq-navrail__btn--create{

@@ -303,7 +303,10 @@ window.PraxisFilters = (function () {
         <span class="material-symbols-rounded chip__close">close</span>
       </button>`;
     }).join('');
-    bar.innerHTML = fixedChips + treeChips + filterChips;
+    // .trim(): with nothing applied the three parts are template-literal
+    // whitespace rather than '', which is enough to defeat :empty — and the
+    // host collapses the bar's padding on :empty.
+    bar.innerHTML = (fixedChips + treeChips + filterChips).trim();
     // Mirror active values into their drawer sections + quick-card highlights
     renderRowChips();
     syncQuickSelection();
