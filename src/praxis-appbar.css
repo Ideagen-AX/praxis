@@ -109,8 +109,13 @@ body[data-variant="praxis"][data-theme="dark"] .appbar__iconbtn:hover{background
    The 840px absolutely-centered search pill is the main thing that must adapt;
    below md it becomes an in-flow flex child that takes the remaining width.
    ===================================================================== */
+/* The centred pill is absolutely positioned, so it can't know what sits beside
+   it — the reserve is the only thing keeping it off the Mazlan button and the
+   avatar. 340px wasn't enough anywhere in this band: 10px of clearance at 950
+   and 4px at 834. 420px holds ~45px clear all the way down to 769, where the
+   pill goes in-flow and the reserve stops mattering. */
 @media (max-width:1024px){
-  .appbar__search{ width:min(600px, calc(100vw - 340px)); }
+  .appbar__search{ width:min(600px, calc(100vw - 420px)); }
 }
 @media (max-width:768px){
   /* Centered 840px pill → in-flow element taking the remaining width */

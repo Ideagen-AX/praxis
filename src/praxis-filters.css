@@ -108,7 +108,7 @@
 .filter-chips .chip--clear {
   padding: 0 var(--s-16);
   color: var(--ehsq-color-red-60);
-  border: 1px solid rgba(226, 45, 56, .24);
+  border: 0;
   background: linear-gradient(180deg, rgba(226, 45, 56, .09), rgba(226, 45, 56, .17));
   box-shadow: var(--px-tool-shadow), inset 0 .5px 0 rgba(255, 255, 255, .6);
   transition: background var(--d-fast) var(--ease-default), box-shadow var(--d-fast) var(--ease-default);
@@ -118,6 +118,17 @@
   box-shadow: var(--px-tool-shadow-hover), inset 0 .5px 0 rgba(255, 255, 255, .6);
 }
 .filter-chips .chip--clear:active { background: linear-gradient(180deg, rgba(226, 45, 56, .2), rgba(226, 45, 56, .28)); }
+/* The bar's generic .chip__close is 24px; Clear all's leading × is a label
+   glyph rather than a dismiss target, so it sits a size down. */
+.filter-chips .chip--clear .material-symbols-rounded,
+.filter-chips .chip--clear svg {
+  /* inline-flex, not inline: width/height are ignored on a non-replaced inline
+     box, so the glyph kept its 24px em square. Covers the SVG too — the Lucide
+     converter swaps these ligatures at runtime. */
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; min-width: 20px;
+  font-size: 20px !important; line-height: 1;
+}
 /* Dark: the lit edge flips to white-on-dark and the tint carries more weight,
    since a 9% red over a navy surface all but disappears. */
 body[data-theme="dark"] .filter-chips .chip--clear {
@@ -130,7 +141,7 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
   background: linear-gradient(180deg, rgba(255, 139, 147, .18), rgba(255, 139, 147, .28));
   box-shadow: var(--px-tool-shadow-hover), inset 0 .5px 0 rgba(255, 255, 255, .08);
 }
-.filter-chips .chip--clear .material-symbols-rounded { font-size: 24px; width: 24px; height: 24px; }
+/* (was a 24px re-declaration here — the size now lives in the block above) */
 .drawer-scrim { position: fixed; inset: 0px; background: rgba(32, 42, 53, 0.5); z-index: 80; opacity: 0; transition: opacity var(--d-normal) var(--ease-default); }
 .drawer-scrim[data-open] { opacity: 1; }
 .filter-drawer { position: fixed; top: var(--s-24); right: var(--s-24); bottom: var(--s-24); width: min(480px, calc(100% - 2 * var(--s-24))); background: var(--color-surface); z-index: 90; display: flex; flex-direction: column; transform: translateX(calc(100% + var(--s-24))); transition: transform var(--d-slow) var(--ease-out); box-shadow: rgba(32, 42, 53, 0.24) 0px 24px 64px, rgba(32, 42, 53, 0.12) 0px 8px 24px; border-radius: 20px; overflow: hidden; }

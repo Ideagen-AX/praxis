@@ -268,11 +268,13 @@ window.PraxisFilters = (function () {
   function renderChips() {
     const bar = $('[data-chips]');
     if (!bar) return;
+    // Clear all only appears once there's something to clear — an always-on
+    // destructive control against an empty chip bar reads as a filter itself.
     const fixedChips = `
-      <button class="chip chip--clear" data-action="clear-all">
+      ${hasActiveFilters() ? `<button class="chip chip--clear" data-action="clear-all">
         <span class="material-symbols-rounded">close</span>
         Clear all
-      </button>
+      </button>` : ''}
       ${scopeChip ? `<button class="chip" data-fixed>
         ${escapeHtml(scopeChip.label)}: <strong>${escapeHtml(scopeChip.value)}</strong>
         <span class="material-symbols-rounded chip__close">close</span>
