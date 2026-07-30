@@ -398,3 +398,22 @@ body[data-variant="praxis"][data-theme="dark"] :is(
   .capa-prio__step--active, .subtab__count,
   .nav-menu-drawer__item--active, .nav-menu-drawer__item--active span
 ){ color:var(--px-primary-fg); }
+
+/* ---------------------------------------------------------------------
+   WCAG 2.4.1 Bypass blocks — skip to content
+
+   Every page opens with an app bar and a nav rail, so a keyboard user
+   traverses ~10 controls before reaching content. Off-screen until focused,
+   then it lands in the top-left as a normal Praxis pill. Nothing is visible
+   at rest, so the default rendering is unchanged.
+   --------------------------------------------------------------------- */
+.px-skip{
+  position:fixed; top:8px; left:8px; z-index:1000;
+  display:inline-flex; align-items:center; height:36px; padding:0 16px;
+  border-radius:10px; background:var(--px-surface); color:var(--ehsq-color-text-link);
+  font-size:.875rem; font-weight:600; text-decoration:none;
+  box-shadow:var(--px-tool-shadow-hover);
+  transform:translateY(-150%); transition:transform 120ms var(--ehsq-ease-default,ease);
+}
+.px-skip:focus-visible, .px-skip:focus{ transform:none; outline:2px solid var(--ehsq-color-teal-50); outline-offset:2px; }
+@media (prefers-reduced-motion: reduce){ .px-skip{ transition:none; } }
