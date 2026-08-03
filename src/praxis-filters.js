@@ -706,11 +706,25 @@ window.PraxisFilters = (function () {
     collapseChip(chip, () => chip.remove());
   });
 
-  // Restore Defaults (footer) / Clear all (chip bar): clears every filter value,
-  // resets operators, and returns favorites/quick filters/accordions to the
-  // seeded defaults. The chip-bar "Clear all" also closes the drawer; the
-  // footer "Restore Defaults" keeps the modal open so the user can keep filtering.
+  // Restore Defaults (footer) / Clear all (chip bar). Both clear every filter
+  // value and reset operators. They diverge on the panel's SET-UP — which
+  // fields are pinned as quick filters, which are favorited:
+  //
+  //   Restore Defaults — resets the set-up to the seeded defaults. That is the
+  //                      button's entire purpose, so it keeps doing it, and it
+  //                      leaves the modal open so the user can carry on.
+  //   Clear all        — clears what is APPLIED and nothing else. It sits on the
+  //                      chip bar next to the active-filter chips, so its scope
+  //                      is those chips; wiping the user's pinned quick filters
+  //                      as a side effect destroyed work they never asked to
+  //                      undo (and silently re-pinned any default they had
+  //                      removed). It closes the drawer.
+  //
+  // Quick-filter VALUES still clear on both paths — resetControlForFilter()
+  // covers the .qfilter cards — so a pinned card survives Clear all, just
+  // emptied. That is the point: the card is set-up, its selection is applied.
   bind('[data-action="clear-all"]', 'click', (e, btn) => {
+    const restoreDefaults = !!btn?.hasAttribute('data-restore-defaults');
     Object.keys(filterState).forEach(k => resetControlForFilter(k));
     Object.keys(filterState).forEach(k => delete filterState[k]);
     Object.keys(opState).forEach(k => delete opState[k]);
@@ -719,10 +733,12 @@ window.PraxisFilters = (function () {
     cfSelected.clear();
     activeTypeSet.clear();
     if (typeof updateTypeSelectLabel === 'function') updateTypeSelectLabel();
-    favOrder = [...DEFAULT_FAVS];
-    favSet.clear(); DEFAULT_FAVS.forEach(n => favSet.add(n));
-    quickOrder = [...DEFAULT_QUICK];
-    quickSet.clear(); DEFAULT_QUICK.forEach(n => quickSet.add(n));
+    if (restoreDefaults) {
+      favOrder = [...DEFAULT_FAVS];
+      favSet.clear(); DEFAULT_FAVS.forEach(n => favSet.add(n));
+      quickOrder = [...DEFAULT_QUICK];
+      quickSet.clear(); DEFAULT_QUICK.forEach(n => quickSet.add(n));
+    }
     expandedRows.clear();
     moreOpen = false;
     renderFilterList();
@@ -1276,6 +1292,24 @@ window.PraxisFilters = (function () {
     if (open) expandedRows.delete(name); else expandedRows.add(name);
     btn.setAttribute('aria-expanded', String(!open));
     row.querySelector('.filter-row__body')?.classList.toggle('is-open', !open);
+  });
+
+  // ---- Whole-row hit target ----
+  // .filter-row__toggle only spans caret + icon + title, so the row's padding
+  // band, the header gaps and the quick-filter badge were dead space: a click
+  // that visibly landed "on the row" did nothing. Forward those to the button
+  // rather than stretching it, so the <button> stays the single accessible
+  // control (keyboard + aria-expanded unchanged) and the trailing bolt /
+  // bookmark buttons keep their own targets.
+  bind('.filter-row', 'click', (e, row) => {
+    // Anything that handles its own click is left alone — including the
+    // toggle itself, whose handler above would otherwise fire alongside this
+    // one and cancel it out. The body and chip rail are excluded so
+    // interacting with a filter's controls can't collapse the row.
+    if (e.target.closest('button, a, input, select, textarea, label, .filter-row__body, .filter-row__chips')) return;
+    // Locked rows (pinned as quick filters) render the toggle disabled;
+    // :not([disabled]) lets those clicks fall through to nothing.
+    row.querySelector('[data-action="toggle-frow"]:not([disabled])')?.click();
   });
 
   // ---- "More Filters" roll-up ----
