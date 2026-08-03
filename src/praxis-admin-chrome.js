@@ -17,9 +17,21 @@
     if(!btn || !pop) return;
     opts = opts || {};
     var scrim = opts.scrimId ? document.getElementById(opts.scrimId) : null;
-    var lift  = opts.lift ? document.querySelector(opts.lift) : null;
-    function open(){ pop.hidden = false; if(scrim) scrim.hidden = false; if(lift) lift.style.zIndex = '131'; btn.setAttribute('aria-expanded','true'); }
-    function close(){ pop.hidden = true; if(scrim) scrim.hidden = true; if(lift) lift.style.zIndex = ''; btn.setAttribute('aria-expanded','false'); }
+    /* The flyout lives inside the nav rail, which is a flex item with z-index:20
+       — z-index applies to flex items even unpositioned, so the rail opens a
+       stacking context that traps the flyout below the z-index:119 scrim.
+
+       Dropping the rail to auto while open is the whole fix: the rail becomes a
+       non-positioned flex item and paints below the scrim (border and all nav
+       buttons with it), while the flyout, being positioned with its own
+       z-index, resolves against the root and clears the scrim on its own.
+
+       This used to raise the whole rail to 131 instead, which put every nav
+       button and the rail's right border above the scrim — the overlay read as
+       sitting behind the navigation rather than over it. */
+    var rail = btn.closest('.ehsq-navrail');
+    function open(){ pop.hidden = false; if(scrim) scrim.hidden = false; if(rail) rail.style.zIndex = 'auto'; btn.setAttribute('aria-expanded','true'); }
+    function close(){ pop.hidden = true; if(scrim) scrim.hidden = true; if(rail) rail.style.zIndex = ''; btn.setAttribute('aria-expanded','false'); }
     btn.addEventListener('click', function(e){ if(!isPraxis()) return; e.stopPropagation(); if(pop.hidden) open(); else close(); });
     pop.addEventListener('click', function(e){ e.stopPropagation(); });
     document.addEventListener('click', function(){ if(!pop.hidden) close(); });
@@ -58,7 +70,7 @@
           + '</div><p class="cn-manage-note">Templates are record types your team has partially filled out — pick one to start ahead.</p>';
       }
     }
-    var api = wirePopover('ad-create-btn','ad-create-pop',{scrimId:'ad-cn-scrim', lift:'.ehsq-navrail'});
+    var api = wirePopover('ad-create-btn','ad-create-pop',{scrimId:'ad-cn-scrim'});
     if(!api) return;
     document.getElementById('ad-create-btn').addEventListener('click', function(){
       if(!api.isOpen()) return;
@@ -81,7 +93,7 @@
 
   /* 2 · Dashboards / workspaces popout (opens right of the nav rail). */
   (function(){
-    var api = wirePopover('ad-dash-btn','ad-dash-pop',{scrimId:'ad-dash-scrim', lift:'.ehsq-navrail'});
+    var api = wirePopover('ad-dash-btn','ad-dash-pop',{scrimId:'ad-dash-scrim'});
     if(!api) return;
     document.querySelectorAll('#ad-dash-pop .ws-item').forEach(function(i){
       i.addEventListener('click', function(){ if(i.tagName !== 'A'){ /* static demo entries */ } api.close(); });
