@@ -42,8 +42,9 @@
     var out = [];
     [].forEach.call(root.children, function (el) {
       if (el.classList.contains('toolbar__spacer')) return;
-      // a group wrapper contributes its children, not itself
-      if (/toolbar__group/.test(el.className)) { out = out.concat(directControls(el)); return; }
+      // a group wrapper contributes its children, not itself. __inner is the
+      // centred column the record family wraps its controls in.
+      if (/toolbar__(group|inner)/.test(el.className)) { out = out.concat(directControls(el)); return; }
       out.push(el);
     });
     return out;

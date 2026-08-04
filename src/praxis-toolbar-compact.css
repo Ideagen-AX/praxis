@@ -16,7 +16,8 @@
 
 /* Compact mode is driven by measurement, not a media query — the script sets
    this class when the toolbar's contents would no longer fit on one line. */
-body.tb-is-compact .toolbar{ flex-wrap:nowrap; gap:8px; }
+body.tb-is-compact .toolbar,
+body.tb-is-compact .toolbar__inner{ flex-wrap:nowrap; gap:8px; }
 body.tb-is-compact .toolbar__spacer{ display:none; }
 
   /* ---- Tools dropdown ---- */
