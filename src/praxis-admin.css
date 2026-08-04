@@ -136,8 +136,10 @@ body[data-theme="dark"] .verswitch{background:rgba(255,255,255,.08);}
 /* Nav-rail CONTAINER (contents styled by praxis-navrail.css) */
 .ehsq-navrail{display:flex;flex-direction:column;justify-content:space-between;width:var(--navrail-w);flex-shrink:0;
   background:var(--ehsq-color-surface-default);border-right:1px solid var(--ehsq-color-neutral-20);box-sizing:border-box;z-index:20;}
-.content{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;}
-.pageheader{--ph-pad-x:24px;}
+/* --ph-pad-x sits here rather than on .pageheader so the toolbar band and
+   .admin-body / .rm-body inherit the same inset and everything below the
+   header lines up against one number. */
+.content{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;--ph-pad-x:24px;}
 
 /* Shared nav-rail popover material (Create New / Dashboards flyouts) */
 .px-pop{position:absolute;z-index:200;background:var(--ehsq-color-surface-default);border:1px solid var(--ehsq-color-border-default);border-radius:12px;padding:6px;box-shadow:var(--ehsq-elevation-4);}
@@ -145,11 +147,8 @@ body[data-theme="dark"] .verswitch{background:rgba(255,255,255,.08);}
 body[data-variant="praxis"] .px-pop{border:0;box-shadow:var(--px-overlay);}
 
 /* ============================================================= TOOLBAR
-   Fades the --px-page cover to transparent so the fixed dot-grid fades
-   in beneath it (matches record/search). */
-.toolbar{display:flex;align-items:center;gap:var(--ehsq-space-8);padding:10px var(--ph-pad-x,24px);flex-wrap:wrap;
-  background:linear-gradient(to bottom, var(--px-page) 0%, transparent 100%);}
-.toolbar__spacer{flex:1;}
+   The band itself — height, inset, page fade and closing hairline — is the
+   shared component in praxis-pageheader.css. Only the controls are local. */
 .tbtn{display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 14px;border:0;border-radius:10px;background:var(--px-tool);color:var(--ehsq-color-text-primary);font-size:.875rem;font-weight:600;box-shadow:var(--px-tool-shadow);transition:box-shadow var(--ehsq-motion-fast),background var(--ehsq-motion-fast),color var(--ehsq-motion-fast);}
 .tbtn .icon{color:var(--ehsq-color-text-secondary);}
 .tbtn .material-symbols-rounded{font-size:20px;color:var(--ehsq-color-text-secondary);}

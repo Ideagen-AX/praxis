@@ -464,7 +464,10 @@ body[data-variant="praxis"][data-theme="dark"] :is(
   /* Both the token AND the padding: most pages derive their page-header inset
      from --ph-pad-x, but a few (the record variants) declare padding directly,
      so the token alone doesn't reach them. */
-  body[data-variant="praxis"] .pageheader{ --ph-pad-x:var(--px-gutter); padding-inline:var(--px-gutter); }
+  /* The toolbar band comes too, so its closing hairline stays flush with the
+     header's at this width instead of stepping in or out by a few px. */
+  body[data-variant="praxis"] .pageheader,
+  body[data-variant="praxis"] .toolbar{ --ph-pad-x:var(--px-gutter); padding-inline:var(--px-gutter); }
 
   /* The admin side nav is 60px of unlabelled icons at this width — unusable,
      and it offsets the page header and content so they can't line up with the
