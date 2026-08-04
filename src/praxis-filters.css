@@ -98,8 +98,12 @@
 .qfilter__more { font-size: var(--t-xs); color: var(--color-action); font-weight: 600; text-align: center; padding: var(--s-4) 0; margin-top: auto; }
 .qfilter__more:hover { text-decoration: underline; }
 .filter-chips { display: flex; flex-wrap: wrap; gap: var(--s-8); padding: var(--s-8) 0 var(--s-12); }
-.filter-chips .chip { display: inline-flex; align-items: center; gap: var(--s-8); padding: 0 var(--s-16); height: 40px; background: var(--ehsq-color-neutral-10); border: 1px solid var(--ehsq-color-neutral-20); border-radius: var(--r-full); font-size: var(--t-base); font-weight: 600; font-family: inherit; color: var(--ehsq-color-neutral-90); transition: background var(--d-fast) var(--ease-default); }
-.filter-chips .chip:hover { background: var(--ehsq-color-neutral-20); }
+/* High-contrast filter chips. Light mode: light fill + dark text/stroke.
+   Dark mode: inverse — dark fill + light text/stroke. */
+.filter-chips .chip { display: inline-flex; align-items: center; gap: var(--s-8); padding: 0 var(--s-16); height: 40px; background: var(--px-surface); border: 1px solid var(--ehsq-color-neutral-90); border-radius: var(--r-full); font-size: var(--t-base); font-weight: 600; font-family: inherit; color: var(--ehsq-color-neutral-90); transition: background var(--d-fast) var(--ease-default); }
+.filter-chips .chip:hover { background: var(--ehsq-color-neutral-05); }
+body[data-theme="dark"] .filter-chips .chip { background: var(--ehsq-color-neutral-90); border-color: rgba(255,255,255,.7); color: #fff; }
+body[data-theme="dark"] .filter-chips .chip:hover { background: var(--ehsq-color-neutral-80); }
 .filter-chips .chip strong { color: inherit; font-weight: 600; margin-left: 2px; }
 .filter-chips .chip__close { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; color: inherit; font-size: 24px !important; }
 /* Clear all reads as a destructive tool button rather than an outlined chip:
