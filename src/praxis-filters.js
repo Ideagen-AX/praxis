@@ -661,26 +661,70 @@ window.PraxisFilters = (function () {
     setFilter(filterName, opt.textContent.trim());
   });
 
+  /* renderChips() rebuilds the whole bar with innerHTML, so a removed chip used
+     to blink out between frames with nothing to confirm the click landed —
+     easy to misread as a misfire when the bar is crowded. Collapse the chip
+     first, then run the state change: by the time the re-render replaces the
+     bar the chip is already gone visually.
+
+     minHeight pins the bar for the duration so a collapsing last-chip-on-a-row
+     doesn't reflow the results underneath mid-animation. Falls straight
+     through to `done` under reduced motion, or where Web Animations is
+     unavailable, so removal never depends on the animation finishing. */
+  function collapseChip(chip, done) {
+    if (!chip || typeof chip.animate !== 'function'
+        || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { done(); return; }
+    const w = chip.getBoundingClientRect().width;
+    const bar = chip.parentElement;
+    if (bar) bar.style.minHeight = bar.getBoundingClientRect().height + 'px';
+    chip.style.overflow = 'hidden';
+    chip.style.whiteSpace = 'nowrap';
+    const anim = chip.animate([
+      { width: w + 'px', opacity: 1, transform: 'scale(1)' },
+      { width: '0px', opacity: 0, transform: 'scale(.94)', paddingLeft: 0, paddingRight: 0, marginRight: '-8px' }
+    ], { duration: 160, easing: 'cubic-bezier(.32,.72,0,1)', fill: 'forwards' });
+    const finish = () => { if (bar) bar.style.minHeight = ''; done(); };
+    anim.onfinish = finish;
+    anim.oncancel = finish;
+  }
+
   // Chip remove (any chip with data-filter-name)
   bind('.chip[data-filter-name] .chip__close', 'click', (e, x) => {
     e.stopPropagation();
     const chip = x.closest('.chip');
     const filterName = chip.getAttribute('data-filter-name');
-    resetControlForFilter(filterName);
-    setFilter(filterName, null);
+    collapseChip(chip, () => {
+      resetControlForFilter(filterName);
+      setFilter(filterName, null);
+    });
   });
 
   // Fixed chip (Module) remove — we'll just remove the chip visually
   bind('.chip[data-fixed] .chip__close', 'click', (e, x) => {
     e.stopPropagation();
-    x.closest('.chip').remove();
+    const chip = x.closest('.chip');
+    collapseChip(chip, () => chip.remove());
   });
 
-  // Restore Defaults (footer) / Clear all (chip bar): clears every filter value,
-  // resets operators, and returns favorites/quick filters/accordions to the
-  // seeded defaults. The chip-bar "Clear all" also closes the drawer; the
-  // footer "Restore Defaults" keeps the modal open so the user can keep filtering.
+  // Restore Defaults (footer) / Clear all (chip bar). Both clear every filter
+  // value and reset operators. They diverge on the panel's SET-UP — which
+  // fields are pinned as quick filters, which are favorited:
+  //
+  //   Restore Defaults — resets the set-up to the seeded defaults. That is the
+  //                      button's entire purpose, so it keeps doing it, and it
+  //                      leaves the modal open so the user can carry on.
+  //   Clear all        — clears what is APPLIED and nothing else. It sits on the
+  //                      chip bar next to the active-filter chips, so its scope
+  //                      is those chips; wiping the user's pinned quick filters
+  //                      as a side effect destroyed work they never asked to
+  //                      undo (and silently re-pinned any default they had
+  //                      removed). It closes the drawer.
+  //
+  // Quick-filter VALUES still clear on both paths — resetControlForFilter()
+  // covers the .qfilter cards — so a pinned card survives Clear all, just
+  // emptied. That is the point: the card is set-up, its selection is applied.
   bind('[data-action="clear-all"]', 'click', (e, btn) => {
+    const restoreDefaults = !!btn?.hasAttribute('data-restore-defaults');
     Object.keys(filterState).forEach(k => resetControlForFilter(k));
     Object.keys(filterState).forEach(k => delete filterState[k]);
     Object.keys(opState).forEach(k => delete opState[k]);
@@ -689,10 +733,12 @@ window.PraxisFilters = (function () {
     cfSelected.clear();
     activeTypeSet.clear();
     if (typeof updateTypeSelectLabel === 'function') updateTypeSelectLabel();
-    favOrder = [...DEFAULT_FAVS];
-    favSet.clear(); DEFAULT_FAVS.forEach(n => favSet.add(n));
-    quickOrder = [...DEFAULT_QUICK];
-    quickSet.clear(); DEFAULT_QUICK.forEach(n => quickSet.add(n));
+    if (restoreDefaults) {
+      favOrder = [...DEFAULT_FAVS];
+      favSet.clear(); DEFAULT_FAVS.forEach(n => favSet.add(n));
+      quickOrder = [...DEFAULT_QUICK];
+      quickSet.clear(); DEFAULT_QUICK.forEach(n => quickSet.add(n));
+    }
     expandedRows.clear();
     moreOpen = false;
     renderFilterList();
@@ -1246,6 +1292,24 @@ window.PraxisFilters = (function () {
     if (open) expandedRows.delete(name); else expandedRows.add(name);
     btn.setAttribute('aria-expanded', String(!open));
     row.querySelector('.filter-row__body')?.classList.toggle('is-open', !open);
+  });
+
+  // ---- Whole-row hit target ----
+  // .filter-row__toggle only spans caret + icon + title, so the row's padding
+  // band, the header gaps and the quick-filter badge were dead space: a click
+  // that visibly landed "on the row" did nothing. Forward those to the button
+  // rather than stretching it, so the <button> stays the single accessible
+  // control (keyboard + aria-expanded unchanged) and the trailing bolt /
+  // bookmark buttons keep their own targets.
+  bind('.filter-row', 'click', (e, row) => {
+    // Anything that handles its own click is left alone — including the
+    // toggle itself, whose handler above would otherwise fire alongside this
+    // one and cancel it out. The body and chip rail are excluded so
+    // interacting with a filter's controls can't collapse the row.
+    if (e.target.closest('button, a, input, select, textarea, label, .filter-row__body, .filter-row__chips')) return;
+    // Locked rows (pinned as quick filters) render the toggle disabled;
+    // :not([disabled]) lets those clicks fall through to nothing.
+    row.querySelector('[data-action="toggle-frow"]:not([disabled])')?.click();
   });
 
   // ---- "More Filters" roll-up ----
@@ -2176,9 +2240,13 @@ window.PraxisFilters = (function () {
     e.stopPropagation();
     const id = btn.dataset.node;
     if (!id) return;
-    cfRemove(builderDraft, id);
-    commitTree();
-    renderFilterList();
+    // closest('.chip') is null when this fires from the builder rather than the
+    // chip bar; collapseChip falls through to the callback in that case.
+    collapseChip(btn.closest('.chip'), () => {
+      cfRemove(builderDraft, id);
+      commitTree();
+      renderFilterList();
+    });
   });
   bind('[data-action="cf-set-conn"]', 'click', (e, btn) => {
     e.stopPropagation();

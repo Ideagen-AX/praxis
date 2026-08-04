@@ -55,11 +55,24 @@
 
 /* Zero-specificity resets: the host page has its own global .btn / .icon-btn /
    .chip and box model. :where() keeps these at specificity 0 so the ported rules
-   below still win, while stopping host globals from leaking into the panel. */
+   below still win, while stopping host globals from leaking into the panel.
+
+   .filter-controls belongs in these lists and was missing. It is one of the
+   component roots — the token bridge above already scopes to it — but its
+   buttons were getting no reset, so the Show/Hide Quick Filters toggle
+   rendered as a raw UA <button>: buttonface grey fill and a 2px outset
+   border. Against the flat page that reads as permanently hovered/pressed,
+   and the real :hover (a teal wash) had nothing to contrast against.
+
+   These stay HERE rather than being appended at the end of the file: the
+   reset has to sit above the component rules, or `color: inherit` would
+   clobber .filter-toggle's accent colour. */
 .filter-drawer :where(button), .drawer-scrim :where(button), .select-menu :where(button),
-.quick-filters :where(button), .filter-chips :where(button) { border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; }
+.quick-filters :where(button), .filter-chips :where(button),
+.filter-controls :where(button) { border: 0; background: transparent; font: inherit; color: inherit; cursor: pointer; }
 .filter-drawer :where(*), .drawer-scrim :where(*), .select-menu :where(*),
-.quick-filters :where(*), .filter-chips :where(*) { box-sizing: border-box; }
+.quick-filters :where(*), .filter-chips :where(*),
+.filter-controls :where(*) { box-sizing: border-box; }
 
 /* The modal's own button + icon-button scale, so the host's .btn (36px, calendar
    primitive) doesn't shrink the v1.5 footer. */
@@ -133,6 +146,14 @@ body[data-theme="dark"] .filter-chips .chip:hover { background: var(--ehsq-color
   width: 20px; height: 20px; min-width: 20px;
   font-size: 20px !important; line-height: 1;
 }
+/* Dark: praxis-core remaps --ehsq-color-neutral-10 (the chip fill) to #222b39
+   but leaves --ehsq-color-neutral-90 (the chip label) at #2a3846, so an active
+   filter chip rendered dark-on-dark at 1.19:1 — invisible, and against the
+   project's hard WCAG 2.2 AA requirement. Take the theme's text token rather
+   than the raw scale, so it follows any future remap. neutral-20 (the border
+   and hover fill) is already remapped, so only the colour needs correcting. */
+body[data-theme="dark"] .filter-chips .chip { color: var(--ehsq-color-text-primary); }
+
 /* Dark: the lit edge flips to white-on-dark and the tint carries more weight,
    since a 9% red over a navy surface all but disappears. */
 body[data-theme="dark"] .filter-chips .chip--clear {
@@ -521,3 +542,310 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
 /* Rows realign to the card's roomier left padding */
 .qfilter__row,
 .qfilter__more { margin-inline: calc(var(--s-4) * -1); }
+
+/* =====================================================================
+   ACCORDION MOTION + HIT TARGET
+
+   1. Easing. The whole component runs on --ehsq-ease-default,
+      cubic-bezier(.32,.72,0,1). That curve is extremely front-loaded — it
+      reaches ~77% progress in the first quarter of its duration, then
+      crawls to rest. On a hover colour it's imperceptible, but driving
+      grid-template-rows 0fr→1fr it reads as a springy snap-and-settle:
+      the row flies open, overshoots the eye, then eases in. Swap the
+      opening rows (and the caret that tracks them) onto an even
+      decelerate. Nothing else in the panel changes — the drawer slide,
+      hovers and press states keep the house curve.
+
+      Note this is a perceptual bounce, not a literal one: neither curve in
+      the system overshoots mathematically (no y control point exceeds 1).
+      Duration is unchanged at --d-normal; only the distribution moves.
+
+   2. Hit target. .filter-row__toggle only spans caret + icon + title, so
+      the row's 16px padding band, the header gaps and the quick-filter
+      badge were all dead space — a click that visibly landed "on the row"
+      did nothing. praxis-filters.js now forwards those to the button; this
+      block supplies the matching affordance.
+   ===================================================================== */
+
+.filter-controls,
+.quick-filters,
+.filter-chips,
+.filter-drawer,
+.filter-menu,
+.drawer-scrim,
+.select-menu {
+  /* Even decelerate — no snap at the head of the curve. */
+  --ease-accordion: cubic-bezier(.4, 0, .2, 1);
+}
+
+.filter-row__body { transition: grid-template-rows var(--d-normal) var(--ease-accordion); }
+.filter-row__body > .filter-row__controls,
+.filter-row__body > .filter-row__conditions { transition: opacity var(--d-normal) var(--ease-accordion); }
+.filter-row__caret { transition: color var(--d-fast) var(--ease-default), transform var(--d-normal) var(--ease-accordion); }
+/* The "More Filters" roll-up is the same interaction one level up, so it
+   tracks the rows rather than keeping the springier curve. */
+.filter-more__body { transition: grid-template-rows var(--d-slow) var(--ease-accordion); }
+
+/* =====================================================================
+   QUICK-FILTER BOLT — filled when on
+
+   .is-on only changed the glyph's colour, so a pinned quick filter read as
+   "pink outline" against an "unset grey outline" — a hue change carrying
+   the whole state, which is weak at 23px and invisible to anyone who
+   can't separate the two hues. Fill the glyph instead, so the state also
+   reads as weight.
+
+   praxis-lucide.js rewrites the Material ligature `bolt` into a Lucide
+   `zap` <svg>, which is stroke-built (fill="none" stroke="currentColor"),
+   so this is a fill change rather than the Material FILL axis. The font
+   glyph is covered too, in case the Lucide pass hasn't run or is absent —
+   the page loads the FILL 0..1 axis, so 'FILL' 1 is available there.
+
+   Both use currentColor, so the fill follows whatever pink the theme has
+   already resolved — #E30072 in light, the brightened #FF7AB8 in dark —
+   and the treatment is identical in both. */
+.filter-row__quick.is-on svg,
+.filter-row__quick.is-on svg * { fill: currentColor; }
+.filter-row__quick.is-on .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
+
+/* ---- The press bounce: the global scale-down on wide controls -------
+   praxis-core.css gives every control a press affordance: hover lifts,
+   press scales down over 150ms. It splits by footprint — .95 for "small
+   controls: icon buttons and compact pills", .97 for larger surfaces,
+   because (its words) "Larger surfaces travel less, or the shrink reads
+   as a jump."
+
+   The split keys off class, though, and the bucket for .95 is a bare
+   `button` selector. Several controls here are full-width rows that carry
+   no .btn-family class, so they land in the SMALL bucket and take the
+   largest scale of anything on the page:
+
+     .filter-more__head    928px wide  → shrinks ~46px on press
+     .filter-row__toggle   836px wide  → shrinks ~42px on press
+     .filter-select        491px wide  → shrinks ~25px on press
+     .filter-date          491px wide  → shrinks ~25px on press
+
+   On the accordion headers that's the visible fault: press Status or
+   Priority and the chevron and title lurch inward, spring back over
+   150ms on the house curve, and only then does the row open.
+
+   praxis-core writes those rules with :where() at specificity 0 so a
+   component can opt out — "A component that wants different press
+   behaviour — or none — overrides it with any class rule." That invitation
+   undersells what's needed, though: :where() is 0, but the rest of the
+   selector is `:active:not(:disabled):not([aria-disabled="true"])`, and
+   :not() contributes its argument's specificity. The core rule is
+   therefore (0,3,0), and a plain `.filter-row__toggle:active` — (0,2,0) —
+   loses to it even when declared later. Verified in-engine, not assumed.
+
+   Hence the descendant + :not() below: (0,4,0), which beats it outright
+   rather than depending on load order. These are rows and fields, not
+   buttons; they already signal press through hover and the caret.
+   Genuinely small controls in the panel (the bolt, bookmark, close and
+   twist icons) keep the affordance. */
+.filter-drawer .filter-row__toggle:active:not(:disabled),
+.filter-drawer .filter-more__head:active:not(:disabled),
+.filter-drawer .filter-select:active:not(:disabled),
+.filter-drawer .filter-date:active:not(:disabled) { transform: none; }
+
+/* ---- The panel resizing under the accordion -------------------------
+   Easing was only half the story. In modal mode the panel is
+   `height: fit-content` AND vertically centred (`margin-block: auto`), so
+   every row that expands grows the dialog — and a centred box grows BOTH
+   ways. Measured on a 980px viewport, opening one row grew the panel 42px:
+   the top edge rose 21px while the bottom dropped 21px, over the same
+   180ms the row was easing open. The whole dialog breathes outward from
+   its centre on every click. That movement is what reads as a bounce, and
+   no easing change can fix it — initModalResize() already documents the
+   behaviour ("The modal is centered, so it grows both ways").
+
+   So take content out of the height equation: give the panel a stable
+   height and let .filter-drawer__body (already overflow-y:auto) absorb the
+   growth by scrolling. Rows then open in place against a dialog that never
+   moves.
+
+   --filter-modal-h now drives height rather than max-height. The drag
+   handles keep working unchanged — initModalResize() writes that same
+   property, and its `grow * 2` still holds because a centred box of fixed
+   height moves each edge by half the delta. The default tracks the height
+   the panel naturally settled at, so its resting size is unchanged. */
+@media (min-width: 1280px) {
+  html[data-filter-mode="modal"] .filter-drawer,
+  html[data-filter-mode="modal"] .filter-drawer:has(.custom-builder:not([hidden])) {
+    height: var(--filter-modal-h, min(720px, calc(100vh - 48px)));
+    max-height: calc(100vh - 48px);
+  }
+}
+
+/* The whole header row is now a hit target, so it takes the pointer and
+   drives the caret's hover state — previously both were scoped to the
+   inner button. Locked rows (pinned as quick filters) don't expand, so
+   they keep the default cursor and no hover response. */
+.filter-row__head { cursor: pointer; }
+.filter-row__head:hover .filter-row__caret { color: var(--ehsq-color-neutral-90); }
+.filter-row--locked .filter-row__head { cursor: default; }
+.filter-row--locked .filter-row__head:hover .filter-row__caret { color: var(--ehsq-color-neutral-50); }
+
+/* =====================================================================
+   DARK THEME
+
+   The ported v1.5 stylesheet paints with RAW SCALE tokens
+   (--ehsq-color-neutral-90, --ehsq-color-teal-80, …) rather than the
+   semantic text/surface tokens, because its source only ever ran in light.
+   praxis-core's dark theme remaps just the low end of that scale —
+   neutral-05/10/15/20, the surface steps — and leaves neutral-30..100 and
+   the whole teal/red/pink tint range at their light values. So in dark:
+
+     • every `color: var(--ehsq-color-neutral-90)` painted #2a3846 (dark
+       navy) onto a #192336 modal — 1.2:1, illegible. That hit the modal
+       title, every filter-row title, all inputs, selects and menu options.
+     • the teal-10 "selected" tints (#e8f3f3, near-white) glared as light
+       blocks on the dark panel.
+     • three panels hardcode rgb(255,255,255) and rendered pure white.
+
+   Rather than rewrite 500 lines of ported rules (and risk regressing
+   light), remap the scale itself inside the filter roots — same scope as
+   the bridge block at the top of this file, so it cannot leak into a host
+   page. That corrects the bulk of the component in one pass; the sections
+   below then fix only the rules where a token is used as a FILL behind
+   light ink, which a straight scale flip would invert the wrong way.
+
+   Values follow the Mazlan dark DNA already in praxis-core: #e7ebf1 ink,
+   the #29D2D7/#5CE0E5 cyan accent in place of light-mode teal, and dark
+   ink (--px-primary-fg) on any bright cyan fill. All text pairings here
+   clear WCAG 2.2 AA (4.5:1) against the surface they sit on, and control
+   borders clear 3:1 for 1.4.11.
+   ===================================================================== */
+
+body[data-theme="dark"] :is(.filter-controls,
+.quick-filters,
+.filter-chips,
+.filter-drawer,
+.filter-menu,
+.drawer-scrim,
+.select-menu) {
+  /* Ink. The scale is ordered light→dark in the source, so it inverts:
+     the high steps become the brightest ink. */
+  --ehsq-color-neutral-100:#f2f5f9;
+  --ehsq-color-neutral-90:#e7ebf1;   /* primary ink — titles, inputs, options */
+  --ehsq-color-neutral-80:#cfd8e3;
+  --ehsq-color-neutral-70:#b7c3d0;
+  --ehsq-color-neutral-60:#9aa7b4;   /* secondary ink, trailing icons */
+  --ehsq-color-neutral-50:#8b98a6;   /* placeholders, empty states — 5.4:1 */
+  --ehsq-color-neutral-40:#7e8c9b;   /* faint hints, drag handles — 4.6:1 */
+  /* Borders and "off" icon controls. Translucent white so it rides whatever
+     surface it lands on (modal, recessed group, footer) at a consistent
+     weight; .42 lands ~3.4:1 for the checkbox borders and the unset
+     favourite/quick-filter icons, clearing 1.4.11's 3:1 for controls. */
+  --ehsq-color-neutral-30:rgba(255,255,255,.42);
+
+  /* Accent. Light-mode teal is far too dark to read on the panel, so the
+     family shifts to the cyan praxis-core already uses for dark accents.
+     The low steps stay translucent — a flat tint would occlude the surface
+     tier it sits on and flatten the modal's elevation. teal-30/40 are
+     referenced by .custom-summary and .cf-cond.is-selected but were never
+     defined at any level, so those declarations were dropping as invalid;
+     defining them here also repairs that in dark. */
+  --ehsq-color-teal-10:rgba(41,210,215,.14);
+  --ehsq-color-teal-20:rgba(41,210,215,.22);
+  --ehsq-color-teal-30:rgba(41,210,215,.32);
+  --ehsq-color-teal-40:rgba(41,210,215,.42);
+  --ehsq-color-teal-50:#29D2D7;
+  --ehsq-color-teal-60:#29D2D7;
+  --ehsq-color-teal-70:#5CE0E5;
+  --ehsq-color-teal-80:#7FEAEE;      /* ink on the cyan tints — 8.2:1 */
+
+  /* Destructive + pink, same treatment. #ff8b93 matches the Clear-all
+     override already established above. pink-10 was only ever reachable
+     through an inline #FDE6F1 fallback, which flared white on dark. */
+  --ehsq-color-red-10:rgba(255,139,147,.16);
+  --ehsq-color-red-50:#ff8b93;
+  --ehsq-color-red-60:#ff8b93;
+  --ehsq-color-pink-10:rgba(255,122,184,.18);
+  --ehsq-color-pink-60:#FF7AB8;
+}
+
+/* ---- Fills that carry light ink -------------------------------------
+   These use a scale token as a BACKGROUND, so the inversion above would
+   have put near-white ink on a near-white fill. Each takes the dark-CTA
+   pattern from praxis-core instead: bright cyan fill, dark ink. */
+body[data-theme="dark"] .segmented__opt--active {
+  background: var(--ehsq-color-teal-60); color: var(--px-primary-fg, #08313a);
+}
+body[data-theme="dark"] .segmented__opt--active:hover {
+  background: #5CE0E5; color: var(--px-primary-fg, #08313a);
+}
+body[data-theme="dark"] .filter-view-switch__opt.is-active,
+body[data-theme="dark"] .filter-view-switch__opt.is-active:hover {
+  color: var(--px-primary-fg, #08313a);
+}
+/* Checkbox ticks: white-on-cyan is ~1.9:1. The faces fill with teal-60,
+   so the glyph takes the same dark ink the CTAs use. */
+body[data-theme="dark"] .qfilter__check,
+body[data-theme="dark"] .select-menu__check { color: var(--px-primary-fg, #08313a); }
+
+/* AND/OR join pills read as one control, so both take a bright fill with
+   dark ink — the hardcoded deep magenta on OR would otherwise pair a
+   white-ink pill against a dark-ink one. */
+body[data-theme="dark"] .cf-join .cf-join__and.is-active {
+  background: var(--ehsq-color-teal-60); color: var(--px-primary-fg, #08313a);
+}
+body[data-theme="dark"] .cf-join .cf-join__or.is-active {
+  background: #FF7AB8; color: #3d0020;
+}
+
+/* Tooltip: neutral-90 was its fill, which the inversion turns near-white.
+   Takes the page's own dark tooltip/snackbar slate. */
+body[data-theme="dark"] .filter-type-btn::after {
+  background: #2b3648; color: var(--ehsq-color-text-primary, #e7ebf1);
+}
+
+/* ---- Hardcoded light panels ----------------------------------------- */
+/* The depth-0 group is the builder's outermost card: white in light, so it
+   reads as the panel surface rather than the recessed well its nested
+   children sit in. Same intent in dark, one tier up from neutral-05. */
+body[data-theme="dark"] .cf-group--d0 { background: var(--px-surface); }
+body[data-theme="dark"] .custom-summary__expr { background: rgba(0,0,0,.22); }
+body[data-theme="dark"] .custom-summary__count {
+  background: rgba(0,0,0,.22); color: var(--ehsq-color-teal-80);
+}
+/* Expression chips: the OR variant hardcodes a pale pink fill + deep
+   magenta ink. Mirror the AND chip's tint-plus-bright-ink construction. */
+body[data-theme="dark"] .cfx-bool--or {
+  background: rgba(255,122,184,.18); color: #FF7AB8;
+}
+body[data-theme="dark"] .cf-remove:hover { color: #ff8b93; }
+
+/* Custom-filter chips carry the cyan accent, but the bar-wide dark rule
+   above (.filter-chips .chip) outranks .chip--custom and was flattening
+   them to plain ink. Re-assert with the theme prefix so it wins. */
+body[data-theme="dark"] .filter-chips .chip--custom { color: var(--ehsq-color-teal-80); }
+
+/* ---- Materials ------------------------------------------------------
+   The modal's shadow, the footer's lip shadow and the scrim are all built
+   from light-mode navy (rgba(32,42,53,…)), which is invisible over a dark
+   page — the modal lost its separation from the content behind it. Take
+   the Praxis dark overlay material, and deepen the scrim so the panel
+   still reads as modal. */
+body[data-theme="dark"] .filter-drawer { box-shadow: var(--px-overlay); }
+body[data-theme="dark"] .drawer-scrim { background: rgba(4,8,16,.62); }
+body[data-theme="dark"] .filter-drawer__foot {
+  box-shadow: 0 -8px 16px rgba(0,0,0,.28), 0 -2px 4px rgba(0,0,0,.20);
+}
+
+/* Row hover used neutral-05, which inverts DARKER than the card it sits on
+   — a hover that reads as a hole. Use the theme's own hover wash. */
+body[data-theme="dark"] .qfilter__row:hover { background: var(--px-hover); }
+
+/* .cf-input never declares a background — in light the UA default is white,
+   which passes for the same field colour its sibling .filter-select paints
+   with --px-surface-2. Under color-scheme:dark the UA default is a neutral
+   grey instead, so the value inputs sat warm and light against the navy
+   selects beside them. Name the surface rather than inherit it. */
+body[data-theme="dark"] .cf-input { background: var(--px-surface-2); }
+
+/* Search focus fell back to a near-white border after the inversion; the
+   cyan focus border matches the other inputs in the panel. */
+body[data-theme="dark"] .filter-search-input input:focus {
+  border-color: var(--ehsq-color-teal-50);
+}
