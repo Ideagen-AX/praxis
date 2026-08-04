@@ -146,13 +146,14 @@ body[data-theme="dark"] .filter-chips .chip:hover { background: var(--ehsq-color
   width: 20px; height: 20px; min-width: 20px;
   font-size: 20px !important; line-height: 1;
 }
-/* Dark: praxis-core remaps --ehsq-color-neutral-10 (the chip fill) to #222b39
-   but leaves --ehsq-color-neutral-90 (the chip label) at #2a3846, so an active
-   filter chip rendered dark-on-dark at 1.19:1 — invisible, and against the
-   project's hard WCAG 2.2 AA requirement. Take the theme's text token rather
-   than the raw scale, so it follows any future remap. neutral-20 (the border
-   and hover fill) is already remapped, so only the colour needs correcting. */
-body[data-theme="dark"] .filter-chips .chip { color: var(--ehsq-color-text-primary); }
+/* Dark chip contrast is handled by the theme-inverse rule further up (fill
+   neutral-90, 70% white border, #fff label — 11.98:1). Worth recording why
+   that rule matters beyond looks: praxis-core remaps --ehsq-color-neutral-10
+   (the old chip fill) to #222b39 but leaves --ehsq-color-neutral-90 (the
+   label) at #2a3846, so an active chip previously rendered dark-on-dark at
+   1.19:1 — invisible, and against the project's hard WCAG 2.2 AA
+   requirement. Inverting the fill fixes that at the same time. Don't
+   reintroduce a colour-only override here; it would fight that rule. */
 
 /* Dark: the lit edge flips to white-on-dark and the tint carries more weight,
    since a 9% red over a navy surface all but disappears. */
