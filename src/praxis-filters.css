@@ -201,7 +201,15 @@ body[data-variant="praxis"][data-theme="dark"] .filter-drawer .btn--primary:hove
 .filter-chips { display: flex; flex-wrap: wrap; gap: var(--s-8); padding: var(--s-8) 0 var(--s-12); }
 /* High-contrast filter chips. Light mode: light fill + dark text/stroke.
    Dark mode: inverse — dark fill + light text/stroke. */
-.filter-chips .chip { display: inline-flex; align-items: center; gap: var(--s-8); padding: 0 var(--s-16); height: 40px; background: var(--px-surface); border: 1px solid var(--ehsq-color-neutral-90); border-radius: var(--r-full); font-size: var(--t-base); font-weight: 600; font-family: inherit; color: var(--ehsq-color-neutral-90); transition: background var(--d-fast) var(--ease-default); }
+/* Same fixed-height trap as the status pill. A chip carrying a multi-value
+   filter ("Assigned To: is Alexandria Gilbert, Safety Review Team, …") does
+   wrap to a second line once the row is narrower than about 900px — but
+   height:40px held the outline at one line, so the second line sat outside it.
+   min-height lets the outline follow the text. Measured at 834 and 700px:
+   clipped before, 52px and intact after. */
+.filter-chips .chip { display: inline-flex; align-items: center; gap: var(--s-8); padding: var(--s-4) var(--s-16); min-height: 40px; max-width: 100%; text-align: left; background: var(--px-surface); border: 1px solid var(--ehsq-color-neutral-90); border-radius: var(--r-full); font-size: var(--t-base); font-weight: 600; font-family: inherit; color: var(--ehsq-color-neutral-90); transition: background var(--d-fast) var(--ease-default); }
+/* The X never shrinks or wraps away from the label it removes. */
+.filter-chips .chip__close { flex-shrink: 0; }
 .filter-chips .chip:hover { background: var(--ehsq-color-neutral-05); }
 body[data-theme="dark"] .filter-chips .chip { background: var(--ehsq-color-neutral-90); border-color: rgba(255,255,255,.7); color: #fff; }
 body[data-theme="dark"] .filter-chips .chip:hover { background: var(--ehsq-color-neutral-80); }
@@ -415,7 +423,11 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
   .quick-filters { display: none; }
   .filter-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: var(--s-8) 0; }
   .filter-chips::-webkit-scrollbar { display: none; }
-  .filter-chips .chip { flex-shrink: 0; }
+  /* This is a scroll strip, not a wrapping row: chips keep their natural width
+     and you swipe. max-width:100% from the base rule would make a long chip
+     wrap to two lines instead of extending into the scroller, so it's lifted
+     here — the wrapping behaviour is only wanted where the row actually wraps. */
+  .filter-chips .chip { flex-shrink: 0; max-width: none; }
 }
 
 .quick-filters[hidden] { display: none !important; }
