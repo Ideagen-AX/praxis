@@ -63,7 +63,11 @@
     if (el) optionParts.push({ el: el, tab: tab, label: label || null });
   }
   part('.viewswitch',          'display');
-  part('#fieldsPanel',         'fields');
+  /* The search page's column picker. It is a toolbar popover above the tablet
+     floor and the Columns tab of this drawer below it — same element, same
+     handlers, moved rather than duplicated, so there is one column control on
+     the page at any width. */
+  part('#colPop',              'fields');
   part('#chartPanel',          'options', 'Chart settings');
   part('#explorePanel',        'options', 'Explore options');
   part('.toolbar__sortlabel',  'sort');
@@ -142,7 +146,7 @@
      tab. */
   var TABS = [
     { id: 'display', label: 'Display mode' },
-    { id: 'fields',  label: 'Fields' },
+    { id: 'fields',  label: 'Columns' },
     { id: 'options', label: 'Options' },
     { id: 'sort',    label: 'Sort by' }
   ];
