@@ -286,6 +286,35 @@ body[data-variant="praxis"] .ws-pop .px-menu__head{
 .ws-pop .ws-item__badge{margin-left:auto;flex-shrink:0;padding:3px 9px;border-radius:999px;
   font-size:.6875rem;font-weight:700;}
 
+/* ---- New dashboard = the flyout's primary action ----------------------
+   The CTA treatment goes on the ICON WELL, not the row: the teal gradient in
+   light and the soft translucent-teal chip in dark, matching
+   .ehsq-navrail__btn--create directly above it. That button is itself an icon
+   button, so the well is the true like-for-like — and the label and its
+   sub-line stay ordinary text on an ordinary row, reading the same as every
+   other entry in the list.
+
+   Previously the well was transparent with only the plus glyph tinted, so the
+   one action in the panel that creates something looked like another list item.
+
+   Scoped through .ws-pop and body[data-variant] so it clears the per-page
+   .ws-item / .ws-item--new copies (.ws-item--new is declared in nine files),
+   whichever order they load in. */
+body[data-variant="praxis"] .ws-pop .ws-item--new .ws-item__icon,
+body[data-variant="praxis"] .ws-pop .ws-item--new:hover .ws-item__icon{
+  background:var(--px-primary-grad); color:var(--ehsq-color-white);
+  box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),inset 0 .5px 0 rgba(255,255,255,.25);
+}
+/* The row itself stays a plain list row — same hover as its neighbours. */
+body[data-variant="praxis"] .ws-pop .ws-item--new{ background:transparent; box-shadow:none; }
+body[data-variant="praxis"] .ws-pop .ws-item--new:hover{ background:var(--px-hover); }
+
+body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--new .ws-item__icon,
+body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--new:hover .ws-item__icon{
+  background:var(--px-primary-soft); color:var(--px-primary-soft-fg);
+  box-shadow:var(--px-primary-soft-shadow-sm);
+}
+
 /* ---- Current workspace ------------------------------------------------
    Only the dashboard actually in view is marked, via .ws-item--current.
    This used to be conflated with .ws-item--home in dark mode, which lit the

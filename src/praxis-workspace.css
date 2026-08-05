@@ -189,44 +189,7 @@ body[data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.
 .gl-theme-btn .gl-sun{ display:none; }
 body[data-theme="dark"] .gl-theme-btn .gl-moon{ display:none; }
 body[data-theme="dark"] .gl-theme-btn .gl-sun{ display:block; }
-
-/* Profile menu (avatar-triggered) — now holds "Get started" + account actions */
-.profile-menu{ position:relative; }
-.profile-menu__pop{
-  position:absolute; top:calc(100% + 8px); right:0; min-width:236px; z-index:200;
-  background:var(--ehsq-color-surface-default);
-  border:1px solid var(--ehsq-color-border-default); border-radius:12px; padding:6px;
-  box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 18px 38px -16px rgba(16,36,58,.22), inset 0 .5px 0 rgba(255,255,255,.6);
-}
-.profile-menu__pop[hidden]{ display:none; }
-.profile-menu__head{ padding:10px 12px 8px; display:flex; flex-direction:column; gap:2px; border-bottom:1px solid var(--ehsq-color-border-default); margin-bottom:6px; }
-.profile-menu__name{ font-weight:600; font-size:var(--ehsq-type-size-sm); color:var(--ehsq-color-text-primary); }
-.profile-menu__role{ font-size:12px; color:var(--ehsq-color-text-secondary); }
-.profile-menu__item{
-  display:flex; align-items:center; gap:10px; width:100%; height:38px; padding:0 12px; border:0; background:transparent;
-  border-radius:8px; cursor:pointer; text-align:left; font-family:inherit; font-size:var(--ehsq-type-size-sm); font-weight:500;
-  color:var(--ehsq-color-text-primary);
-}
-.profile-menu__item .material-symbols-rounded{ font-size:20px; color:var(--ehsq-color-text-secondary); }
-.profile-menu__item:hover{ background:var(--ehsq-color-neutral-05); }
-.profile-menu__sep{ height:1px; background:var(--ehsq-color-border-default); margin:6px 0; }
-/* dark: frosted-glass popover */
-body[data-theme="dark"] .profile-menu__pop{
-  background:rgba(26,32,45,.9);
-  -webkit-backdrop-filter:saturate(1.3) blur(16px); backdrop-filter:saturate(1.3) blur(16px);
-  box-shadow:0 0 0 .5px rgba(255,255,255,.08), 0 24px 50px -20px rgba(0,0,0,.7), inset 0 .5px 0 rgba(255,255,255,.07);
-}
-body[data-theme="dark"] .profile-menu__item:hover{ background:rgba(255,255,255,.06); }
-/* In-menu rows + segmented control (Appearance) */
-.profile-menu__row{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 12px; }
-.profile-menu__row-label{ font-size:.8125rem; font-weight:600; color:var(--ehsq-color-text-secondary); }
-.verswitch{ display:inline-flex; align-items:center; gap:2px; padding:3px; background:rgba(16,36,58,.06); border-radius:9999px; }
-.verswitch__opt{ height:28px; padding:0 12px; border:0; background:transparent; color:var(--ehsq-color-text-secondary);
-  font-family:inherit; font-size:.8125rem; font-weight:600; border-radius:9999px; cursor:pointer; white-space:nowrap; }
-.verswitch__opt:hover{ color:var(--ehsq-color-text-primary); }
-.verswitch__opt--active,.verswitch__opt--active:hover{ background:var(--ehsq-color-surface-default); color:var(--ehsq-color-text-primary); box-shadow:0 1px 2px rgba(16,36,58,.14); }
-body[data-theme="dark"] .verswitch{ background:rgba(255,255,255,.08); }
-body[data-theme="dark"] .verswitch__opt--active{ background:rgba(255,255,255,.16); box-shadow:none; }
+/* Profile menu — shared component, see praxis-profile-menu.css */
 
 /* =====================================================================
    Persona switcher relocated INTO the profile menu ("Viewing as").

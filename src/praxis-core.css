@@ -59,10 +59,25 @@ body[data-variant="praxis"]{
   --px-card-raised:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85);
 
   /* primary button — refined teal with lit edge (used by Submit / Create New /
-     Reassign task on the record page and the quick-actions on the workspace) */
-  --px-primary-grad:linear-gradient(180deg,#1f8f97,#1b838b);
+     Reassign task on the record page and the quick-actions on the workspace)
+
+     WCAG 1.4.3 — white on the whole fill, not just the bottom of it. The stops
+     were #1f8f97 → #1b838b, which put --px-primary-fg (#fff) at 3.86:1 over the
+     top of the gradient and exactly 4.50:1 over the bottom: the label failed
+     across the upper half of every primary button in the app.
+
+     Both stops moved down, not just the top one. The old bottom stop was
+     already at the 4.50 threshold, so any top lighter than it fails and any top
+     darker than it inverts the gradient — the fix has to shift the pair. The
+     original step between stops is preserved, so the lit-edge shading reads the
+     same, just a slightly deeper teal: 5.00:1 at the top, 5.88:1 at the bottom.
+
+     Not --ehsq-color-teal-60 (#1b838b): that token also carries text and
+     borders, where it is measured against a light background and is fine.
+     Only the fill needed to move. */
+  --px-primary-grad:linear-gradient(180deg,#197b83,#156f77);
   --px-primary-fg:#fff;
-  --px-primary-shadow:0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(27,131,139,.5),inset 0 .5px 0 rgba(255,255,255,.28);
+  --px-primary-shadow:0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28);
 
   /* Map the generic elevation tokens onto Praxis materials so any component
      that references --ehsq-elevation-* inherits the lit-edge look. The record
@@ -202,13 +217,41 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *){
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):hover{
   border-color:var(--ehsq-color-text-tertiary);
 }
+/* Checked / indeterminate fill: neutral, not the pink selection accent. Pink is
+   the app's attention colour, and a page of ticked boxes turned into a field of
+   accent marks competing with everything that genuinely needed noticing.
+
+   Both values are theme tokens rather than fixed colours, so the pair inverts
+   with the theme and the mark always contrasts its fill:
+     light  ink #2F4051 box, white  tick
+     dark   #e7ebf1 box,   slate tick
+   --px-surface is the mark on purpose — it's whatever the surface behind the
+   box is, so the tick reads as a cut-out rather than a painted-on colour. */
+body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *){
+  --px-check-fill:var(--ehsq-color-text-primary);
+  --px-check-mark:var(--px-surface);
+}
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):checked{
-  background:var(--ehsq-color-pink-60,#e30072);
-  border-color:var(--ehsq-color-pink-60,#e30072);
+  background:var(--px-check-fill);
+  border-color:var(--px-check-fill);
 }
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):checked::after{
   content:''; width:4px; height:8px; margin-top:-1px;
-  border:solid var(--ehsq-color-white); border-width:0 2px 2px 0; transform:rotate(45deg);
+  border:solid var(--px-check-mark); border-width:0 2px 2px 0; transform:rotate(45deg);
+}
+/* Indeterminate — a partial selection. appearance:none removes the platform
+   control entirely, so the browser's own dash never renders and an
+   indeterminate box looked identical to an empty one. Same filled ground as
+   :checked so it reads as "acted upon", with a dash instead of a tick. Placed
+   after :checked because the two can be set at once: an indeterminate box also
+   carries checked=true in some states, and the dash is the truthful mark. */
+body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):indeterminate{
+  background:var(--px-check-fill);
+  border-color:var(--px-check-fill);
+}
+body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):indeterminate::after{
+  content:''; width:8px; height:0; margin:0; transform:none;
+  border:solid var(--px-check-mark); border-width:0 0 2px 0; border-radius:1px;
 }
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):focus-visible{
   outline:2px solid color-mix(in srgb, var(--ehsq-color-interactive-default) 60%, transparent);
@@ -392,6 +435,36 @@ body[data-variant="praxis"][data-theme="dark"]
   color:var(--px-primary-soft-fg);
   box-shadow:var(--px-primary-soft-shadow-sm-hover);
   filter:none;
+}
+
+/* =====================================================================
+   Dark — secondary toolbar buttons take the inactive nav-rail treatment
+
+   They were flat: --px-tool in dark is a 6% white wash, so a row of tool
+   pills read as text floating on the page rather than as buttons. The rail's
+   inactive items solve the same problem one level over — a solid slate chip
+   with a hairline and an inset top highlight, which is what gives them their
+   raised edge — so they're matched here rather than invented again. Hover
+   matches too: the same chip with the --px-hover-btn overlay and a brighter
+   hairline.
+
+   Only the secondaries. The primaries above keep the soft teal CTA, and the
+   label stays --ehsq-color-text-primary rather than the rail's #c8cfd7: that
+   value is tuned for an icon-only glyph, and text needs the extra contrast.
+   ===================================================================== */
+body[data-variant="praxis"][data-theme="dark"]
+  :is(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
+  :is(.tbtn, .sortbtn):not(.btn--primary):not(.tbtn--primary):not(.tbtn--run):not(.pill-btn){
+  background:var(--px-surface-2,#232c3b);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06);
+}
+body[data-variant="praxis"][data-theme="dark"]
+  :is(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
+  :is(.tbtn, .sortbtn):not(.btn--primary):not(.tbtn--primary):not(.tbtn--run):not(.pill-btn):hover{
+  color:var(--ehsq-color-white);
+  background-color:var(--px-surface-2,#232c3b);
+  background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
+  box-shadow:0 0 0 .5px rgba(255,255,255,.14),inset 0 .5px 0 rgba(255,255,255,.08);
 }
 
 /* =====================================================================

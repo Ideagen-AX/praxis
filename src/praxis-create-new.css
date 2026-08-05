@@ -129,7 +129,12 @@
   cursor:pointer; transition:background var(--dur-fast,.18s) ease, color var(--dur-fast,.18s) ease;
 }
 .cn-seg__btn:hover{ color:var(--ehsq-color-text-primary); }
-.cn-seg__btn--active{ background:var(--px-surface); color:var(--ehsq-color-interactive-default); box-shadow:var(--px-tool-shadow); }
+/* Selected: the lifted pill and its shadow already carry the state, so the
+   label stays plain ink rather than repeating it in the interactive colour —
+   which also stopped it reading as a link. This is the reference segmented
+   control; .verswitch (praxis-profile-menu.css), .viewswitch (search page) and
+   .filter-view-switch (praxis-filters.css) all match it. */
+.cn-seg__btn--active{ background:var(--px-surface); color:var(--ehsq-color-text-primary); box-shadow:var(--px-tool-shadow); }
 .cn-seg[hidden]{ display:none; }
 
 /* ---- Body (scrolls) ---- */

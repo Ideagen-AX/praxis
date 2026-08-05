@@ -47,6 +47,94 @@
 .filter-drawer .btn--clear { background: transparent; color: var(--ehsq-color-red-60); border: 1px solid var(--ehsq-color-red-60); }
 .filter-drawer .btn--clear:hover { background: var(--ehsq-color-red-10); }
 .filter-drawer .btn--clear:active { background: var(--ehsq-color-red-10); }
+
+/* =====================================================================
+   PRAXIS — footer buttons
+
+   Clear and Reset take the same construction as the app's other buttons: a
+   two-stop 180deg gradient, a hairline, a tight shadow, a coloured ambient
+   glow and an inset top highlight — the shape of --px-primary-grad /
+   --px-primary-shadow, in red for the destructive action and in neutral for
+   Reset. In dark both switch to the soft-chip form the primaries use there,
+   rather than a bright fill on a dark panel.
+
+   The red stops are darker than a straight red-60 would be, on purpose.
+   White on red-60 (#e22d38) is 4.39:1 and on a lighter top stop 3.93:1 —
+   under AA. #d9303b → #bb2029 gives 4.73:1 and 6.27:1, so the label holds up
+   across the whole gradient. (Worth noting --px-primary-grad's own top stop
+   is 3.86:1 with white; this deliberately doesn't copy that.)
+
+   Dark can't reuse --ehsq-color-red-60: this file remaps it to #ff8b93 for
+   dark because that value is meant to carry text ON a dark surface. As a
+   fill it's a light salmon — white on it is 1.9:1 — so in dark it becomes
+   the label on a deep red chip instead: 6.5:1.
+   ===================================================================== */
+body[data-variant="praxis"] .filter-drawer .btn--clear {
+  border: 0; color: var(--ehsq-color-white, #fff);
+  background: linear-gradient(180deg, #d9303b, #bb2029);
+  box-shadow: 0 0 0 .5px rgba(16,36,58,.2), 0 1px 2px rgba(16,36,58,.15),
+              0 8px 18px -8px rgba(200,36,48,.5), inset 0 .5px 0 rgba(255,255,255,.28);
+}
+body[data-variant="praxis"] .filter-drawer .btn--clear:hover {
+  color: var(--ehsq-color-white, #fff); filter: brightness(1.06);
+}
+body[data-variant="praxis"] .filter-drawer .btn--clear:active { filter: brightness(.97); }
+
+body[data-variant="praxis"][data-theme="dark"] .filter-drawer .btn--clear {
+  color: #ff8b93;
+  background: linear-gradient(180deg, rgb(72,26,32) 0%, rgb(54,20,25) 100%);
+  box-shadow: 0 0 0 .5px rgba(255,139,147,.30), 0 1px 2px rgba(0,0,0,.35),
+              0 4px 10px -8px rgba(255,139,147,.40), inset 0 .5px 0 rgba(255,255,255,.08);
+}
+body[data-variant="praxis"][data-theme="dark"] .filter-drawer .btn--clear:hover {
+  color: #ffa4ab; filter: brightness(1.10);
+}
+
+/* Reset to Defaults — same construction, neutral. It restores displayed
+   fields rather than destroying anything, so it carries no colour. */
+body[data-variant="praxis"] .filter-drawer .btn--neutral {
+  border: 0; color: var(--ehsq-color-text-primary);
+  background: linear-gradient(180deg, #ffffff, #eef1f5);
+  box-shadow: 0 0 0 .5px rgba(16,36,58,.14), 0 1px 2px rgba(16,36,58,.10),
+              0 2px 5px -2px rgba(16,36,58,.14);
+}
+body[data-variant="praxis"] .filter-drawer .btn--neutral:hover {
+  background: linear-gradient(180deg, #ffffff, #e7ebf1);
+  box-shadow: 0 0 0 .5px rgba(16,36,58,.18), 0 2px 8px -2px rgba(16,36,58,.18);
+}
+body[data-variant="praxis"] .filter-drawer .btn--neutral:active { filter: brightness(.98); }
+
+body[data-variant="praxis"][data-theme="dark"] .filter-drawer .btn--neutral {
+  color: var(--ehsq-color-text-primary);
+  background: linear-gradient(180deg, var(--px-surface-2,#232c3b), rgb(28,36,49));
+  box-shadow: 0 0 0 .5px rgba(255,255,255,.14), 0 1px 3px rgba(0,0,0,.5),
+              inset 0 .5px 0 rgba(255,255,255,.10);
+}
+body[data-variant="praxis"][data-theme="dark"] .filter-drawer .btn--neutral:hover {
+  color: var(--ehsq-color-white);
+  background-image: linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
+  background-color: var(--px-surface-2,#232c3b);
+  box-shadow: 0 0 0 .5px rgba(255,255,255,.20), 0 2px 6px rgba(0,0,0,.5), inset 0 .5px 0 rgba(255,255,255,.12);
+}
+
+/* Apply matches the toolbar's Run. In light they were already identical — both
+   take the shared primary in praxis-core.css. Dark had them apart: that sheet
+   gives toolbar primaries the soft chip but scopes it to
+   :is(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar), and this footer is
+   none of those, so Apply kept the bold cyan CTA.
+
+   Note this reverses a deliberate call recorded in praxis-core.css — that
+   in-dialog CTAs sit on their own surface, where the bold treatment still reads
+   right. Matching Run was the explicit ask; revert this block to get the bold
+   CTA back in dialogs. */
+body[data-variant="praxis"][data-theme="dark"] .filter-drawer .btn--primary {
+  background: var(--px-primary-soft);
+  color: var(--px-primary-soft-fg);
+  box-shadow: var(--px-primary-soft-shadow-sm);
+}
+body[data-variant="praxis"][data-theme="dark"] .filter-drawer .btn--primary:hover {
+  background: var(--px-primary-soft); filter: brightness(1.06);
+}
 .filter-drawer .btn:disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
 
 /* ---------------------------------------------------------------------
@@ -216,7 +304,16 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
 .filter-row__controls .segmented { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
 .filter-row__controls .segmented__opt { justify-content: center; }
 .filter-row__head { display: flex; align-items: center; gap: var(--s-8); }
-.filter-row__icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--ehsq-color-neutral-05); color: var(--ehsq-color-neutral-90); font-size: 20px; flex-shrink: 0; }
+/* No enclosure. The glyph used to sit in a filled, fully-rounded chip
+   (neutral-05 at 12px radius on a 20px box), which read as a coloured circle —
+   near-white in light mode, a distinctly dark disc in dark mode — competing
+   with the chevron beside it for the same job. The glyph now stands on its own.
+   Box is 20px because that is the size the icons actually render at: the 40px
+   here never applied, since praxis-lucide.js replaces the ligature with an
+   <svg class="icon icon--20"> whose own rule wins. Stating it explicitly keeps
+   any span-rendered glyph (one that never got converted) the same size rather
+   than leaving a 40px transparent gap. */
+.filter-row__icon { display: grid; place-items: center; width: 20px; height: 20px; color: var(--ehsq-color-neutral-90); font-size: 20px; flex-shrink: 0; }
 .filter-row__title { font-size: var(--t-base); font-weight: 600; color: var(--ehsq-color-neutral-90); margin: 0px; }
 .filter-row__toggle { flex: 1 1 0%; display: flex; align-items: center; gap: var(--s-8); min-width: 0px; border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; background: transparent; padding: 0px; font: inherit; text-align: left; cursor: pointer; }
 .filter-row__caret { font-size: 20px; color: var(--ehsq-color-neutral-50); flex-shrink: 0; transition: color var(--d-fast) var(--ease-default), transform var(--d-normal) var(--ease-out); }
@@ -238,7 +335,14 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
 .frow-chip__x { display: grid; place-items: center; width: 22px; height: 22px; border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; background: transparent; border-radius: 50%; color: var(--ehsq-color-neutral-50); cursor: pointer; }
 .frow-chip__x:hover { background: var(--ehsq-color-neutral-20); color: var(--ehsq-color-neutral-90); }
 .frow-chip__x .material-symbols-rounded { font-size: 16px; }
-.filter-row__body { display: grid; grid-template-rows: 0fr; overflow: hidden; transition: grid-template-rows var(--d-normal) var(--ease-default); }
+/* minmax(0, 0fr), not 0fr: an fr track's implicit minimum is min-content, and
+   .filter-row__controls carries padding-top:8px, which min-height:0 cannot
+   remove — so a collapsed row's track floored at 8px instead of 0. That 8px sat
+   below the header inside the row's 16px padding band, leaving the collapsed
+   content visibly high in its container (12px above, 21px below). Flooring the
+   track at 0 lets it close completely, so the header centres. The open state
+   keeps its auto minimum so the controls still size to content. */
+.filter-row__body { display: grid; grid-template-rows: minmax(0, 0fr); overflow: hidden; transition: grid-template-rows var(--d-normal) var(--ease-default); }
 .filter-row__body.is-open { grid-template-rows: 1fr; }
 .filter-row__body > .filter-row__controls { min-height: 0px; overflow: hidden; opacity: 0; transition: opacity var(--d-normal) var(--ease-default); }
 .filter-row__body.is-open > .filter-row__controls { opacity: 1; }
@@ -355,6 +459,58 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
 .filter-view-switch__opt.is-active { background: var(--ehsq-color-teal-60); color: rgb(255, 255, 255); box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 2px; }
 .filter-view-switch__opt.is-active:hover { color: rgb(255, 255, 255); }
 .filter-view-switch__opt .material-symbols-rounded { font-size: 18px; }
+
+/* =====================================================================
+   PRAXIS — Standard / Custom takes the workspace segmented switch:
+   .segswitch in index.html, the control the Assignments and Recently Created
+   Items cards use (.asg__tabs / .rci__range are only size modifiers on it).
+   Values are copied from there so the two read as one component.
+
+   An earlier pass here matched the Create New flyout's .cn-seg instead. That
+   was the wrong reference: .cn-seg is a flat chip track with a single flat
+   shadow, while the workspace switch is a RECESSED groove — inset shadow plus
+   hairline — with the selected option raised on a ring and two drop shadows.
+   Same silhouette, visibly different material.
+
+   Geometry is untouched (34px options, 16px padding, 18px icons); only the
+   surface treatment moves.
+
+   The selected label is plain ink: the lifted pill and its shadow already carry
+   the state, so colour doesn't need to repeat it, and ink keeps the label from
+   reading as a link. .cn-seg was moved to match, so this is now one treatment
+   across all four segmented controls in the system.
+
+   Specificity: further down this file there is a dark-mode colour correction
+   for the old teal fill — body[data-theme="dark"] .filter-view-switch__opt
+   .is-active, which sets --px-primary-fg (#08313a, near-black teal, chosen to
+   sit on a saturated teal button). A [data-variant] prefix does NOT beat it:
+   both compute to (0,3,1), so the later one wins and the label came out
+   #08313a on the #192336 pill — 1.13:1, invisible. The [data-theme] variants
+   below take it to (0,4,1)/(0,5,1) so this treatment holds in dark too.
+   ===================================================================== */
+body[data-variant="praxis"] .filter-view-switch {
+  border: 0; padding: 3px; background: var(--px-chip); border-radius: 11px;
+  box-shadow: inset 0 1px 2px rgba(16,36,58,.10), inset 0 0 0 .5px rgba(16,36,58,.06);
+}
+body[data-variant="praxis"] .filter-view-switch__opt { color: var(--ehsq-color-text-secondary); border-radius: 8px; }
+body[data-variant="praxis"] .filter-view-switch__opt:hover { color: var(--ehsq-color-text-primary); }
+body[data-variant="praxis"] .filter-view-switch__opt.is-active,
+body[data-variant="praxis"] .filter-view-switch__opt.is-active:hover {
+  background: var(--px-surface);
+  color: var(--ehsq-color-text-primary);
+  box-shadow: 0 0 0 .5px rgba(16,36,58,.14), 0 1px 2px rgba(16,36,58,.10), 0 2px 5px -2px rgba(16,36,58,.14);
+}
+/* Dark: groove darkens, raised option takes the elevated surface + lit edge. */
+body[data-variant="praxis"][data-theme="dark"] .filter-view-switch {
+  background: rgba(0,0,0,.22);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.45), inset 0 0 0 .5px rgba(255,255,255,.05);
+}
+body[data-variant="praxis"][data-theme="dark"] .filter-view-switch__opt.is-active,
+body[data-variant="praxis"][data-theme="dark"] .filter-view-switch__opt.is-active:hover {
+  background: var(--px-surface-2);
+  color: var(--ehsq-color-white);
+  box-shadow: 0 0 0 .5px rgba(255,255,255,.14), 0 1px 3px rgba(0,0,0,.5), inset 0 .5px 0 rgba(255,255,255,.10);
+}
 .custom-builder { position: absolute; inset: 0px; z-index: 3; background: var(--color-surface, var(--ehsq-color-white)); display: flex; flex-direction: column; }
 .custom-builder[hidden] { display: none; }
 .custom-builder__head { position: relative; display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s-16); padding: var(--s-12) var(--s-16); }
