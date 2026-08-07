@@ -403,9 +403,13 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
 .filter-drawer__foot [data-action="close-filter-drawer"][hidden] { display: none; }
 @media (max-width: 1399px) {
   .filter-controls { grid-template-columns: 1fr; }
-  .filter-controls > .filter-toggle, .quick-filters { display: none; }
   .filter-controls > .btn[data-action="open-filter-drawer"] { justify-self: start; }
 }
+
+/* LOCAL DELETION: `.filter-controls > .filter-toggle, .quick-filters` used to
+   be hidden here from 1399px down. That handover now keys off
+   body.tb-is-compact and lives in praxis-filters-local.css, so it survives a
+   re-extract of this ported file. */
 
 @media (max-width: 639px) {
   .filter-controls { grid-template-columns: 1fr; gap: var(--s-8); padding-bottom: var(--s-8); }

@@ -33,10 +33,20 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
   .tb-compact__pop > *{
     width:100% !important; height:auto !important; min-height:44px;
     justify-content:flex-start !important;
-    border-radius:8px !important; box-shadow:none !important;
+    border-radius:8px !important;
+  }
+  /* Everything except the primary action flattens to a plain row. Run keeps
+     its own background: the blanket transparent fill used to erase its
+     gradient but not its white text, leaving it white-on-white at 1.00:1 —
+     invisible in light mode. Restyling the text instead would need a new
+     accent that passes on white, where the gradient it already carries is
+     verified (5.00:1 at the top stop, from the contrast fix in praxis-core).
+     Dark is left to its own .tbtn--run soft treatment for the same reason. */
+  .tb-compact__pop > *:not(.tbtn--run){
+    box-shadow:none !important;
     background:transparent !important;
   }
-  .tb-compact__pop > *:hover{ background:var(--px-hover-btn) !important; }
+  .tb-compact__pop > *:not(.tbtn--run):hover{ background:var(--px-hover-btn) !important; }
   /* .tb-menu wrappers hold their own trigger; let it fill the row. */
   .tb-compact__pop .tb-menu > .tbtn{ width:100%; justify-content:flex-start; }
 
