@@ -50,76 +50,146 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
   /* .tb-menu wrappers hold their own trigger; let it fill the row. */
   .tb-compact__pop .tb-menu > .tbtn{ width:100%; justify-content:flex-start; }
 
-  /* ---- Options drawer -------------------------------------------------
-     A bottom sheet that sits just under the toolbar and spans the full page
-     width, rather than a side panel: at these widths the controls it holds
-     (a mode list, a column list) read better across the full measure, and
-     sliding up from below keeps the toolbar that opened it visible. */
-  .tb-options__scrim{
-    position:fixed; inset:0; z-index:150;
-    background:rgba(32,42,53,.45); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
-    opacity:0; transition:opacity 200ms var(--ehsq-ease-default);
-  }
-  .tb-options__scrim.is-open{ opacity:1; }
-  .tb-options__scrim[hidden]{ display:none; }
+  /* ---- Options side panel ---------------------------------------------
+     Third attempt, and the first one sized for the job.
 
+     It began as a bottom sheet from under the toolbar to the floor: 77% of the
+     viewport, 51% of it empty, tab strip clipped on a phone. Replacing it with
+     an anchored dropdown fixed the emptiness and the clipping but was wrong on
+     a tablet — a 320px card floating in an 834px viewport, and a hard ceiling
+     on how much it could ever hold.
+
+     The ceiling is the real constraint: this panel has to survive a page with
+     forty columns and several sections, and no popover does. Material 3 puts
+     bottom sheets on compact widths only and recommends a SIDE sheet at medium
+     and expanded, where a standard (non-modal) one shows content without
+     blocking the primary content. Apple reserves popovers for short transient
+     option sets. So: a side panel docked under the toolbar to the bottom edge,
+     which is the one shape that grows with its content instead of capping it.
+
+     Tablet  — docked right, ~380px, table still visible and usable beside it.
+     Phone   — the same panel at full width; at 390px there is no room for a
+               side-by-side, and a cramped popover holds even less.
+     Both    — no scrim. It is not modal; the page underneath stays live. */
   .tb-options{
-    position:fixed; left:0; right:0; bottom:0; z-index:151;
-    /* --tb-top is set by the script to the toolbar's bottom edge. */
-    top:var(--tb-top, 200px);
+    position:fixed; z-index:151;
+    /* Full height. It used to hang off the toolbar's bottom edge, which left
+       it starting a third of the way down the screen and reading as clipped
+       rather than as a panel. Running the whole height gives it a top edge of
+       its own and the most room for long content — z-index clears the app bar
+       (30) so the panel is genuinely full height rather than tucked under it. */
+    top:0; bottom:0; right:0;
+    width:min(380px, 45vw);
     display:flex; flex-direction:column;
-    background:var(--ehsq-color-surface-default); color:var(--ehsq-color-text-primary);
-    border-radius:16px 16px 0 0;
-    box-shadow:0 -6px 28px rgba(16,36,58,.22), 0 0 0 .5px rgba(16,36,58,.08);
-    transform:translateY(100%); transition:transform 240ms var(--ehsq-ease-default);
+    background:var(--px-surface, var(--ehsq-color-surface-default));
+    color:var(--ehsq-color-text-primary);
+    border-left:1px solid var(--ehsq-color-border-default);
+    box-shadow:-8px 0 28px rgba(16,36,58,.14);
+    transform:translateX(100%);
+    transition:transform 200ms var(--ehsq-ease-default);
   }
   .tb-options.is-open{ transform:none; }
   .tb-options[hidden]{ display:none; }
-  body[data-theme="dark"] .tb-options{
-    box-shadow:0 -6px 28px rgba(0,0,0,.55), 0 0 0 .5px rgba(255,255,255,.08);
+  body[data-theme="dark"] .tb-options{ box-shadow:-8px 0 28px rgba(0,0,0,.45); }
+
+  /* Phone: full width. A 45vw panel on a 390px screen is 175px, which is not a
+     panel, it's a gutter. */
+  @media (max-width:768px){
+    .tb-options{ width:100%; border-left:0; }
   }
-/* Kept outside the query so the drawer still animates correctly if the
-   viewport is resized while it's open. */
 @media (prefers-reduced-motion: reduce){
-  .tb-options, .tb-options__scrim{ transition:none; }
+  .tb-options{ transition:none; }
 }
 
+/* ---- panel header: title, count, close ---- */
 .tb-options__head{
-  display:flex; align-items:stretch; justify-content:space-between; gap:8px;
-  padding:0 8px 0 12px; flex-shrink:0;
+  flex-shrink:0; display:flex; align-items:center; gap:8px;
+  padding:10px 8px 10px 16px;
   border-bottom:1px solid var(--ehsq-color-border-default);
 }
-.tb-options__tabs{ display:flex; align-items:stretch; gap:2px; overflow-x:auto; min-width:0; }
-.tb-options__tab{
-  position:relative; flex-shrink:0; height:48px; padding:0 14px;
-  border:0; background:transparent; cursor:pointer;
-  font:inherit; font-size:.875rem; font-weight:600;
-  color:var(--ehsq-color-text-secondary);
-  transition:color var(--ehsq-motion-fast), background-color var(--ehsq-motion-fast);
-}
-.tb-options__tab:hover{ color:var(--ehsq-color-text-primary); background:var(--px-hover-btn); }
-.tb-options__tab.is-active{ color:var(--ehsq-color-text-link); }
-.tb-options__tab.is-active::after{
-  content:""; position:absolute; left:10px; right:10px; bottom:0; height:2px;
-  border-radius:2px 2px 0 0; background:var(--ehsq-color-teal-60);
-}
-.tb-options__tab:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-2px; }
+.tb-options__title{ margin:0; font-size:.9375rem; font-weight:700; flex:1; min-width:0; }
 .tb-options__close{
-  width:40px; height:40px; align-self:center; flex-shrink:0; display:grid; place-items:center;
+  width:40px; height:40px; flex-shrink:0; display:grid; place-items:center;
   border:0; background:transparent; border-radius:var(--ehsq-radius-md);
   color:var(--ehsq-color-text-secondary); cursor:pointer;
-  transition:background-color var(--ehsq-motion-fast), transform 150ms var(--ehsq-ease-default);
 }
 .tb-options__close:hover{ background:var(--px-hover-btn); color:var(--ehsq-color-text-primary); }
-.tb-options__close:active{ transform:scale(.95); }
+.tb-options__close:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-2px; }
 .tb-options__close .material-symbols-rounded{ font-size:22px; }
 
-.tb-options__body{ flex:1; overflow-y:auto; padding:16px 20px 28px; display:flex; flex-direction:column; gap:12px; }
-.tb-options__panel{ display:flex; flex-direction:column; gap:10px; }
+/* ---- search ----
+   The answer to "there could be many many columns". Appears only once the
+   panel holds enough rows to be worth searching (the script decides), so a
+   three-item panel doesn't get a search box it doesn't need. */
+/* Defined here rather than borrowed: this component ships to four pages and
+   .visually-hidden only exists on one of them. */
+.tb-options__sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.tb-options__search{ flex-shrink:0; position:relative; padding:10px 12px; }
+.tb-options__search[hidden]{ display:none; }
+.tb-options__search input{
+  width:100%; height:40px; padding:0 34px 0 12px;
+  border:1px solid var(--ehsq-color-neutral-50, var(--ehsq-color-border-strong));
+  border-radius:var(--ehsq-radius-sm);
+  background:var(--px-surface); color:var(--ehsq-color-text-primary);
+  font-family:inherit; font-size:.875rem;
+}
+.tb-options__search input::placeholder{ color:var(--ehsq-color-text-secondary); }
+.tb-options__search input:focus{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-1px; border-color:transparent; }
+.tb-options__search .material-symbols-rounded{
+  position:absolute; right:22px; top:50%; transform:translateY(-50%);
+  font-size:19px; color:var(--ehsq-color-text-secondary); pointer-events:none;
+}
+.tb-options__empty{
+  padding:18px 16px; margin:0; text-align:center;
+  font-size:.8125rem; color:var(--ehsq-color-text-secondary);
+}
+.tb-options__empty[hidden]{ display:none; }
+
+.tb-options__body{
+  flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain;
+  padding:6px 8px 24px; display:flex; flex-direction:column; gap:2px;
+}
+.tb-options__panel{ display:flex; flex-direction:column; gap:4px; }
 .tb-options__panel[hidden]{ display:none; }
+.tb-options__panel + .tb-options__panel{ margin-top:8px; }
+/* The search hides rows with the `hidden` attribute, but the layout rules
+   below set display on these same elements and would win over the UA's
+   [hidden] rule on specificity alone. Restore it explicitly. */
+.tb-options__body .viewswitch__btn[hidden],
+.tb-options__body .sortmenu__opt[hidden],
+.tb-options__body .colmenu__row[hidden],
+.tb-options__body .colmenu__group[hidden],
+.tb-options__body [data-tb-row][hidden],
+.tb-options__body [data-tb-group][hidden]{ display:none !important; }
+/* Sticky, because with a long column list the heading you need is the one that
+   has just scrolled off. Sections stay expanded rather than collapsing into an
+   accordion: NN/g's finding is that accordions cut visibility and add
+   interaction cost, and search is the better answer to length. */
+.tb-options__sechead{
+  position:sticky; top:0; z-index:2; margin:0;
+  /* Full-bleed white: the heading sits inside the body's 8px padding, so a
+     background only as wide as the text box leaves a gutter down each side for
+     rows to scroll through. Pulled out to the panel edges and padded back in,
+     the band is solid all the way across. */
+  margin-left:-8px; margin-right:-8px;
+  padding:8px 16px 6px;
+  background:var(--px-surface, var(--ehsq-color-surface-default));
+  border-bottom:1px solid var(--ehsq-color-border-default);
+  font-size:.75rem; font-weight:700; letter-spacing:.02em; text-transform:uppercase;
+  color:var(--ehsq-color-text-secondary);
+}
 /* Sentence case, weight for emphasis rather than caps. */
 .tb-options__label{
-  font-size:.8125rem; font-weight:700; color:var(--ehsq-color-text-secondary); padding:2px 0 0;
+  font-size:.8125rem; font-weight:700; color:var(--ehsq-color-text-secondary); padding:6px 0 0 8px;
+}
+/* The page's own "Sort Results By:" caption travels in with the sort menu and
+   would sit directly under a heading that already says Sort by. Likewise the
+   column list's own filter box — the panel search covers every section, and
+   two search fields in one panel is a worse problem than none. */
+.tb-options__body .toolbar__sortlabel,
+.tb-options__body .colmenu__search{ display:none; }
+.tb-options__body .colmenu__grouplabel{
+  font-size:.8125rem; font-weight:700; color:var(--ehsq-color-text-secondary); padding:6px 8px 2px;
 }
 
 /* Display mode: a vertical list of icon + label rather than an icon strip. */
@@ -127,6 +197,13 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
   display:flex; flex-direction:column; gap:2px; width:100%;
   background:transparent; box-shadow:none; padding:0;
 }
+/* The switcher's sliding indicator is absolutely positioned, and its width and
+   transform are computed for the horizontal strip in the toolbar. Restacked as
+   a vertical list those numbers are meaningless: it rendered as a stray pale
+   pill floating across the rows — most visibly as a smear through the sticky
+   DISPLAY MODE heading, which looked like the heading was transparent. The
+   active row already carries its own fill here, so the thumb is redundant. */
+.tb-options__body .viewswitch__thumb{ display:none !important; }
 .tb-options__body .viewswitch__btn{
   display:flex; align-items:center; justify-content:flex-start; gap:12px;
   width:100%; height:auto; min-height:48px; padding:0 12px;
@@ -139,10 +216,30 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
 .tb-options__body .viewswitch__btn .tb-viewlabel{
   font-size:.9375rem; font-weight:600; color:inherit;
 }
-/* The moved controls were laid out for a horizontal bar; stack them. */
-.tb-options__body .toolbar__sortlabel{ font-size:11px; font-weight:800; letter-spacing:normal; color:var(--ehsq-color-text-tertiary); padding-top:2px; }
+/* The moved controls were laid out for a horizontal bar; stack them.
+   (The "Sort Results By:" caption is hidden above — the section heading says
+   it. Styling it here as well would just override that.) */
 .tb-options__body .sortmenu,
 .tb-options__body .viewswitch{ width:100%; }
+
+/* Sort: a trigger plus its own absolutely-positioned dropdown. Nested inside a
+   scrolling popover that dropdown gets clipped by the scroll container, and a
+   menu opening a menu is the wrong shape here anyway. Inside Options it
+   flattens — the trigger goes and its options become the list, matching how
+   Display mode reads two sections above.
+
+   Done in CSS, deliberately: the options keep their own click handlers so
+   choosing one still sorts, and #sortPop keeps its `hidden` attribute, so when
+   the viewport grows and the control is handed back to the toolbar it returns
+   as a closed dropdown rather than a list stuck open. */
+.tb-options__body .sortmenu{ position:static; }
+.tb-options__body .sortbtn{ display:none; }
+.tb-options__body .sortmenu__pop{
+  display:flex !important; flex-direction:column; gap:2px;
+  position:static; width:100%; min-width:0; inset:auto;
+  background:transparent; border:0; border-radius:0; box-shadow:none; padding:0;
+}
+.tb-options__body .sortmenu__opt{ min-height:44px; height:auto; padding:0 12px; border-radius:10px; font-size:.9375rem; }
 
 
 .tb-options__body > *{ flex-shrink:0; }

@@ -12,11 +12,25 @@
 
    - Tools   a dropdown holding the secondary actions (Save, Export,
              Notification, Add Filters / Group, Share, Delete …)
-   - Options a drawer that slides in over the content, holding the sort
-             control, the display-mode switch, and whatever panel belongs to
-             the current display mode (table columns, chart settings). Only
-             built when the page actually has those controls, so the record and
-             report toolbars get Tools alone.
+   - Options a dropdown of the same kind, holding the sort control, the
+             display-mode switch, and whatever panel belongs to the current
+             display mode (table columns, chart settings). Only built when the
+             page actually has those controls, so the record and report
+             toolbars get Tools alone.
+
+   Options was a full-width sheet that slid up from the bottom edge, spanning
+   from under the toolbar to the floor. Measured on the search page it took 77%
+   of the viewport at both 390px and 834px and filled 51% of that with content —
+   a screen-covering modal, half of it empty, to choose one of six display
+   modes. Its tab strip also outran its own header on a phone (360px of tabs in
+   322px), clipping "Sort by".
+
+   It is now the same anchored popover Tools uses, six pixels under its button:
+   height hugs the content, no scrim, no focus trap, and the table you are
+   configuring stays visible behind it. Two buttons sitting side by side in one
+   bar now behave the same way, which is what they should have done from the
+   start. The four tabs became section headings in one short scrolling list —
+   sections cost less than tabs at this size and cannot be clipped.
 
    Controls are MOVED, not cloned. Everything here is already wired by the host
    page — the view switch, the sort menu, the fields panel all carry live
@@ -64,17 +78,26 @@
   });
 
   // Options-drawer contents: sort + display mode + the current mode's panel.
+  /* `unhide` marks a part the host keeps hidden until one of its own controls
+     opens it — a popover. Those have to be forced visible here, because in the
+     Options menu they ARE the content.
+
+     Everything else is view-gated by the host (the Explore panel belongs to
+     hierarchy view, the sort menu to the tile views) and its hidden state is
+     left alone. Unhiding those too is what used to put Explore options in front
+     of someone looking at a table; the tab strip hid the mistake by showing one
+     group at a time, and stacking the sections exposes it. */
   var optionParts = [];
-  function part(sel, tab, label) {
+  function part(sel, tab, label, unhide) {
     var el = (sel[0] === '#' ? document : toolbar).querySelector(sel);
-    if (el) optionParts.push({ el: el, tab: tab, label: label || null });
+    if (el) optionParts.push({ el: el, tab: tab, label: label || null, unhide: !!unhide });
   }
   part('.viewswitch',          'display');
   /* The search page's column picker. It is a toolbar popover above the tablet
-     floor and the Columns tab of this drawer below it — same element, same
+     floor and the Columns section of this menu below it — same element, same
      handlers, moved rather than duplicated, so there is one column control on
      the page at any width. */
-  part('#colPop',              'fields');
+  part('#colPop',              'fields',  null, true);
   part('#chartPanel',          'options', 'Chart settings');
   part('#explorePanel',        'options', 'Explore options');
   part('.toolbar__sortlabel',  'sort');
@@ -142,21 +165,21 @@
   optionsBtn.setAttribute('aria-expanded', 'false');
   optionsBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">tune</span>Options';
 
-  var scrim = document.createElement('div');
-  scrim.className = 'tb-options__scrim';
-  scrim.hidden = true;
-
+  /* Non-modal: no aria-modal, no scrim, no focus trap — the page underneath
+     stays live, which is the point of a standard side sheet. It does get a
+     close button, because at phone width it covers the page and there is
+     nothing left to tap away at. */
   var drawer = document.createElement('aside');
   drawer.className = 'tb-options';
   drawer.setAttribute('role', 'dialog');
-  drawer.setAttribute('aria-modal', 'true');
   drawer.setAttribute('aria-label', 'Display options');
   drawer.hidden = true;
-  /* Tabbed header. The tabs are fixed in order — Display mode, Fields,
-     Options, Sort by — and each one is only rendered if the page actually
-     supplies that content, so a page with no chart panel doesn't get an empty
-     tab. */
-  var TABS = [
+  /* Sections, fixed in order — Display mode, Columns, Options, Sort by — each
+     rendered only if the page supplies that content, so a page with no chart
+     panel doesn't get an empty heading. Same ids as the old tab panels
+     (#tb-panel-<id>), because host pages address them to show and hide their
+     own sections as the view changes. */
+  var SECTIONS = [
     { id: 'display', label: 'Display mode' },
     { id: 'fields',  label: 'Columns' },
     { id: 'options', label: 'Options' },
@@ -164,19 +187,28 @@
   ];
   drawer.innerHTML =
     '<header class="tb-options__head">' +
-      '<div class="tb-options__tabs" role="tablist" aria-label="Display options"></div>' +
-      '<button class="tb-options__close" type="button" aria-label="Close options">' +
-        '<span class="material-symbols-rounded">close</span></button>' +
-    '</header><div class="tb-options__body"></div>';
-  var drawerBody = drawer.querySelector('.tb-options__body');
-  var tabStrip   = drawer.querySelector('.tb-options__tabs');
+      '<h2 class="tb-options__title" id="tb-options-title">Display options</h2>' +
+      '<button class="tb-options__close" type="button" aria-label="Close display options">' +
+        '<span class="material-symbols-rounded" aria-hidden="true">close</span></button>' +
+    '</header>' +
+    '<div class="tb-options__search" hidden>' +
+      '<label class="tb-options__sr" for="tb-options-filter">Search display options</label>' +
+      '<input id="tb-options-filter" type="text" placeholder="Search options" autocomplete="off">' +
+      '<span class="material-symbols-rounded" aria-hidden="true">search</span>' +
+    '</div>' +
+    '<div class="tb-options__body"></div>' +
+    '<p class="tb-options__empty" hidden>No options match that search.</p>';
+  drawer.setAttribute('aria-labelledby', 'tb-options-title');
+  var drawerBody   = drawer.querySelector('.tb-options__body');
+  var searchWrap   = drawer.querySelector('.tb-options__search');
+  var searchInput  = drawer.querySelector('#tb-options-filter');
+  var emptyMsg     = drawer.querySelector('.tb-options__empty');
 
   /* Placed directly after the back button when there is one, else first. */
   var back = toolbar.querySelector(BACK);
   var anchor = back ? (back.closest('.toolbar__group') || back) : null;
   if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(bar, anchor.nextSibling);
   else toolbar.insertBefore(bar, toolbar.firstChild);
-  document.body.appendChild(scrim);
   document.body.appendChild(drawer);
 
   /* ---- move controls in / out ------------------------------------------- */
@@ -197,23 +229,27 @@
     // Between Tools and Options — appended before the Options button below.
     if (filtersBtn) bar.appendChild(filtersBtn);
 
-    // one panel per tab that has content
-    var used = {};
-    TABS.forEach(function (t) {
+    /* One section per group that has content. All of them are visible at once
+       now — the whole point of dropping the tabs is that four short lists read
+       better stacked than they do behind a strip too wide for the header. */
+    SECTIONS.forEach(function (t) {
       var mine = optionParts.filter(function (p) { return p.tab === t.id; });
       if (!mine.length) return;
-      used[t.id] = true;
-      var panel = document.createElement('div');
+      var panel = document.createElement('section');
       panel.className = 'tb-options__panel';
       panel.id = 'tb-panel-' + t.id;
-      panel.setAttribute('role', 'tabpanel');
-      if (t.id === 'display') {
-        var lab = document.createElement('div');
-        lab.className = 'tb-options__label';
-        lab.textContent = 'Display as';
-        panel.appendChild(lab);
-      }
+      panel.setAttribute('role', 'group');
+      panel.setAttribute('aria-labelledby', 'tb-sechead-' + t.id);
+
+      var head = document.createElement('h2');
+      head.className = 'tb-options__sechead';
+      head.id = 'tb-sechead-' + t.id;
+      head.textContent = t.label;
+      panel.appendChild(head);
+
       mine.forEach(function (p) {
+        /* A part's own label (e.g. "Chart settings") sits under the section
+           heading as a sub-label; without one the heading is the only title. */
         if (p.label) {
           var h = document.createElement('div');
           h.className = 'tb-options__label';
@@ -221,28 +257,15 @@
           panel.appendChild(h);
         }
         panel.appendChild(p.el);
-        // the host page hides these until its own toolbar opens them; in the
-        // drawer they are the content
-        p.el.removeAttribute('hidden');
-        p.el.classList.remove('is-collapsed');
+        // only the host's own popovers get forced open; view-gated panels keep
+        // whatever visibility the page has given them
+        if (p.unhide) {
+          p.el.removeAttribute('hidden');
+          p.el.classList.remove('is-collapsed');
+        }
       });
       drawerBody.appendChild(panel);
     });
-
-    tabStrip.innerHTML = '';
-    var order = TABS.filter(function (t) { return used[t.id]; });
-    order.forEach(function (t, i) {
-      var btn = document.createElement('button');
-      btn.className = 'tb-options__tab' + (i === 0 ? ' is-active' : '');
-      btn.type = 'button';
-      btn.setAttribute('role', 'tab');
-      btn.setAttribute('aria-selected', String(i === 0));
-      btn.setAttribute('aria-controls', 'tb-panel-' + t.id);
-      btn.dataset.tab = t.id;
-      btn.textContent = t.label;
-      tabStrip.appendChild(btn);
-    });
-    showTab(order.length ? order[0].id : null);
 
     /* The display switch is a horizontal icon strip in the toolbar. In the
        drawer it becomes a vertical list, and each option needs a readable
@@ -264,6 +287,15 @@
     if (optionParts.length) bar.appendChild(optionsBtn);
 
     document.body.classList.add('tb-is-compact');
+    announceMode(true);
+  }
+
+  /* Collapsing happens after the host has finished its own setup, and it can
+     force a part visible (the column popover) that the host had good reason to
+     keep hidden for the current view. The host can't see that happen, so it's
+     told: pages that gate a part by view re-assert it here. */
+  function announceMode(on) {
+    document.dispatchEvent(new CustomEvent('px:toolbar-compact', { detail: { compact: on } }));
   }
 
   function leave() {
@@ -278,31 +310,15 @@
     tools.forEach(restore);
     optionParts.forEach(function (p) { restore(p.el); });
     if (filtersBtn) restore(filtersBtn);
-    // whatever the drawer built is disposable; a re-entry rebuilds it
+    // whatever the popover built is disposable; a re-entry rebuilds it
     drawerBody.innerHTML = '';
-    tabStrip.innerHTML = '';
     if (toolsWrap.parentNode === bar) bar.removeChild(toolsWrap);
     if (optionsBtn.parentNode === bar) bar.removeChild(optionsBtn);
     document.body.classList.remove('tb-is-compact');
+    announceMode(false);
   }
 
   /* ---- behaviour --------------------------------------------------------- */
-  function showTab(id) {
-    if (!id) return;
-    [].forEach.call(tabStrip.children, function (b) {
-      var on = b.dataset.tab === id;
-      b.classList.toggle('is-active', on);
-      b.setAttribute('aria-selected', String(on));
-    });
-    [].forEach.call(drawerBody.children, function (pnl) {
-      pnl.hidden = pnl.id !== 'tb-panel-' + id;
-    });
-  }
-  drawer.addEventListener('click', function (e) {
-    var t = e.target.closest('.tb-options__tab');
-    if (t) showTab(t.dataset.tab);
-  });
-
   function closeTools() { toolsPop.hidden = true; toolsBtn.setAttribute('aria-expanded', 'false'); }
   function openTools() { toolsPop.hidden = false; toolsBtn.setAttribute('aria-expanded', 'true'); }
   toolsBtn.addEventListener('click', function (e) {
@@ -315,33 +331,143 @@
   });
   document.addEventListener('click', function () { if (!toolsPop.hidden) closeTools(); });
 
-  function openOptions() {
-    /* Sit just under the toolbar. Read at open time rather than hardcoded,
-       because the toolbar's height differs per page and with the app bar. */
-    var tb = toolbar.getBoundingClientRect();
-    drawer.style.setProperty('--tb-top', Math.round(tb.bottom) + 'px');
-    scrim.hidden = false; drawer.hidden = false;
-    requestAnimationFrame(function () { scrim.classList.add('is-open'); drawer.classList.add('is-open'); });
-    optionsBtn.setAttribute('aria-expanded', 'true');
-    var f = drawer.querySelector('button, select, input, a[href]');
-    if (f) setTimeout(function () { f.focus(); }, 60);
+  /* Anchored under the Options button and clamped to the viewport.
+
+     Positioned from script rather than with `position:absolute; right:0` on a
+     wrapper: Options is the last control on the compact bar on the search page
+     but not necessarily anywhere else, and a right-aligned popover hanging off
+     a button that sits near the left edge runs off the screen. Measuring the
+     button and clamping to a gutter is correct on every page and at every
+     width, which is what a shared component needs.
+
+     Height is capped to the room actually below the button, so it can never
+     grow past the bottom of the screen — the sheet's original sin. */
+  /* A section whose every control is hidden is a heading over nothing. Which
+     controls apply depends on the current view, and the view changes while the
+     menu is shut, so this is settled at open time rather than at build — the
+     state only has to be right at the moment it becomes visible. */
+  function syncSections() {
+    SECTIONS.forEach(function (t) {
+      var panel = drawerBody.querySelector('#tb-panel-' + t.id);
+      if (!panel) return;
+      var mine = optionParts.filter(function (p) { return p.tab === t.id; });
+      var anyVisible = mine.some(function (p) { return !p.el.hasAttribute('hidden'); });
+      /* Recorded as well as applied: the search also hides sections, and
+         without knowing which of the two hid a section the search would
+         happily un-hide one the current view had ruled out. */
+      panel.__viewHidden = !anyVisible;
+      panel.hidden = !anyVisible;
+    });
   }
-  function closeOptions() {
-    scrim.classList.remove('is-open'); drawer.classList.remove('is-open');
+
+  /* ---- search across every section --------------------------------------
+     The answer to "there could be many many columns". Rows are matched on their
+     visible text, and a section whose rows have all been filtered out drops its
+     heading with them, so a search reads as a short list rather than a run of
+     empty headings.
+
+     Row types are listed rather than inferred: the moved content is arbitrary
+     host markup, and "any element with text" would match wrappers as readily as
+     rows. A host can opt anything else in with data-tb-row. */
+  var ROW_SEL = '.viewswitch__btn, .colmenu__row, .sortmenu__opt, [data-tb-row]';
+  /* Sub-groups within a section — "Displayed columns" and "Group rows by" each
+     carry their own label. Filtering the rows out from under one leaves the
+     label stranded over nothing, so an emptied group is hidden with them. */
+  var GROUP_SEL = '.colmenu__group, [data-tb-group]';
+  var SEARCH_MIN_ROWS = 10;   // below this a search field is clutter, not help
+
+  function allRows() { return [].slice.call(drawerBody.querySelectorAll(ROW_SEL)); }
+
+  function applySearch() {
+    var q = (searchInput.value || '').trim().toLowerCase();
+    var total = 0;
+    [].forEach.call(drawerBody.children, function (panel) {
+      if (panel.__viewHidden) return;          // hidden by the current view, not by search
+      var rows = [].slice.call(panel.querySelectorAll(ROW_SEL));
+      var shown = 0;
+      rows.forEach(function (row) {
+        var hit = !q || (row.textContent || '').toLowerCase().indexOf(q) !== -1;
+        row.hidden = !hit;
+        if (hit) shown++;
+      });
+      [].forEach.call(panel.querySelectorAll(GROUP_SEL), function (g) {
+        var gr = [].slice.call(g.querySelectorAll(ROW_SEL));
+        g.hidden = gr.length > 0 && gr.every(function (r) { return r.hidden; });
+      });
+      /* A section with no matchable rows at all — a moved-in panel of custom
+         controls — is left alone rather than hidden. We can't judge it, and
+         silently dropping content is worse than leaving it on screen. */
+      panel.hidden = rows.length > 0 && shown === 0;
+      total += shown;
+    });
+    emptyMsg.hidden = !q || total > 0 || allRows().length === 0;
+  }
+  function syncSearchAffordance() {
+    var many = allRows().length >= SEARCH_MIN_ROWS;
+    searchWrap.hidden = !many;
+    if (!many && searchInput.value) searchInput.value = '';
+  }
+  searchInput.addEventListener('input', applySearch);
+
+  /* The panel is non-modal, so the view can change underneath it — tap Card
+     while it's open and the Columns section no longer applies. Settling that
+     only at open time left an inapplicable section on screen until it was
+     closed and reopened. Watching the parts' own `hidden` picks up whatever
+     the host does without the component needing to know what a view is. */
+  var partObserver = new MutationObserver(function () {
+    if (drawer.hidden) return;               // open time will handle it
+    syncSections();
+    syncSearchAffordance();
+    applySearch();
+  });
+  optionParts.forEach(function (p) {
+    partObserver.observe(p.el, { attributes: true, attributeFilter: ['hidden'] });
+  });
+
+  function openOptions() {
+    syncSections();
+    syncSearchAffordance();
+    applySearch();                 // re-apply whatever was typed last time
+    drawer.hidden = false;
+    /* Flush layout so the transition has a start state to move from, rather
+       than deferring the class to a rAF that may not run before the panel is
+       read — offscreen and headless contexts don't always paint a frame, and
+       the panel would then sit translated off the right edge, open but
+       invisible. A forced reflow is synchronous and always correct. */
+    void drawer.offsetWidth;
+    drawer.classList.add('is-open');
+    optionsBtn.setAttribute('aria-expanded', 'true');
+    /* No auto-focus: non-modal, and pulling focus onto the first display mode
+       put a focus ring on a row nobody had chosen. Tab reaches it in one step. */
+  }
+  function closeOptions(returnFocus) {
+    if (drawer.hidden) return;
+    drawer.classList.remove('is-open');
     optionsBtn.setAttribute('aria-expanded', 'false');
-    setTimeout(function () { scrim.hidden = true; drawer.hidden = true; }, 220);
+    setTimeout(function () { drawer.hidden = true; }, 220);
+    if (returnFocus) optionsBtn.focus();
   }
   optionsBtn.addEventListener('click', function (e) {
     e.stopPropagation();
     drawer.hidden ? openOptions() : closeOptions();
   });
-  scrim.addEventListener('click', closeOptions);
-  drawer.querySelector('.tb-options__close').addEventListener('click', closeOptions);
+  drawer.querySelector('.tb-options__close').addEventListener('click', function () {
+    closeOptions(true);
+  });
+  /* Tap-away dismissal. Meaningful beside the panel on a tablet; at phone width
+     it covers the page, which is what the close button is for. */
+  document.addEventListener('click', function (e) {
+    if (drawer.hidden) return;
+    if (drawer.contains(e.target) || e.target.closest('.tb-compact__btn')) return;
+    closeOptions();
+  });
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;
-    if (!drawer.hidden) closeOptions();
+    if (!drawer.hidden) closeOptions(true);
     else if (!toolsPop.hidden) closeTools();
   });
+  /* No repositioning on resize: the panel is pinned to all four edges it needs
+     (top, bottom, right) in CSS, so it re-lays out on its own. */
 
   /* ---- when to collapse -------------------------------------------------
      Ask the browser directly rather than adding up widths: with wrapping
