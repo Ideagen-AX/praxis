@@ -50,9 +50,16 @@
     return out;
   }
 
+  /* Filters stays on the bar rather than folding into Tools: it is the control
+     users reach for most on a search screen, and burying it behind a menu put
+     it two taps away. It sits between Tools and Options. */
+  var FILTERS = '[data-action="open-filter-drawer"], [data-action="add-filter"]';
+  var filtersBtn = null;
+
   var all = directControls(toolbar);
   var tools = all.filter(function (el) {
     if (el.matches(BACK)) return false;
+    if (el.matches(FILTERS)) { filtersBtn = el; return false; }
     return el.matches('.tbtn, .tb-menu, button, a.tbtn, .btn');
   });
 
@@ -73,7 +80,7 @@
   part('.toolbar__sortlabel',  'sort');
   part('.sortmenu',            'sort');
 
-  if (!tools.length && !optionParts.length) return;
+  if (!tools.length && !optionParts.length && !filtersBtn) return;
 
   /* Remember each node's origin so it can be put back verbatim. */
   /* Position is fixed for the life of the page, so it's captured once. Visible
@@ -106,6 +113,11 @@
   }
   tools.forEach(remember);
   optionParts.forEach(function (p) { remember(p.el); });
+  /* Filters is hoisted onto the compact bar rather than folded into Tools, but
+     it still needs its home recorded — restore() and captureState() both bail
+     out on a missing __pxHome, so without this it never travels back to the
+     toolbar and stays stranded on the bar at expanded widths. */
+  if (filtersBtn) remember(filtersBtn);
 
   /* ---- build the compact bar -------------------------------------------- */
   /* A wrapper inside the toolbar, so Tools and Options sit on the same line as
@@ -177,9 +189,13 @@
     // rather than to whatever was true when the page first loaded
     tools.forEach(captureState);
     optionParts.forEach(function (p) { captureState(p.el); });
+    if (filtersBtn) captureState(filtersBtn);
 
     tools.forEach(function (el) { toolsPop.appendChild(el); });
     if (tools.length) bar.appendChild(toolsWrap);
+
+    // Between Tools and Options — appended before the Options button below.
+    if (filtersBtn) bar.appendChild(filtersBtn);
 
     // one panel per tab that has content
     var used = {};
@@ -261,6 +277,7 @@
     [].slice.call(document.querySelectorAll('.tb-viewlabel')).forEach(function (n) { n.remove(); });
     tools.forEach(restore);
     optionParts.forEach(function (p) { restore(p.el); });
+    if (filtersBtn) restore(filtersBtn);
     // whatever the drawer built is disposable; a re-entry rebuilds it
     drawerBody.innerHTML = '';
     tabStrip.innerHTML = '';

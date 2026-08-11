@@ -1,0 +1,206 @@
+/* ============================================================================
+   Praxis quick-filter rail — the compact form of the quick-filter strip
+   ============================================================================
+   When the toolbar collapses, the five-across card grid in praxis-filters.css
+   is hidden and this takes over: a horizontally scrolling row of pills, one
+   per designated quick filter, each opening a popover anchored under its pill.
+
+   Gated on body.tb-is-compact, NOT a media query. praxis-toolbar-compact.js
+   collapses on `toolbar.scrollWidth > clientWidth || innerWidth <= 1024` — it
+   is content-driven with a tablet floor, so a wide toolbar can collapse well
+   above 1024px. A max-width query here drifted out of step with it; sharing
+   the class keeps the two switches identical by construction.
+
+   Why this exists: the strip used to vanish below 1399px while the filter
+   modal still let you designate quick filters — and designating one LOCKS its
+   row in the modal (filter-row--locked, controls not rendered). So a
+   quick-designated filter became completely unreachable at narrow widths,
+   showing a "Used as Quick Filter" badge that pointed at something invisible.
+
+   This file and praxis-quick-rail.js are deliberately separate from
+   praxis-filters.*, which is a PORT of the Responsive Search project — a
+   re-extract overwrites those two files and would wipe anything added there.
+   Only one rule in praxis-filters.css belongs to this feature (the one that
+   hides the strip); it is commented there.
+   ========================================================================= */
+
+/* Expanded toolbar keeps the card grid; the rail is compact-mode only. */
+.qrail{ display:none; }
+.qrail-pop{ display:none; }
+
+body.tb-is-compact .qrail{
+  display:block;
+  /* No negative-margin bleed. It used to pull the rail one gutter past the
+     container so it could scroll edge to edge, but that put the box at -16px
+     on a 390px screen — the pills ran off the left of the view. The rail
+     starts on the content edge and grows to the right only. */
+  padding:var(--s-8, 8px) 0;
+}
+body.tb-is-compact .qrail[hidden]{ display:none !important; }
+
+body.tb-is-compact .qrail__scroller{
+  display:flex; gap:var(--s-8, 8px);
+  overflow-x:auto; scrollbar-width:none;
+  /* One gutter, matching .filter-chips below and the toolbar above, so the
+     first pill shares their left edge.
+
+     No scroll-snap here. scroll-snap-align:start snaps a pill to the
+     scrollport's border edge, not its padding edge, so the browser settled
+     the rail at scrollLeft = padding — swallowing the left inset and sitting
+     the first pill flush at 0 while the chips below stayed at one gutter. */
+  padding:2px var(--praxis-filters-gutter, 20px);
+}
+body.tb-is-compact .qrail__scroller::-webkit-scrollbar{ display:none; }
+
+/* Same construction as a toolbar button (.tbtn): rectangular at 10px, the
+   --px-tool fill and --px-tool-shadow elevation. Both tokens are theme-scoped,
+   so dark comes for free and needs no override here. Applied-filter chips are
+   deliberately the opposite — flat and pill-shaped — so the two rows read as
+   different kinds of thing. See praxis-filters-local.css. */
+body.tb-is-compact .qrail__pill{
+  flex:0 0 auto;
+  display:inline-flex; align-items:center; gap:7px;
+  height:40px; padding:0 14px;
+  border:0; border-radius:10px;
+  background:var(--px-tool);
+  color:var(--ehsq-color-text-primary);
+  box-shadow:var(--px-tool-shadow);
+  font:inherit; font-size:.875rem; font-weight:600;
+  white-space:nowrap; cursor:pointer;
+  transition:box-shadow var(--ehsq-motion-fast, 120ms),
+             background var(--ehsq-motion-fast, 120ms),
+             color var(--ehsq-motion-fast, 120ms);
+}
+body.tb-is-compact .qrail__pill:hover{ box-shadow:var(--px-tool-shadow-hover); }
+body.tb-is-compact .qrail__pill:active{ background:var(--px-surface-2); }
+body.tb-is-compact .qrail__pill:focus-visible{
+  outline:2px solid var(--ehsq-color-interactive-default);
+  outline-offset:2px;
+}
+body.tb-is-compact .qrail__pill[aria-expanded="true"]{
+  background:var(--px-surface-2);
+  box-shadow:var(--px-tool-shadow-hover);
+}
+
+body.tb-is-compact .qrail__bolt{ font-size:18px; line-height:1; color:var(--ehsq-color-text-tertiary); }
+body.tb-is-compact .qrail__caret{ font-size:18px; line-height:1; opacity:.7; margin-left:-2px; }
+
+/* An active pill stays neutral — the count alone carries the state. Several
+   of these sit in a row, and accenting them all turns the rail into a solid
+   band with no hierarchy left. */
+body.tb-is-compact .qrail__count{
+  display:inline-grid; place-items:center;
+  min-width:20px; height:20px; padding:0 6px;
+  border-radius:999px;
+  background:var(--ehsq-color-neutral-15, rgba(32,42,53,.10));
+  color:var(--ehsq-color-text-primary);
+  font-size:var(--t-xs, .75rem); font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+
+/* praxis-core gives dark toolbar buttons an opaque --px-surface-2 fill, but
+   that rule is scoped to .toolbar descendants and the rail sits outside it —
+   left alone the pill fell back to --px-tool's translucent white and read a
+   shade off. Match the toolbar explicitly. */
+body[data-theme="dark"].tb-is-compact .qrail__pill{ background:var(--px-surface-2); }
+body[data-theme="dark"].tb-is-compact .qrail__pill:active,
+body[data-theme="dark"].tb-is-compact .qrail__pill[aria-expanded="true"]{ background:var(--px-surface); }
+
+body[data-theme="dark"].tb-is-compact .qrail__count{
+  background:rgba(255,255,255,.14);
+  color:var(--ehsq-color-text-primary);
+}
+
+/* ---- Popover, anchored under the pill (positioned by the script) ---- */
+body.tb-is-compact .qrail-pop{
+  position:fixed; z-index:151; top:0; left:0;
+  display:flex; flex-direction:column;
+  width:max-content; min-width:240px;
+  max-width:min(340px, calc(100vw - 16px));
+  /* Capped so a long distribution scrolls inside the popover rather than
+     running off-screen — this is what makes "See More" safe for an arbitrary
+     number of values. */
+  max-height:min(60vh, 420px);
+  background:var(--px-surface, #fff);
+  border:1px solid var(--color-border, var(--ehsq-color-neutral-20));
+  border-radius:12px;
+  box-shadow:var(--px-overlay, 0 8px 32px rgba(0,0,0,.18));
+  opacity:0; transform:translateY(-4px);
+  transition:opacity 140ms var(--ease-default, ease),
+             transform 140ms var(--ease-default, ease);
+}
+body.tb-is-compact .qrail-pop.is-open{ opacity:1; transform:none; }
+body.tb-is-compact .qrail-pop[hidden]{ display:none; }
+
+body.tb-is-compact .qrail-pop__head{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 8px 4px 12px; flex-shrink:0;
+}
+body.tb-is-compact .qrail-pop__title{
+  margin:0; flex:1; min-width:0;
+  font-size:var(--t-sm, .875rem); font-weight:700;
+  color:var(--color-text, var(--ehsq-color-text-primary));
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+body.tb-is-compact .qrail-pop__close{
+  display:grid; place-items:center;
+  width:32px; height:32px; flex-shrink:0;
+  border:0; border-radius:8px; background:transparent;
+  color:var(--ehsq-color-text-secondary); cursor:pointer;
+}
+body.tb-is-compact .qrail-pop__close:hover{ background:var(--px-hover, rgba(0,0,0,.04)); }
+body.tb-is-compact .qrail-pop__close .material-symbols-rounded{ font-size:20px; }
+
+body.tb-is-compact .qrail-pop__body{
+  overflow-y:auto; overscroll-behavior:contain;
+  padding:0 8px 8px; min-height:0;
+}
+/* The .qfilter card is MOVED in here, not cloned, so praxis-filters.js keeps
+   driving it (its handlers delegate from document). Strip the card chrome —
+   the popover already provides the surface, title and dismiss. */
+body.tb-is-compact .qrail-pop__body .qfilter{
+  border:0; background:transparent; padding:0;
+}
+body.tb-is-compact .qrail-pop__body .qfilter__head{ display:none; }
+/* Distribution rows are touch targets here. */
+body.tb-is-compact .qrail-pop__body .qfilter__row{ min-height:40px; padding:var(--s-8, 8px); }
+/* praxis-filters.css resets native button chrome, but scopes that reset to
+   .quick-filters and friends — and this card has been moved out of there, so
+   every button inside the popover was falling back to the UA default. That is
+   what put a `2px outset black` bevel on See More. Same reset, same :where()
+   zero specificity so the rules below still win. */
+body.tb-is-compact .qrail-pop :where(button){
+  border:0; background:transparent; font:inherit; color:inherit; cursor:pointer;
+}
+body.tb-is-compact .qrail-pop :where(*){ box-sizing:border-box; }
+
+/* See More / See Less: a footer action pinned to the bottom of the scroll area
+   so it stays reachable once the list is long enough to scroll. */
+body.tb-is-compact .qrail-pop__body .qfilter__more{
+  position:sticky; bottom:0; z-index:1;
+  display:flex; align-items:center; justify-content:center;
+  min-height:40px; width:100%; margin-top:4px; padding:0 8px;
+  border:0; border-top:1px solid var(--ehsq-color-border-default);
+  border-radius:0 0 6px 6px;
+  background:var(--px-surface, #fff);
+  color:var(--ehsq-color-interactive-default);
+  font-size:var(--t-xs, .75rem); font-weight:700; text-align:center;
+  cursor:pointer;
+  transition:background var(--d-fast, 120ms) var(--ease-default, ease);
+}
+body.tb-is-compact .qrail-pop__body .qfilter__more:hover{
+  background:var(--px-hover, rgba(0,0,0,.04));
+  text-decoration:none;
+}
+body.tb-is-compact .qrail-pop__body .qfilter__more:focus-visible{
+  outline:2px solid var(--ehsq-color-interactive-default);
+  outline-offset:-2px;
+}
+body[data-theme="dark"].tb-is-compact .qrail-pop__body .qfilter__more{
+  background:var(--px-surface, #192336);
+  border-top-color:rgba(255,255,255,.12);
+}
+
+@media (prefers-reduced-motion:reduce){
+  body.tb-is-compact .qrail-pop{ transition:none; }
+}
