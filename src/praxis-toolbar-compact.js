@@ -6,17 +6,19 @@
    different natural widths and any single px value would be early for one page
    and late for another. It collapses to:
 
-     [back]  [Tools ▾]  [Options]
+     [back]  [Tools ▾]  [Filters]  [Options]  [▤]
 
    in the toolbar itself, in line with the back button.
 
    - Tools   a dropdown holding the secondary actions (Save, Export,
              Notification, Add Filters / Group, Share, Delete …)
-   - Options a dropdown of the same kind, holding the sort control, the
-             display-mode switch, and whatever panel belongs to the current
-             display mode (table columns, chart settings). Only built when the
-             page actually has those controls, so the record and report
-             toolbars get Tools alone.
+   - Display the display-mode switch, as its own dropdown. Icon only — the
+             icon of the mode you are currently in — with the full icon+label
+             list inside. See below.
+   - Options a dropdown of the same kind, holding the sort control and whatever
+             panel belongs to the current display mode (table columns, chart
+             settings). Only built when the page actually has those controls,
+             so the record and report toolbars get Tools alone.
 
    Options was a full-width sheet that slid up from the bottom edge, spanning
    from under the toolbar to the floor. Measured on the search page it took 77%
@@ -92,7 +94,12 @@
     var el = (sel[0] === '#' ? document : toolbar).querySelector(sel);
     if (el) optionParts.push({ el: el, tab: tab, label: label || null, unhide: !!unhide });
   }
-  part('.viewswitch',          'display');
+  /* Display mode used to be the first section of Options. It is out on the bar
+     now, as its own dropdown: it's the choice people make most often on a
+     results screen, and behind Options it sat two taps deep under a heading,
+     below a panel of column checkboxes. Same element, moved not cloned, so the
+     host's handlers and its active state travel with it. */
+  var viewSwitch = toolbar.querySelector('.viewswitch');
   /* The search page's column picker. It is a toolbar popover above the tablet
      floor and the Columns section of this menu below it — same element, same
      handlers, moved rather than duplicated, so there is one column control on
@@ -103,7 +110,7 @@
   part('.toolbar__sortlabel',  'sort');
   part('.sortmenu',            'sort');
 
-  if (!tools.length && !optionParts.length && !filtersBtn) return;
+  if (!tools.length && !optionParts.length && !filtersBtn && !viewSwitch) return;
 
   /* Remember each node's origin so it can be put back verbatim. */
   /* Position is fixed for the life of the page, so it's captured once. Visible
@@ -141,6 +148,7 @@
      out on a missing __pxHome, so without this it never travels back to the
      toolbar and stays stranded on the bar at expanded widths. */
   if (filtersBtn) remember(filtersBtn);
+  if (viewSwitch) remember(viewSwitch);
 
   /* ---- build the compact bar -------------------------------------------- */
   /* A wrapper inside the toolbar, so Tools and Options sit on the same line as
@@ -158,6 +166,26 @@
   var toolsBtn = toolsWrap.querySelector('button');
   var toolsPop = toolsWrap.querySelector('.tb-compact__pop');
 
+  /* ---- Display-mode dropdown ----
+     Icon-only trigger, showing the mode you are in rather than a static
+     "Display" glyph: on a bar this narrow the one word the button could carry
+     is the one thing the icon already says, and the current mode is otherwise
+     invisible once the strip is folded away. The label lives on aria-label and
+     the tooltip, and inside the menu every row is icon + word. */
+  var displayWrap = null, displayBtn = null, displayPop = null;
+  if (viewSwitch) {
+    displayWrap = document.createElement('div');
+    displayWrap.className = 'tb-compact__menu tb-display';
+    displayWrap.innerHTML =
+      '<button class="tbtn tbtn--icon tb-display__btn" type="button" ' +
+              'aria-haspopup="menu" aria-expanded="false" aria-label="Display mode">' +
+        '<span class="tb-display__icon" aria-hidden="true"></span>' +
+      '</button>' +
+      '<div class="tb-compact__pop tb-display__pop" role="menu" aria-label="Display mode" hidden></div>';
+    displayBtn = displayWrap.querySelector('button');
+    displayPop = displayWrap.querySelector('.tb-display__pop');
+  }
+
   var optionsBtn = document.createElement('button');
   optionsBtn.className = 'tbtn tb-compact__btn';
   optionsBtn.type = 'button';
@@ -165,34 +193,41 @@
   optionsBtn.setAttribute('aria-expanded', 'false');
   optionsBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">tune</span>Options';
 
-  /* Non-modal: no aria-modal, no scrim, no focus trap — the page underneath
-     stays live, which is the point of a standard side sheet. It does get a
-     close button, because at phone width it covers the page and there is
-     nothing left to tap away at. */
+  /* Scrim behind the card, matching the Filters drawer this panel now borrows
+     its shape from. Clicking it closes — the document-level tap-away below
+     already did that, so the scrim adds the dimming, not the behaviour.
+
+     Still no focus trap and no aria-modal, which is what the Filters drawer on
+     this page does too. Consistent, but consistent with something that ought to
+     be fixed in both places rather than only here. */
+  var scrim = document.createElement('div');
+  scrim.className = 'tb-options-scrim';
+  scrim.hidden = true;
+
   var drawer = document.createElement('aside');
   drawer.className = 'tb-options';
   drawer.setAttribute('role', 'dialog');
-  drawer.setAttribute('aria-label', 'Display options');
+  drawer.setAttribute('aria-label', 'Options');
   drawer.hidden = true;
-  /* Sections, fixed in order — Display mode, Columns, Options, Sort by — each
-     rendered only if the page supplies that content, so a page with no chart
-     panel doesn't get an empty heading. Same ids as the old tab panels
-     (#tb-panel-<id>), because host pages address them to show and hide their
-     own sections as the view changes. */
+  /* Sections, fixed in order — Columns, Options, Sort by — each rendered only
+     if the page supplies that content, so a page with no chart panel doesn't
+     get an empty heading. Same ids as the old tab panels (#tb-panel-<id>),
+     because host pages address them to show and hide their own sections as the
+     view changes. (Display mode is no longer among them; it is its own button
+     on the bar.) */
   var SECTIONS = [
-    { id: 'display', label: 'Display mode' },
     { id: 'fields',  label: 'Columns' },
     { id: 'options', label: 'Options' },
     { id: 'sort',    label: 'Sort by' }
   ];
   drawer.innerHTML =
     '<header class="tb-options__head">' +
-      '<h2 class="tb-options__title" id="tb-options-title">Display options</h2>' +
-      '<button class="tb-options__close" type="button" aria-label="Close display options">' +
+      '<h2 class="tb-options__title" id="tb-options-title">Options</h2>' +
+      '<button class="tb-options__close" type="button" aria-label="Close options">' +
         '<span class="material-symbols-rounded" aria-hidden="true">close</span></button>' +
     '</header>' +
     '<div class="tb-options__search" hidden>' +
-      '<label class="tb-options__sr" for="tb-options-filter">Search display options</label>' +
+      '<label class="tb-options__sr" for="tb-options-filter">Search options</label>' +
       '<input id="tb-options-filter" type="text" placeholder="Search options" autocomplete="off">' +
       '<span class="material-symbols-rounded" aria-hidden="true">search</span>' +
     '</div>' +
@@ -209,6 +244,7 @@
   var anchor = back ? (back.closest('.toolbar__group') || back) : null;
   if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(bar, anchor.nextSibling);
   else toolbar.insertBefore(bar, toolbar.firstChild);
+  document.body.appendChild(scrim);
   document.body.appendChild(drawer);
 
   /* ---- move controls in / out ------------------------------------------- */
@@ -222,6 +258,7 @@
     tools.forEach(captureState);
     optionParts.forEach(function (p) { captureState(p.el); });
     if (filtersBtn) captureState(filtersBtn);
+    if (viewSwitch) captureState(viewSwitch);
 
     tools.forEach(function (el) { toolsPop.appendChild(el); });
     if (tools.length) bar.appendChild(toolsWrap);
@@ -267,24 +304,28 @@
       drawerBody.appendChild(panel);
     });
 
-    /* The display switch is a horizontal icon strip in the toolbar. In the
-       drawer it becomes a vertical list, and each option needs a readable
+    /* The display switch is a horizontal icon strip in the toolbar. In its
+       dropdown it becomes a vertical list, and each option needs a readable
        label — the icon alone carried the meaning on the strip because of its
        tooltip. Titles are already on the buttons, so use those. */
-    var vs = drawerBody.querySelector('.viewswitch');
-    if (vs) {
-      [].forEach.call(vs.querySelectorAll('.viewswitch__btn'), function (btn) {
+    if (viewSwitch) {
+      displayPop.appendChild(viewSwitch);
+      viewSwitch.removeAttribute('hidden');
+      [].forEach.call(viewSwitch.querySelectorAll('.viewswitch__btn'), function (btn) {
         if (btn.querySelector('.tb-viewlabel')) return;
-        var name = (btn.getAttribute('title') || btn.getAttribute('aria-label') || '').replace(/\s*view$/i, '');
+        var name = viewName(btn);
         if (!name) return;
         var span = document.createElement('span');
         span.className = 'tb-viewlabel';
         span.textContent = name;
         btn.appendChild(span);
       });
+      syncDisplayBtn();
     }
 
     if (optionParts.length) bar.appendChild(optionsBtn);
+    /* Last on the bar, after Options. */
+    if (viewSwitch) bar.appendChild(displayWrap);
 
     document.body.classList.add('tb-is-compact');
     announceMode(true);
@@ -301,7 +342,7 @@
   function leave() {
     if (!compact) return;
     compact = false;
-    closeTools(); closeOptions();
+    closeTools(); closeOptions(); closeDisplay();
     /* Strip the injected labels first. Restoring moves the view switch back
        into the toolbar, and anything still attached to it goes along — which
        is how the mode labels ended up breaking the desktop toolbar. Query the
@@ -310,9 +351,11 @@
     tools.forEach(restore);
     optionParts.forEach(function (p) { restore(p.el); });
     if (filtersBtn) restore(filtersBtn);
+    if (viewSwitch) restore(viewSwitch);
     // whatever the popover built is disposable; a re-entry rebuilds it
     drawerBody.innerHTML = '';
     if (toolsWrap.parentNode === bar) bar.removeChild(toolsWrap);
+    if (displayWrap && displayWrap.parentNode === bar) bar.removeChild(displayWrap);
     if (optionsBtn.parentNode === bar) bar.removeChild(optionsBtn);
     document.body.classList.remove('tb-is-compact');
     announceMode(false);
@@ -330,6 +373,65 @@
     if (e.target.closest('.tbtn, button, a')) setTimeout(closeTools, 0);
   });
   document.addEventListener('click', function () { if (!toolsPop.hidden) closeTools(); });
+
+  /* ---- display-mode dropdown behaviour ----------------------------------- */
+  /* The buttons' tooltips are the mode names ("List view", "Chart view"), which
+     is where both the menu labels and the trigger's accessible name come from —
+     one source, so a page that adds a seventh mode needs no change here. */
+  function viewName(btn) {
+    return (btn.getAttribute('title') || btn.getAttribute('aria-label') || '')
+             .replace(/\s*view$/i, '').trim();
+  }
+  function activeViewBtn() {
+    if (!viewSwitch) return null;
+    return viewSwitch.querySelector('.viewswitch__btn--active') ||
+           viewSwitch.querySelector('.viewswitch__btn');
+  }
+  /* Mirror the active mode's icon onto the trigger. Cloned rather than
+     re-created from a name map: the icon in the strip may be a Lucide SVG, a
+     Material ligature or a plain <i> depending on how far the page's icon pass
+     has got, and a copy is right in all three cases. */
+  function syncDisplayBtn() {
+    if (!displayBtn) return;
+    var src = activeViewBtn();
+    if (!src) return;
+    var icon = src.querySelector('svg, img, [data-lucide], .material-symbols-rounded, .icon');
+    var slot = displayBtn.querySelector('.tb-display__icon');
+    slot.textContent = '';
+    if (icon) slot.appendChild(icon.cloneNode(true));
+    var name = viewName(src);
+    var label = name ? 'Display mode: ' + name : 'Display mode';
+    displayBtn.setAttribute('aria-label', label);
+    displayBtn.setAttribute('title', label);
+  }
+  function closeDisplay() {
+    if (!displayPop) return;
+    displayPop.hidden = true;
+    displayBtn.setAttribute('aria-expanded', 'false');
+  }
+  function openDisplay() {
+    displayPop.hidden = false;
+    displayBtn.setAttribute('aria-expanded', 'true');
+  }
+  if (viewSwitch) {
+    displayBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      displayPop.hidden ? openDisplay() : closeDisplay();
+    });
+    /* Picking a mode still runs the host's own handler on the same button; this
+       only shuts the menu afterwards, and after the host has toggled the active
+       class so the trigger picks up the new icon. */
+    displayPop.addEventListener('click', function (e) {
+      if (!e.target.closest('.viewswitch__btn')) return;
+      setTimeout(function () { syncDisplayBtn(); closeDisplay(); }, 0);
+    });
+    document.addEventListener('click', function () { closeDisplay(); });
+    /* The view can also change from outside the menu — a deep link, the chart
+       picker, a keyboard shortcut — so the trigger follows the active class
+       rather than only its own clicks. */
+    new MutationObserver(function () { syncDisplayBtn(); })
+      .observe(viewSwitch, { subtree: true, attributes: true, attributeFilter: ['class'] });
+  }
 
   /* Anchored under the Options button and clamped to the viewport.
 
@@ -428,6 +530,7 @@
     syncSections();
     syncSearchAffordance();
     applySearch();                 // re-apply whatever was typed last time
+    scrim.hidden = false;
     drawer.hidden = false;
     /* Flush layout so the transition has a start state to move from, rather
        than deferring the class to a rAF that may not run before the panel is
@@ -435,6 +538,7 @@
        the panel would then sit translated off the right edge, open but
        invisible. A forced reflow is synchronous and always correct. */
     void drawer.offsetWidth;
+    scrim.classList.add('is-open');
     drawer.classList.add('is-open');
     optionsBtn.setAttribute('aria-expanded', 'true');
     /* No auto-focus: non-modal, and pulling focus onto the first display mode
@@ -443,8 +547,12 @@
   function closeOptions(returnFocus) {
     if (drawer.hidden) return;
     drawer.classList.remove('is-open');
+    scrim.classList.remove('is-open');
     optionsBtn.setAttribute('aria-expanded', 'false');
-    setTimeout(function () { drawer.hidden = true; }, 220);
+    /* Long enough for the card's slide-out (--d-slow, 320ms) rather than the
+       200ms the old flush panel used — hiding at 220ms cut the animation off
+       two thirds of the way through and the card vanished mid-slide. */
+    setTimeout(function () { drawer.hidden = true; scrim.hidden = true; }, 340);
     if (returnFocus) optionsBtn.focus();
   }
   optionsBtn.addEventListener('click', function (e) {
@@ -465,6 +573,7 @@
     if (e.key !== 'Escape') return;
     if (!drawer.hidden) closeOptions(true);
     else if (!toolsPop.hidden) closeTools();
+    else if (displayPop && !displayPop.hidden) { closeDisplay(); displayBtn.focus(); }
   });
   /* No repositioning on resize: the panel is pinned to all four edges it needs
      (top, bottom, right) in CSS, so it re-lays out on its own. */

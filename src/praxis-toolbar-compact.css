@@ -2,8 +2,9 @@
    Praxis compact toolbar — tablet form (see praxis-toolbar-compact.js)
    ============================================================================
    Below 1024px the page toolbar keeps only the back button and the primary
-   action; everything else moves into a Tools dropdown, and the display
-   controls into an Options drawer.
+   action; everything else moves into a Tools dropdown, the display-mode switch
+   into its own icon-only dropdown, and the remaining display controls (sort,
+   columns, chart settings) into an Options drawer.
    ========================================================================= */
 
 /* The wrapper sits inside the toolbar, in line with the back button. It's
@@ -19,6 +20,41 @@
 body.tb-is-compact .toolbar,
 body.tb-is-compact .toolbar__inner{ flex-wrap:nowrap; gap:8px; }
 body.tb-is-compact .toolbar__spacer{ display:none; }
+
+/* Phone: the bar carries five controls once Display is out of Options, and at
+   390px the fifth one ran off the right edge. The space comes back from the
+   spacing rather than from a control — nothing here is dropped or hidden.
+   The Tools caret goes because it is the one mark on the bar that carries no
+   information: the button is already aria-haspopup="menu", and Options next to
+   it has never had one. */
+@media (max-width:520px){
+  body.tb-is-compact .toolbar,
+  body.tb-is-compact .toolbar__inner{ gap:6px; }
+  .tb-compact{ gap:6px; }
+  .tb-compact__btn{ gap:6px; }
+  .tb-compact__caret{ display:none; }
+  body.tb-is-compact .tbtn{ padding:0 8px; }
+  body.tb-is-compact .tbtn--icon{ width:36px; padding:0; }
+}
+/* The smallest phones this page targets (~360px). The bar fitted here exactly,
+   with nothing to spare, so the fifth control has to be paid for.
+
+   It is paid for out of the leading icons on the captioned buttons, not out of
+   any caption. A wrench for "Tools" and sliders for "Options" are decoration
+   next to the word they sit beside — nobody reads the glyph — while the words
+   are the only thing that tells two adjacent dropdowns of settings apart.
+   Filters goes with them: it was held back at first as the primary control, but
+   one icon among three bare captions reads as an oversight rather than as
+   emphasis. Display keeps its icon because it has no caption: there, the icon
+   is the state, and it is the only thing distinguishing it from the back
+   button. Above this width all three captions keep their icons, so the rule is
+   "all or none" at any given size rather than a standing exception. */
+@media (max-width:400px){
+  .tb-compact > .tb-compact__menu > .tb-compact__btn > .material-symbols-rounded,
+  .tb-compact > .tb-compact__btn > .material-symbols-rounded,
+  .tb-compact > [data-action="open-filter-drawer"] > .icon,
+  .tb-compact > [data-action="add-filter"] > .icon{ display:none; }
+}
 
   /* ---- Tools dropdown ---- */
   .tb-compact__pop{
@@ -50,68 +86,134 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
   /* .tb-menu wrappers hold their own trigger; let it fill the row. */
   .tb-compact__pop .tb-menu > .tbtn{ width:100%; justify-content:flex-start; }
 
-  /* ---- Options side panel ---------------------------------------------
-     Third attempt, and the first one sized for the job.
+  /* ---- Display-mode dropdown ------------------------------------------
+     Its own control on the compact bar rather than the first section of
+     Options: choosing a view is the most-repeated action on a results screen,
+     and behind Options it was two taps deep, under a heading, below a column
+     list. The trigger is the current mode's icon and nothing else — the bar has
+     no room for a caption, and the word would only repeat what the icon says.
+     The name is on aria-label and the tooltip, and every row in the open menu
+     is icon + word, so nothing rests on icon recognition alone. */
+  .tb-display__btn{ padding:0 !important; }
+  /* Square like the back button beside it, so the bar reads as one row of
+     controls rather than a pill with an odd square in it. */
+  .tb-display__btn .tb-display__icon{ display:flex; align-items:center; justify-content:center; }
+  .tb-display__btn .tb-display__icon > *{ width:20px; height:20px; font-size:20px; }
+  .tb-display__btn[aria-expanded="true"]{ background:var(--px-chip); }
+  /* Right-aligned: Display sits at the end of the bar next to Options, and a
+     left-anchored popover there hangs off the edge of a phone. */
+  .tb-display__pop{ left:auto; right:0; min-width:200px; }
 
-     It began as a bottom sheet from under the toolbar to the floor: 77% of the
-     viewport, 51% of it empty, tab strip clipped on a phone. Replacing it with
-     an anchored dropdown fixed the emptiness and the clipping but was wrong on
-     a tablet — a 320px card floating in an 834px viewport, and a hard ceiling
-     on how much it could ever hold.
+  /* The strip becomes a vertical list, matching how it read inside Options.
+     Its sliding thumb is absolutely positioned with a width and transform
+     computed for the horizontal strip; restacked those numbers are meaningless
+     and it renders as a stray pill smeared across the rows. The active row
+     carries its own fill here, so the thumb is redundant. */
+  .tb-display__pop .viewswitch{
+    display:flex; flex-direction:column; gap:2px; width:100%;
+    margin:0; padding:0; background:transparent; box-shadow:none;
+  }
+  .tb-display__pop .viewswitch__thumb{ display:none !important; }
+  .tb-display__pop .viewswitch__btn{
+    display:flex; align-items:center; justify-content:flex-start; gap:12px;
+    width:100%; height:auto; min-height:44px; padding:0 12px;
+    border-radius:8px; background:transparent; box-shadow:none;
+  }
+  .tb-display__pop .viewswitch__btn:hover{ background:var(--px-hover-btn); }
+  .tb-display__pop .viewswitch__btn--active{
+    background:var(--px-chip); color:var(--ehsq-color-pink-60);
+  }
+  .tb-display__pop .viewswitch__btn .tb-viewlabel{
+    font-size:.9375rem; font-weight:600; color:inherit;
+  }
 
-     The ceiling is the real constraint: this panel has to survive a page with
-     forty columns and several sections, and no popover does. Material 3 puts
-     bottom sheets on compact widths only and recommends a SIDE sheet at medium
-     and expanded, where a standard (non-modal) one shows content without
-     blocking the primary content. Apple reserves popovers for short transient
-     option sets. So: a side panel docked under the toolbar to the bottom edge,
-     which is the one shape that grows with its content instead of capping it.
+  /* ---- Options panel ---------------------------------------------------
+     Fourth shape, and this time not an invention: it is the Filters drawer.
 
-     Tablet  — docked right, ~380px, table still visible and usable beside it.
-     Phone   — the same panel at full width; at 390px there is no room for a
-               side-by-side, and a cramped popover holds even less.
-     Both    — no scrim. It is not modal; the page underneath stays live. */
+     It began as a bottom sheet from under the toolbar to the floor (77% of the
+     viewport, 51% of it empty, tab strip clipped on a phone), became an
+     anchored dropdown (too small for forty columns), then a flush full-height
+     side sheet — square-cornered, edge-to-edge, no scrim. That last one was
+     defensible on its own terms and wrong next to its neighbour: Filters, one
+     button along on the same bar, opens a rounded card inset 24px from every
+     edge over a dimmed page. Two panels opened from the same toolbar, doing the
+     same kind of job, looked like they came from different products.
+
+     So the geometry, radius, shadow, inset, scrim and slide are all taken from
+     .filter-drawer below 1280px, deliberately by copy rather than by extending
+     that class — praxis-filters.css belongs to the filter component and this
+     file ships to pages that don't load it. If the drawer's shape changes,
+     these numbers have to be changed with it.
+
+     Phone and tablet get the same card at the same inset; min(480px, …) simply
+     resolves to the full width minus gutters on a phone, which is what the
+     Filters drawer does there too. */
   .tb-options{
     position:fixed; z-index:151;
-    /* Full height. It used to hang off the toolbar's bottom edge, which left
-       it starting a third of the way down the screen and reading as clipped
-       rather than as a panel. Running the whole height gives it a top edge of
-       its own and the most room for long content — z-index clears the app bar
-       (30) so the panel is genuinely full height rather than tucked under it. */
-    top:0; bottom:0; right:0;
-    width:min(380px, 45vw);
+    top:24px; right:24px; bottom:24px;
+    width:min(480px, calc(100% - 48px));
     display:flex; flex-direction:column;
     background:var(--px-surface, var(--ehsq-color-surface-default));
     color:var(--ehsq-color-text-primary);
-    border-left:1px solid var(--ehsq-color-border-default);
-    box-shadow:-8px 0 28px rgba(16,36,58,.14);
-    transform:translateX(100%);
-    transition:transform 200ms var(--ehsq-ease-default);
+    border-radius:20px;
+    /* Clips the header band and the scrolling body to the rounded corners. */
+    overflow:hidden;
+    box-shadow:0 24px 64px rgba(32,42,53,.24), 0 8px 24px rgba(32,42,53,.12);
+    transform:translateX(calc(100% + 24px));
+    transition:transform var(--d-slow, 320ms) var(--ease-out, cubic-bezier(.32,.72,0,1));
   }
   .tb-options.is-open{ transform:none; }
   .tb-options[hidden]{ display:none; }
-  body[data-theme="dark"] .tb-options{ box-shadow:-8px 0 28px rgba(0,0,0,.45); }
+  /* Both shadows are built from light-mode navy and vanish over a dark page.
+     Same substitutions praxis-filters.css makes for the drawer and its scrim. */
+  body[data-theme="dark"] .tb-options{ box-shadow:var(--px-overlay); }
 
-  /* Phone: full width. A 45vw panel on a 390px screen is 175px, which is not a
-     panel, it's a gutter. */
-  @media (max-width:768px){
-    .tb-options{ width:100%; border-left:0; }
+  /* Same scrim as the Filters drawer, at the same opacity. The panel was
+     non-modal by design — the table stayed live behind it — but a card floating
+     24px off every edge over an undimmed page reads as detached rather than as
+     a layer, and the two panels on this bar should not disagree about whether
+     the page behind them is available. Clicking it closes, which the panel
+     already supported as tap-away. */
+  .tb-options-scrim{
+    position:fixed; inset:0; z-index:150;
+    background:rgba(32,42,53,.5);
+    opacity:0; transition:opacity var(--d-normal, 220ms) var(--ease-default, ease);
   }
+  .tb-options-scrim.is-open{ opacity:1; }
+  .tb-options-scrim[hidden]{ display:none; }
+  body[data-theme="dark"] .tb-options-scrim{ background:rgba(4,8,16,.62); }
+
 @media (prefers-reduced-motion: reduce){
-  .tb-options{ transition:none; }
+  .tb-options, .tb-options-scrim{ transition:none; }
 }
 
-/* ---- panel header: title, count, close ---- */
+/* ---- panel header: title, count, close ----
+   .filter-drawer__head's proportions: 16px in, 4px under, title at --t-xl/700,
+   and no rule beneath it — the hairline belongs to the toolbar row below, which
+   is where the search sits here too. */
+/* Top-aligned, not centred. Both panels declare padding-top:16px, but the close
+   button is 36px against a 30px title line, so centring the row pushed the title
+   3px down and the measured gap to 19px. The Filters modal now lands on a true
+   16px, and these two are meant to read as the same header. The button keeps its
+   36px target and simply hangs 6px lower than the title. */
 .tb-options__head{
-  flex-shrink:0; display:flex; align-items:center; gap:8px;
-  padding:10px 8px 10px 16px;
-  border-bottom:1px solid var(--ehsq-color-border-default);
+  flex-shrink:0; display:flex; align-items:flex-start; justify-content:space-between; gap:8px;
+  padding:16px 16px 4px;
 }
-.tb-options__title{ margin:0; font-size:.9375rem; font-weight:700; flex:1; min-width:0; }
+/* Same size and weight as .filter-drawer__head h2, but coloured from
+   --ehsq-color-text-primary rather than the neutral scale that rule uses.
+   praxis-filters.css inverts the neutrals inside .filter-drawer for dark mode;
+   this panel is a sibling of that subtree, so it would have taken the light
+   value and rendered near-black on navy. */
+.tb-options__title{
+  margin:0; flex:1; min-width:0;
+  font-size:var(--t-xl, 1.25rem); font-weight:700;
+  color:var(--ehsq-color-text-primary);
+}
 .tb-options__close{
-  width:40px; height:40px; flex-shrink:0; display:grid; place-items:center;
-  border:0; background:transparent; border-radius:var(--ehsq-radius-md);
-  color:var(--ehsq-color-text-secondary); cursor:pointer;
+  width:36px; height:36px; flex-shrink:0; display:grid; place-items:center;
+  border:0; background:transparent; border-radius:var(--ehsq-radius-sm);
+  color:var(--ehsq-color-text-primary); cursor:pointer;
 }
 .tb-options__close:hover{ background:var(--px-hover-btn); color:var(--ehsq-color-text-primary); }
 .tb-options__close:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-2px; }
@@ -124,20 +226,34 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
 /* Defined here rather than borrowed: this component ships to four pages and
    .visually-hidden only exists on one of them. */
 .tb-options__sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
-.tb-options__search{ flex-shrink:0; position:relative; padding:10px 12px; }
-.tb-options__search[hidden]{ display:none; }
-.tb-options__search input{
-  width:100%; height:40px; padding:0 34px 0 12px;
-  border:1px solid var(--ehsq-color-neutral-50, var(--ehsq-color-border-strong));
-  border-radius:var(--ehsq-radius-sm);
-  background:var(--px-surface); color:var(--ehsq-color-text-primary);
-  font-family:inherit; font-size:.875rem;
+/* Sits where .filter-drawer__toolbar does, and carries the same hairline —
+   inset from the edges rather than bled to them, which is what stops the card's
+   rounded corners from being cut by a full-width rule. */
+.tb-options__search{
+  flex-shrink:0; position:relative;
+  padding:4px 16px 16px;
 }
-.tb-options__search input::placeholder{ color:var(--ehsq-color-text-secondary); }
-.tb-options__search input:focus{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-1px; border-color:transparent; }
+.tb-options__search::after{
+  content:""; position:absolute; left:16px; right:16px; bottom:0; height:1px;
+  background:var(--ehsq-color-border-default);
+}
+.tb-options__search[hidden]{ display:none; }
+/* .filter-search's metrics — 40px, 12px in, 40px of room for the icon, 600
+   weight — on theme-aware colours, for the reason given on the title above. */
+.tb-options__search input{
+  width:100%; height:40px; padding:0 40px 0 12px;
+  border:1px solid var(--ehsq-color-border-default);
+  border-radius:var(--ehsq-radius-md, 8px);
+  background:var(--px-surface-2, var(--px-surface));
+  color:var(--ehsq-color-text-primary);
+  font-family:inherit; font-size:var(--t-base, .875rem); font-weight:600;
+  outline:none;
+}
+.tb-options__search input::placeholder{ color:var(--ehsq-color-text-secondary); font-weight:500; }
+.tb-options__search input:focus{ border-color:var(--ehsq-color-teal-50); box-shadow:0 0 0 2px var(--ehsq-color-teal-50); }
 .tb-options__search .material-symbols-rounded{
-  position:absolute; right:22px; top:50%; transform:translateY(-50%);
-  font-size:19px; color:var(--ehsq-color-text-secondary); pointer-events:none;
+  position:absolute; right:28px; top:calc(50% - 6px); transform:translateY(-50%);
+  font-size:20px; color:var(--ehsq-color-text-secondary); pointer-events:none;
 }
 .tb-options__empty{
   padding:18px 16px; margin:0; text-align:center;
@@ -145,9 +261,13 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
 }
 .tb-options__empty[hidden]{ display:none; }
 
+/* No top padding: a sticky heading with top:0 stops at the scrollport edge, so
+   any padding above it is a strip the rows scroll through in the open — 6px of
+   half a checkbox riding above "COLUMNS". The headings carry their own 8px of
+   top padding, so nothing is lost by taking it off the container. */
 .tb-options__body{
   flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain;
-  padding:6px 8px 24px; display:flex; flex-direction:column; gap:2px;
+  padding:0 8px 24px; display:flex; flex-direction:column; gap:2px;
 }
 .tb-options__panel{ display:flex; flex-direction:column; gap:4px; }
 .tb-options__panel[hidden]{ display:none; }
@@ -236,7 +356,10 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
 .tb-options__body .sortbtn{ display:none; }
 .tb-options__body .sortmenu__pop{
   display:flex !important; flex-direction:column; gap:2px;
-  position:static; width:100%; min-width:0; inset:auto;
+  /* z-index:auto alongside position:static — see the note on .colmenu__pop in
+     search-page.html. A leftover popover z-index can outrank the sticky section
+     heading the moment its host becomes a flex item. */
+  position:static; z-index:auto; width:100%; min-width:0; inset:auto;
   background:transparent; border:0; border-radius:0; box-shadow:none; padding:0;
 }
 .tb-options__body .sortmenu__opt{ min-height:44px; height:auto; padding:0 12px; border-radius:10px; font-size:.9375rem; }
