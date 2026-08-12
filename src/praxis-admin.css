@@ -171,7 +171,7 @@ body[data-theme="dark"] .adminnav__item--active::before{background:#29D2D7;}
 /* ===================================================================
    ADMIN BODY — the scrolling content region below the toolbar.
    =================================================================== */
-.admin-body{flex:1;min-height:0;overflow-y:auto;padding:6px var(--ph-pad-x,24px) 32px;
+.admin-body{flex:1;min-height:0;overflow-y:auto;padding:var(--px-toolbar-gutter,16px) var(--ph-pad-x,24px) 32px;
   display:flex;flex-direction:column;gap:18px;}
 /* two-column split (Users, Reporting Authorities, Components) */
 .admin-cols{display:grid;gap:18px;align-items:start;}
@@ -197,16 +197,52 @@ body[data-theme="dark"] .adminnav__item--active::before{background:#29D2D7;}
 .admin-field{position:relative;display:flex;flex-direction:column;gap:5px;min-width:0;}
 .admin-field__label{font-size:.8125rem;font-weight:600;color:var(--ehsq-color-text-secondary);}
 .admin-field__label .req{color:var(--ehsq-color-red-60);margin-left:2px;}
-.admin-field__control{height:34px;width:100%;border:0;border-bottom:1px solid var(--ehsq-color-border-default);
-  background:transparent;font:inherit;font-size:.875rem;color:var(--ehsq-color-text-primary);padding:0 2px;}
-.admin-field__control::placeholder{color:var(--ehsq-color-text-disabled);}
-.admin-field__control:focus{outline:none;border-bottom-color:var(--ehsq-color-teal-60);box-shadow:0 1px 0 0 var(--ehsq-color-teal-60);}
-select.admin-field__control{appearance:none;-webkit-appearance:none;padding-right:20px;cursor:pointer;}
-.admin-field--select .admin-field__caret{position:absolute;right:0;bottom:6px;font-size:20px;color:var(--ehsq-color-text-secondary);pointer-events:none;}
-.admin-field__value{height:34px;display:flex;align-items:center;font-size:.875rem;font-weight:600;color:var(--ehsq-color-text-primary);border-bottom:1px solid var(--ehsq-color-border-default);}
+/* ---- Fields: the same treatment as the record fields (.rfield__control in
+   praxis-rfield.css) — no border, --px-field fill carrying the affordance,
+   chevron and trailing icons inset 12px. Was an underline on a transparent
+   background, which read as a different control system to the record pages'.
+   Height stays 34px rather than the record pages' 40: admin screens run
+   several fields to a row inside fixed grids, and the shared thing is the
+   treatment, not the density. ---- */
+.admin-field__control{height:34px;width:100%;border:0;border-radius:var(--ehsq-radius-md);
+  background-color:var(--px-field);font:inherit;font-size:.875rem;
+  color:var(--ehsq-color-text-primary);padding:0 12px;
+  transition:background-color var(--ehsq-motion-fast),box-shadow var(--ehsq-motion-fast);}
+/* text-disabled measured 2.73:1 against this fill — under 1.4.3. text-secondary
+   is the lightest token that clears 4.5:1; weight does the rest of the work of
+   separating a placeholder from a real value. */
+.admin-field__control::placeholder{color:var(--ehsq-color-text-secondary);font-weight:500;opacity:1;}
+.admin-field__control:hover:not(:disabled){background-color:var(--px-field-hover);}
+/* No resting border, so focus draws an inset ring — inside the box, so nothing
+   reflows in a grid of fields when one takes focus. */
+.admin-field__control:focus{outline:none;
+  box-shadow:inset 0 0 0 1px var(--ehsq-color-interactive-default),
+             0 0 0 3px color-mix(in srgb, var(--ehsq-color-interactive-default) 22%, transparent);}
+/* Chevron drawn by CSS on every select, so it cannot go missing. The old
+   .admin-field__caret span was only on some selects, leaving the rest with no
+   arrow at all under appearance:none — and praxis-lucide.js rewrites
+   material-symbols spans into SVGs it sizes via an injected
+   `svg.material-symbols-rounded` rule, which outranks a plain class selector,
+   so the span could not be reliably hidden from here either. Removed from
+   build-admin.py and profile.html instead. */
+select.admin-field__control{appearance:none;-webkit-appearance:none;padding-right:34px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235D6977'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:20px 20px;}
+body[data-theme="dark"] select.admin-field__control{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239AA7B4'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");}
+/* Date, time and datetime-local carry native indicators on the same edge. */
+.admin-field__control::-webkit-calendar-picker-indicator{margin-right:2px;}
+/* A read-only value is not a field, so it takes no fill and no underline —
+   an underlined value next to unbordered inputs read as the editable one. */
+.admin-field__value{height:34px;display:flex;align-items:center;font-size:.875rem;font-weight:600;color:var(--ehsq-color-text-primary);}
 /* inline label + toggle/value row */
-.admin-field--row{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;}
-.admin-field--row .admin-field__label{flex:1;}
+/* Label and control sit together. This was space-between with a flex:1 label,
+   which pinned the toggle to the far right of whatever the row happened to be
+   — across a full-width card that left a label and its switch a metre apart
+   with nothing in between, and no way to tell which label a switch belonged to
+   in a stack of them. */
+.admin-field--row{flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;}
+.admin-field--row .admin-field__label{flex:0 1 auto;}
 
 /* ---- Tabs (underline strip) ---- */
 .admin-tabs{display:flex;gap:2px;flex-wrap:wrap;border-bottom:1px solid var(--ehsq-color-border-default);margin-bottom:18px;}

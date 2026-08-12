@@ -38,6 +38,15 @@ body[data-variant="praxis"]{
   --px-page:#F0F2F4; --px-surface:#ffffff; --px-surface-2:#F4F6F8; --px-tool:#ffffff;
   --px-drawer:#ffffff;  /* shared drawer/panel surface (Mazlan + filter); dark deepens to navy */
   --px-chip:#EEF1F4; --px-glass:rgba(255,255,255,.82); --px-hover:rgba(16,36,58,.025); --px-dot:rgba(16,36,58,.11);
+  /* Gap between a toolbar band and the first card of page content. One token
+     because it was set independently per section and drifted: 8px on the record
+     page, 6px on the admin pages and profile. Not theme-dependent. */
+  --px-toolbar-gutter:16px;
+  /* Form-field fill. Fields carry no border, so this is the whole affordance —
+     it has to read as a step off --px-surface without going dark enough to
+     fight the value inside it. Shared by the record fields (.rfield) and the
+     admin/profile fields (.admin-field), which is why it lives here. */
+  --px-field:#EEF1F4; --px-field-hover:#E6EAEF;
   /* --px-hover is 2.5% — deliberately faint for large row targets, but invisible
      on a small raised tool. Buttons use this stronger wash instead. */
   --px-hover-btn:rgba(16,36,58,.075);
@@ -141,6 +150,10 @@ body[data-variant="praxis"][data-theme="dark"]{
   --px-page:rgb(14,19,36); --px-surface:#192336; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
   --px-drawer:#0e1324;  /* deep navy — matches the external Mazlan prototype */
   --px-chip:rgba(255,255,255,.07); --px-glass:rgba(26,32,45,.72); --px-hover:rgba(255,255,255,.05); --px-dot:rgba(255,255,255,.09);
+  /* Opaque, not a translucent white: fields sit on several different surfaces
+     (card, drawer, admin panel) and a translucent fill would land on a
+     different colour on each one. */
+  --px-field:#262F3F; --px-field-hover:#2C3646;
   --px-hover-btn:rgba(255,255,255,.10);
   --px-scroll:rgba(255,255,255,.26); --px-scroll-hover:rgba(255,255,255,.42);
   --px-edge:rgba(255,255,255,.08);

@@ -1,0 +1,463 @@
+/* =====================================================================
+   PRAXIS RECORD FIELDS (.rfield) — shared record-form field system.
+
+   Extracted from record-page.html on 2026-08-12, when a second page
+   (record-page-initiate.html) needed the same controls. Previously inline,
+   which is the per-page-copy pattern the Aug 4 consolidation pass removed
+   everywhere else. Load this instead of copying the block.
+
+   Contents
+     1 · .rfield          enclosed control, label above
+     2 · .pillset/.pill   picklists as real radios
+     3 · .rref            reference field (lookup from a configured list)
+     4 · .rtable          in-record table (grid rows + empty state)
+     5 · .subsec          sub-section heading inside a section
+   ===================================================================== */
+
+/* ============================== 1 · RECORD FORM FIELD ==============================
+
+   The alternative to .field. .field is a read-only display row: label in a
+   200px gutter on the left, value on the right, rows separated by inset
+   hairlines and nothing enclosed. That reads well for a summary but poorly
+   for data entry — there's no visible affordance telling you a value can be
+   changed, which matters more here than usual because the same record body
+   is editable in one workflow step and frozen in the next.
+
+   So: label above, control in a container. The enclosure carries the state.
+
+   The control started from the enclosed inputs in the filter modal
+   (.filter-search-input input / .cf-input in praxis-filters.css) so a text box
+   would look the same wherever it appears. It has since moved on: 40px tall,
+   no border, --px-field fill, chevron inset 12px. praxis-filters.css still
+   carries the older bordered treatment and is a candidate to follow.
+
+   Workflow steps: fields exist per step, and a step can freeze its fields
+   once it's passed. .rfield--locked renders that frozen state (no border, no
+   fill, value as plain text) so a passed step reads as a record rather than
+   a disabled form. Section visibility per step is markup-level: give a
+   .section a data-step="initiate" and show/hide by the record's current step.
+   ===================================================================== */
+/* The fill is the affordance now that there's no border, so it carries a real
+   step away from the card surface rather than the near-white it had when a 1px
+   edge was doing the work. It lives in praxis-core.css as --px-field, not here,
+   because the admin and profile fields (.admin-field) take the same treatment
+   and the two must not drift. */
+
+.rfield{display:flex;flex-direction:column;gap:6px;padding:10px 16px;min-width:0;}
+/* text-secondary / text-primary, NOT the neutral scale. praxis-core does not
+   remap --ehsq-color-neutral-90 or -70 for dark — they stay #2a3846 and
+   #465c74 — so a control that took them rendered dark-on-dark at 1.17:1,
+   invisible. The theme tokens invert properly (11.74:1 in dark). Same trap the
+   filter chips hit; worth checking any control that reaches for the raw scale. */
+.rfield__label{display:flex;align-items:center;font-size:.8125rem;font-weight:600;
+  color:var(--ehsq-color-text-secondary);}
+.rfield__label .req{display:inline-block;width:.72em;height:.72em;margin-left:5px;
+  vertical-align:middle;position:relative;top:-1px;}
+/* One enclosure for every control type, so a select, a date and a text box
+   share a fill and a baseline. No border: the grey block is the affordance,
+   which keeps a column of fields quieter than a column of outlined boxes.
+   background-color, not the shorthand — selects layer a chevron image on top
+   and the shorthand would wipe it. */
+.rfield__control{width:100%;min-width:0;box-sizing:border-box;height:40px;padding:0 12px;
+  border:0;border-radius:var(--ehsq-radius-md);
+  background-color:var(--px-field);
+  font:inherit;font-size:.875rem;font-weight:600;color:var(--ehsq-color-text-primary);
+  transition:background-color var(--ehsq-motion-fast),box-shadow var(--ehsq-motion-fast);}
+/* Placeholders are content, so they answer to 1.4.3 like any other text.
+   --ehsq-color-text-disabled measured 2.73:1 light / 2.77:1 dark against this
+   fill — well under 4.5. text-secondary is the lightest token that clears it
+   (4.91:1 and 5.51:1); the weight drop is what separates a placeholder from a
+   real value now, not the colour alone. */
+.rfield__control::placeholder{color:var(--ehsq-color-text-secondary);font-weight:500;opacity:1;}
+.rfield__control:hover:not(:disabled){background-color:var(--px-field-hover);}
+/* :not(:disabled) here only to match the hover rule's specificity — without it
+   hover is (0,3,0) against focus's (0,2,0) and wins, so clicking into a field
+   kept the grey hover fill while the ring said teal. */
+/* With no resting border the focused edge has to come from somewhere: an inset
+   ring draws it without changing the box, so nothing shifts on focus. */
+.rfield__control:focus:not(:disabled){outline:none;
+  box-shadow:inset 0 0 0 1px var(--ehsq-color-interactive-default),
+             0 0 0 3px color-mix(in srgb, var(--ehsq-color-interactive-default) 22%, transparent);}
+
+/* The native select arrow pins itself to the control's right edge and no
+   amount of padding moves it, so it read as touching the side. Own chevron
+   instead, inset by the same 12px as the text. Two images rather than
+   currentColor, which background-image can't take. */
+select.rfield__control{appearance:none;-webkit-appearance:none;padding-right:38px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235D6977'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:20px 20px;}
+body[data-theme="dark"] select.rfield__control{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%239AA7B4'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");}
+/* Date and time carry native indicators on the same edge — give them the same
+   inset so the trailing icons line up down the column. */
+.rfield__control::-webkit-calendar-picker-indicator{margin-right:2px;}
+textarea.rfield__control{height:auto;min-height:96px;padding:10px 12px;font-weight:400;
+  line-height:1.6;resize:vertical;}
+
+/* Groups of short fields sit side by side rather than each taking a full row. */
+.rfield__group{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+/* Once frozen, a side-by-side group stacks: three label-above-value columns
+   would be the one place static fields stopped being label-beside-value rows. */
+.rfield__group:has(.rfield--locked){grid-template-columns:1fr;}
+.rfield__group .rfield{padding-inline:16px;}
+
+/* Pills and chips keep their own shapes — they're already the control — but
+   take the same label treatment and vertical rhythm as the enclosed ones. */
+.rfield--choice .toggle-group,.rfield--choice .chip-area{margin-top:2px;}
+
+/* An auto-filled value the user can still override reads as a normal control;
+   the hint carries the "we filled this for you" part so the field doesn't
+   silently look like typed input. */
+.rfield__hint{font-size:.75rem;font-weight:500;color:var(--ehsq-color-text-secondary);}
+
+/* ---- Invalid: a required field the user tried to save or submit without.
+   An inset ring rather than a real border, for the same reason focus uses one —
+   the box does not change size, so nothing reflows when a form of fields turns
+   red at once. 1.5px because a 1px red line on a grey fill is easy to miss.
+   Only ever set by the save/submit check, never on load: showing a form as
+   broken before it has been touched is its own usability problem. */
+.rfield--invalid .rfield__control,
+.rfield--invalid .rfield__control:hover:not(:disabled){
+  box-shadow:inset 0 0 0 1.5px var(--ehsq-color-red-60);}
+/* Focus still wins, but keeps the red so the field does not look resolved just
+   because the cursor is in it. */
+.rfield--invalid .rfield__control:focus:not(:disabled){
+  box-shadow:inset 0 0 0 1.5px var(--ehsq-color-red-60),
+             0 0 0 3px color-mix(in srgb, var(--ehsq-color-red-60) 20%, transparent);}
+/* A pill group has no box of its own, so the pills carry it. */
+.rfield--invalid .pill span{border-color:var(--ehsq-color-red-60);}
+.rfield--invalid .rfield__label{color:var(--ehsq-color-red-60);}
+
+/* ---- The message that explains why nothing saved. role="alert" in markup. */
+.form-alert{display:flex;gap:12px;align-items:flex-start;margin:0 0 4px;padding:12px 14px;
+  border-radius:var(--ehsq-radius-md);background:var(--ehsq-color-red-10);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ehsq-color-red-60) 35%, transparent);}
+.form-alert[hidden]{display:none;}
+body[data-theme="dark"] .form-alert{background:rgba(226,45,56,.14);}
+.form-alert__icon{flex-shrink:0;width:20px;height:20px;color:var(--ehsq-color-red-60);}
+.form-alert__icon svg{width:20px;height:20px;fill:currentColor;display:block;}
+.form-alert__body{min-width:0;display:flex;flex-direction:column;gap:2px;}
+.form-alert__title{font-size:.875rem;font-weight:600;color:var(--ehsq-color-text-primary);}
+.form-alert__detail{font-size:.8125rem;color:var(--ehsq-color-text-secondary);}
+.form-alert__list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:4px 10px;}
+.form-alert__list button{border:0;background:transparent;padding:0;font:inherit;font-size:.8125rem;
+  font-weight:600;color:var(--ehsq-color-text-link);text-decoration:underline;cursor:pointer;}
+.form-alert__list button:focus-visible{outline:2px solid var(--ehsq-color-interactive-default);outline-offset:2px;border-radius:2px;}
+
+/* ====================== FROZEN BY WORKFLOW STEP — the static field ==========
+   One representation for a value the user cannot change, wherever it appears:
+   label in a fixed gutter on the left, value beside it, a thin inset rule
+   between rows. This is the .field row from the record summary card — the
+   treatment that already read correctly — generalised, so locked record fields
+   and the admin/profile read-outs match it instead of each inventing their own
+   label-above-value variant.
+
+   Semantic tokens only. The summary card's .field reaches for --ehsq-color-
+   neutral-70/-90 and needs two dark-mode overrides to stay legible; taking
+   text-secondary/text-primary here means it inverts on its own.
+   ===================================================================== */
+/* One height for every static row, content centred in it, and the label and
+   value sharing a baseline. The three go together: the label and value are set
+   at the same size and line-height, so a single line box in each means
+   align-items:center centres the pair AND puts their baselines on the same
+   line. Aligning baselines while the two texts were 13px and 14px would have
+   needed a magic offset that broke the moment either size changed.
+
+   min-height, not height: a wrapped location or a two-line summary has to
+   grow. Every single-line row is exactly --static-field-h; only content that
+   genuinely does not fit exceeds it, which beats clipping it. */
+:root{
+  /* 64px, matching the summary card's rows — body[data-variant="praxis"]
+     .field:not(.field--vertical) raises those from 48 to 64, so a static row
+     built at 48 sat visibly shorter than the ones it was meant to match. */
+  --static-field-h:64px;
+}
+.rfield--locked{
+  position:relative;
+  flex-direction:row;
+  align-items:center;
+  gap:12px;
+  min-height:var(--static-field-h);
+  padding:8px 16px;
+}
+/* Inset, like the summary card's — a rule that runs to the card edge cuts the
+   card in half instead of separating two rows. */
+/* A divider starts where the label starts. The rows carry 16px of padding, so
+   the rule is inset 16px too — at the inherited 24px it began 8px inside the
+   label's left edge, which read as a misalignment down the whole card. The
+   summary card's own .field::before is corrected to match, below. */
+.rfield--locked::before,
+.rfield--locked::after{
+  content:"";position:absolute;left:16px;right:16px;
+  height:1px;background:var(--ehsq-color-border-default);
+}
+.rfield--locked::before{top:0;}
+.rfield--locked::after{bottom:0;}
+/* Every static row draws both rules, so one standing alone is bounded top and
+   bottom. Stacked rows would then paint two 1px lines against each other, so
+   consecutive ones overlap by exactly 1px and the two rules land on the same
+   pixel. Done with a negative margin rather than by suppressing one rule: the
+   rows are not always DOM-adjacent — a .rfield__group of short fields sits
+   between them — so a sibling-based :has() test misses those boundaries, which
+   is what it did here. */
+.rfield--locked + .rfield--locked,
+.rfield--locked + .rfield__group,
+.rfield__group + .rfield--locked,
+.rfield__group + .rfield__group,
+.rfield__group .rfield--locked + .rfield--locked{margin-top:-1px;}
+/* Same correction for the summary card's rows. Same specificity as the pages'
+   own rule, and this file loads after them. */
+.field::before,.field__group::before{left:16px;right:16px;}
+/* Every static row draws its top rule, including the first in a section: a row
+   standing on its own needs a rule above and below it (see the profile page's
+   Account card), and suppressing the first one made a lone field look
+   unbounded. */
+.rfield--locked .rfield__label{
+  width:200px;flex-shrink:0;
+  /* Same size and line-height as the value, so the two share a baseline
+     without an offset. The label stays distinguishable by colour. */
+  font-size:.875rem;line-height:1.5;
+  align-items:baseline;
+  color:var(--ehsq-color-text-secondary);
+}
+/* Labels on static fields terminate in a colon. Done here rather than in the
+   markup so it holds for fields added later, and for the ten generated admin
+   pages. Ordered before .req so a required frozen field reads "Name:*", the
+   same way the summary card's .field__prompt does.
+   [data-label-nocolon] opts out the labels that are questions — "Was High
+   Energy Present?:" is not an improvement. */
+.rfield--locked .rfield__label::after,
+.admin-field:has(> .admin-field__value) .admin-field__label::after{
+  content:":";order:1;
+}
+.rfield--locked .rfield__label[data-label-nocolon]::after,
+.admin-field:has(> .admin-field__value) .admin-field__label[data-label-nocolon]::after{
+  content:none;
+}
+.rfield--locked .rfield__label .req,
+.admin-field:has(> .admin-field__value) .admin-field__label .req{order:2;}
+.rfield--locked .rfield__control,
+.rfield--locked .rfield__control:hover{
+  flex:1;min-width:0;width:auto;height:auto;min-height:0;
+  border-color:transparent;background:transparent;padding:0;
+  font-size:.875rem;line-height:1.5;
+  color:var(--ehsq-color-text-primary);box-shadow:none;pointer-events:none;}
+.rfield--locked select.rfield__control{appearance:none;-webkit-appearance:none;background-image:none;}
+/* A frozen textarea is the one that still looked editable: a filled, bordered,
+   resizable box with a scrollbar. As static text it has to size to its content
+   instead of holding a fixed 96px well. */
+.rfield--locked textarea.rfield__control{
+  field-sizing:content;resize:none;overflow:hidden;line-height:1.5;font-weight:600;
+}
+.rfield--locked .pillset{margin-top:0;flex:1;}
+/* The pill shell is 32px tall, which would make the one pill row taller than
+   every other static row. Frozen, it is just the chosen value as text. */
+.rfield--locked .pill input:checked + span{height:auto;line-height:1.5;padding:0;border:0;background:transparent;}
+.rfield--locked .rfield__hint{display:none;}
+
+/* ---- The same row, for the admin and profile read-outs (.admin-field__value).
+   Selected with :has() so the ten generated admin pages and the profile page
+   need no markup change — the rule finds the read-only rows by the fact that
+   they hold a value rather than a control. */
+.admin-field:has(> .admin-field__value){
+  position:relative;flex-direction:row;align-items:center;gap:12px;
+  min-height:var(--static-field-h);padding:8px 0;
+}
+.admin-field:has(> .admin-field__value)::before,
+.admin-field:has(> .admin-field__value)::after{
+  content:"";position:absolute;left:0;right:0;height:1px;background:var(--ehsq-color-border-default);
+}
+.admin-field:has(> .admin-field__value)::before{top:0;}
+.admin-field:has(> .admin-field__value)::after{bottom:0;}
+/* No overlap rule for the admin read-outs: on the pages that have them the
+   static rows are either side by side in a grid or separated by another field,
+   so their rules never meet. Two stacked in one column would want the same 1px
+   overlap as the record rows. */
+.admin-field:has(> .admin-field__value) .admin-field__label{
+  /* Narrower gutter than the record pages': admin lays two fields to a row, so
+     a fixed 200px would leave the value squeezed against the column edge. */
+  width:min(200px, 45%);flex-shrink:0;
+  display:flex;align-items:baseline;
+  font-size:.875rem;line-height:1.5;
+}
+.admin-field:has(> .admin-field__value) .admin-field__value{
+  flex:1;min-width:0;height:auto;font-size:.875rem;line-height:1.5;
+}
+
+/* ---- The summary card's description. It was a filled, inset-bordered well
+   with a drag grip, which is the vocabulary of a textarea — so the one field on
+   the card that cannot be edited looked like the only one that could. Now it is
+   text in the value column like every other static field. Loaded after each
+   record page's own stylesheet, so these win without !important.
+   The See All control stays: the description is genuinely truncated. */
+.summary__desc,
+body[data-variant="praxis"] .summary__desc{
+  background:transparent;box-shadow:none;padding:0;min-height:0;cursor:default;
+  font-size:.875rem;font-weight:600;color:var(--ehsq-color-text-primary);
+}
+body[data-variant="praxis"] .summary__desc:focus-within{box-shadow:none;}
+.summary__desc-grip{display:none;}
+.summary__desc-foot{padding:2px 0 0;justify-content:flex-start;}
+.summary__desc-seeall{padding:0;}
+
+/* ============================== 2 · PICKLISTS AS REAL RADIOS ==============================
+   The .toggle pills elsewhere are <button aria-checked> with nothing wired to
+   them, so they look selectable and aren't. Same silhouette here, built on
+   <input type="radio">: selection, keyboard navigation and screen-reader
+   semantics all come free, and the group actually holds a value. */
+.pillset{display:flex;gap:6px;flex-wrap:wrap;}
+.pill{position:relative;display:inline-flex;}
+/* Both record pages carry an older, unrelated .pill for status chips
+   (.pill--open / --warn / --todo) that sets padding:0 10px and height:26px.
+   It matches these radio labels too, which inset each visible pill 10px inside
+   its own box — so Yes and No sat 26px apart while the gap said 6px, and the
+   label box was 6px shorter than the pill inside it. Reset both, scoped to a
+   .pillset so the status chips keep their own padding. */
+.pillset .pill{padding:0;height:auto;}
+.pill input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;}
+.pill span{display:inline-flex;align-items:center;height:32px;padding:0 16px;
+  border:2px solid var(--ehsq-color-interactive-default);border-radius:var(--ehsq-radius-full);
+  background:var(--px-surface);font-size:.875rem;font-weight:600;color:var(--ehsq-color-text-primary);
+  white-space:nowrap;transition:background var(--ehsq-motion-fast);}
+.pill:hover span{background:var(--ehsq-color-neutral-10);}
+.pill input:checked + span{background:var(--ehsq-color-teal-10);}
+.pill input:focus-visible + span{outline:2px solid var(--ehsq-color-interactive-default);outline-offset:2px;}
+body[data-theme="dark"] .pill input:checked + span{background:rgba(41,210,215,.16);}
+.rfield--locked .pillset{pointer-events:none;}
+.rfield--locked .pill input:not(:checked) + span{display:none;}
+.rfield--locked .pill input:checked + span{border-color:transparent;background:transparent;padding-left:0;}
+
+/* ============================== 3 · REFERENCE FIELD ==============================
+   A reference points at a row in another table, so free text is the wrong
+   affordance: the value has to come from the configured list. The control is
+   the same enclosure as .rfield__control with a lookup button on the trailing
+   edge; the input filters the list as you type rather than accepting arbitrary
+   text, and blur restores the last committed value. Options live in the
+   markup (<div class="rref__opt">) so a page can configure its own list. */
+.rref{position:relative;display:flex;}
+.rref__input{flex:1;min-width:0;padding-right:44px;}
+/* 44px wide with a 20px icon centred puts the lookup glyph 12px off the edge —
+   the same inset as the select chevron and the field text, so every trailing
+   control in a column of fields sits on one vertical line. The 1px offsets
+   this had came from the border that is no longer there. */
+.rref__btn{position:absolute;right:0;top:0;bottom:0;width:44px;display:flex;
+  align-items:center;justify-content:center;border:0;border-radius:0 var(--ehsq-radius-md) var(--ehsq-radius-md) 0;
+  background:transparent;color:var(--ehsq-color-text-secondary);cursor:pointer;}
+.rref__btn:hover{color:var(--ehsq-color-text-primary);background:var(--ehsq-color-neutral-10);}
+.rref__btn:focus-visible{outline:2px solid var(--ehsq-color-interactive-default);outline-offset:-2px;}
+.rref__btn svg{width:20px;height:20px;fill:currentColor;}
+.rref__menu{position:absolute;z-index:40;top:calc(100% + 4px);left:0;right:0;max-height:260px;
+  overflow:auto;padding:6px;border-radius:var(--ehsq-radius-md);background:var(--px-surface);
+  box-shadow:0 0 0 1px rgba(16,36,58,.10),0 12px 28px -8px rgba(16,36,58,.28);}
+body[data-theme="dark"] .rref__menu{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 12px 28px -8px rgba(0,0,0,.6);}
+.rref__menu[hidden]{display:none;}
+.rref__opt{display:block;width:100%;text-align:left;padding:8px 10px;border:0;border-radius:var(--ehsq-radius-sm);
+  background:transparent;font:inherit;font-size:.875rem;color:var(--ehsq-color-text-primary);cursor:pointer;}
+.rref__opt:hover,.rref__opt[data-active]{background:var(--ehsq-color-neutral-10);}
+body[data-theme="dark"] .rref__opt:hover,
+body[data-theme="dark"] .rref__opt[data-active]{background:rgba(255,255,255,.08);}
+.rref__opt small{display:block;font-size:.75rem;color:var(--ehsq-color-text-secondary);}
+.rref__empty{padding:10px;font-size:.8125rem;color:var(--ehsq-color-text-secondary);}
+.rfield--locked .rref__btn{display:none;}
+
+/* ============================== 4 · IN-RECORD TABLE ==============================
+   Rows of related records inside a section (individuals, contractors, assets).
+   Its own actions row, and an explicit empty state rather than a bare header —
+   an empty table with no message reads as broken. */
+/* White, not the grey field fill: a table of rows is content, not a control,
+   and the grey read as one large input. Rows then zebra off it so a wide row
+   stays trackable across the columns. */
+.rtable{margin:4px 16px 0;border:1px solid var(--ehsq-color-neutral-20);
+  border-radius:var(--ehsq-radius-md);overflow:hidden;background:var(--px-surface);}
+.rtable__actions{display:flex;align-items:center;gap:var(--ehsq-space-8);flex-wrap:wrap;
+  padding:8px;border-bottom:1px solid var(--ehsq-color-neutral-20);}
+.rtable__action{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;
+  border:0;border-radius:var(--ehsq-radius-md);background:transparent;
+  font:inherit;font-size:.8125rem;font-weight:600;color:var(--ehsq-color-text-link);cursor:pointer;}
+.rtable__action:hover{background:var(--ehsq-color-neutral-10);}
+.rtable__action:focus-visible{outline:2px solid var(--ehsq-color-interactive-default);outline-offset:2px;}
+.rtable__action svg{width:18px;height:18px;fill:currentColor;}
+.rtable table{width:100%;border-collapse:collapse;}
+.rtable th{text-align:left;padding:8px 12px;font-size:.75rem;font-weight:600;
+  color:var(--ehsq-color-text-secondary);background:var(--ehsq-color-neutral-05);
+  border-bottom:1px solid var(--ehsq-color-neutral-20);white-space:nowrap;}
+body[data-theme="dark"] .rtable th{background:rgba(255,255,255,.05);}
+.rtable td{padding:10px 12px;font-size:.875rem;color:var(--ehsq-color-text-primary);
+  border-bottom:1px solid var(--ehsq-color-neutral-20);vertical-align:middle;}
+.rtable tr:last-child td{border-bottom:0;}
+/* Zebra striping. nth-of-type so the count follows the rows as they are added
+   and removed, and :not(.rtable__empty) so the "no data" row stays white —
+   striping a single placeholder row would look like data. */
+.rtable tbody tr:nth-of-type(even):not(.rtable__empty){background:var(--px-surface-2);}
+body[data-theme="dark"] .rtable tbody tr:nth-of-type(even):not(.rtable__empty){background:rgba(255,255,255,.04);}
+.rtable__empty td{padding:18px 12px;text-align:center;font-size:.875rem;
+  color:var(--ehsq-color-text-secondary);}
+.rtable__rm{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+  border:0;border-radius:var(--ehsq-radius-sm);background:transparent;
+  color:var(--ehsq-color-text-secondary);cursor:pointer;}
+.rtable__rm:hover{background:var(--ehsq-color-neutral-10);color:var(--ehsq-color-text-primary);}
+.rtable__rm:focus-visible{outline:2px solid var(--ehsq-color-interactive-default);outline-offset:2px;}
+.rtable__rm svg{width:18px;height:18px;fill:currentColor;}
+.rtable__cell-actions{width:44px;text-align:right;}
+
+/* A table frozen by workflow step: the rows stay, the ways to change them go.
+   Pairs with .rfield--locked so a passed step reads consistently. */
+.rtable--locked{box-shadow:none;border-color:var(--ehsq-color-neutral-15);}
+.rtable--locked .rtable__actions,
+.rtable--locked .rtable__rm{display:none;}
+
+/* ============================== 5a · MAZLAN SECTION ACTION ==============================
+   A section-level hand-off to Mazlan (Risk Analysis on Incident Review). Pill
+   shaped and quiet so it reads as an offer next to the section title rather
+   than competing with the toolbar's Submit. The dot mark comes from
+   praxis-mazlan.css, so the page must link that too. */
+.mazbtn{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;margin:2px 16px 10px;
+  border:0;border-radius:var(--ehsq-radius-full);background:var(--px-surface-2);
+  font:inherit;font-size:.8125rem;font-weight:600;color:var(--ehsq-color-text-primary);cursor:pointer;
+  box-shadow:0 0 0 1px rgba(127,140,160,.18);
+  transition:background var(--ehsq-motion-fast);}
+.mazbtn:hover{background:var(--px-chip);}
+.mazbtn:focus-visible{outline:2px solid var(--ehsq-color-interactive-default);outline-offset:2px;}
+body[data-theme="dark"] .mazbtn{box-shadow:0 0 0 1px rgba(255,255,255,.10);}
+
+/* ============================== 4a · SECTION HEADER ==============================
+   The collapse control sits to the LEFT of the title: it is the affordance for
+   the thing it precedes, and on a page where passed steps arrive collapsed the
+   chevrons line up in a column you can run down, instead of being scattered at
+   the right edge wherever each title happens to end. Set with order rather than
+   by moving markup, so every page that already emits header-then-button gets it
+   without an edit. */
+/* Order across the header: teal tick, chevron, title, then any note. The tick
+   was drawn as .section__title::before, i.e. inside the title, so nothing could
+   be placed between the two. It moves to the header as its own flex item and
+   the title's copy is switched off — same 3x14 mark, now an item the chevron can
+   sit after. Explicit order on every child, because a flex item without one
+   defaults to 0 and would jump ahead of the chevron. */
+body[data-variant="praxis"] .section__header::before{
+  content:"";order:0;flex:0 0 auto;width:3px;height:14px;border-radius:2px;
+  background:var(--ehsq-color-interactive-default);
+}
+body[data-variant="praxis"] .section__header .section__title::before{display:none;}
+body[data-variant="praxis"] .section__header .section__title{padding-left:0;}
+.section__header .chevron-btn{order:1;margin:0 2px 0 6px;}
+.section__header .section__title{order:2;margin-right:auto;}
+
+/* Rotates to point at the collapsed body. The pages' own
+   .section.is-collapsed rule handles this too; repeated here so pages that only
+   link this file still get it. */
+.section.is-collapsed .section__header .chevron-btn svg{transform:rotate(-90deg);}
+.section__header .chevron-btn svg{transition:transform var(--ehsq-motion-fast);}
+
+/* ============================== 5 · SUB-SECTION ==============================
+   A titled run of fields inside a section (Action Items under First Report).
+   Lighter than .section__title so the nesting is legible without a second
+   collapsing control. */
+.subsec{margin-top:var(--ehsq-space-16);padding-top:var(--ehsq-space-8);}
+.subsec__title{padding:0 16px 2px;font-size:.9375rem;font-weight:600;
+  color:var(--ehsq-color-text-primary);}
+
+@media (max-width:640px){
+  .rfield__group{grid-template-columns:1fr;}
+  .rtable{margin-inline:8px;}
+  .rtable th,.rtable td{padding-inline:8px;}
+}

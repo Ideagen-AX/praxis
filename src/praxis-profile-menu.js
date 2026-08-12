@@ -54,6 +54,8 @@
     { label: 'Contextual Awareness',  icon: 'layout-dashboard', href: 'contextual-awareness.html' },
     { label: 'Search',                icon: 'search',           href: 'search-page.html' },
     { label: 'Incident record',       icon: 'file-text',        href: 'record-page.html' },
+    { label: 'New incident',          icon: 'file-plus',        href: 'record-page-initiate.html' },
+    { label: 'Saved records',         icon: 'package',          href: 'saved-records.html' },
     { label: 'Report management',     icon: 'clipboard-list',   href: 'report-management.html' },
     { label: 'Admin',                 icon: 'settings',         href: 'admin-users.html' },
     { label: 'Login',                 icon: 'log-in',           href: 'login.html' },
