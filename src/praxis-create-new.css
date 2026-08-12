@@ -49,11 +49,11 @@
        ignores the scrim's centering) ---- */
 .cn-flyout{
   position:fixed; z-index:120;
-  top:calc(var(--appbar-height, 64px) + 8px);
+  top:calc(var(--praxis-appbar-h) + 8px);
   left:calc(var(--praxis-navrail-width, 56px) + 8px);
   width:468px;
   max-width:calc(100vw - var(--praxis-navrail-width, 56px) - 24px);
-  max-height:calc(100vh - var(--appbar-height, 64px) - 24px);
+  max-height:calc(100vh - var(--praxis-appbar-h) - 24px);
   display:flex; flex-direction:column; overflow:hidden;
   /* Frosted glass so the solid tiles read against it (a solid panel made the
      white/dark tiles blend in). Translucent fill (theme-aware via color-mix)
@@ -126,7 +126,7 @@
 .cn-seg__btn{
   flex:1; height:30px; border:0; background:transparent; border-radius:9px;
   font:inherit; font-size:13px; font-weight:600; color:var(--praxis-color-text-secondary);
-  cursor:pointer; transition:background var(--dur-fast,.18s) ease, color var(--dur-fast,.18s) ease;
+  cursor:pointer; transition:background var(--praxis-motion-normal) ease, color var(--praxis-motion-normal) ease;
 }
 .cn-seg__btn:hover{ color:var(--praxis-color-text-primary); }
 /* Selected: the lifted pill and its shadow already carry the state, so the
@@ -176,7 +176,7 @@
   background:var(--px-surface); border:0; border-radius:10px; box-shadow:var(--px-tool-shadow);
   font:inherit; font-size:14px; font-weight:600; color:var(--praxis-color-text-primary);
   text-align:left; cursor:pointer; min-width:0;
-  transition:box-shadow var(--dur-fast,.18s) ease;
+  transition:box-shadow var(--praxis-motion-normal) ease;
 }
 .cn-item:hover{ box-shadow:var(--px-tool-shadow-hover); }
 .cn-item__icon{
@@ -193,7 +193,7 @@
   display:flex; align-items:flex-start; gap:10px; width:100%; padding:10px;
   background:var(--px-surface); border:0; border-radius:12px; box-shadow:var(--px-tool-shadow);
   font:inherit; text-align:left; cursor:pointer;
-  transition:box-shadow var(--dur-fast,.18s) ease;
+  transition:box-shadow var(--praxis-motion-normal) ease;
 }
 .cn-tpl:hover{ box-shadow:var(--px-tool-shadow-hover); }
 .cn-tpl__icon{
@@ -228,7 +228,7 @@
   display:flex; align-items:center; gap:var(--praxis-space-12);
   min-height:46px; padding:5px 8px; width:100%;
   border:0; border-radius:10px; background:transparent; cursor:pointer; font:inherit; text-align:left;
-  transition:background var(--dur-fast,.18s) ease;
+  transition:background var(--praxis-motion-normal) ease;
 }
 .cn-row:hover{ background:var(--px-hover); }
 .cn-row__icon{

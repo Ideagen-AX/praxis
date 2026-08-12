@@ -261,7 +261,7 @@ body[data-theme="dark"] .filter-chips .chip--clear:hover {
 .filter-drawer[hidden] { display: none; }
 .filter-drawer[data-open] { transform: none; }
 @media (min-width: 1280px) {
-  html[data-filter-mode="modal"] .filter-drawer { left: 0px; right: 0px; margin-inline: auto; width: min(960px, -96px + 100vw); height: fit-content; max-height: var(--filter-modal-h, calc(100vh - 48px)); margin-block: auto; transform: translateY(16px); opacity: 0; transition: transform var(--praxis-motion-normal) var(--praxis-ease-default),
+  html[data-filter-mode="modal"] .filter-drawer { left: 0px; right: 0px; margin-inline: auto; width: min(960px, -96px + 100vw); height: fit-content; max-height: calc(100vh - 48px); margin-block: auto; transform: translateY(16px); opacity: 0; transition: transform var(--praxis-motion-normal) var(--praxis-ease-default),
                 opacity var(--praxis-motion-normal) var(--praxis-ease-default); }
   html[data-filter-mode="modal"] .filter-drawer[data-open] { transform: none; opacity: 1; }
   html[data-filter-mode="modal"] .filter-drawer__resize { display: block; }
@@ -832,7 +832,7 @@ body[data-variant="praxis"][data-theme="dark"] .filter-view-switch__opt.is-activ
    growth by scrolling. Rows then open in place against a dialog that never
    moves.
 
-   --filter-modal-h now drives height rather than max-height. The drag
+   An explicit height, not max-height, now drives the sheet. The drag
    handles keep working unchanged — initModalResize() writes that same
    property, and its `grow * 2` still holds because a centred box of fixed
    height moves each edge by half the delta. The default tracks the height
@@ -840,7 +840,7 @@ body[data-variant="praxis"][data-theme="dark"] .filter-view-switch__opt.is-activ
 @media (min-width: 1280px) {
   html[data-filter-mode="modal"] .filter-drawer,
   html[data-filter-mode="modal"] .filter-drawer:has(.custom-builder:not([hidden])) {
-    height: var(--filter-modal-h, min(720px, calc(100vh - 48px)));
+    height: min(720px, calc(100vh - 48px));
     max-height: calc(100vh - 48px);
   }
 }

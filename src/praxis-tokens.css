@@ -204,6 +204,22 @@
   --praxis-type-size-2xs:0.6875rem;
   --praxis-type-size-3xl:1.875rem;
 
+  /* Chrome geometry. --praxis-appbar-h was previously --appbar-height, defined only in
+     two page <head>s and in the legacy chrome sheet, while three shared component
+     sheets referenced it — so every other page fell through to a hard-coded 64px
+     fallback. Canonicalised 2026-08-12. praxis-admin.css still declares the local
+     --appbar-h / --navrail-w / --adminnav-w trio for its own grid maths. */
+  --praxis-appbar-h:64px;
+
+  /* Drawer motion. The Mazlan drawer's transitions referenced --dur-base,
+     --ease-spring and --ease-spring-soft with NO fallback, and those three were
+     defined only in contextual-awareness.html — so on every other page the
+     declarations were invalid at computed-value time and the drawer had no
+     transition at all. Values taken from that page, where the motion was correct. */
+  --praxis-motion-drawer:280ms;
+  --praxis-ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --praxis-ease-spring-soft:cubic-bezier(.22,1,.36,1);
+
   /* The superseded --praxis-status-* / --praxis-encoding-* families that used to sit
      here were kept 'for parity with the EHSQ-E base'. That base is defunct, so parity
      with it is not a reason. Nothing referenced them; pruned 2026-08-12. */

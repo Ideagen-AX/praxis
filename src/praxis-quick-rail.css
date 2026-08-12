@@ -34,12 +34,12 @@ body.tb-is-compact .qrail{
      container so it could scroll edge to edge, but that put the box at -16px
      on a 390px screen — the pills ran off the left of the view. The rail
      starts on the content edge and grows to the right only. */
-  padding:var(--s-8, 8px) 0;
+  padding:var(--praxis-space-8) 0;
 }
 body.tb-is-compact .qrail[hidden]{ display:none !important; }
 
 body.tb-is-compact .qrail__scroller{
-  display:flex; gap:var(--s-8, 8px);
+  display:flex; gap:var(--praxis-space-8);
   overflow-x:auto; scrollbar-width:none;
   /* One gutter, matching .filter-chips below and the toolbar above, so the
      first pill shares their left edge.
@@ -65,7 +65,7 @@ body.tb-is-compact .qrail__pill{
   background:var(--px-tool);
   color:var(--praxis-color-text-primary);
   box-shadow:var(--px-tool-shadow);
-  font:inherit; font-size:.875rem; font-weight:600;
+  font:inherit; font-size:var(--praxis-type-size-base); font-weight:600;
   white-space:nowrap; cursor:pointer;
   transition:box-shadow var(--praxis-motion-fast, 120ms),
              background var(--praxis-motion-fast, 120ms),
@@ -94,7 +94,7 @@ body.tb-is-compact .qrail__count{
   border-radius:999px;
   background:var(--praxis-color-neutral-15, rgba(32,42,53,.10));
   color:var(--praxis-color-text-primary);
-  font-size:var(--t-xs, .75rem); font-weight:700;
+  font-size:var(--praxis-type-size-xs); font-weight:700;
   font-variant-numeric:tabular-nums;
 }
 
@@ -122,12 +122,12 @@ body.tb-is-compact .qrail-pop{
      number of values. */
   max-height:min(60vh, 420px);
   background:var(--px-surface, #fff);
-  border:1px solid var(--color-border, var(--praxis-color-neutral-20));
+  border:1px solid var(--praxis-color-border-default);
   border-radius:12px;
   box-shadow:var(--px-overlay, 0 8px 32px rgba(0,0,0,.18));
   opacity:0; transform:translateY(-4px);
-  transition:opacity 140ms var(--ease-default, ease),
-             transform 140ms var(--ease-default, ease);
+  transition:opacity 140ms ease,
+             transform 140ms ease;
 }
 body.tb-is-compact .qrail-pop.is-open{ opacity:1; transform:none; }
 body.tb-is-compact .qrail-pop[hidden]{ display:none; }
@@ -138,8 +138,8 @@ body.tb-is-compact .qrail-pop__head{
 }
 body.tb-is-compact .qrail-pop__title{
   margin:0; flex:1; min-width:0;
-  font-size:var(--t-sm, .875rem); font-weight:700;
-  color:var(--color-text, var(--praxis-color-text-primary));
+  font-size:var(--praxis-type-size-base); font-weight:700;
+  color:var(--praxis-color-text-primary);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 body.tb-is-compact .qrail-pop__close{
@@ -163,7 +163,7 @@ body.tb-is-compact .qrail-pop__body .qfilter{
 }
 body.tb-is-compact .qrail-pop__body .qfilter__head{ display:none; }
 /* Distribution rows are touch targets here. */
-body.tb-is-compact .qrail-pop__body .qfilter__row{ min-height:40px; padding:var(--s-8, 8px); }
+body.tb-is-compact .qrail-pop__body .qfilter__row{ min-height:40px; padding:var(--praxis-space-8); }
 /* praxis-filters.css resets native button chrome, but scopes that reset to
    .quick-filters and friends — and this card has been moved out of there, so
    every button inside the popover was falling back to the UA default. That is
@@ -184,9 +184,9 @@ body.tb-is-compact .qrail-pop__body .qfilter__more{
   border-radius:0 0 6px 6px;
   background:var(--px-surface, #fff);
   color:var(--praxis-color-interactive-default);
-  font-size:var(--t-xs, .75rem); font-weight:700; text-align:center;
+  font-size:var(--praxis-type-size-xs); font-weight:700; text-align:center;
   cursor:pointer;
-  transition:background var(--d-fast, 120ms) var(--ease-default, ease);
+  transition:background var(--praxis-motion-fast) ease;
 }
 body.tb-is-compact .qrail-pop__body .qfilter__more:hover{
   background:var(--px-hover, rgba(0,0,0,.04));

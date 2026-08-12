@@ -26,7 +26,7 @@
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
     opacity: 0;
-    transition: opacity var(--dur-base) var(--ease-spring-soft);
+    transition: opacity var(--praxis-motion-drawer) var(--praxis-ease-spring-soft);
   }
   .mazlan-scrim[hidden] { display: none; }
   .mazlan-scrim.mazlan-scrim--open { opacity: 1; }
@@ -35,7 +35,7 @@
     /* Floats with margin from edges so all four 24px corners are visible.
        Anchored below the top bar; calc keeps it inset from top/right/bottom. */
     position: fixed;
-    top: calc(var(--appbar-height, var(--appbar-h, 64px)) + 16px);
+    top: calc(var(--praxis-appbar-h) + 16px);
     right: 16px;
     bottom: 16px;
     width: min(484px, calc(100vw - 32px));
@@ -48,7 +48,7 @@
     flex-direction: column;
     overflow: hidden;
     transform: translateX(calc(100% + 16px));
-    transition: transform var(--dur-base) var(--ease-spring);
+    transition: transform var(--praxis-motion-drawer) var(--praxis-ease-spring);
   }
   .mazlan-drawer[hidden] { display: none; }
   .mazlan-drawer.mazlan-drawer--open { transform: translateX(0); }

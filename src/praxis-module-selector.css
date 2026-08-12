@@ -32,7 +32,7 @@
 }
 .msel__input::placeholder{ color:var(--praxis-color-text-secondary); font-weight:600; }
 .msel__caret{ font-size:20px !important; color:var(--praxis-color-text-secondary); flex-shrink:0; pointer-events:none;
-  transition:transform var(--dur-fast,.18s) ease; }
+  transition:transform var(--praxis-motion-normal) ease; }
 .msel.is-open .msel__caret{ transform:rotate(180deg); }
 /* Dark: the module label + dropdown arrow read too dark on the header pill;
    lighten to neutral-20 (light palette value — the token remaps dark). */
