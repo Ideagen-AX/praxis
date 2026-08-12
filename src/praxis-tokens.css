@@ -1,0 +1,211 @@
+/* =====================================================================
+   PRAXIS TOKENS — the single source of the EHSQ-E foundation layer.
+
+   Generated 2026-08-12 from the values 11 pages were each carrying in their
+   own :root block. Those 11 copies agreed on 70 of 75 tokens; the five they
+   disagreed on are resolved here and marked inline.
+
+   WHY THIS FILE EXISTS
+   Every page except four was self-supplying the base palette in its own
+   <style>, so "the value of --praxis-radius-md" was a fact about which page you
+   were on. This file is now the only place the foundation is declared.
+
+   LOAD ORDER — this file FIRST, then praxis-core.css:
+       <link rel="stylesheet" href="praxis-tokens.css" />
+       <link rel="stylesheet" href="praxis-core.css" />
+   praxis-core.css layers the Praxis light overrides, the dark remaps and the
+   --px-* material tokens on top, scoped to body[data-variant="praxis"] — a
+   higher specificity than the :root below, so it wins regardless of order.
+   Keeping the order anyway means the cascade reads the way it behaves.
+
+   Values are the RESOLVED ones measured in-browser across 27 pages x 2
+   themes, not what any single source file claimed.
+   ===================================================================== */
+:root{
+  /* Neutrals */
+  --praxis-color-neutral-05:#f4f5f6;
+  --praxis-color-neutral-10:#edf0f2;
+  --praxis-color-neutral-100:#202a35;
+  --praxis-color-neutral-15:#dadfe4;
+  --praxis-color-neutral-20:#c8cfd7;
+  --praxis-color-neutral-30:#adb8c4;
+  --praxis-color-neutral-40:#8898a9;
+  --praxis-color-neutral-50:#718499;
+  --praxis-color-neutral-60:#4d657f;
+  --praxis-color-neutral-70:#465c74;
+  --praxis-color-neutral-80:#37485a;
+  --praxis-color-neutral-90:#2a3846;
+  --praxis-color-white:#ffffff;
+
+  /* Hue scales */
+  --praxis-color-blue-10:#edf0fd;
+  --praxis-color-blue-50:#6882ef;
+  --praxis-color-blue-60:#4766eb;
+  --praxis-color-green-10:#e6f3ee;
+  --praxis-color-green-60:#098b53;
+  --praxis-color-orange-10:#fdf2e6;
+  --praxis-color-orange-60:#ef8100;
+  --praxis-color-pink-50:#e82e8b;
+  --praxis-color-pink-60:#e30072;
+  --praxis-color-pink-90:#810041;
+  --praxis-color-red-10:#fceaeb;
+  --praxis-color-red-50:#e7535c;
+  --praxis-color-red-60:#e22d38;
+  --praxis-color-teal-10:#e8f3f3;
+  --praxis-color-teal-20:#c8e1e3;
+  --praxis-color-teal-50:#4499a0;
+  --praxis-color-teal-60:#1b838b;
+  --praxis-color-teal-70:#176f76;
+  --praxis-color-teal-80:#135d63;
+  --praxis-color-yellow-10:#fdf9e6;
+  --praxis-color-yellow-50:#f2d02e;
+  --praxis-color-yellow-90:#887100;
+
+  /* Semantic — text / surface / border / interactive */
+  --praxis-color-border-default:var(--praxis-color-neutral-20);
+  --praxis-color-border-focus:var(--praxis-color-teal-50);
+  --praxis-color-border-strong:var(--praxis-color-neutral-40);
+  --praxis-color-interactive-active:var(--praxis-color-teal-80);
+  --praxis-color-interactive-default:var(--praxis-color-teal-60);
+  --praxis-color-interactive-hover:var(--praxis-color-teal-70);
+  --praxis-color-surface-default:var(--praxis-color-white);
+  --praxis-color-surface-subtle:var(--praxis-color-neutral-10);
+  --praxis-color-text-disabled:var(--praxis-color-neutral-40);
+  --praxis-color-text-inverse:var(--praxis-color-white);
+  --praxis-color-text-link:var(--praxis-color-teal-60);
+  --praxis-color-text-primary:var(--praxis-color-neutral-90);
+  --praxis-color-text-secondary:var(--praxis-color-neutral-60);
+  --praxis-color-text-tertiary:#616f7e;   /* promoted from page-local; one value */
+
+  /* Semantic — status */
+  --praxis-color-status-danger:var(--praxis-color-red-60);
+  --praxis-color-status-info:var(--praxis-color-blue-60);
+  --praxis-color-status-success:var(--praxis-color-green-60);
+  --praxis-color-status-warning:var(--praxis-color-orange-60);
+
+  /* Typography */
+  --praxis-type-font-sans:'Gilroy','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --praxis-type-size-base:0.875rem;
+  --praxis-type-size-lg:1.125rem;
+  --praxis-type-size-md:1rem;
+  --praxis-type-size-sm:0.8125rem;
+  --praxis-type-size-xl:1.25rem;
+  --praxis-type-size-xs:0.75rem;
+
+  /* Spacing */
+  --praxis-space-12:.75rem;
+  --praxis-space-16:1rem;
+  --praxis-space-24:1.5rem;
+  --praxis-space-32:2rem;
+  --praxis-space-4:.25rem;
+  --praxis-space-8:.5rem;
+
+  /* Radius */
+  --praxis-radius-full:9999px;
+  --praxis-radius-lg:16px;   /* Praxis 8/12/16 — the value that already renders on all 27 pages */
+  --praxis-radius-md:12px;   /* Praxis 8/12/16 — the value that already renders on all 27 pages */
+  --praxis-radius-sm:8px;   /* Praxis 8/12/16 — the value that already renders on all 27 pages */
+
+  /* Elevation */
+  --praxis-elevation-1:0 1px 2px 0 rgb(32 42 53 / .06);
+  --praxis-elevation-2:0 1px 3px 0 rgb(32 42 53 / .1), 0 1px 2px -1px rgb(32 42 53 / .06);
+  --praxis-elevation-3:0 4px 6px -1px rgb(32 42 53 / .1), 0 2px 4px -2px rgb(32 42 53 / .06);
+  --praxis-elevation-4:0 10px 15px -3px rgb(32 42 53 / .1), 0 4px 6px -4px rgb(32 42 53 / .05);
+
+  /* Motion */
+  /* normal/slow existed only inside praxis-filters.css's adapter block; promoted
+     here when that adapter was removed, values unchanged. */
+  --praxis-motion-normal:180ms;
+  --praxis-motion-slow:260ms;
+  --praxis-ease-default:cubic-bezier(.32,.72,0,1);   /* Praxis spring — already renders on all 27 pages */
+  --praxis-motion-fast:120ms;   /* DECISION 2026-08-12: 120ms canonical (was 100ms on 7 pages) */
+
+  /* ============ Completed from praxis-chrome-legacy.css, 2026-08-12 ============
+     praxis-chrome-legacy.css was the only definition of these, and just 4 of 27
+     pages load it — so --praxis-color-border-subtle (used unguarded in
+     praxis-mazlan.css) resolved to nothing on the other 23. A foundation
+     layer has to carry the whole ramp, not the subset the current screens
+     happen to use. */
+
+  /* Chrome metrics */
+  --praxis-navrail-width:56px;
+  --praxis-navrail-width-expanded:240px;
+
+  /* Elevation semantics (Praxis remaps these to --px-* materials) */
+  --praxis-elevation-card:0 2px 16px -4px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.1);
+  --praxis-elevation-card-raised:0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.1);
+  --praxis-elevation-popover:0 4px 6px rgba(32, 42, 53, 0.07), 0 10px 15px rgba(32, 42, 53, 0.08);
+
+  /* Palette rungs completed from the EHSQ-E base */
+  --praxis-color-blue-100:#202e6a;
+  --praxis-color-blue-20:#d3dafa;
+  --praxis-color-blue-30:#b0bdf6;
+  --praxis-color-blue-40:#8b9ff2;
+  --praxis-color-blue-70:#3c57c8;
+  --praxis-color-blue-80:#3248a7;
+  --praxis-color-blue-90:#283a86;
+  --praxis-color-green-100:#043f25;
+  --praxis-color-green-20:#c4e3d6;
+  --praxis-color-green-30:#95cdb5;
+  --praxis-color-green-40:#64b693;
+  --praxis-color-green-50:#35a072;
+  --praxis-color-green-70:#087647;
+  --praxis-color-green-80:#06633b;
+  --praxis-color-green-90:#054f2f;
+  --praxis-color-orange-100:#6c3a00;
+  --praxis-color-orange-20:#fbe1c2;
+  --praxis-color-orange-30:#f8c991;
+  --praxis-color-orange-40:#f5b05e;
+  --praxis-color-orange-50:#f2982e;
+  --praxis-color-orange-70:#cb6e00;
+  --praxis-color-orange-80:#aa5c00;
+  --praxis-color-orange-90:#884a00;
+  --praxis-color-pink-10:#fce6f1;
+  --praxis-color-pink-100:#660033;
+  --praxis-color-pink-20:#f8c2dd;
+  --praxis-color-pink-30:#f391c2;
+  --praxis-color-pink-40:#ed5ea6;
+  --praxis-color-pink-70:#c10061;
+  --praxis-color-pink-80:#a10051;
+  --praxis-color-red-100:#661419;
+  --praxis-color-red-20:#f8cdcf;
+  --praxis-color-red-30:#f3a5a9;
+  --praxis-color-red-40:#ed7b82;
+  --praxis-color-red-70:#c02630;
+  --praxis-color-red-80:#a02028;
+  --praxis-color-red-90:#811a20;
+  --praxis-color-teal-100:#0c3b3f;
+  --praxis-color-teal-30:#9dcacd;
+  --praxis-color-teal-40:#6fb1b6;
+  --praxis-color-teal-90:#0f4b4f;
+  --praxis-color-yellow-100:#6c5900;
+  --praxis-color-yellow-20:#fbf1c2;
+  --praxis-color-yellow-30:#f8e691;
+  --praxis-color-yellow-40:#f5db5e;
+  --praxis-color-yellow-60:#efc600;
+  --praxis-color-yellow-70:#cba800;
+  --praxis-color-yellow-80:#aa8d00;
+
+  /* Radius completed */
+  --praxis-radius-card:20px;
+  --praxis-radius-xl:16px;
+
+  /* Semantic colour completed */
+  --praxis-color-border-subtle:var(--praxis-color-neutral-10);
+  --praxis-color-surface-muted:var(--praxis-color-neutral-10);
+
+  /* Spacing completed */
+  --praxis-space-20:1.25rem;
+  --praxis-space-40:2.5rem;
+  --praxis-space-48:3rem;
+
+  /* Typography completed */
+  --praxis-type-size-2xl:1.5rem;
+  --praxis-type-size-2xs:0.6875rem;
+  --praxis-type-size-3xl:1.875rem;
+
+  /* The superseded --praxis-status-* / --praxis-encoding-* families that used to sit
+     here were kept 'for parity with the EHSQ-E base'. That base is defunct, so parity
+     with it is not a reason. Nothing referenced them; pruned 2026-08-12. */
+
+}

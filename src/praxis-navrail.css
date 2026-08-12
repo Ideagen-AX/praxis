@@ -4,98 +4,98 @@
    the record-page rail: an icon-only column led by the product hub logo.
 
    This file styles the rail's CONTENTS (core, items, hub link, buttons).
-   The .ehsq-navrail CONTAINER positioning stays per-page (the record page
+   The .praxis-navrail CONTAINER positioning stays per-page (the record page
    is an in-flow flex child of .shell; the workspace is a fixed sidebar),
    since that is dictated by each page's overall layout — only the visual
    treatment (transparent fill, hairline border) is unified here.
    ===================================================================== */
 
-.ehsq-navrail__core{ display:flex; flex-direction:column; align-items:center; }
-.ehsq-navrail__item{
+.praxis-navrail__core{ display:flex; flex-direction:column; align-items:center; }
+.praxis-navrail__item{
   display:flex; align-items:center; justify-content:center;
-  width:var(--navrail-w, var(--ehsq-navrail-width, 56px)); height:56px; flex-shrink:0;
+  width:var(--navrail-w, var(--praxis-navrail-width, 56px)); height:56px; flex-shrink:0;
 }
 
-.ehsq-navrail__link{
+.praxis-navrail__link{
   display:flex; align-items:center; justify-content:center; width:40px; height:40px;
-  padding:0; border-radius:var(--ehsq-radius-md);
-  transition:background var(--ehsq-motion-fast) var(--ehsq-ease-default);
+  padding:0; border-radius:var(--praxis-radius-md);
+  transition:background var(--praxis-motion-fast) var(--praxis-ease-default);
 }
-.ehsq-navrail__link:hover{ background:var(--ehsq-color-neutral-20); text-decoration:none; }
-.ehsq-navrail__link:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:2px; }
-.ehsq-navrail__link img{ display:block; width:35px; height:40px; }
+.praxis-navrail__link:hover{ background:var(--praxis-color-neutral-20); text-decoration:none; }
+.praxis-navrail__link:focus-visible{ outline:2px solid var(--praxis-color-teal-50); outline-offset:2px; }
+.praxis-navrail__link img{ display:block; width:35px; height:40px; }
 
-.ehsq-navrail__btn{
+.praxis-navrail__btn{
   display:flex; align-items:center; justify-content:center; width:40px; height:40px;
-  padding:0; gap:0; border:0; background:transparent; border-radius:var(--ehsq-radius-md);
-  color:var(--ehsq-color-neutral-70); cursor:pointer;
-  transition:background-color var(--ehsq-motion-fast) var(--ehsq-ease-default), transform 150ms var(--ehsq-ease-default);
+  padding:0; gap:0; border:0; background:transparent; border-radius:var(--praxis-radius-md);
+  color:var(--praxis-color-neutral-70); cursor:pointer;
+  transition:background-color var(--praxis-motion-fast) var(--praxis-ease-default), transform 150ms var(--praxis-ease-default);
 }
-.ehsq-navrail__btn:hover{ background-color:var(--ehsq-color-neutral-20); }
-.ehsq-navrail__btn:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:2px; }
-.ehsq-navrail__btn svg{ display:block; }
-.ehsq-navrail__btn--active{ background-color:var(--ehsq-color-pink-50); color:var(--ehsq-color-white); }
-.ehsq-navrail__btn--active:hover{ background-color:var(--ehsq-color-pink-50); }
-.ehsq-navrail__btn--create{ background-color:var(--ehsq-color-teal-60); color:var(--ehsq-color-white); }
-.ehsq-navrail__btn--create:hover{ background-color:var(--ehsq-color-teal-70); }
+.praxis-navrail__btn:hover{ background-color:var(--praxis-color-neutral-20); }
+.praxis-navrail__btn:focus-visible{ outline:2px solid var(--praxis-color-teal-50); outline-offset:2px; }
+.praxis-navrail__btn svg{ display:block; }
+.praxis-navrail__btn--active{ background-color:var(--praxis-color-pink-50); color:var(--praxis-color-white); }
+.praxis-navrail__btn--active:hover{ background-color:var(--praxis-color-pink-50); }
+.praxis-navrail__btn--create{ background-color:var(--praxis-color-teal-60); color:var(--praxis-color-white); }
+.praxis-navrail__btn--create:hover{ background-color:var(--praxis-color-teal-70); }
 
-body[data-theme="dark"] .ehsq-navrail__btn{ color:var(--ehsq-color-text-secondary); }
+body[data-theme="dark"] .praxis-navrail__btn{ color:var(--praxis-color-text-secondary); }
 /* The selected item keeps its pink rect + a WHITE glyph in dark — the base
    .btn dark rule above otherwise has enough specificity to grey it out. */
-body[data-theme="dark"] .ehsq-navrail__btn--active{ color:var(--ehsq-color-white); }
+body[data-theme="dark"] .praxis-navrail__btn--active{ color:var(--praxis-color-white); }
 
 /* ---- Praxis: transparent/borderless rail; buttons become neutral filled
         containers with a lit edge (matches the toolbar tools). ---- */
-body[data-variant="praxis"] .ehsq-navrail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
-body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create){
-  color:var(--ehsq-color-text-secondary);
+body[data-variant="praxis"] .praxis-navrail{ background:transparent; border-right:1px solid var(--praxis-color-border-default); }
+body[data-variant="praxis"] .praxis-navrail__btn:not(.praxis-navrail__btn--active):not(.praxis-navrail__btn--create){
+  color:var(--praxis-color-text-secondary);
   background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.06),0 1px 2px rgba(16,36,58,.05);
 }
 /* Hover shifts the fill, not just the glyph — the shadow-only version read as
    a rendering artefact. The wash rides over the surface so the button keeps
    reading as raised. (This rule outranks the shared pass in praxis-core.css,
    and its `background` shorthand would reset the image anyway.) */
-body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create):hover{
+body[data-variant="praxis"] .praxis-navrail__btn:not(.praxis-navrail__btn--active):not(.praxis-navrail__btn--create):hover{
   background-color:var(--px-surface);
   background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
   box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14);
 }
-body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create){
+body[data-variant="praxis"][data-theme="dark"] .praxis-navrail__btn:not(.praxis-navrail__btn--active):not(.praxis-navrail__btn--create){
   color:#c8cfd7; /* neutral-20 (light value) — a lighter glyph on the slate chip */
   background:var(--px-surface-2,#232c3b);
   box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06);
 }
-body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--active):not(.ehsq-navrail__btn--create):hover{
-  color:var(--ehsq-color-white);
+body[data-variant="praxis"][data-theme="dark"] .praxis-navrail__btn:not(.praxis-navrail__btn--active):not(.praxis-navrail__btn--create):hover{
+  color:var(--praxis-color-white);
   background-color:var(--px-surface-2,#232c3b);
   background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
   box-shadow:0 0 0 .5px rgba(255,255,255,.14),inset 0 .5px 0 rgba(255,255,255,.08);
 }
-body[data-variant="praxis"] .ehsq-navrail__link{ background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.06),0 1px 2px rgba(16,36,58,.05); }
-body[data-variant="praxis"] .ehsq-navrail__link:hover{ background-color:var(--px-surface); background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn)); box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14); }
-body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__link{ background:var(--px-surface-2,#232c3b); box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06); }
-body[data-variant="praxis"] .ehsq-navrail__link img{ width:auto; height:28px; }
-body[data-variant="praxis"] .ehsq-navrail__btn--create{
-  background:var(--px-primary-grad); color:var(--ehsq-color-white);
+body[data-variant="praxis"] .praxis-navrail__link{ background:var(--px-surface); box-shadow:0 0 0 .5px rgba(16,36,58,.06),0 1px 2px rgba(16,36,58,.05); }
+body[data-variant="praxis"] .praxis-navrail__link:hover{ background-color:var(--px-surface); background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn)); box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14); }
+body[data-variant="praxis"][data-theme="dark"] .praxis-navrail__link{ background:var(--px-surface-2,#232c3b); box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06); }
+body[data-variant="praxis"] .praxis-navrail__link img{ width:auto; height:28px; }
+body[data-variant="praxis"] .praxis-navrail__btn--create{
+  background:var(--px-primary-grad); color:var(--praxis-color-white);
   box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),inset 0 .5px 0 rgba(255,255,255,.25);
 }
 /* Dark: Create matches the quick-action buttons — a soft translucent-teal chip
    with a bright-teal icon (not the bold gradient CTA). */
-body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create{
+body[data-variant="praxis"][data-theme="dark"] .praxis-navrail__btn--create{
   background:var(--px-primary-soft); color:var(--px-primary-soft-fg);
   /* -sm: the full soft shadow's ambient glow was too heavy for a 40px chip.
      Same level the quick actions use, so all three primaries match. */
   box-shadow:var(--px-primary-soft-shadow-sm);
-  transition:background var(--ehsq-motion-fast) var(--ehsq-ease-default),
-             box-shadow var(--ehsq-motion-fast) var(--ehsq-ease-default),
-             transform 150ms var(--ehsq-ease-default);
+  transition:background var(--praxis-motion-fast) var(--praxis-ease-default),
+             box-shadow var(--praxis-motion-fast) var(--praxis-ease-default),
+             transform 150ms var(--praxis-ease-default);
 }
-body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create:hover{
+body[data-variant="praxis"][data-theme="dark"] .praxis-navrail__btn--create:hover{
   background:var(--px-primary-soft-hover); box-shadow:var(--px-primary-soft-shadow-sm-hover);
 }
-body[data-variant="praxis"] .ehsq-navrail__btn:focus-visible,
-body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
-  outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--ehsq-color-interactive-default) 22%, transparent);
+body[data-variant="praxis"] .praxis-navrail__btn:focus-visible,
+body[data-variant="praxis"] .praxis-navrail__btn--create:focus-visible{
+  outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--praxis-color-interactive-default) 22%, transparent);
 }
 
 /* ============================================================================
@@ -108,7 +108,7 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 .px-navtoggle{ display:none; }
 
 @media (max-width:640px){
-  .ehsq-navrail{ display:none !important; }
+  .praxis-navrail{ display:none !important; }
   /* Pages offset their content by the rail width in several different ways
      (margin-left, padding-left, a grid column). Zeroing the token covers all
      of them at once. */
@@ -117,14 +117,14 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
   .px-navtoggle{
     display:inline-flex; align-items:center; justify-content:center;
     width:40px; height:40px; flex-shrink:0; margin-right:2px;
-    border:0; border-radius:var(--ehsq-radius-md); background:transparent;
-    color:var(--ehsq-color-text-secondary); cursor:pointer;
-    transition:background-color var(--ehsq-motion-fast) var(--ehsq-ease-default),
-               transform 150ms var(--ehsq-ease-default);
+    border:0; border-radius:var(--praxis-radius-md); background:transparent;
+    color:var(--praxis-color-text-secondary); cursor:pointer;
+    transition:background-color var(--praxis-motion-fast) var(--praxis-ease-default),
+               transform 150ms var(--praxis-ease-default);
   }
-  .px-navtoggle:hover{ background-color:var(--px-hover-btn); color:var(--ehsq-color-text-primary); }
+  .px-navtoggle:hover{ background-color:var(--px-hover-btn); color:var(--praxis-color-text-primary); }
   .px-navtoggle:active{ transform:scale(.95); }
-  .px-navtoggle:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:2px; }
+  .px-navtoggle:focus-visible{ outline:2px solid var(--praxis-color-teal-50); outline-offset:2px; }
   .px-navtoggle .material-symbols-rounded{ font-size:24px; }
   .px-navtoggle svg{ width:24px; height:24px; }
 }
@@ -143,7 +143,7 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 .px-navdrawer__scrim{
   position:fixed; inset:0; z-index:140;
   background:rgba(16,22,30,.55); backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px);
-  opacity:0; transition:opacity 200ms var(--ehsq-ease-default);
+  opacity:0; transition:opacity 200ms var(--praxis-ease-default);
 }
 .px-navdrawer__scrim.is-open{ opacity:1; }
 .px-navdrawer__scrim[hidden]{ display:none; }
@@ -153,7 +153,7 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
   width:280px; max-width:85vw; display:flex; flex-direction:column;
   background:rgb(36,48,60); color:#e7ebf1;
   box-shadow:4px 0 20px rgba(0,0,0,.32);
-  transform:translateX(-100%); transition:transform 220ms var(--ehsq-ease-default);
+  transform:translateX(-100%); transition:transform 220ms var(--praxis-ease-default);
 }
 .px-navdrawer.is-open{ transform:none; }
 .px-navdrawer[hidden]{ display:none; }
@@ -173,9 +173,9 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 .px-navdrawer__brand svg{ width:28px; height:32px; display:block; flex-shrink:0; }
 .px-navdrawer__close{
   width:40px; height:40px; display:grid; place-items:center;
-  background:transparent; border:0; border-radius:var(--ehsq-radius-md);
+  background:transparent; border:0; border-radius:var(--praxis-radius-md);
   color:rgba(255,255,255,.72); cursor:pointer;
-  transition:background-color var(--ehsq-motion-fast), transform 150ms var(--ehsq-ease-default);
+  transition:background-color var(--praxis-motion-fast), transform 150ms var(--praxis-ease-default);
 }
 .px-navdrawer__close:hover{ background:rgba(255,255,255,.10); color:#fff; }
 .px-navdrawer__close:active{ transform:scale(.95); }
@@ -192,19 +192,19 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
   border:0; background:transparent; border-radius:10px;
   font:inherit; font-size:.875rem; font-weight:600; text-align:left;
   color:rgba(255,255,255,.86); text-decoration:none; cursor:pointer;
-  transition:background-color var(--ehsq-motion-fast), color var(--ehsq-motion-fast),
-             transform 150ms var(--ehsq-ease-default);
+  transition:background-color var(--praxis-motion-fast), color var(--praxis-motion-fast),
+             transform 150ms var(--praxis-ease-default);
 }
 .px-navdrawer__item:hover{ background:rgba(255,255,255,.06); color:#fff; text-decoration:none; }
 .px-navdrawer__item:active{ transform:scale(.98); }
-.px-navdrawer__item:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-2px; }
+.px-navdrawer__item:focus-visible{ outline:2px solid var(--praxis-color-teal-50); outline-offset:-2px; }
 
 /* The icon well is the state carrier — same 40px square the rail uses. */
 .px-navdrawer__icon{
-  width:40px; height:40px; flex-shrink:0; border-radius:var(--ehsq-radius-md);
+  width:40px; height:40px; flex-shrink:0; border-radius:var(--praxis-radius-md);
   display:grid; place-items:center;
   background:rgba(255,255,255,.07); color:rgba(255,255,255,.78);
-  transition:background-color var(--ehsq-motion-fast), color var(--ehsq-motion-fast);
+  transition:background-color var(--praxis-motion-fast), color var(--praxis-motion-fast);
 }
 .px-navdrawer__item:hover .px-navdrawer__icon{ background:rgba(255,255,255,.12); color:#fff; }
 .px-navdrawer__icon svg{ width:20px; height:20px; }
@@ -215,11 +215,11 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 .px-navdrawer__item--active{ color:#fff; }
 .px-navdrawer__item--active .px-navdrawer__icon,
 .px-navdrawer__item--active:hover .px-navdrawer__icon{
-  background:var(--ehsq-color-pink-50); color:var(--ehsq-color-white);
+  background:var(--praxis-color-pink-50); color:var(--praxis-color-white);
 }
 /* Create: the rail's own treatment, on the icon well. */
 .px-navdrawer__item--create .px-navdrawer__icon{
-  background:var(--px-primary-grad); color:var(--ehsq-color-white);
+  background:var(--px-primary-grad); color:var(--praxis-color-white);
   box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),
              inset 0 .5px 0 rgba(255,255,255,.25);
 }
@@ -228,7 +228,7 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
 .px-navdrawer__label{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 .px-navdrawer__group{
-  padding:16px 12px 4px; font-size:11px; font-weight:800; letter-spacing:normal; color:var(--ehsq-color-text-tertiary);
+  padding:16px 12px 4px; font-size:11px; font-weight:800; letter-spacing:normal; color:var(--praxis-color-text-tertiary);
 }
 
 /* =====================================================================
@@ -254,8 +254,8 @@ body[data-variant="praxis"] .ehsq-navrail__btn--create:focus-visible{
    bottom sheet, and those declarations come later, so they must still win. */
 .ws-pop{position:absolute;z-index:200;top:0;left:calc(100% + 8px);width:300px;
   max-height:min(70vh,560px);overflow-y:auto;padding:6px;border-radius:12px;
-  background:var(--ehsq-color-surface-default);border:1px solid var(--ehsq-color-border-default);
-  box-shadow:var(--ehsq-elevation-4);}
+  background:var(--praxis-color-surface-default);border:1px solid var(--praxis-color-border-default);
+  box-shadow:var(--praxis-elevation-4);}
 .ws-pop[hidden]{display:none;}
 body[data-variant="praxis"] .ws-pop{
   background:color-mix(in srgb, var(--px-surface) 60%, transparent);
@@ -264,7 +264,7 @@ body[data-variant="praxis"] .ws-pop{
   border-radius:14px;padding:10px;transform-origin:top left;}
 body[data-variant="praxis"] .ws-pop .px-menu__head{
   font-size:16px;font-weight:700;letter-spacing:0;text-transform:none;
-  color:var(--ehsq-color-text-primary);padding:6px 8px 12px;}
+  color:var(--praxis-color-text-primary);padding:6px 8px 12px;}
 
 /* ---- Base component ---------------------------------------------------
    index.html loads neither praxis-admin.css nor an inline copy, so its
@@ -273,23 +273,23 @@ body[data-variant="praxis"] .ws-pop .px-menu__head{
    their own still win and nothing there changes. */
 .ws-pop .ws-item{display:flex;align-items:center;gap:12px;width:100%;padding:8px 10px;border:0;
   background:transparent;border-radius:10px;cursor:pointer;text-align:left;font-family:inherit;
-  color:var(--ehsq-color-text-primary);text-decoration:none;}
+  color:var(--praxis-color-text-primary);text-decoration:none;}
 .ws-pop .ws-item:hover{background:var(--px-hover);text-decoration:none;}
-.ws-pop .ws-item:focus-visible{outline:2px solid var(--ehsq-color-teal-50);outline-offset:-2px;}
+.ws-pop .ws-item:focus-visible{outline:2px solid var(--praxis-color-teal-50);outline-offset:-2px;}
 .ws-pop .ws-item__icon{width:34px;height:34px;flex-shrink:0;border-radius:9px;display:flex;
   align-items:center;justify-content:center;
-  background:var(--ehsq-color-neutral-10);color:var(--ehsq-color-text-secondary);}
+  background:var(--praxis-color-neutral-10);color:var(--praxis-color-text-secondary);}
 .ws-pop .ws-item__icon .icon{width:19px;height:19px;}
 .ws-pop .ws-item__text{display:flex;flex-direction:column;min-width:0;flex:1;}
 .ws-pop .ws-item__name{font-size:.875rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ws-pop .ws-item__sub{font-size:.75rem;color:var(--ehsq-color-text-secondary);}
+.ws-pop .ws-item__sub{font-size:.75rem;color:var(--praxis-color-text-secondary);}
 .ws-pop .ws-item__badge{margin-left:auto;flex-shrink:0;padding:3px 9px;border-radius:999px;
   font-size:.6875rem;font-weight:700;}
 
 /* ---- New dashboard = the flyout's primary action ----------------------
    The CTA treatment goes on the ICON WELL, not the row: the teal gradient in
    light and the soft translucent-teal chip in dark, matching
-   .ehsq-navrail__btn--create directly above it. That button is itself an icon
+   .praxis-navrail__btn--create directly above it. That button is itself an icon
    button, so the well is the true like-for-like — and the label and its
    sub-line stay ordinary text on an ordinary row, reading the same as every
    other entry in the list.
@@ -302,7 +302,7 @@ body[data-variant="praxis"] .ws-pop .px-menu__head{
    whichever order they load in. */
 body[data-variant="praxis"] .ws-pop .ws-item--new .ws-item__icon,
 body[data-variant="praxis"] .ws-pop .ws-item--new:hover .ws-item__icon{
-  background:var(--px-primary-grad); color:var(--ehsq-color-white);
+  background:var(--px-primary-grad); color:var(--praxis-color-white);
   box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),inset 0 .5px 0 rgba(255,255,255,.25);
 }
 /* The row itself stays a plain list row — same hover as its neighbours. */
@@ -322,14 +322,14 @@ body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--new:hover .ws-i
    a property of the workspace; current is a property of the view. */
 body[data-variant="praxis"] .ws-pop .ws-item--current .ws-item__icon,
 body[data-variant="praxis"] .ws-pop .ws-item--current:hover .ws-item__icon{
-  background:var(--ehsq-color-pink-50,#e82e8b);
-  color:var(--ehsq-color-white,#fff);
+  background:var(--praxis-color-pink-50,#e82e8b);
+  color:var(--praxis-color-white,#fff);
   box-shadow:none;
 }
 /* Undo the dark-mode pink that .ws-item--home used to claim (praxis-admin.css) —
    the fill now tracks .ws-item--current in both themes. */
 body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--home:not(.ws-item--current) .ws-item__icon{
-  background:var(--px-surface); color:var(--ehsq-color-text-secondary);
+  background:var(--px-surface); color:var(--praxis-color-text-secondary);
 }
 body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--home:not(.ws-item--current){
   background:transparent;
@@ -342,8 +342,8 @@ body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item--home:not(.ws-it
    Light pink in both themes: it labels the home workspace, it isn't a
    selected state, so it stays a tint rather than the solid pink above. */
 body[data-variant="praxis"] .ws-pop .ws-item__badge{
-  background:var(--ehsq-color-pink-10,#fce6f1);
-  color:var(--ehsq-color-pink-60,#e30072);
+  background:var(--praxis-color-pink-10,#fce6f1);
+  color:var(--praxis-color-pink-60,#e30072);
 }
 body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item__badge{
   background:rgba(227,0,114,.18); color:#ff8ac2;
@@ -353,7 +353,7 @@ body[data-variant="praxis"][data-theme="dark"] .ws-pop .ws-item__badge{
    The rail's create treatment, on the icon well — identical to
    .px-navdrawer__item--create above so the two read as the same action. */
 body[data-variant="praxis"] .ws-pop .ws-item--new .ws-item__icon{
-  background:var(--px-primary-grad); color:var(--ehsq-color-white,#fff);
+  background:var(--px-primary-grad); color:var(--praxis-color-white,#fff);
   box-shadow:0 0 0 .5px rgba(16,36,58,.18),0 2px 6px -1px rgba(27,131,139,.45),
              inset 0 .5px 0 rgba(255,255,255,.25);
 }

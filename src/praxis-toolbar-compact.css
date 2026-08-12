@@ -121,7 +121,7 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
   }
   .tb-display__pop .viewswitch__btn:hover{ background:var(--px-hover-btn); }
   .tb-display__pop .viewswitch__btn--active{
-    background:var(--px-chip); color:var(--ehsq-color-pink-60);
+    background:var(--px-chip); color:var(--praxis-color-pink-60);
   }
   .tb-display__pop .viewswitch__btn .tb-viewlabel{
     font-size:.9375rem; font-weight:600; color:inherit;
@@ -153,8 +153,8 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
     top:24px; right:24px; bottom:24px;
     width:min(480px, calc(100% - 48px));
     display:flex; flex-direction:column;
-    background:var(--px-surface, var(--ehsq-color-surface-default));
-    color:var(--ehsq-color-text-primary);
+    background:var(--px-surface, var(--praxis-color-surface-default));
+    color:var(--praxis-color-text-primary);
     border-radius:20px;
     /* Clips the header band and the scrolling body to the rounded corners. */
     overflow:hidden;
@@ -201,22 +201,22 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
   padding:16px 16px 4px;
 }
 /* Same size and weight as .filter-drawer__head h2, but coloured from
-   --ehsq-color-text-primary rather than the neutral scale that rule uses.
+   --praxis-color-text-primary rather than the neutral scale that rule uses.
    praxis-filters.css inverts the neutrals inside .filter-drawer for dark mode;
    this panel is a sibling of that subtree, so it would have taken the light
    value and rendered near-black on navy. */
 .tb-options__title{
   margin:0; flex:1; min-width:0;
   font-size:var(--t-xl, 1.25rem); font-weight:700;
-  color:var(--ehsq-color-text-primary);
+  color:var(--praxis-color-text-primary);
 }
 .tb-options__close{
   width:36px; height:36px; flex-shrink:0; display:grid; place-items:center;
-  border:0; background:transparent; border-radius:var(--ehsq-radius-sm);
-  color:var(--ehsq-color-text-primary); cursor:pointer;
+  border:0; background:transparent; border-radius:var(--praxis-radius-sm);
+  color:var(--praxis-color-text-primary); cursor:pointer;
 }
-.tb-options__close:hover{ background:var(--px-hover-btn); color:var(--ehsq-color-text-primary); }
-.tb-options__close:focus-visible{ outline:2px solid var(--ehsq-color-teal-50); outline-offset:-2px; }
+.tb-options__close:hover{ background:var(--px-hover-btn); color:var(--praxis-color-text-primary); }
+.tb-options__close:focus-visible{ outline:2px solid var(--praxis-color-teal-50); outline-offset:-2px; }
 .tb-options__close .material-symbols-rounded{ font-size:22px; }
 
 /* ---- search ----
@@ -235,29 +235,29 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
 }
 .tb-options__search::after{
   content:""; position:absolute; left:16px; right:16px; bottom:0; height:1px;
-  background:var(--ehsq-color-border-default);
+  background:var(--praxis-color-border-default);
 }
 .tb-options__search[hidden]{ display:none; }
 /* .filter-search's metrics — 40px, 12px in, 40px of room for the icon, 600
    weight — on theme-aware colours, for the reason given on the title above. */
 .tb-options__search input{
   width:100%; height:40px; padding:0 40px 0 12px;
-  border:1px solid var(--ehsq-color-border-default);
-  border-radius:var(--ehsq-radius-md, 8px);
+  border:1px solid var(--praxis-color-border-default);
+  border-radius:var(--praxis-radius-md, 8px);
   background:var(--px-surface-2, var(--px-surface));
-  color:var(--ehsq-color-text-primary);
+  color:var(--praxis-color-text-primary);
   font-family:inherit; font-size:var(--t-base, .875rem); font-weight:600;
   outline:none;
 }
-.tb-options__search input::placeholder{ color:var(--ehsq-color-text-secondary); font-weight:500; }
-.tb-options__search input:focus{ border-color:var(--ehsq-color-teal-50); box-shadow:0 0 0 2px var(--ehsq-color-teal-50); }
+.tb-options__search input::placeholder{ color:var(--praxis-color-text-secondary); font-weight:500; }
+.tb-options__search input:focus{ border-color:var(--praxis-color-teal-50); box-shadow:0 0 0 2px var(--praxis-color-teal-50); }
 .tb-options__search .material-symbols-rounded{
   position:absolute; right:28px; top:calc(50% - 6px); transform:translateY(-50%);
-  font-size:20px; color:var(--ehsq-color-text-secondary); pointer-events:none;
+  font-size:20px; color:var(--praxis-color-text-secondary); pointer-events:none;
 }
 .tb-options__empty{
   padding:18px 16px; margin:0; text-align:center;
-  font-size:.8125rem; color:var(--ehsq-color-text-secondary);
+  font-size:.8125rem; color:var(--praxis-color-text-secondary);
 }
 .tb-options__empty[hidden]{ display:none; }
 
@@ -293,14 +293,14 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
      the band is solid all the way across. */
   margin-left:-8px; margin-right:-8px;
   padding:8px 16px 6px;
-  background:var(--px-surface, var(--ehsq-color-surface-default));
-  border-bottom:1px solid var(--ehsq-color-border-default);
+  background:var(--px-surface, var(--praxis-color-surface-default));
+  border-bottom:1px solid var(--praxis-color-border-default);
   font-size:.75rem; font-weight:700; letter-spacing:.02em; text-transform:uppercase;
-  color:var(--ehsq-color-text-secondary);
+  color:var(--praxis-color-text-secondary);
 }
 /* Sentence case, weight for emphasis rather than caps. */
 .tb-options__label{
-  font-size:.8125rem; font-weight:700; color:var(--ehsq-color-text-secondary); padding:6px 0 0 8px;
+  font-size:.8125rem; font-weight:700; color:var(--praxis-color-text-secondary); padding:6px 0 0 8px;
 }
 /* The page's own "Sort Results By:" caption travels in with the sort menu and
    would sit directly under a heading that already says Sort by. Likewise the
@@ -309,7 +309,7 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
 .tb-options__body .toolbar__sortlabel,
 .tb-options__body .colmenu__search{ display:none; }
 .tb-options__body .colmenu__grouplabel{
-  font-size:.8125rem; font-weight:700; color:var(--ehsq-color-text-secondary); padding:6px 8px 2px;
+  font-size:.8125rem; font-weight:700; color:var(--praxis-color-text-secondary); padding:6px 8px 2px;
 }
 
 /* Display mode: a vertical list of icon + label rather than an icon strip. */
@@ -331,7 +331,7 @@ body.tb-is-compact .toolbar__spacer{ display:none; }
 }
 .tb-options__body .viewswitch__btn:hover{ background:var(--px-hover-btn); }
 .tb-options__body .viewswitch__btn--active{
-  background:var(--px-chip); color:var(--ehsq-color-pink-60);
+  background:var(--px-chip); color:var(--praxis-color-pink-60);
 }
 .tb-options__body .viewswitch__btn .tb-viewlabel{
   font-size:.9375rem; font-weight:600; color:inherit;

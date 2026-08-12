@@ -19,7 +19,7 @@
 (function () {
   'use strict';
 
-  var rail = document.querySelector('.ehsq-navrail');
+  var rail = document.querySelector('.praxis-navrail');
   var bar = document.querySelector('.appbar');
   if (!rail || !bar || document.querySelector('.px-navdrawer')) return;
 
@@ -38,8 +38,8 @@
      current filename. */
   var here = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   function isCurrent(el) {
-    if (el.classList.contains('ehsq-navrail__btn--active') ||
-        el.classList.contains('ehsq-navrail__link--active') ||
+    if (el.classList.contains('praxis-navrail__btn--active') ||
+        el.classList.contains('praxis-navrail__link--active') ||
         el.getAttribute('aria-current') === 'page') return true;
     var href = el.getAttribute && el.getAttribute('href');
     if (!href) return false;
@@ -51,13 +51,13 @@
   /* Create leads the list as a filled action — that's how the Mazlan drawer is
      built, and it makes the drawer self-sufficient on pages that have no
      in-page Create button. */
-  var createBtn = rail.querySelector('.ehsq-navrail__btn--create');
+  var createBtn = rail.querySelector('.praxis-navrail__btn--create');
   if (createBtn) items.push({
     label: 'Create new', href: null, active: false, create: true,
     glyph: '<span class="material-symbols-rounded">add</span>', source: createBtn
   });
-  rail.querySelectorAll('.ehsq-navrail__link, .ehsq-navrail__btn').forEach(function (el) {
-    if (el.classList.contains('ehsq-navrail__btn--create')) return;   // added above
+  rail.querySelectorAll('.praxis-navrail__link, .praxis-navrail__btn').forEach(function (el) {
+    if (el.classList.contains('praxis-navrail__btn--create')) return;   // added above
     var label = labelFor(el);
     if (!label) return;
     items.push({

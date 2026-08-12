@@ -28,7 +28,7 @@
 .pageheader{position:relative;box-sizing:border-box;min-height:var(--ph-h,68px);
   padding:var(--ph-pad-top,0) var(--ph-pad-x,24px) 10px;background:var(--px-page);}
 .pageheader::after{content:"";position:absolute;left:var(--ph-pad-x,24px);right:var(--ph-pad-x,24px);
-  bottom:0;height:1px;background:var(--ehsq-color-border-default);}
+  bottom:0;height:1px;background:var(--praxis-color-border-default);}
 
 /* =====================================================================
    TOOLBAR BAND — the row of page-level actions directly under the header.
@@ -43,24 +43,24 @@
    still run edge to edge.
    ===================================================================== */
 .toolbar{position:relative;box-sizing:border-box;display:flex;align-items:center;flex-wrap:wrap;
-  gap:var(--ehsq-space-8);min-height:var(--px-toolbar-h,60px);
+  gap:var(--praxis-space-8);min-height:var(--px-toolbar-h,60px);
   padding:var(--px-toolbar-pad-y,10px) var(--ph-pad-x,24px);
   background:linear-gradient(to bottom, var(--px-page) 0%, transparent 100%);}
 .toolbar::after{content:"";position:absolute;left:var(--ph-pad-x,24px);right:var(--ph-pad-x,24px);
-  bottom:0;height:1px;background:var(--ehsq-color-border-default);}
+  bottom:0;height:1px;background:var(--praxis-color-border-default);}
 /* The centred column. Pages set its max-width alongside their content column
    so the two share one number. */
-.toolbar__inner{display:flex;align-items:center;gap:var(--ehsq-space-8);
+.toolbar__inner{display:flex;align-items:center;gap:var(--praxis-space-8);
   width:100%;min-width:0;margin-inline:auto;}
 .toolbar__spacer{flex:1;}
 
 .breadcrumb{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;
-  font-size:.8125rem;font-weight:600;color:var(--ehsq-color-text-secondary);}
-.breadcrumb a{color:var(--ehsq-color-text-secondary);text-decoration:none;}
-.breadcrumb a:hover{color:var(--ehsq-color-text-primary);}
-.breadcrumb__home{display:inline-flex;align-items:center;color:var(--ehsq-color-text-disabled);}
-.breadcrumb__sep{display:inline-flex;align-items:center;color:var(--ehsq-color-text-disabled);}
-.breadcrumb__current{display:inline-flex;align-items:center;gap:6px;color:var(--ehsq-color-text-primary);}
+  font-size:.8125rem;font-weight:600;color:var(--praxis-color-text-secondary);}
+.breadcrumb a{color:var(--praxis-color-text-secondary);text-decoration:none;}
+.breadcrumb a:hover{color:var(--praxis-color-text-primary);}
+.breadcrumb__home{display:inline-flex;align-items:center;color:var(--praxis-color-text-disabled);}
+.breadcrumb__sep{display:inline-flex;align-items:center;color:var(--praxis-color-text-disabled);}
+.breadcrumb__current{display:inline-flex;align-items:center;gap:6px;color:var(--praxis-color-text-primary);}
 .breadcrumb .material-symbols-rounded{font-size:18px;line-height:1;}
 
 .pageheader__titlerow{display:flex;align-items:center;gap:12px;}
@@ -68,13 +68,13 @@
    marker. A light chip one step off the page with a slate glyph — enough to
    separate from the background without competing with the title. */
 .pageheader__icon{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;
-  justify-content:center;background:var(--px-surface-2,#f4f6f8);color:var(--ehsq-color-neutral-90,#2f4051);
+  justify-content:center;background:var(--px-surface-2,#f4f6f8);color:var(--praxis-color-neutral-90,#2f4051);
   box-shadow:0 0 0 .5px rgba(16,36,58,.10),0 1px 2px rgba(16,36,58,.06),inset 0 1px 0 rgba(255,255,255,.9);}
 body[data-theme="dark"] .pageheader__icon{
   background:var(--px-surface-2);color:#e7ebf1;
   box-shadow:0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);}
 .pageheader__icon .material-symbols-rounded{font-size:20px;}
 .pageheader__icon .icon{width:20px;height:20px;}
-.pageheader__title{margin:0;font-size:var(--ehsq-type-size-xl);font-weight:700;line-height:1.25;
-  color:var(--ehsq-color-text-primary);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pageheader__title{margin:0;font-size:var(--praxis-type-size-xl);font-weight:700;line-height:1.25;
+  color:var(--praxis-color-text-primary);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .pageheader__status{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0;}

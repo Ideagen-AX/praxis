@@ -36,10 +36,10 @@
      cramped the Appearance row's segmented control. */
   min-width:250px;
   padding:6px;
-  background:var(--ehsq-color-surface-default);
-  border:1px solid var(--ehsq-color-border-default);
-  border-radius:var(--ehsq-radius-md);
-  box-shadow:var(--ehsq-elevation-4);
+  background:var(--praxis-color-surface-default);
+  border:1px solid var(--praxis-color-border-default);
+  border-radius:var(--praxis-radius-md);
+  box-shadow:var(--praxis-elevation-4);
 }
 .profile-menu__pop[hidden]{ display:none; }
 
@@ -60,25 +60,25 @@ body[data-variant="praxis"] .profile-menu__pop{
 /* ---- Header (name + role) ------------------------------------------- */
 .profile-menu__head{
   padding:10px 12px 8px; display:flex; flex-direction:column; gap:2px;
-  border-bottom:1px solid var(--ehsq-color-border-default); margin-bottom:6px;
+  border-bottom:1px solid var(--praxis-color-border-default); margin-bottom:6px;
 }
-.profile-menu__name{ font-weight:600; font-size:.875rem; color:var(--ehsq-color-text-primary); }
-.profile-menu__role{ font-size:.75rem; color:var(--ehsq-color-text-secondary); }
+.profile-menu__name{ font-weight:600; font-size:.875rem; color:var(--praxis-color-text-primary); }
+.profile-menu__role{ font-size:.75rem; color:var(--praxis-color-text-secondary); }
 
 /* ---- Rows ----------------------------------------------------------- */
 .profile-menu__item{
   display:flex; align-items:center; gap:10px; width:100%; height:38px; padding:0 12px;
-  border:0; background:transparent; border-radius:var(--ehsq-radius-sm);
-  font:inherit; font-size:.875rem; font-weight:500; color:var(--ehsq-color-text-primary);
+  border:0; background:transparent; border-radius:var(--praxis-radius-sm);
+  font:inherit; font-size:.875rem; font-weight:500; color:var(--praxis-color-text-primary);
   text-align:left; text-decoration:none; cursor:pointer;
 }
 a.profile-menu__item{ text-decoration:none; color:inherit; }
-.profile-menu__item:hover{ background:var(--px-hover,var(--ehsq-color-neutral-05)); text-decoration:none; }
+.profile-menu__item:hover{ background:var(--px-hover,var(--praxis-color-neutral-05)); text-decoration:none; }
 body[data-theme="dark"] .profile-menu__item:hover{ background:rgba(255,255,255,.06); }
 /* Both icon systems appear in this menu: Lucide SVGs on the record and
    search pages, Material Symbols on admin and the workspace. */
-.profile-menu__item .icon{ width:20px; height:20px; color:var(--ehsq-color-text-secondary); fill:none; flex-shrink:0; }
-.profile-menu__item .material-symbols-rounded{ font-size:20px; color:var(--ehsq-color-text-secondary); }
+.profile-menu__item .icon{ width:20px; height:20px; color:var(--praxis-color-text-secondary); fill:none; flex-shrink:0; }
+.profile-menu__item .material-symbols-rounded{ font-size:20px; color:var(--praxis-color-text-secondary); }
 /* No visual highlight for the current page. The rows are destinations, not a
    nav state, and colouring one of them made the menu read as a navigation
    tree with a selection.
@@ -89,35 +89,35 @@ body[data-theme="dark"] .profile-menu__item:hover{ background:rgba(255,255,255,.
 
 .profile-menu__navlabel{
   font-size:11px; font-weight:800; letter-spacing:normal;
-  color:var(--ehsq-color-text-secondary); padding:8px 12px 2px;
+  color:var(--praxis-color-text-secondary); padding:8px 12px 2px;
 }
 /* Read-outs, not actions — the app version and build number. Same left edge as
    the rows above so the column stays aligned, but no hover, no pointer and no
    menuitem role: nothing here is clickable. */
 .profile-menu__meta{
   padding:4px 12px; font-size:.75rem; font-weight:500;
-  color:var(--ehsq-color-text-secondary); cursor:default;
+  color:var(--praxis-color-text-secondary); cursor:default;
 }
-.profile-menu__sep{ height:1px; background:var(--ehsq-color-border-default); margin:6px 0; }
+.profile-menu__sep{ height:1px; background:var(--praxis-color-border-default); margin:6px 0; }
 
 /* ---- Inline control rows (Appearance, Version, Viewing as) ---------- */
 .profile-menu__row{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 12px; }
-.profile-menu__row-label{ font-size:.8125rem; font-weight:600; color:var(--ehsq-color-text-secondary); }
+.profile-menu__row-label{ font-size:.8125rem; font-weight:600; color:var(--praxis-color-text-secondary); }
 .profile-menu__row .verswitch{ margin-right:0; }
 
 /* ---- Segmented control used inside the menu ------------------------- */
 .verswitch{
   display:inline-flex; align-items:center; gap:2px; padding:3px;
-  background:rgba(16,36,58,.06); border-radius:var(--ehsq-radius-full);
+  background:rgba(16,36,58,.06); border-radius:var(--praxis-radius-full);
 }
 .verswitch__opt{
   height:28px; padding:0 12px; border:0; background:transparent;
-  color:var(--ehsq-color-text-secondary); font:inherit; font-size:.8125rem; font-weight:600;
-  border-radius:var(--ehsq-radius-full); cursor:pointer; white-space:nowrap;
+  color:var(--praxis-color-text-secondary); font:inherit; font-size:.8125rem; font-weight:600;
+  border-radius:var(--praxis-radius-full); cursor:pointer; white-space:nowrap;
 }
-.verswitch__opt:hover{ color:var(--ehsq-color-text-primary); }
+.verswitch__opt:hover{ color:var(--praxis-color-text-primary); }
 .verswitch__opt--active,.verswitch__opt--active:hover{
-  background:var(--ehsq-color-surface-default); color:var(--ehsq-color-text-primary);
+  background:var(--praxis-color-surface-default); color:var(--praxis-color-text-primary);
   box-shadow:0 1px 2px rgba(16,36,58,.14);
 }
 body[data-theme="dark"] .verswitch{ background:rgba(255,255,255,.08); }

@@ -2,13 +2,13 @@
    Praxis skin for the Workspace (Concierge home) — brings the home into
    the Mazlan / Groom Lake language and adds a Mazlan-style dark mode, so
    the Workspace and the record page read as one system. Layered on top
-   of concierge-base.css (which already shares the --ehsq-* tokens and a
+   of praxis-chrome-legacy.css (which already shares the --praxis-* tokens and a
    dot-grid page background). Toggled via body[data-theme].
    ===================================================================== */
 
 /* =====================================================================
    App header + nav rail: "floating" light treatment, mirroring the
-   record page (record-page.html .appbar / .ehsq-navrail). The header
+   record page (record-page.html .appbar / .praxis-navrail). The header
    blends into the page background (no dark bar, no border, no shadow);
    the search becomes a fully-rounded Mazlan-style floating pill; the
    right-side controls read as dark ink on the light header; the nav
@@ -18,8 +18,8 @@
 
 /* ---- App header: blend into the page (solid page-color bg — it's fixed) ---- */
 .appbar{
-  background:var(--ehsq-color-surface-subtle);
-  color:var(--ehsq-color-text-primary);
+  background:var(--praxis-color-surface-subtle);
+  color:var(--praxis-color-text-primary);
   border:0; box-shadow:none;
   /* Span the full viewport width (incl. the scrollbar gutter) so the fixed
      header geometry matches the record page's naturally full-width bar — the
@@ -30,7 +30,7 @@
 /* Brand wordmark — theme-aware (dark wordmark on light header, white in dark) */
 /* Match the record page's brand cluster geometry so the wordmark + page
    switcher land in the exact same spot across pages */
-.appbar__logo-area{ padding-left:var(--ehsq-space-16); gap:var(--ehsq-space-16); }
+.appbar__logo-area{ padding-left:var(--praxis-space-16); gap:var(--praxis-space-16); }
 .appbar__brand{ display:inline-flex; align-items:center; text-decoration:none; }
 .appbar__logo-img{ display:block; height:26px; width:auto; }
 .appbar__logo-img--ondark{ display:none; }
@@ -47,24 +47,24 @@ body[data-theme="dark"] .appbar__logo-img--ondark{ display:block; }
 .appswitch__trigger:hover{ background:rgba(16,36,58,.06); }
 .appswitch__pop{
   position:absolute; top:calc(100% + 6px); left:0; min-width:200px; z-index:200;
-  background:var(--ehsq-color-surface-default); border:1px solid var(--ehsq-color-border-default);
+  background:var(--praxis-color-surface-default); border:1px solid var(--praxis-color-border-default);
   border-radius:12px; padding:6px;
   box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 18px 38px -16px rgba(16,36,58,.22);
 }
 .appswitch__pop[hidden]{ display:none; }
 .appswitch__item{
   display:block; padding:8px 10px; border-radius:8px; font-size:.875rem; font-weight:500;
-  color:var(--ehsq-color-text-primary); text-decoration:none;
+  color:var(--praxis-color-text-primary); text-decoration:none;
 }
-.appswitch__item:hover{ background:var(--ehsq-color-neutral-05); text-decoration:none; }
-.appswitch__item--active{ color:var(--ehsq-color-text-link,var(--ehsq-color-teal-60)); font-weight:600; }
+.appswitch__item:hover{ background:var(--praxis-color-neutral-05); text-decoration:none; }
+.appswitch__item--active{ color:var(--praxis-color-text-link,var(--praxis-color-teal-60)); font-weight:600; }
 body[data-theme="dark"] .appswitch__trigger:hover{ background:rgba(255,255,255,.08); }
 body[data-theme="dark"] .appswitch__item:hover{ background:rgba(255,255,255,.06); }
 
 /* ---- Search: fully-rounded floating field (Mazlan style) ---- */
 .appbar__search{
   border-radius:9999px;
-  background:var(--ehsq-color-surface-default);
+  background:var(--praxis-color-surface-default);
   overflow:visible;
   padding:0 6px 0 4px;
   box-shadow:0 0 0 1px rgba(16,36,58,.08), 0 1px 2px rgba(16,36,58,.05);
@@ -73,55 +73,55 @@ body[data-theme="dark"] .appbar__search{ box-shadow:0 0 0 1px rgba(255,255,255,.
 /* Module selector — transparent floating text with a short centered divider */
 .appbar__module-selector{
   background:transparent;
-  color:var(--ehsq-color-text-secondary);
-  border-right:1px solid var(--ehsq-color-border-default);
+  color:var(--praxis-color-text-secondary);
+  border-right:1px solid var(--praxis-color-border-default);
   align-self:center; height:56%;
   min-width:0; padding:0 14px;
 }
-.appbar__module-selector .material-symbols-rounded{ color:var(--ehsq-color-text-secondary); }
+.appbar__module-selector .material-symbols-rounded{ color:var(--praxis-color-text-secondary); }
 /* Input area + input — transparent, primary ink */
 .appbar__input-area{ background:transparent; }
-.appbar__search-input{ background:transparent; color:var(--ehsq-color-text-primary); }
+.appbar__search-input{ background:transparent; color:var(--praxis-color-text-primary); }
 /* Run-search button — transparent floating magnifier */
 .appbar__search-go{
   background:transparent;
-  color:var(--ehsq-color-text-secondary);
+  color:var(--praxis-color-text-secondary);
   border-radius:9999px;
 }
-.appbar__search-go:hover{ background:transparent; color:var(--ehsq-color-text-primary); }
+.appbar__search-go:hover{ background:transparent; color:var(--praxis-color-text-primary); }
 
 /* ---- Right-side controls: read as dark ink on the light header ---- */
 .appbar__action-btn{
   background:rgba(16,36,58,.06);
-  color:var(--ehsq-color-text-primary);
+  color:var(--praxis-color-text-primary);
   border-color:rgba(16,36,58,.10);
 }
 .appbar__action-btn:hover{ background:rgba(16,36,58,.10); }
-.appbar__icon-btn{ color:var(--ehsq-color-text-secondary); }
-.appbar__icon-btn:hover{ background:rgba(16,36,58,.06); color:var(--ehsq-color-text-primary); }
+.appbar__icon-btn{ color:var(--praxis-color-text-secondary); }
+.appbar__icon-btn:hover{ background:rgba(16,36,58,.06); color:var(--praxis-color-text-primary); }
 .appbar__avatar{ border-color:rgba(16,36,58,.12); }
 .appbar__avatar--photo{ background-size:cover; background-position:center; background-repeat:no-repeat; color:transparent; overflow:hidden; }
 /* Persona picker (styled inline in index.html — needs body-prefix to win) */
 body .persona-trigger{
   background:rgba(16,36,58,.06);
-  color:var(--ehsq-color-text-primary);
+  color:var(--praxis-color-text-primary);
 }
 body .persona-trigger:hover{ background:rgba(16,36,58,.10); }
 body .persona-trigger[aria-expanded="true"]{ background:rgba(16,36,58,.14); }
-body .persona-trigger__sub{ color:var(--ehsq-color-text-secondary); }
+body .persona-trigger__sub{ color:var(--praxis-color-text-secondary); }
 
 /* dark: swap dark-tints for light-tints */
 body[data-theme="dark"] .appbar__action-btn{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12); }
 /* Mazlan trigger: light neutral pill matching the shared lit-edge button
    convention (nav-rail tools / search pill). The four-dot mark keeps its
    teal→pink signature — its dark-slate dot reads on the light surface. */
-#mazlan-trigger{ background:var(--px-surface); color:var(--ehsq-color-text-secondary); border:0;
+#mazlan-trigger{ background:var(--px-surface); color:var(--praxis-color-text-secondary); border:0;
   box-shadow:0 0 0 .5px rgba(16,36,58,.06),0 1px 2px rgba(16,36,58,.05); }
-#mazlan-trigger:hover{ filter:none; color:var(--ehsq-color-text-primary);
+#mazlan-trigger:hover{ filter:none; color:var(--praxis-color-text-primary);
   box-shadow:0 0 0 .5px rgba(16,36,58,.09),0 2px 6px -1px rgba(16,36,58,.14); }
-body[data-theme="dark"] #mazlan-trigger{ background:var(--px-surface-2,#232c3b); color:var(--ehsq-color-text-secondary); border:0;
-  box-shadow:var(--ehsq-elevation-card); }
-body[data-theme="dark"] #mazlan-trigger:hover{ background:var(--px-surface-2,#232c3b); color:var(--ehsq-color-white);
+body[data-theme="dark"] #mazlan-trigger{ background:var(--px-surface-2,#232c3b); color:var(--praxis-color-text-secondary); border:0;
+  box-shadow:var(--praxis-elevation-card); }
+body[data-theme="dark"] #mazlan-trigger:hover{ background:var(--px-surface-2,#232c3b); color:var(--praxis-color-white);
   box-shadow:0 0 0 .5px rgba(255,255,255,.12),0 6px 18px -6px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.08); }
 body[data-theme="dark"] .appbar__action-btn:hover{ background:rgba(255,255,255,.12); }
 body[data-theme="dark"] .appbar__icon-btn:hover{ background:rgba(255,255,255,.10); }
@@ -134,31 +134,31 @@ body[data-theme="dark"] .persona-trigger[aria-expanded="true"]{ background:rgba(
    the four-dot Mazlan mark carries the identity */
 
 /* ---- Nav rail: blend into the page — no background, no border ---- */
-.ehsq-navrail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
+.praxis-navrail{ background:transparent; border-right:1px solid var(--praxis-color-border-default); }
 /* Hide the expand/collapse control for now — the record page's rail has none,
    so this keeps the two consistent. Kept in the DOM (button + JS intact) so it
    can be re-enabled later by removing this rule. The whole cell is hidden to
    avoid leaving its 56px slot empty at the top of the rail. */
-.ehsq-navrail__cell:has(> .ehsq-navrail__toggle){ display:none; }
+.praxis-navrail__cell:has(> .praxis-navrail__toggle){ display:none; }
 
 /* ---- Nav rail buttons: neutral filled containers (a set with Create) ----
-   The Create button colors its 40×40 .ehsq-navrail__icon box (radius-md); give the
+   The Create button colors its 40×40 .praxis-navrail__icon box (radius-md); give the
    plain nav buttons' icon boxes the SAME container silhouette but neutral, so
    they read as a matched set of pickable chips rather than floating icons.
    Create keeps its teal; the active item keeps its pink. */
-.ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active) .ehsq-navrail__icon{
-  background:var(--ehsq-color-surface-default);
+.praxis-navrail__btn:not(.praxis-navrail__btn--create):not(.praxis-navrail__btn--active) .praxis-navrail__icon{
+  background:var(--praxis-color-surface-default);
   box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 1px 2px rgba(16,36,58,.05);
 }
-.ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active):hover .ehsq-navrail__icon{
-  background:var(--ehsq-color-surface-default);
+.praxis-navrail__btn:not(.praxis-navrail__btn--create):not(.praxis-navrail__btn--active):hover .praxis-navrail__icon{
+  background:var(--praxis-color-surface-default);
   box-shadow:0 0 0 .5px rgba(16,36,58,.09), 0 2px 6px -1px rgba(16,36,58,.14);
 }
-body[data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active) .ehsq-navrail__icon{
+body[data-theme="dark"] .praxis-navrail__btn:not(.praxis-navrail__btn--create):not(.praxis-navrail__btn--active) .praxis-navrail__icon{
   background:rgba(255,255,255,.06);
   box-shadow:0 0 0 .5px rgba(255,255,255,.10);
 }
-body[data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active):hover .ehsq-navrail__icon{
+body[data-theme="dark"] .praxis-navrail__btn:not(.praxis-navrail__btn--create):not(.praxis-navrail__btn--active):hover .praxis-navrail__icon{
   background:rgba(255,255,255,.10);
   box-shadow:0 0 0 .5px rgba(255,255,255,.14);
 }
@@ -174,10 +174,10 @@ body[data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.
    the page background at the left + right edges and top by compositing a
    page-color gradient OVER the dots (not masking — masking would hide content). */
 .page{
-  background-color:var(--ehsq-color-surface-subtle);
+  background-color:var(--praxis-color-surface-subtle);
   background-image:
-    linear-gradient(to right, var(--ehsq-color-surface-subtle), transparent 7%, transparent 93%, var(--ehsq-color-surface-subtle)),
-    linear-gradient(to bottom, var(--ehsq-color-surface-subtle), transparent 10%),
+    linear-gradient(to right, var(--praxis-color-surface-subtle), transparent 7%, transparent 93%, var(--praxis-color-surface-subtle)),
+    linear-gradient(to bottom, var(--praxis-color-surface-subtle), transparent 10%),
     radial-gradient(circle, rgba(16,36,58,.11) 1px, transparent 1px);
   background-size:100% 100%, 100% 100%, 18px 18px;
   background-repeat:no-repeat, no-repeat, repeat;
@@ -185,7 +185,7 @@ body[data-theme="dark"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.
 
 /* Theme toggle — inline moon/sun SVGs that swap by [data-theme] (same as the record page) */
 .gl-theme-btn{ color:rgba(255,255,255,.85); }
-.gl-theme-btn:hover{ color:var(--ehsq-color-white); }
+.gl-theme-btn:hover{ color:var(--praxis-color-white); }
 .gl-theme-btn .gl-sun{ display:none; }
 body[data-theme="dark"] .gl-theme-btn .gl-moon{ display:none; }
 body[data-theme="dark"] .gl-theme-btn .gl-sun{ display:block; }
@@ -203,22 +203,22 @@ body[data-theme="dark"] .gl-theme-btn .gl-sun{ display:block; }
 body .persona-picker--in-menu .persona-trigger{
   display:flex; width:100%; height:auto; margin:0; box-sizing:border-box;
   padding:8px 10px; gap:10px; border-radius:8px;
-  background:var(--ehsq-color-neutral-05); color:var(--ehsq-color-text-primary);
+  background:var(--praxis-color-neutral-05); color:var(--praxis-color-text-primary);
 }
-body .persona-picker--in-menu .persona-trigger:hover{ background:var(--ehsq-color-neutral-10); }
+body .persona-picker--in-menu .persona-trigger:hover{ background:var(--praxis-color-neutral-10); }
 body[data-theme="dark"] .persona-picker--in-menu .persona-trigger{ background:rgba(255,255,255,.06); }
 body[data-theme="dark"] .persona-picker--in-menu .persona-trigger:hover{ background:rgba(255,255,255,.10); }
-.persona-picker--in-menu .persona-trigger__icon{ font-size:20px; color:var(--ehsq-color-text-secondary); }
-.persona-picker--in-menu .persona-trigger__label{ font-size:var(--ehsq-type-size-sm); font-weight:600; color:var(--ehsq-color-text-primary); }
-.persona-picker--in-menu .persona-trigger__sub{ font-size:12px; font-weight:500; color:var(--ehsq-color-text-secondary); }
+.persona-picker--in-menu .persona-trigger__icon{ font-size:20px; color:var(--praxis-color-text-secondary); }
+.persona-picker--in-menu .persona-trigger__label{ font-size:var(--praxis-type-size-sm); font-weight:600; color:var(--praxis-color-text-primary); }
+.persona-picker--in-menu .persona-trigger__sub{ font-size:12px; font-weight:500; color:var(--praxis-color-text-secondary); }
 .persona-picker--in-menu .persona-trigger__text{ flex:1; }
-.persona-picker--in-menu .persona-trigger__chev{ margin-left:auto; color:var(--ehsq-color-text-secondary); }
+.persona-picker--in-menu .persona-trigger__chev{ margin-left:auto; color:var(--praxis-color-text-secondary); }
 /* Flyout opens to the LEFT of the profile popover so it doesn't clip */
 .persona-picker--in-menu .persona-popover{
   position:absolute; top:0; right:calc(100% + 12px); left:auto;
   min-width:320px; max-width:340px;
-  background:var(--ehsq-color-surface-default);
-  border:1px solid var(--ehsq-color-border-default); border-radius:12px; padding:6px;
+  background:var(--praxis-color-surface-default);
+  border:1px solid var(--praxis-color-border-default); border-radius:12px; padding:6px;
   box-shadow:0 0 0 .5px rgba(16,36,58,.06), 0 24px 50px -18px rgba(16,36,58,.30);
 }
 body[data-theme="dark"] .persona-picker--in-menu .persona-popover{
@@ -230,7 +230,7 @@ body[data-theme="dark"] .persona-picker--in-menu .persona-popover{
   /* Phone: keep the label visible in-menu, and drop the flyout below the trigger */
   .persona-picker--in-menu .persona-trigger__text{ display:flex; }
   .persona-picker--in-menu .persona-popover{
-    position:fixed; top:auto; right:var(--ehsq-space-12); left:var(--ehsq-space-12); min-width:0; max-width:none;
+    position:fixed; top:auto; right:var(--praxis-space-12); left:var(--praxis-space-12); min-width:0; max-width:none;
   }
 }
 
@@ -240,17 +240,17 @@ body[data-theme="dark"] .persona-picker--in-menu .persona-popover{
    ===================================================================== */
 body[data-theme="dark"]{
   color-scheme:dark;
-  --ehsq-color-surface-default:#192336;
-  --ehsq-color-surface-subtle:#12161f;
-  --ehsq-color-neutral-05:#12161f;
-  --ehsq-color-neutral-10:#222b39;
-  --ehsq-color-neutral-20:#3a4556;
-  --ehsq-color-neutral-30:#3a4556;
-  --ehsq-color-border-default:rgba(255,255,255,.10);
-  --ehsq-color-text-primary:#e7ebf1;
-  --ehsq-color-text-secondary:#9aa7b4;
+  --praxis-color-surface-default:#192336;
+  --praxis-color-surface-subtle:#12161f;
+  --praxis-color-neutral-05:#12161f;
+  --praxis-color-neutral-10:#222b39;
+  --praxis-color-neutral-20:#3a4556;
+  --praxis-color-neutral-30:#3a4556;
+  --praxis-color-border-default:rgba(255,255,255,.10);
+  --praxis-color-text-primary:#e7ebf1;
+  --praxis-color-text-secondary:#9aa7b4;
 }
-body[data-theme="dark"]{ color:var(--ehsq-color-text-primary); }
+body[data-theme="dark"]{ color:var(--praxis-color-text-primary); }
 body[data-theme="dark"] .page{
   background-color:var(--px-page);
   background-image:
@@ -265,6 +265,6 @@ body[data-theme="dark"] .card{
   box-shadow:0 0 0 .5px rgba(255,255,255,.08), 0 1px 2px rgba(0,0,0,.4),
              0 16px 40px -18px rgba(0,0,0,.6), inset 0 .5px 0 rgba(255,255,255,.07);
 }
-body[data-theme="dark"] .ehsq-navrail{ background:transparent; border-right:1px solid var(--ehsq-color-border-default); }
+body[data-theme="dark"] .praxis-navrail{ background:transparent; border-right:1px solid var(--praxis-color-border-default); }
 /* soft cyan accent lift for the primary action in dark, matching Praxis */
 body[data-theme="dark"] .btn--primary{ filter:saturate(1.05) brightness(1.05); }
