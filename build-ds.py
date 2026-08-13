@@ -49,7 +49,11 @@ for _i, _a in enumerate(sys.argv):
     if _a == '--consumer' and _i + 1 < len(sys.argv):
         CONSUMER = os.path.abspath(sys.argv[_i + 1])
 
-DEF = re.compile(r'(--[A-Za-z0-9_-]+)\s*:\s*([^;}]+)')
+# A custom-property DECLARATION always starts one: it follows `{`, `;` or a
+# line break. Without that anchor this also matches BEM modifiers in selectors
+# — `.chip--danger:hover{…}` reads as a token named `--danger` — which inflated
+# every count this script produced before 2026-08-13 (206 reported vs 195 real).
+DEF = re.compile(r'(?:[{;]|^)\s*(--[A-Za-z0-9_-]+)\s*:\s*([^;}]+)', re.M)
 USE = re.compile(r'var\(\s*(--[A-Za-z0-9_-]+)')
 
 

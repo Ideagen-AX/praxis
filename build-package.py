@@ -276,7 +276,12 @@ def verify(ver, manifest):
 
     # Token coverage: every var() referenced in the barrel should resolve from it.
     barrel = (DIST / "praxis.css").read_text()
-    defined = set(re.findall(r"(--[\w-]+)\s*:", barrel))
+    # Anchored to the start of a declaration ({, ; or line break). Unanchored,
+    # this also matches BEM modifiers in selectors — `.chip--danger:hover{…}`
+    # counts as a token named `--danger` — which overstated the token count
+    # (206 reported vs 195 real) and, worse, made undefined-token detection
+    # miss real bugs by treating those phantoms as definitions.
+    defined = set(re.findall(r"(?:[{;]|^)\s*(--[\w-]+)\s*:", barrel, re.M))
     used = set(re.findall(r"var\(\s*(--[\w-]+)", barrel))
     # Tokens the host app or a runtime script legitimately supplies.
     runtime = {"--reveal-i", "--ph-pad-top", "--praxis-filters-gutter", "--muted"}

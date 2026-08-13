@@ -224,4 +224,62 @@
      here were kept 'for parity with the EHSQ-E base'. That base is defunct, so parity
      with it is not a reason. Nothing referenced them; pruned 2026-08-12. */
 
+  /* ============ Centralised from page <head>s, 2026-08-13 ============
+     Extracting Praxis surfaced 75 custom properties that pages were defining
+     for themselves. Most were aliases for tokens that already existed here
+     (--s-16 for --praxis-space-16, --t-sm for --praxis-type-size-sm, and so
+     on) and were simply deleted at the call site. The families below were
+     not aliases: they are real design decisions that had no canonical home,
+     so several pages each invented their own copy and the copies drifted.
+     ================================================================== */
+
+  /* Motion scale. Pages carried two competing scales — 180/280/420ms and a
+     quicker 120/180/260ms. The first is canonical because it already matched
+     --praxis-motion-drawer, which was canonicalised a day earlier. */
+  --praxis-duration-fast:180ms;
+  --praxis-duration-base:280ms;
+  --praxis-duration-slow:420ms;
+
+  --praxis-ease-spring-out:cubic-bezier(.5,0,.75,0);
+  --praxis-ease-spring-bouncy:cubic-bezier(.175,.885,.32,1.275);
+
+  /* Quick-rail motion. Seven pages defined this identically, which is about as
+     clear a signal as a token gets. The rail's WIDTH is deliberately not here:
+     it was genuinely different on every page (100% / 260px / 300px), so it
+     stays a per-page decision. */
+  --praxis-rail-duration:480ms;
+  --praxis-rail-ease:cubic-bezier(.34,.01,.1,1);
+  --praxis-rail-travel:-56px;
+
+  /* Profile-menu motion, from the two pages that animate it. */
+  --praxis-menu-duration:520ms;
+  --praxis-menu-ease:cubic-bezier(.4,0,.2,1);
+
+  /* Glass material. A frosted translucent surface used by drawers and floating
+     panels on three pages, each with its own slightly different recipe. These
+     are the light values; praxis-core.css remaps them for dark. */
+  --praxis-glass-bg:rgba(255,255,255,.5);
+  --praxis-glass-drawer:rgba(255,255,255,.82);
+  --praxis-glass-border:rgba(255,255,255,.6);
+  --praxis-glass-blur:blur(22px) saturate(1.8);
+  --praxis-glass-inset:inset 0 1px 0 rgba(255,255,255,.6);
+  --praxis-glass-sheen:linear-gradient(135deg,rgba(255,255,255,.45),rgba(255,255,255,0));
+  --praxis-glass-shadow:0 10px 32px -14px rgba(16,26,40,.45);
+  --praxis-glass-hover:rgba(255,255,255,.28);
+  --praxis-glass-on:rgba(27,131,139,.16);
+
+  /* Status tones — the paired background/foreground used by status chips and
+     badges. Two pages defined these, one in literals and one in var()s that
+     disagreed with the literals. Resolved to the palette references. */
+  --praxis-tone-neutral-bg:var(--praxis-color-neutral-15);
+  --praxis-tone-neutral-fg:var(--praxis-color-neutral-70);
+  --praxis-tone-info-bg:var(--praxis-color-blue-10);
+  --praxis-tone-info-fg:var(--praxis-color-blue-70);
+  --praxis-tone-success-bg:var(--praxis-color-green-10);
+  --praxis-tone-success-fg:var(--praxis-color-green-70);
+  --praxis-tone-warning-bg:var(--praxis-color-orange-10);
+  --praxis-tone-warning-fg:var(--praxis-color-orange-70);
+  --praxis-tone-danger-bg:var(--praxis-color-red-10);
+  --praxis-tone-danger-fg:var(--praxis-color-red-70);
+
 }

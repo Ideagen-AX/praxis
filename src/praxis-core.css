@@ -141,6 +141,27 @@ body[data-theme="dark"]{
 
 /* ---- Praxis DARK: Mazlan dark surfaces + materials ---- */
 body[data-variant="praxis"][data-theme="dark"]{
+  /* Glass and status tones, centralised from page <head>s 2026-08-13. The
+     light values live in praxis-tokens.css; these are the dark counterparts
+     the three glass pages and two tone pages were each carrying locally. The
+     tone foregrounds are literals rather than palette references because the
+     palette's -70 steps are tuned for light surfaces and go muddy on dark. */
+  --praxis-glass-bg:rgba(30,38,52,.52);
+  --praxis-glass-drawer:rgba(28,35,48,.86);
+  --praxis-glass-border:rgba(255,255,255,.14);
+  --praxis-glass-blur:blur(24px) saturate(1.6);
+  --praxis-glass-inset:inset 0 1px 0 rgba(255,255,255,.06);
+  --praxis-glass-sheen:linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,0));
+  --praxis-glass-shadow:0 14px 36px -14px rgba(0,0,0,.6);
+  --praxis-glass-hover:rgba(255,255,255,.06);
+  --praxis-glass-on:rgba(41,210,215,.16);
+
+  --praxis-tone-neutral-bg:rgba(255,255,255,.08); --praxis-tone-neutral-fg:#9aa7b4;
+  --praxis-tone-info-bg:rgba(71,102,235,.18);     --praxis-tone-info-fg:#8aa0f5;
+  --praxis-tone-success-bg:rgba(9,139,83,.16);    --praxis-tone-success-fg:#4cd08a;
+  --praxis-tone-warning-bg:rgba(239,129,0,.16);   --praxis-tone-warning-fg:#f5b45c;
+  --praxis-tone-danger-bg:rgba(226,45,56,.18);    --praxis-tone-danger-fg:#f28b91;
+
   --praxis-color-text-primary:#e7ebf1; --praxis-color-text-secondary:#9aa7b4;
   --praxis-color-border-default:rgba(255,255,255,.10);
   --praxis-color-surface-default:#192336; --praxis-color-surface-subtle:#161c27;
