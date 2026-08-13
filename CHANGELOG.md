@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.1.2 — 2026-08-13
+
+The first release with new material in it. Extracting Praxis made visible how
+much of the system the consuming prototype was still carrying itself: 88 custom
+properties defined in page `<head>`s. Most were aliases for tokens that already
+existed here. These were not.
+
+### Added
+
+- **Motion**: `--praxis-motion-slowest` (420ms), the one step of a competing
+  page-level scale that had no equivalent in `--praxis-motion-*`.
+- **Easing**: `--praxis-ease-spring-out`, `--praxis-ease-spring-bouncy`. The
+  spring family was two-thirds present; pages supplied the rest.
+- **Quick-rail motion**: `--praxis-rail-duration`, `--praxis-rail-ease`,
+  `--praxis-rail-travel`. Seven pages defined these identically.
+- **Menu motion**: `--praxis-menu-duration`, `--praxis-menu-ease`.
+- **Glass material**: nine `--praxis-glass-*` tokens, light and dark. A frosted
+  translucent surface three pages each had a slightly different recipe for.
+- **Status tones**: ten `--praxis-tone-{neutral,info,success,warning,danger}-{bg,fg}`
+  pairs, light and dark.
+- **Layout**: `--praxis-record-rail-w` (300px) and `--praxis-control-h` (32px),
+  each identical everywhere it appeared.
+
+### Fixed
+
+- **The teal scale had no dark treatment.** `--praxis-color-teal-80` is a
+  light-mode ink and measured 1.55:1 on a dark panel — illegible — while
+  teal-10/20 are near-white and glared as light blocks. Four pages were each
+  patching this locally. Now remapped in the dark theme, alongside the status
+  inks. **This changes dark rendering anywhere teal-10/20/80 is used**, which is
+  the point: those surfaces were displaying the bug.
+- **The token-counting regex matched BEM modifiers.** Unanchored, it read
+  `.chip--danger:hover{…}` as a token named `--danger`. This overstated every
+  published count (206 against 195 real) and, more seriously, let phantom
+  definitions mask genuinely undefined tokens in the build's own verification.
+
+### Changed
+
+- `--praxis-duration-fast/base/slow`, added earlier the same day, are **removed**
+  before anyone could depend on them. They were a third motion scale introduced
+  on a misreading: `--praxis-motion-drawer:280ms` is a single drawer value, not
+  evidence of a 180/280/420 scale. The canonical scale is `--praxis-motion-*` at
+  120/180/260, already referenced 213 times.
+
 ## 0.1.1 — 2026-08-13
 
 Praxis now lives in its own repository, `Ideagen-AX/praxis`, and `src/` is the

@@ -46,13 +46,13 @@
 <!-- GENERATED:stats -->
 | Measure | Value |
 |---|---|
-| Distinct custom properties defined | **206** |
-| `var()` usages | **1,491** |
-| Raw colour literals remaining | 765 (339 hex / 426 rgb·rgba) |
-| Tokenization coverage | **66%** |
-| Tokens defined in more than one file | 50 |
+| Distinct custom properties defined | **224** |
+| `var()` usages | **1,501** |
+| Raw colour literals remaining | 798 (349 hex / 449 rgb·rgba) |
+| Tokenization coverage | **65%** |
+| Tokens defined in more than one file | 69 |
 | Used but never defined (excluding runtime-set) | 3 — `--muted`, `--ph-pad-top`, `--praxis-filters-gutter` |
-| Defined but never referenced | 93 |
+| Defined but never referenced | 106 |
 | Stylesheets measured | 16 |
 | Consumer pages measured | none — src/ measured in isolation |
 <!-- /GENERATED:stats -->
@@ -313,12 +313,12 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-color-red-10` | `#fceaeb` | — |
 | `--praxis-color-red-50` | `#e7535c` | — |
 | `--praxis-color-red-60` | `#e22d38` | — |
-| `--praxis-color-teal-10` | `#e8f3f3` | — |
-| `--praxis-color-teal-20` | `#c8e1e3` | — |
+| `--praxis-color-teal-10` | `#e8f3f3` | `#12313c` |
+| `--praxis-color-teal-20` | `#c8e1e3` | `#16404c` |
 | `--praxis-color-teal-50` | `#4499a0` | — |
 | `--praxis-color-teal-60` | `#1b838b` | — |
 | `--praxis-color-teal-70` | `#176f76` | — |
-| `--praxis-color-teal-80` | `#135d63` | — |
+| `--praxis-color-teal-80` | `#135d63` | `#5CE0E5` |
 | `--praxis-color-yellow-10` | `#fdf9e6` | — |
 | `--praxis-color-yellow-50` | `#f2d02e` | — |
 | `--praxis-color-yellow-90` | `#887100` | — |
@@ -348,8 +348,8 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 |---|---|---|
 | `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | — |
 | `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | — |
-| `--praxis-color-status-success` | `var(--praxis-color-green-60)` | — |
-| `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | — |
+| `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
+| `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
 
 **Typography**
 
@@ -400,6 +400,9 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-motion-slow` | `260ms` | — |
 | `--praxis-ease-default` | `cubic-bezier(.32,.72,0,1)` | — |
 | `--praxis-motion-fast` | `120ms` | — |
+| `--praxis-motion-slowest` | `420ms` | — |
+| `--praxis-record-rail-w` | `300px` | — |
+| `--praxis-control-h` | `32px` | — |
 
 **Chrome metrics**
 
@@ -497,6 +500,37 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-motion-drawer` | `280ms` | — |
 | `--praxis-ease-spring` | `cubic-bezier(.34,1.56,.64,1)` | — |
 | `--praxis-ease-spring-soft` | `cubic-bezier(.22,1,.36,1)` | — |
+| `--praxis-ease-spring-out` | `cubic-bezier(.5,0,.75,0)` | — |
+| `--praxis-ease-spring-bouncy` | `cubic-bezier(.175,.885,.32,1.275)` | — |
+| `--praxis-rail-duration` | `480ms` | — |
+| `--praxis-rail-ease` | `cubic-bezier(.34,.01,.1,1)` | — |
+| `--praxis-rail-travel` | `-56px` | — |
+
+**Profile-menu motion, from the two pages that animate it.**
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--praxis-menu-duration` | `520ms` | — |
+| `--praxis-menu-ease` | `cubic-bezier(.4,0,.2,1)` | — |
+| `--praxis-glass-bg` | `rgba(255,255,255,.5)` | `rgba(30,38,52,.52)` |
+| `--praxis-glass-drawer` | `rgba(255,255,255,.82)` | `rgba(28,35,48,.86)` |
+| `--praxis-glass-border` | `rgba(255,255,255,.6)` | `rgba(255,255,255,.14)` |
+| `--praxis-glass-blur` | `blur(22px) saturate(1.8)` | `blur(24px) saturate(1.6)` |
+| `--praxis-glass-inset` | `inset 0 1px 0 rgba(255,255,255,.6)` | `inset 0 1px 0 rgba(255,255,255,.06)` |
+| `--praxis-glass-sheen` | `linear-gradient(135deg,rgba(255,255,255,.45),rgba(255,255,255,0))` | `linear-gradient(135deg,rgba(255,255,255,.08),rgba(255,255,255,0))` |
+| `--praxis-glass-shadow` | `0 10px 32px -14px rgba(16,26,40,.45)` | `0 14px 36px -14px rgba(0,0,0,.6)` |
+| `--praxis-glass-hover` | `rgba(255,255,255,.28)` | `rgba(255,255,255,.06)` |
+| `--praxis-glass-on` | `rgba(27,131,139,.16)` | `rgba(41,210,215,.16)` |
+| `--praxis-tone-neutral-bg` | `var(--praxis-color-neutral-15)` | `rgba(255,255,255,.08)` |
+| `--praxis-tone-neutral-fg` | `var(--praxis-color-neutral-70)` | `#9aa7b4` |
+| `--praxis-tone-info-bg` | `var(--praxis-color-blue-10)` | `rgba(71,102,235,.18)` |
+| `--praxis-tone-info-fg` | `var(--praxis-color-blue-70)` | `#8aa0f5` |
+| `--praxis-tone-success-bg` | `var(--praxis-color-green-10)` | `rgba(9,139,83,.16)` |
+| `--praxis-tone-success-fg` | `var(--praxis-color-green-70)` | `#4cd08a` |
+| `--praxis-tone-warning-bg` | `var(--praxis-color-orange-10)` | `rgba(239,129,0,.16)` |
+| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-70)` | `#f5b45c` |
+| `--praxis-tone-danger-bg` | `var(--praxis-color-red-10)` | `rgba(226,45,56,.18)` |
+| `--praxis-tone-danger-fg` | `var(--praxis-color-red-70)` | `#f28b91` |
 <!-- /GENERATED:foundation -->
 
 ---
@@ -717,7 +751,7 @@ Measured by CSS class-block frequency across all sources. Grouped by area.
 | `praxis-quick-rail.css` | 37 | `.tb-is-compact`, `.qrail-pop`, `.qrail`, `.qfilter`, `.css` |
 | `praxis-reset.css` | 6 | `.css` |
 | `praxis-rfield.css` | 124 | `.rfield`, `.rtable`, `.admin-field`, `.rref`, `.pill` |
-| `praxis-tokens.css` | 1 | `.css`, `.html` |
+| `praxis-tokens.css` | 1 | `.css`, `.record`, `.html` |
 | `praxis-toolbar-compact.css` | 82 | `.tb-options`, `.tb-compact`, `.viewswitch`, `.tb-display`, `.tb-is-compact` |
 | `praxis-workspace.css` | 81 | `.appbar`, `.praxis-navrail`, `.persona-trigger`, `.persona-picker`, `.appswitch` |
 <!-- /GENERATED:components -->
