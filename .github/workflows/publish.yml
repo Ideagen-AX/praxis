@@ -49,9 +49,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
@@ -66,7 +66,7 @@ jobs:
       # build-package.py is stdlib-only (json, re, shutil, sys, pathlib) — there
       # is nothing to pip install. Pinned anyway so a runner image change to the
       # default python3 can't move the build underneath a release.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
