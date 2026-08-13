@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.1 — 2026-08-13
+
+Praxis now lives in its own repository, `Ideagen-AX/praxis`, and `src/` is the
+source of truth. It was extracted from the groom-lake prototype with history —
+174 of that repo's 334 commits touched these files — and the sheets are
+byte-identical to the ones 0.1.0 shipped.
+
+**No functional change.** The built output differs from 0.1.0 only in two
+provenance strings that name the new source, plus the version-pinned Lucide
+fallback URL. Nothing a consumer renders changes. This release exists to prove
+the pipeline publishes from the new home before anything depends on it.
+
+Six files stayed with the prototype because they are bound to that application
+rather than to the design system; `dist/manifest.json` lists them with reasons.
+
 ## 0.1.0 — 2026-08-13
 
 First packaged release. Praxis has existed in the prototype for months; this is
