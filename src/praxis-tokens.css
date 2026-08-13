@@ -119,6 +119,12 @@
   --praxis-motion-slow:260ms;
   --praxis-ease-default:cubic-bezier(.32,.72,0,1);   /* Praxis spring — already renders on all 27 pages */
   --praxis-motion-fast:120ms;   /* DECISION 2026-08-12: 120ms canonical (was 100ms on 7 pages) */
+  --praxis-motion-slowest:420ms;  /* the one --dur-* step with no equivalent here */
+
+  /* Layout constants promoted from page <head>s, 2026-08-13. Each was identical
+     everywhere it appeared, so it was a shared decision written down N times. */
+  --praxis-record-rail-w:300px;  /* .record__guide / .record__tree; narrows at breakpoints */
+  --praxis-control-h:32px;       /* compact action control height */
 
   /* ============ Completed from praxis-chrome-legacy.css, 2026-08-12 ============
      praxis-chrome-legacy.css was the only definition of these, and just 4 of 27
@@ -233,12 +239,11 @@
      so several pages each invented their own copy and the copies drifted.
      ================================================================== */
 
-  /* Motion scale. Pages carried two competing scales — 180/280/420ms and a
-     quicker 120/180/260ms. The first is canonical because it already matched
-     --praxis-motion-drawer, which was canonicalised a day earlier. */
-  --praxis-duration-fast:180ms;
-  --praxis-duration-base:280ms;
-  --praxis-duration-slow:420ms;
+  /* Motion: see --praxis-motion-* above. The canonical scale is 120/180/260,
+     and the page-level --d-* vocabulary was that same scale under another name.
+     The competing --dur-* vocabulary on one page mapped exactly onto
+     motion-normal (180) and motion-drawer (280); only its slowest step had no
+     equivalent, so --praxis-motion-slowest is defined beside the others. */
 
   --praxis-ease-spring-out:cubic-bezier(.5,0,.75,0);
   --praxis-ease-spring-bouncy:cubic-bezier(.175,.885,.32,1.275);
