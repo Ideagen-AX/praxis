@@ -1,4 +1,4 @@
-<!-- transcribed from src/ at 0.1.2 — 2026-08-13 -->
+<!-- transcribed from src/ at 0.1.3 — 2026-08-13 -->
 <!-- method: read every sheet and script in src/, extracted selector structure, JS DOM
      contracts (querySelector/getElementById targets) and token definitions. Not
      render-verified: no page was loaded in a browser for this pass. Where a claim is
@@ -97,7 +97,7 @@ Save as `index.html` and open it. No install, no build, no server.
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My prototype</title>
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.2/dist/praxis.css">
+        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.3/dist/praxis.css">
 </head>
 
 <body data-variant="praxis" data-theme="light">
@@ -117,7 +117,7 @@ Save as `index.html` and open it. No install, no build, no server.
   </div>
 
   <!-- Only if you use icons. Loads its own pinned Lucide from beside itself. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.2/dist/praxis-lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.3/dist/praxis-lucide.js"></script>
 </body>
 </html>
 ```
@@ -129,7 +129,7 @@ In a bundled app the requirements are identical — stylesheet, the two `<body>`
 attributes, the icon script if you want icons:
 
 ```sh
-npm install @ideagen-ax/praxis@0.1.2
+npm install @ideagen-ax/praxis@0.1.3
 ```
 
 ```js
@@ -310,9 +310,9 @@ token — not one page — or the dot grid will cut across your header.
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.2/dist/praxis-lucide.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.2/dist/praxis-navdrawer.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.2/dist/praxis-profile-menu.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.3/dist/praxis-lucide.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.3/dist/praxis-navdrawer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.3/dist/praxis-profile-menu.js"></script>
 </body>
 ```
 
@@ -377,7 +377,7 @@ give the element its own wrapper.
 
 ## Tokens
 
-Measured from `src/praxis-tokens.css` and `src/praxis-core.css` at 0.1.2. This is the
+Measured from `src/praxis-tokens.css` and `src/praxis-core.css` at 0.1.3. This is the
 complete list of what is *defined* — nothing here is aspirational.
 
 ### Reach for these first
@@ -839,7 +839,7 @@ into the package rather than reinvented per prototype.
 
 ## What Praxis does not define
 
-Verified absent from `src/` at 0.1.2. These class names appear in Praxis selectors — so
+Verified absent from `src/` at 0.1.3. These class names appear in Praxis selectors — so
 they look supported — but have **no base definition**. If you use one, you write it.
 
 | Class | Status |
@@ -892,7 +892,7 @@ themes.
 
 ## Corrections to `DESIGN-SYSTEM.md`
 
-Measured against `src/` at 0.1.2. Trust this file over that one on these points:
+Measured against `src/` at 0.1.3. Trust this file over that one on these points:
 
 - **`--praxis-type-weight-*`, `--praxis-type-leading-*` and `--praxis-type-tracking-*` do
   not exist.** §6 lists them. Nothing in `src/` defines any of the three. Use

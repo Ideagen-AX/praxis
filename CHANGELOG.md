@@ -1,5 +1,50 @@
 # Changelog
 
+## 0.1.3 — 2026-08-13
+
+**No CSS or JS changed.** `src/` is byte-identical to 0.1.2, so nothing renders
+differently — `dist/` differs only in its version stamp. This release exists to
+put a build guide in the tarball and to make publishing reproducible.
+
+### Added
+
+- **`PRAXIS-FOR-AGENTS.md`, and it now ships in the package.** The doc a
+  teammate — or their coding agent — reads to build a prototype: the canonical
+  app shell as literal markup, per-component markup contracts, the measured
+  token list, and the classes Praxis references but never defines. It was
+  missing from `files`, so installing from npm rather than cloning got you the
+  README and nothing else.
+
+  Three things it records that were not written down anywhere:
+  `praxis-admin.css` owns the app shell every page needs (`.app`, `.main`,
+  `.content`, app-bar positioning, the rail container, `.tbtn`, `.switch`,
+  `.mazlan-mark`, `box-sizing`) despite its name; `.btn` has **no base
+  definition** in the package, only `.btn--primary`; and the Mazlan drawer
+  cannot be used at all from the package, because `praxis-mazlan.js` needs
+  ~20 fixed element ids whose markup is not shipped and it no-ops silently
+  without them.
+
+- **Automated publishing.** A `v*` tag now builds, verifies and publishes via
+  npm trusted publishing — OIDC, no token, provenance attached. Previously
+  impossible from CI: the npm account uses a passkey, so a non-TTY publish died
+  with `EOTP`.
+
+- **CI on every pull request**, running the build's own verification — no font
+  binary in the package, no surviving `--ehsq-*` token, no CDN-breaking relative
+  path, no unresolvable `var()` in the barrel.
+
+### Fixed
+
+- **The README pinned `0.1.0` while the package was `0.1.2`**, so anyone
+  copying the quickstart's CDN URLs got a two-versions-stale build. The CI job
+  now warns when the two disagree.
+
+- **`npm run check` was documented as the CI gate** in both the README and
+  `CLAUDE.md`. It cannot be: it compares a rebuild against the `dist/` on disk,
+  and `dist/` is gitignored, so in any fresh clone it exits 1 with `dist/ is
+  missing`. It is a local staleness check. CI runs `npm run build`, which
+  performs the same verification.
+
 ## 0.1.2 — 2026-08-13
 
 The first release with new material in it. Extracting Praxis made visible how
