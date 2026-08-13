@@ -1,0 +1,61 @@
+# Build verification on every pull request and every push to main.
+#
+# This runs `npm run build`, NOT `npm run check`.
+#
+# `npm run check` (build-package.py --check) exits 1 with "dist/ is missing" in
+# any fresh clone, because dist/ is gitignored and therefore never checked out.
+# It compares a rebuild against the dist/ already on disk, so it answers "is my
+# working tree stale?" — a local question. In CI it would be permanently red.
+#
+# `npm run build` runs the same verify() pass and exits non-zero on:
+#   - a legacy --ehsq-* token surviving in the output
+#   - a font binary in the package (Gilroy is licensed and must never ship)
+#   - a relative path that would 404 when served from a CDN
+#   - a var() in the barrel that the barrel cannot resolve
+#   - a praxis.css smaller than the sum of its parts (partial write)
+#
+# So this job catches the things that matter, and catches them on the PR rather
+# than at publish time.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build and verify dist/
+        run: npm run build
+
+      # Catches the drift that shipped a two-versions-stale CDN URL in the
+      # README: package.json said 0.1.2 while the quickstart pinned 0.1.0, so
+      # anyone copying the snippet got the wrong build. Advisory, not fatal —
+      # a docs-only PR shouldn't be blocked by it, but it should be visible.
+      - name: Check README version pins match package.json
+        run: |
+          pkg_version="$(node -p 'require("./package.json").version')"
+          if grep -q "praxis@${pkg_version}" README.md; then
+            echo "README pins @${pkg_version} ✓"
+          else
+            stale="$(grep -oE 'praxis@[0-9]+\.[0-9]+\.[0-9]+' README.md | sort -u | tr '\n' ' ')"
+            echo "::warning file=README.md::package.json is ${pkg_version} but README pins: ${stale:-none found}. Update the quickstart and CDN URLs."
+          fi

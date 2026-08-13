@@ -245,8 +245,8 @@ is no second copy of Praxis to keep in step — edit the sheet in `src/` and
 rebuild.
 
 ```sh
-npm run build     # regenerate dist/ from src/
-npm run check     # exit non-zero if dist/ is stale — for CI
+npm run build     # regenerate dist/ from src/, and verify the output
+npm run check     # exit non-zero if your local dist/ is stale
 npm run docs      # regenerate the measured sections of DESIGN-SYSTEM.md
 ```
 

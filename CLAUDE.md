@@ -30,13 +30,19 @@ two-version-stale build.
 **`src/` is the source of truth. `dist/` is generated and gitignored.**
 
 Never hand-edit `dist/`. Edit the sheet in `src/`, then `npm run build`.
-`npm run check` exits non-zero when `dist/` is stale.
 
 ```sh
-npm run build     # regenerate dist/ from src/
-npm run check     # CI staleness gate
+npm run build     # regenerate dist/ from src/, and verify the output
+npm run check     # LOCAL staleness gate — is my working tree's dist/ current?
 npm run docs      # regenerate the measured sections of DESIGN-SYSTEM.md
 ```
+
+**`npm run check` is not a CI gate**, despite how it reads. It compares a
+rebuild against the `dist/` already on disk, and `dist/` is gitignored — so in
+any fresh clone it exits 1 with "dist/ is missing". CI runs `npm run build`,
+which performs the same `verify()` pass (no `--ehsq-*` tokens, no font
+binaries, no CDN-breaking relative paths, no unresolvable `var()`, no partial
+barrel write). See `.github/workflows/ci.yml`.
 
 ## Consumers
 
@@ -55,9 +61,34 @@ generated mirror; the edit belongs here.
 
 ## Publishing
 
-The npm account uses a **passkey**, so there is no OTP to pass via `--otp=`.
-A publish from a non-TTY shell fails with `EOTP` and redacts the auth URL in
-both stdout and the debug log. Run it from a real terminal:
+**Publishing is automated. Push a version tag.**
+
+```sh
+# 1. bump "version" in package.json   2. write the CHANGELOG entry   3. commit
+git tag v0.1.3 && git push origin v0.1.3
+```
+
+`.github/workflows/publish.yml` builds, verifies that the tag matches
+`package.json`, and publishes via **npm trusted publishing** — a short-lived
+OIDC credential, no token and no secret in the repo. Provenance is attached
+automatically.
+
+Pushing to `main` does not publish. The tag is the trigger, because npm refuses
+to republish an existing version and a push-triggered job would be red on every
+commit that doesn't bump the version.
+
+The trusted publisher on npmjs.com is bound to the **workflow filename**
+(`publish.yml`), which is part of the OIDC `job_workflow_ref` claim. Renaming
+that file breaks publishing until the npm config is updated, and it fails as an
+OIDC error that reads like a credentials problem.
+
+### Manual fallback
+
+Only if the workflow is broken or unavailable. The npm account uses a
+**passkey**, so there is no OTP to pass via `--otp=`. A publish from a non-TTY
+shell fails with `EOTP` and redacts the auth URL in both stdout and the debug
+log — which is precisely why CI could not do this before trusted publishing.
+Run it from a real terminal:
 
 ```sh
 npm publish --auth-type=web
@@ -66,7 +97,8 @@ npm publish --auth-type=web
 A first `PUT 401` followed by the browser handshake is normal, not a failure.
 Confirm from `~/.npm/_logs/`: look for `PUT 200` and `info ok`. The registry's
 read side can lag a successful write by several minutes, so a 404 immediately
-after publishing does not mean it failed.
+after publishing does not mean it failed — this applies to the automated path
+too.
 
 ## Fonts
 

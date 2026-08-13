@@ -28,6 +28,7 @@
   "files": [
     "dist",
     "README.md",
+    "PRAXIS-FOR-AGENTS.md",
     "CHANGELOG.md"
   ],
   "scripts": {
