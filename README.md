@@ -8,11 +8,16 @@ No framework, no build step, no runtime dependency. Drop in a stylesheet and use
 the classes. It works the same in a React app, a Vue app, a Rails view or a
 static HTML file.
 
+**Building a prototype, with or without an AI agent?** Start from
+[PRAXIS-FOR-AGENTS.md](./PRAXIS-FOR-AGENTS.md) — the canonical app shell, the
+markup each component expects, the full token list, and what Praxis leaves for
+you to define. This README covers installing; that file covers building.
+
 ---
 
 > ### Alpha — under active development
 >
-> Praxis is at `0.1.0` and is **not production-ready**. It is published early so
+> Praxis is at `0.1.2` and is **not production-ready**. It is published early so
 > the team can build against one shared copy, not because it is finished.
 >
 > - **Anything can change in any release.** Class names, token names, markup
@@ -24,7 +29,7 @@ static HTML file.
 >   edges listed under it.
 > - **No support commitment.** There is no release schedule, no LTS, and no
 >   guarantee that an issue gets looked at.
-> - **Pin the exact version** — `@0.1.0`, never `@0.1`, `^0.1.0` or `@latest`.
+> - **Pin the exact version** — `@0.1.2`, never `@0.1`, `^0.1.2` or `@latest`.
 >
 > If you need something you can rely on not moving underneath you, wait for 1.0.
 
@@ -43,7 +48,7 @@ import '@ideagen-ax/praxis'            // everything: tokens + core + all compon
 Or over a CDN, with no install at all:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.0/dist/praxis.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.2/dist/praxis.css">
 ```
 
 Pin the exact version. `@0.1` or `@latest` will pick up breaking changes while
@@ -64,7 +69,7 @@ open it — no install, no build, no server.
 
   <!-- The bundle: tokens, materials, dark mode and every component. -->
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.0/dist/praxis.css">
+        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.2/dist/praxis.css">
 </head>
 
 <!-- Both attributes are required. data-variant is always "praxis". -->
@@ -88,7 +93,7 @@ open it — no install, no build, no server.
   <i data-lucide="triangle-alert"></i>
 
   <!-- Only needed if you use icons. Loads its own pinned copy of Lucide. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.0/dist/praxis-lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.2/dist/praxis-lucide.js"></script>
 </body>
 </html>
 ```
@@ -99,7 +104,7 @@ Same three requirements — the stylesheet, the two `<body>` attributes, and the
 icon script if you want icons.
 
 ```sh
-npm install @ideagen-ax/praxis@0.1.0
+npm install @ideagen-ax/praxis@0.1.2
 ```
 
 ```js

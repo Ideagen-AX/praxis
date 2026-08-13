@@ -6,6 +6,25 @@ framework, no build step for consumers, no runtime dependency.
 Published as [`@ideagen-ax/praxis`](https://www.npmjs.com/package/@ideagen-ax/praxis)
 (MIT). Extracted from the `groom-lake` prototype on 2026-08-13, with history.
 
+## The four docs
+
+| File | Audience | Regenerated? |
+|---|---|---|
+| `README.md` | Installing, publishing, fonts, licence | Hand-written |
+| `PRAXIS-FOR-AGENTS.md` | Building a prototype: shell, markup, tokens, gaps | Hand-written, transcribed from `src/` |
+| `DESIGN-SYSTEM.md` | Design rationale + audit history | Partly, via `npm run docs` |
+| `CHANGELOG.md` | Release notes | Hand-written |
+
+`PRAXIS-FOR-AGENTS.md` is measured from `src/` and states what is *defined*, not
+what is intended — including the classes Praxis references but never defines
+(`.btn`, `.section`, `.px-menu`, `.callout`). After adding or renaming a
+component, update it, and re-check its *Corrections to DESIGN-SYSTEM.md*
+section, which records where the older reference has gone stale.
+
+Keep the version strings in `README.md` in step with `package.json` — they drifted
+to 0.1.0 while the package was at 0.1.2, so the quickstart's CDN URLs served a
+two-version-stale build.
+
 ## The one rule
 
 **`src/` is the source of truth. `dist/` is generated and gitignored.**
