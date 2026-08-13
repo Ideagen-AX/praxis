@@ -162,6 +162,18 @@ body[data-variant="praxis"][data-theme="dark"]{
   --praxis-tone-warning-bg:rgba(239,129,0,.16);   --praxis-tone-warning-fg:#f5b45c;
   --praxis-tone-danger-bg:rgba(226,45,56,.18);    --praxis-tone-danger-fg:#f28b91;
 
+  /* The teal scale had no dark treatment at all, so four pages each patched it
+     locally. teal-80 is a light-mode ink and measured 1.55:1 on a dark panel —
+     illegible — while teal-10/20 are near-white and glared as light blocks.
+     Values from process-map-drill.html, where the remap was done properly.
+     This is the same class of bug as the filters sheet flipping palette
+     primitives in its own scope: the fix belongs in the theme, not the page. */
+  --praxis-color-teal-10:#12313c; --praxis-color-teal-20:#16404c;
+  --praxis-color-teal-80:#5CE0E5;
+
+  /* Status inks brighten on dark for the same reason. */
+  --praxis-color-status-success:#3ecf8e; --praxis-color-status-warning:#ffa32e;
+
   --praxis-color-text-primary:#e7ebf1; --praxis-color-text-secondary:#9aa7b4;
   --praxis-color-border-default:rgba(255,255,255,.10);
   --praxis-color-surface-default:#192336; --praxis-color-surface-subtle:#161c27;
