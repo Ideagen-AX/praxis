@@ -34,12 +34,12 @@ body.tb-is-compact .qrail{
      container so it could scroll edge to edge, but that put the box at -16px
      on a 390px screen — the pills ran off the left of the view. The rail
      starts on the content edge and grows to the right only. */
-  padding:var(--s-8, 8px) 0;
+  padding:var(--praxis-space-8) 0;
 }
 body.tb-is-compact .qrail[hidden]{ display:none !important; }
 
 body.tb-is-compact .qrail__scroller{
-  display:flex; gap:var(--s-8, 8px);
+  display:flex; gap:var(--praxis-space-8);
   overflow-x:auto; scrollbar-width:none;
   /* One gutter, matching .filter-chips below and the toolbar above, so the
      first pill shares their left edge.
@@ -63,18 +63,18 @@ body.tb-is-compact .qrail__pill{
   height:40px; padding:0 14px;
   border:0; border-radius:10px;
   background:var(--px-tool);
-  color:var(--ehsq-color-text-primary);
+  color:var(--praxis-color-text-primary);
   box-shadow:var(--px-tool-shadow);
-  font:inherit; font-size:.875rem; font-weight:600;
+  font:inherit; font-size:var(--praxis-type-size-base); font-weight:600;
   white-space:nowrap; cursor:pointer;
-  transition:box-shadow var(--ehsq-motion-fast, 120ms),
-             background var(--ehsq-motion-fast, 120ms),
-             color var(--ehsq-motion-fast, 120ms);
+  transition:box-shadow var(--praxis-motion-fast, 120ms),
+             background var(--praxis-motion-fast, 120ms),
+             color var(--praxis-motion-fast, 120ms);
 }
 body.tb-is-compact .qrail__pill:hover{ box-shadow:var(--px-tool-shadow-hover); }
 body.tb-is-compact .qrail__pill:active{ background:var(--px-surface-2); }
 body.tb-is-compact .qrail__pill:focus-visible{
-  outline:2px solid var(--ehsq-color-interactive-default);
+  outline:2px solid var(--praxis-color-interactive-default);
   outline-offset:2px;
 }
 body.tb-is-compact .qrail__pill[aria-expanded="true"]{
@@ -82,7 +82,7 @@ body.tb-is-compact .qrail__pill[aria-expanded="true"]{
   box-shadow:var(--px-tool-shadow-hover);
 }
 
-body.tb-is-compact .qrail__bolt{ font-size:18px; line-height:1; color:var(--ehsq-color-text-tertiary); }
+body.tb-is-compact .qrail__bolt{ font-size:18px; line-height:1; color:var(--praxis-color-text-tertiary); }
 body.tb-is-compact .qrail__caret{ font-size:18px; line-height:1; opacity:.7; margin-left:-2px; }
 
 /* An active pill stays neutral — the count alone carries the state. Several
@@ -92,9 +92,9 @@ body.tb-is-compact .qrail__count{
   display:inline-grid; place-items:center;
   min-width:20px; height:20px; padding:0 6px;
   border-radius:999px;
-  background:var(--ehsq-color-neutral-15, rgba(32,42,53,.10));
-  color:var(--ehsq-color-text-primary);
-  font-size:var(--t-xs, .75rem); font-weight:700;
+  background:var(--praxis-color-neutral-15, rgba(32,42,53,.10));
+  color:var(--praxis-color-text-primary);
+  font-size:var(--praxis-type-size-xs); font-weight:700;
   font-variant-numeric:tabular-nums;
 }
 
@@ -108,7 +108,7 @@ body[data-theme="dark"].tb-is-compact .qrail__pill[aria-expanded="true"]{ backgr
 
 body[data-theme="dark"].tb-is-compact .qrail__count{
   background:rgba(255,255,255,.14);
-  color:var(--ehsq-color-text-primary);
+  color:var(--praxis-color-text-primary);
 }
 
 /* ---- Popover, anchored under the pill (positioned by the script) ---- */
@@ -122,12 +122,12 @@ body.tb-is-compact .qrail-pop{
      number of values. */
   max-height:min(60vh, 420px);
   background:var(--px-surface, #fff);
-  border:1px solid var(--color-border, var(--ehsq-color-neutral-20));
+  border:1px solid var(--praxis-color-border-default);
   border-radius:12px;
   box-shadow:var(--px-overlay, 0 8px 32px rgba(0,0,0,.18));
   opacity:0; transform:translateY(-4px);
-  transition:opacity 140ms var(--ease-default, ease),
-             transform 140ms var(--ease-default, ease);
+  transition:opacity 140ms ease,
+             transform 140ms ease;
 }
 body.tb-is-compact .qrail-pop.is-open{ opacity:1; transform:none; }
 body.tb-is-compact .qrail-pop[hidden]{ display:none; }
@@ -138,15 +138,15 @@ body.tb-is-compact .qrail-pop__head{
 }
 body.tb-is-compact .qrail-pop__title{
   margin:0; flex:1; min-width:0;
-  font-size:var(--t-sm, .875rem); font-weight:700;
-  color:var(--color-text, var(--ehsq-color-text-primary));
+  font-size:var(--praxis-type-size-base); font-weight:700;
+  color:var(--praxis-color-text-primary);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 body.tb-is-compact .qrail-pop__close{
   display:grid; place-items:center;
   width:32px; height:32px; flex-shrink:0;
   border:0; border-radius:8px; background:transparent;
-  color:var(--ehsq-color-text-secondary); cursor:pointer;
+  color:var(--praxis-color-text-secondary); cursor:pointer;
 }
 body.tb-is-compact .qrail-pop__close:hover{ background:var(--px-hover, rgba(0,0,0,.04)); }
 body.tb-is-compact .qrail-pop__close .material-symbols-rounded{ font-size:20px; }
@@ -163,7 +163,7 @@ body.tb-is-compact .qrail-pop__body .qfilter{
 }
 body.tb-is-compact .qrail-pop__body .qfilter__head{ display:none; }
 /* Distribution rows are touch targets here. */
-body.tb-is-compact .qrail-pop__body .qfilter__row{ min-height:40px; padding:var(--s-8, 8px); }
+body.tb-is-compact .qrail-pop__body .qfilter__row{ min-height:40px; padding:var(--praxis-space-8); }
 /* praxis-filters.css resets native button chrome, but scopes that reset to
    .quick-filters and friends — and this card has been moved out of there, so
    every button inside the popover was falling back to the UA default. That is
@@ -180,20 +180,20 @@ body.tb-is-compact .qrail-pop__body .qfilter__more{
   position:sticky; bottom:0; z-index:1;
   display:flex; align-items:center; justify-content:center;
   min-height:40px; width:100%; margin-top:4px; padding:0 8px;
-  border:0; border-top:1px solid var(--ehsq-color-border-default);
+  border:0; border-top:1px solid var(--praxis-color-border-default);
   border-radius:0 0 6px 6px;
   background:var(--px-surface, #fff);
-  color:var(--ehsq-color-interactive-default);
-  font-size:var(--t-xs, .75rem); font-weight:700; text-align:center;
+  color:var(--praxis-color-interactive-default);
+  font-size:var(--praxis-type-size-xs); font-weight:700; text-align:center;
   cursor:pointer;
-  transition:background var(--d-fast, 120ms) var(--ease-default, ease);
+  transition:background var(--praxis-motion-fast) ease;
 }
 body.tb-is-compact .qrail-pop__body .qfilter__more:hover{
   background:var(--px-hover, rgba(0,0,0,.04));
   text-decoration:none;
 }
 body.tb-is-compact .qrail-pop__body .qfilter__more:focus-visible{
-  outline:2px solid var(--ehsq-color-interactive-default);
+  outline:2px solid var(--praxis-color-interactive-default);
   outline-offset:-2px;
 }
 body[data-theme="dark"].tb-is-compact .qrail-pop__body .qfilter__more{

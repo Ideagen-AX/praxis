@@ -29,7 +29,7 @@
        This used to raise the whole rail to 131 instead, which put every nav
        button and the rail's right border above the scrim — the overlay read as
        sitting behind the navigation rather than over it. */
-    var rail = btn.closest('.ehsq-navrail');
+    var rail = btn.closest('.praxis-navrail');
     function open(){ pop.hidden = false; if(scrim) scrim.hidden = false; if(rail) rail.style.zIndex = 'auto'; btn.setAttribute('aria-expanded','true'); }
     function close(){ pop.hidden = true; if(scrim) scrim.hidden = true; if(rail) rail.style.zIndex = ''; btn.setAttribute('aria-expanded','false'); }
     btn.addEventListener('click', function(e){ if(!isPraxis()) return; e.stopPropagation(); if(pop.hidden) open(); else close(); });

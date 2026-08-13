@@ -7,9 +7,9 @@
 
    Owns: --px-* surface/material tokens, Praxis geometry (8/12/16 radii,
    12px cards), Praxis ink/strokes, the primary-button gradient, the
-   generic --ehsq-elevation-* → Praxis-material remaps, and the dot-grid
+   generic --praxis-elevation-* → Praxis-material remaps, and the dot-grid
    page texture. Component rules stay in each page, but both pages now share
-   the same chrome vocabulary (.appbar, .ehsq-navrail) after reconciliation.
+   the same chrome vocabulary (.appbar, .praxis-navrail) after reconciliation.
 
    Mazlan DNA: slate layered elevation w/ lit edges, frosted glass,
    12px geometry, lighter strokes, teal→magenta AI signature, brighter
@@ -18,21 +18,21 @@
 
 body[data-variant="praxis"]{
   /* ink + strokes (light) */
-  --ehsq-color-text-primary:#2F4051; --ehsq-color-text-secondary:#5D6977;
-  --ehsq-color-border-default:#E2E5E9;
+  --praxis-color-text-primary:#2F4051; --praxis-color-text-secondary:#5D6977;
+  --praxis-color-border-default:#E2E5E9;
 
   /* Solution accent palette — used to tint module/record-type icons (Create New
      groups). pink + teal already exist as brand tokens; add the rest here so
      nothing is hardcoded. */
-  --ehsq-color-blue-60:#4361c4; --ehsq-color-orange-60:#ef8100; --ehsq-color-purple-60:#805ad5;
+  --praxis-color-blue-60:#4361c4; --praxis-color-orange-60:#ef8100; --praxis-color-purple-60:#805ad5;
 
   /* geometry + motion — Praxis 8/12/16 geometry takes primacy */
-  --ehsq-radius-sm:8px; --ehsq-radius-md:12px; --ehsq-radius-lg:16px;
-  --ehsq-radius-card:12px;
-  --ehsq-ease-default:cubic-bezier(.32,.72,0,1);
+  --praxis-radius-sm:8px; --praxis-radius-md:12px; --praxis-radius-lg:16px;
+  --praxis-radius-card:12px;
+  --praxis-ease-default:cubic-bezier(.32,.72,0,1);
 
   /* slate elevation */
-  --ehsq-elevation-1:0 0 0 .5px rgba(16,36,58,.05),0 1px 2px rgba(16,36,58,.04);
+  --praxis-elevation-1:0 0 0 .5px rgba(16,36,58,.05),0 1px 2px rgba(16,36,58,.04);
 
   /* Praxis surface/material palette (LIGHT) */
   --px-page:#F0F2F4; --px-surface:#ffffff; --px-surface-2:#F4F6F8; --px-tool:#ffffff;
@@ -81,7 +81,7 @@ body[data-variant="praxis"]{
      original step between stops is preserved, so the lit-edge shading reads the
      same, just a slightly deeper teal: 5.00:1 at the top, 5.88:1 at the bottom.
 
-     Not --ehsq-color-teal-60 (#1b838b): that token also carries text and
+     Not --praxis-color-teal-60 (#1b838b): that token also carries text and
      borders, where it is measured against a light background and is fine.
      Only the fill needed to move. */
   --px-primary-grad:linear-gradient(180deg,#197b83,#156f77);
@@ -89,12 +89,12 @@ body[data-variant="praxis"]{
   --px-primary-shadow:0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28);
 
   /* Map the generic elevation tokens onto Praxis materials so any component
-     that references --ehsq-elevation-* inherits the lit-edge look. The record
-     page uses its own --ehsq-elevation-1..4 scale, so these only affect the
+     that references --praxis-elevation-* inherits the lit-edge look. The record
+     page uses its own --praxis-elevation-1..4 scale, so these only affect the
      workspace's cards/popovers. */
-  --ehsq-elevation-card:var(--praxis-card);
-  --ehsq-elevation-card-raised:var(--praxis-card);
-  --ehsq-elevation-popover:var(--px-overlay);
+  --praxis-elevation-card:var(--praxis-card);
+  --praxis-elevation-card-raised:var(--praxis-card);
+  --praxis-elevation-popover:var(--px-overlay);
 
   /* dotted-grid page texture — faded at left/right edges (page-color gradient
      over the dots). Fixed to the viewport so it reads as page material. */
@@ -125,28 +125,28 @@ body[data-variant="praxis"]{
   background-size:100% 100%, 100% 100%, 18px 18px;
   background-repeat:no-repeat, no-repeat, repeat;
   background-attachment:fixed, fixed, fixed;
-  color:var(--ehsq-color-text-primary);
+  color:var(--praxis-color-text-primary);
 }
 
 /* ---- base DARK: recolors token-driven styles (covers Miramar too) ---- */
 body[data-theme="dark"]{
   color-scheme:dark;
-  --ehsq-color-surface-default:#192336; --ehsq-color-surface-subtle:#161c27;
-  --ehsq-color-neutral-05:#10151e; --ehsq-color-neutral-10:#222b39;
-  --ehsq-color-neutral-15:#2a3342; --ehsq-color-neutral-20:#3a4556;
-  --ehsq-color-border-default:rgba(255,255,255,.10);
-  --ehsq-color-text-primary:#e7ebf1; --ehsq-color-text-secondary:#9aa7b4; --ehsq-color-text-disabled:#62707e;
-  --ehsq-color-text-tertiary:#8b98a6;  /* 4.6:1 on the dark card (was 3.65:1) */
+  --praxis-color-surface-default:#192336; --praxis-color-surface-subtle:#161c27;
+  --praxis-color-neutral-05:#10151e; --praxis-color-neutral-10:#222b39;
+  --praxis-color-neutral-15:#2a3342; --praxis-color-neutral-20:#3a4556;
+  --praxis-color-border-default:rgba(255,255,255,.10);
+  --praxis-color-text-primary:#e7ebf1; --praxis-color-text-secondary:#9aa7b4; --praxis-color-text-disabled:#62707e;
+  --praxis-color-text-tertiary:#8b98a6;  /* 4.6:1 on the dark card (was 3.65:1) */
 }
 
 /* ---- Praxis DARK: Mazlan dark surfaces + materials ---- */
 body[data-variant="praxis"][data-theme="dark"]{
-  --ehsq-color-text-primary:#e7ebf1; --ehsq-color-text-secondary:#9aa7b4;
-  --ehsq-color-border-default:rgba(255,255,255,.10);
-  --ehsq-color-surface-default:#192336; --ehsq-color-surface-subtle:#161c27;
-  --ehsq-color-interactive-default:#29D2D7; --ehsq-color-text-link:#5CE0E5;
+  --praxis-color-text-primary:#e7ebf1; --praxis-color-text-secondary:#9aa7b4;
+  --praxis-color-border-default:rgba(255,255,255,.10);
+  --praxis-color-surface-default:#192336; --praxis-color-surface-subtle:#161c27;
+  --praxis-color-interactive-default:#29D2D7; --praxis-color-text-link:#5CE0E5;
   /* Solution accents brighten on dark so they read on tinted chips */
-  --ehsq-color-blue-60:#7a93e0; --ehsq-color-orange-60:#ffa94d; --ehsq-color-purple-60:#b088e8;
+  --praxis-color-blue-60:#7a93e0; --praxis-color-orange-60:#ffa94d; --praxis-color-purple-60:#b088e8;
   --px-page:rgb(14,19,36); --px-surface:#192336; --px-surface-2:#232c3b; --px-tool:rgba(255,255,255,.06);
   --px-drawer:#0e1324;  /* deep navy — matches the external Mazlan prototype */
   --px-chip:rgba(255,255,255,.07); --px-glass:rgba(26,32,45,.72); --px-hover:rgba(255,255,255,.05); --px-dot:rgba(255,255,255,.09);
@@ -197,13 +197,13 @@ body[data-variant="praxis"][data-theme="dark"]{
 }
 
 /* Dark mode: primary CTAs use dark ink on the cyan gradient. Higher specificity
-   than the per-page color:var(--ehsq-color-white) rules, so it wins regardless of load order. */
+   than the per-page color:var(--praxis-color-white) rules, so it wins regardless of load order. */
 body[data-variant="praxis"][data-theme="dark"] .tbtn--run,
 body[data-variant="praxis"][data-theme="dark"] .tbtn--primary,
 body[data-variant="praxis"][data-theme="dark"] .pill-btn,
 body[data-variant="praxis"][data-theme="dark"] .btn--primary,
 body[data-variant="praxis"][data-theme="dark"] .qa,
-body[data-variant="praxis"][data-theme="dark"] .ehsq-navrail__btn--create,
+body[data-variant="praxis"][data-theme="dark"] .praxis-navrail__btn--create,
 body[data-variant="praxis"][data-theme="dark"] .mz-input__send,
 body[data-variant="praxis"][data-theme="dark"] .tbtn--run .icon,
 body[data-variant="praxis"][data-theme="dark"] .tbtn--primary .icon,
@@ -221,14 +221,14 @@ body[data-variant="praxis"][data-theme="dark"] .pill-btn .icon{
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *){
   -webkit-appearance:none; appearance:none; margin:0; flex-shrink:0;
   width:16px; height:16px; border-radius:4px;
-  border:1.5px solid var(--ehsq-color-border-default);
+  border:1.5px solid var(--praxis-color-border-default);
   background:var(--px-surface);
   cursor:pointer; display:inline-grid; place-content:center;
-  transition:background var(--ehsq-motion-fast,120ms) var(--ehsq-ease-default),
-             border-color var(--ehsq-motion-fast,120ms) var(--ehsq-ease-default);
+  transition:background var(--praxis-motion-fast,120ms) var(--praxis-ease-default),
+             border-color var(--praxis-motion-fast,120ms) var(--praxis-ease-default);
 }
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):hover{
-  border-color:var(--ehsq-color-text-tertiary);
+  border-color:var(--praxis-color-text-tertiary);
 }
 /* Checked / indeterminate fill: neutral, not the pink selection accent. Pink is
    the app's attention colour, and a page of ticked boxes turned into a field of
@@ -241,7 +241,7 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):h
    --px-surface is the mark on purpose — it's whatever the surface behind the
    box is, so the tick reads as a cut-out rather than a painted-on colour. */
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *){
-  --px-check-fill:var(--ehsq-color-text-primary);
+  --px-check-fill:var(--praxis-color-text-primary);
   --px-check-mark:var(--px-surface);
 }
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):checked{
@@ -267,7 +267,7 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):i
   border:solid var(--px-check-mark); border-width:0 0 2px 0; border-radius:1px;
 }
 body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):focus-visible{
-  outline:2px solid color-mix(in srgb, var(--ehsq-color-interactive-default) 60%, transparent);
+  outline:2px solid color-mix(in srgb, var(--praxis-color-interactive-default) 60%, transparent);
   outline-offset:2px;
 }
 
@@ -311,12 +311,12 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):f
    ===================================================================== */
 @media (prefers-reduced-motion: no-preference){
   :where(button, [role="button"], .btn, a.btn, .tbtn, .qa, .pill-btn, .icon-btn,
-         .ehsq-navrail__btn, .card__link, .rep__pin, .segswitch > button){
-    transition: transform 150ms var(--ehsq-ease-default, cubic-bezier(.32,.72,0,1));
+         .praxis-navrail__btn, .card__link, .rep__pin, .segswitch > button){
+    transition: transform 150ms var(--praxis-ease-default, cubic-bezier(.32,.72,0,1));
   }
   /* Small controls: icon buttons and compact pills */
   :where(button, [role="button"], .icon-btn, .card__link, .rep__pin,
-         .ehsq-navrail__btn, .segswitch > button):active:not(:disabled):not([aria-disabled="true"]){
+         .praxis-navrail__btn, .segswitch > button):active:not(:disabled):not([aria-disabled="true"]){
     transform: scale(.95);
   }
   /* Larger surfaces travel less, or the shrink reads as a jump */
@@ -347,8 +347,8 @@ body[data-variant="praxis"] input[type="checkbox"]:not(.switch):not(.switch *):f
    ===================================================================== */
 body[data-variant="praxis"] :where(
   .tbtn, .viewswitch__btn, .pager__btn, .icon-btn, .filter-toggle,
-  .ehsq-navrail__btn, .ehsq-navrail__link, .card__link, .rep__pin, .cn-item
-):not(:disabled):not([aria-disabled="true"]):not(.ehsq-navrail__btn--active):hover{
+  .praxis-navrail__btn, .praxis-navrail__link, .card__link, .rep__pin, .cn-item
+):not(:disabled):not([aria-disabled="true"]):not(.praxis-navrail__btn--active):hover{
   background-color:var(--px-hover-btn);
 }
 
@@ -356,18 +356,18 @@ body[data-variant="praxis"] :where(
    repainting it with the surface colour, so it went white on hover and its
    white glyph all but disappeared. It keeps its fill and shifts one step
    lighter instead — pink-40, the tint above pink-50. */
-body[data-variant="praxis"] .ehsq-navrail__btn--active:hover{
-  background-color:var(--ehsq-color-pink-40,#ed5ea6);
+body[data-variant="praxis"] .praxis-navrail__btn--active:hover{
+  background-color:var(--praxis-color-pink-40,#ed5ea6);
   background-image:none;
-  color:var(--ehsq-color-white);
+  color:var(--praxis-color-white);
   box-shadow:none;
 }
 /* The tools and rail buttons are raised on their own surface, so a flat wash
    would erase them — tint over the surface and deepen the shadow instead. */
 body[data-variant="praxis"] .tbtn:not(.tbtn--run):not(:disabled):hover,
 body[data-variant="praxis"] .pager__btn:not(.pager__btn--active):not(:disabled):hover,
-body[data-variant="praxis"] .ehsq-navrail__btn:not(.ehsq-navrail__btn--create):not(.ehsq-navrail__btn--active):hover,
-body[data-variant="praxis"] .ehsq-navrail__link:hover{
+body[data-variant="praxis"] .praxis-navrail__btn:not(.praxis-navrail__btn--create):not(.praxis-navrail__btn--active):hover,
+body[data-variant="praxis"] .praxis-navrail__link:hover{
   background-color:var(--px-surface);
   background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
   box-shadow:var(--px-tool-shadow-hover);
@@ -462,7 +462,7 @@ body[data-variant="praxis"][data-theme="dark"]
    hairline.
 
    Only the secondaries. The primaries above keep the soft teal CTA, and the
-   label stays --ehsq-color-text-primary rather than the rail's #c8cfd7: that
+   label stays --praxis-color-text-primary rather than the rail's #c8cfd7: that
    value is tuned for an icon-only glyph, and text needs the extra contrast.
    ===================================================================== */
 body[data-variant="praxis"][data-theme="dark"]
@@ -474,7 +474,7 @@ body[data-variant="praxis"][data-theme="dark"]
 body[data-variant="praxis"][data-theme="dark"]
   :is(.toolbar, .rp-toolbar, .ws-toolbar, .admin-toolbar)
   :is(.tbtn, .sortbtn):not(.btn--primary):not(.tbtn--primary):not(.tbtn--run):not(.pill-btn):hover{
-  color:var(--ehsq-color-white);
+  color:var(--praxis-color-white);
   background-color:var(--px-surface-2,#232c3b);
   background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
   box-shadow:0 0 0 .5px rgba(255,255,255,.14),inset 0 .5px 0 rgba(255,255,255,.08);
@@ -483,7 +483,7 @@ body[data-variant="praxis"][data-theme="dark"]
 /* =====================================================================
    WCAG 1.4.3 — dark ink on the bright cyan fill
 
-   In dark, --ehsq-color-interactive-default brightens to #29D2D7, a LIGHT
+   In dark, --praxis-color-interactive-default brightens to #29D2D7, a LIGHT
    colour (luminance .55). Anything using it as a FILL with white text
    measures 1.86:1 against a 4.5 minimum. Selected segments, count badges and
    the workspace Create button all did.
@@ -507,12 +507,12 @@ body[data-variant="praxis"][data-theme="dark"] :is(
 .px-skip{
   position:fixed; top:8px; left:8px; z-index:1000;
   display:inline-flex; align-items:center; height:36px; padding:0 16px;
-  border-radius:10px; background:var(--px-surface); color:var(--ehsq-color-text-link);
+  border-radius:10px; background:var(--px-surface); color:var(--praxis-color-text-link);
   font-size:.875rem; font-weight:600; text-decoration:none;
   box-shadow:var(--px-tool-shadow-hover);
-  transform:translateY(-150%); transition:transform 120ms var(--ehsq-ease-default,ease);
+  transform:translateY(-150%); transition:transform 120ms var(--praxis-ease-default,ease);
 }
-.px-skip:focus-visible, .px-skip:focus{ transform:none; outline:2px solid var(--ehsq-color-teal-50); outline-offset:2px; }
+.px-skip:focus-visible, .px-skip:focus{ transform:none; outline:2px solid var(--praxis-color-teal-50); outline-offset:2px; }
 @media (prefers-reduced-motion: reduce){ .px-skip{ transition:none; } }
 
 /* ============================================================================

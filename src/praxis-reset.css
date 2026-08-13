@@ -1,0 +1,21 @@
+/* =====================================================================
+   PRAXIS RESET — the base element normalisation.
+
+   Extracted 2026-08-12 from praxis-chrome-legacy.css. Three pages (login,
+   animation-lab, ds/index) were loading that entire 44KB file for these few
+   generic rules and nothing else — measured in-browser: 6 of its 242 rules
+   matched anything on those pages. Everything else they render comes from the
+   praxis-* component sheets.
+   ===================================================================== */
+*, *::before, *::after{box-sizing: border-box;}
+html, body{margin: 0; padding: 0;}
+body{font-family: var(--praxis-type-font-sans);
+  font-size: var(--praxis-type-size-base);
+  color: var(--praxis-color-text-primary);
+  background: var(--praxis-color-surface-subtle);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;}
+button{font-family: inherit; cursor: pointer; border: none; background: none; color: inherit;}
+ul, ol{list-style: none; padding: 0; margin: 0;}
+a{color: inherit;}

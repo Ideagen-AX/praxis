@@ -21,18 +21,18 @@
    is inset from the top/bottom edges rather than spanning the full height. */
 .msel::after{
   content:""; position:absolute; right:0; top:50%; transform:translateY(-50%);
-  width:1px; height:56%; background:var(--ehsq-color-border-default);
+  width:1px; height:56%; background:var(--praxis-color-border-default);
 }
 /* The trigger field only displays the current scope; it opens the menu on click
    and is not typeable (filtering lives inside the menu). */
 .msel__input{
   flex:1; min-width:0; border:0; outline:0; background:transparent; padding:0;
-  font:inherit; font-size:.875rem; font-weight:600; color:var(--ehsq-color-text-primary);
+  font:inherit; font-size:.875rem; font-weight:600; color:var(--praxis-color-text-primary);
   text-overflow:ellipsis; cursor:pointer;
 }
-.msel__input::placeholder{ color:var(--ehsq-color-text-secondary); font-weight:600; }
-.msel__caret{ font-size:20px !important; color:var(--ehsq-color-text-secondary); flex-shrink:0; pointer-events:none;
-  transition:transform var(--dur-fast,.18s) ease; }
+.msel__input::placeholder{ color:var(--praxis-color-text-secondary); font-weight:600; }
+.msel__caret{ font-size:20px !important; color:var(--praxis-color-text-secondary); flex-shrink:0; pointer-events:none;
+  transition:transform var(--praxis-motion-normal) ease; }
 .msel.is-open .msel__caret{ transform:rotate(180deg); }
 /* Dark: the module label + dropdown arrow read too dark on the header pill;
    lighten to neutral-20 (light palette value — the token remaps dark). */
@@ -67,17 +67,17 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
   -webkit-backdrop-filter:saturate(1.35) blur(16px); backdrop-filter:saturate(1.35) blur(16px);
   border:0; border-radius:14px;
   box-shadow:var(--px-overlay), inset 0 .5px 0 var(--px-edge);
-  color:var(--ehsq-color-text-primary);
+  color:var(--praxis-color-text-primary);
   /* open/close animation */
   transform-origin:top left;
-  transition:opacity .16s ease, transform .2s var(--ehsq-ease-default, cubic-bezier(.32,.72,0,1)), display .2s allow-discrete;
+  transition:opacity .16s ease, transform .2s var(--praxis-ease-default, cubic-bezier(.32,.72,0,1)), display .2s allow-discrete;
 }
 .msel__menu[hidden]{ display:none; opacity:0; transform:translateY(-6px) scale(.99); }
 @starting-style{ .msel__menu:not([hidden]){ opacity:0; transform:translateY(-6px) scale(.99); } }
 
 /* ---- Menu title ---- */
 .msel__titlebar{ display:flex; align-items:center; margin:0 0 10px; }
-.msel__title{ font-size:16px; font-weight:700; color:var(--ehsq-color-text-primary); margin:0; }
+.msel__title{ font-size:16px; font-weight:700; color:var(--praxis-color-text-primary); margin:0; }
 
 /* ---- Filter field — narrows the module list; lives inside the menu, below
        the title (the trigger field is display-only). Reuses the Create New
@@ -102,7 +102,7 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
    uppercase, tracked title in the solution colour, clearly distinct from the
    pale-tinted, sentence-case tiles below. Left edge still aligns with tiles. */
 .msel__menu .cn-group__head{ padding:0 10px; gap:8px; height:32px; margin-bottom:6px; }
-.msel__menu .cn-group__icon{ width:32px; height:32px; border-radius:8px; background:var(--cn-tone); color:var(--ehsq-color-white); }
+.msel__menu .cn-group__icon{ width:32px; height:32px; border-radius:8px; background:var(--cn-tone); color:var(--praxis-color-white); }
 .msel__menu .cn-group__icon .material-symbols-rounded{ font-size:20px; }
 .msel__menu .cn-group__title{ font-size:11px; font-weight:800; letter-spacing:normal; color:var(--cn-tone); }
 
@@ -112,11 +112,11 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
        multi-selectable ---- */
 .msel__menu .cn-grid{ grid-template-columns:1fr; }
 .msel__menu .cn-item{ position:relative; }
-.msel__menu .cn-item.is-sel{ box-shadow:0 0 0 1.5px var(--ehsq-color-interactive-default), var(--px-tool-shadow); }
-.msel__menu .cn-item__check{ margin-left:auto; color:var(--ehsq-color-interactive-default); font-size:18px !important; display:none; }
+.msel__menu .cn-item.is-sel{ box-shadow:0 0 0 1.5px var(--praxis-color-interactive-default), var(--px-tool-shadow); }
+.msel__menu .cn-item__check{ margin-left:auto; color:var(--praxis-color-interactive-default); font-size:18px !important; display:none; }
 .msel__menu .cn-item.is-sel .cn-item__check{ display:inline-flex; }
 
-.msel__empty{ font-size:var(--ehsq-type-size-sm); color:var(--ehsq-color-text-secondary); padding:10px 8px; }
+.msel__empty{ font-size:var(--praxis-type-size-sm); color:var(--praxis-color-text-secondary); padding:10px 8px; }
 
 /* =====================================================================
    RESPONSIVE (≤768px md / ≤480px sm) — the trigger shrinks to a compact
@@ -139,8 +139,8 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
    selection is already empty, since "All" is what an empty selection means. */
 .msel__clear{
   margin-left:auto; font:inherit; font-size:13px; font-weight:600;
-  color:var(--ehsq-color-text-link); background:transparent; border:0;
-  padding:4px 8px; border-radius:var(--ehsq-radius-sm); cursor:pointer;
+  color:var(--praxis-color-text-link); background:transparent; border:0;
+  padding:4px 8px; border-radius:var(--praxis-radius-sm); cursor:pointer;
 }
 .msel__clear:hover{ background:var(--px-hover); }
 .msel__clear[hidden]{ display:none; }
@@ -169,14 +169,14 @@ body[data-theme="dark"] .msel__caret{ color:#c8cfd7; }
   .msel__menu .cn-group__head{
     display:flex; align-items:center; width:100%; height:44px; padding:0 8px;
     border:0; background:transparent; border-radius:10px; cursor:pointer;
-    font:inherit; text-align:left; color:var(--ehsq-color-text-primary);
+    font:inherit; text-align:left; color:var(--praxis-color-text-primary);
   }
   .msel__menu .cn-group__head:hover{ background:var(--px-hover-btn); }
   .msel__menu .cn-group__head::after{
     content:""; margin-left:auto; width:9px; height:9px; flex-shrink:0;
     border-right:2px solid currentColor; border-bottom:2px solid currentColor;
-    transform:rotate(45deg); transition:transform 160ms var(--ehsq-ease-default);
-    color:var(--ehsq-color-text-secondary);
+    transform:rotate(45deg); transition:transform 160ms var(--praxis-ease-default);
+    color:var(--praxis-color-text-secondary);
   }
   .msel__menu .cn-group.is-collapsed .cn-group__head::after{ transform:rotate(-45deg); }
   .msel__menu .cn-group.is-collapsed .cn-grid{ display:none; }
