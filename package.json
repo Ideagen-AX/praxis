@@ -1,0 +1,53 @@
+{
+  "name": "@ideagen-ax/praxis",
+  "version": "0.1.0",
+  "description": "Praxis \u2014 the design system for Ideagen EHSQ Enterprise. Tokens, chrome and record-form components as plain CSS and vanilla JS, with no build step and no framework.",
+  "keywords": [
+    "design-system",
+    "css",
+    "design-tokens",
+    "ideagen",
+    "praxis"
+  ],
+  "license": "MIT",
+  "author": "Ideagen",
+  "type": "module",
+  "sideEffects": [
+    "./dist/*.css",
+    "./dist/*.js"
+  ],
+  "exports": {
+    ".": "./dist/praxis.css",
+    "./css": "./dist/praxis.css",
+    "./tokens": "./dist/praxis-tokens.css",
+    "./reset": "./dist/praxis-reset.css",
+    "./fonts-example": "./dist/praxis-fonts.example.css",
+    "./manifest": "./dist/manifest.json",
+    "./dist/*": "./dist/*"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "python3 build-package.py",
+    "check": "python3 build-package.py --check",
+    "prepublishOnly": "python3 build-package.py",
+    "docs": "python3 build-ds.py"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ideagen-AX/praxis.git"
+  },
+  "homepage": "https://github.com/Ideagen-AX/praxis#readme",
+  "bugs": {
+    "url": "https://github.com/Ideagen-AX/praxis/issues"
+  }
+}
