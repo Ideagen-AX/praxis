@@ -17,7 +17,7 @@ you to define. This README covers installing; that file covers building.
 
 > ### Alpha — under active development
 >
-> Praxis is at `0.1.3` and is **not production-ready**. It is published early so
+> Praxis is at `0.1.4` and is **not production-ready**. It is published early so
 > the team can build against one shared copy, not because it is finished.
 >
 > - **Anything can change in any release.** Class names, token names, markup
@@ -29,7 +29,7 @@ you to define. This README covers installing; that file covers building.
 >   edges listed under it.
 > - **No support commitment.** There is no release schedule, no LTS, and no
 >   guarantee that an issue gets looked at.
-> - **Pin the exact version** — `@0.1.3`, never `@0.1`, `^0.1.3` or `@latest`.
+> - **Pin the exact version** — `@0.1.4`, never `@0.1`, `^0.1.4` or `@latest`.
 >
 > If you need something you can rely on not moving underneath you, wait for 1.0.
 
@@ -48,7 +48,7 @@ import '@ideagen-ax/praxis'            // everything: tokens + core + all compon
 Or over a CDN, with no install at all:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.3/dist/praxis.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.4/dist/praxis.css">
 ```
 
 Pin the exact version. `@0.1` or `@latest` will pick up breaking changes while
@@ -69,7 +69,7 @@ open it — no install, no build, no server.
 
   <!-- The bundle: tokens, materials, dark mode and every component. -->
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.3/dist/praxis.css">
+        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.4/dist/praxis.css">
 </head>
 
 <!-- Both attributes are required. data-variant is always "praxis". -->
@@ -93,7 +93,7 @@ open it — no install, no build, no server.
   <i data-lucide="triangle-alert"></i>
 
   <!-- Only needed if you use icons. Loads its own pinned copy of Lucide. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.3/dist/praxis-lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.4/dist/praxis-lucide.js"></script>
 </body>
 </html>
 ```
@@ -104,7 +104,7 @@ Same three requirements — the stylesheet, the two `<body>` attributes, and the
 icon script if you want icons.
 
 ```sh
-npm install @ideagen-ax/praxis@0.1.3
+npm install @ideagen-ax/praxis@0.1.4
 ```
 
 ```js

@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.4 — 2026-08-14
+
+### Fixed
+
+- **The profile menu scrolls instead of running off the bottom of the window.**
+  `.profile-menu__pop` had no height limit, and its contents are set by the page
+  rather than by the component: admin pages add six "Switch to" links, the
+  record pages add the Appearance row, the workspace adds "Viewing as". On a
+  laptop viewport the tallest of those extended past the bottom edge, so Sign
+  out — the last row — could not be reached at all. The panel is now capped at
+  the room below the app bar, `calc(100vh - var(--praxis-appbar-h) - 24px)`,
+  and scrolls its overflow, matching the cap `.cn-flyout` already used.
+
+  It scrolls the panel itself rather than an inner body, as the module selector
+  does, because there is no sticky header in this menu to hold in place.
+  `overscroll-behavior:contain` keeps a flick past the last row from scrolling
+  the page underneath.
+
 ## 0.1.3 — 2026-08-13
 
 **No CSS or JS changed.** `src/` is byte-identical to 0.1.2, so nothing renders

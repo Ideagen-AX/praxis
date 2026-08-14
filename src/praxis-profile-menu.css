@@ -36,6 +36,18 @@
      cramped the Appearance row's segmented control. */
   min-width:250px;
   padding:6px;
+  /* The menu's height is whatever its page gives it — admin adds six "Switch
+     to" links, the record pages add Appearance, the workspace adds "Viewing
+     as" — and the tallest of those runs off the bottom of a laptop viewport,
+     putting Sign out somewhere unreachable. Cap it at the room below the app
+     bar and scroll the rest: the panel's top edge is the app bar plus 8px, so
+     24px leaves a matching 16px gutter underneath. Same cap and same idiom as
+     .cn-flyout and the module selector, which scroll the panel itself rather
+     than an inner body — there is no sticky header here to keep in place.
+     overscroll-behavior stops a flick past the last row from scrolling the
+     page behind the menu. */
+  max-height:calc(100vh - var(--praxis-appbar-h) - 24px);
+  overflow-y:auto; overscroll-behavior:contain;
   background:var(--praxis-color-surface-default);
   border:1px solid var(--praxis-color-border-default);
   border-radius:var(--praxis-radius-md);
