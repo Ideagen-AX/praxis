@@ -18,6 +18,14 @@ there is no error. This page exists so you can look it up instead.</p>
 <code>--praxis-*</code> for the foundation and <code>--px-*</code> for the Praxis material
 layer.</p>
 
+<p><strong>Part names are not always BEM, and one case is worth knowing.</strong> The toggle
+switch accepts both <code>.switch__track</code> / <code>.switch__thumb</code> and the original
+<code>.track</code> / <code>.thumb</code>. The BEM pair is canonical; the bare pair is kept
+because consumers use it, and it is a good illustration of why the convention exists —
+<code>.track</code> and <code>.thumb</code> are about as collision-prone as class names get in a
+sheet you drop into someone else's application. See
+<a href="../components/form-controls.html#part-names">form controls</a>.</p>
+
 <p>Two things that look like exceptions and are not.
 <code>.praxis-navrail</code> carries the full prefix because it collided with a host class
 during extraction. And <code>.px-*</code> classes — <code>.px-pop</code>,

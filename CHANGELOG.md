@@ -1,11 +1,103 @@
 # Changelog
 
-## Unreleased
+## 0.1.5 — 2026-08-18
 
-**No CSS or JS changed.** `src/` is untouched, so nothing renders differently for
-a consumer. This adds the reference site and the machinery behind it.
+**`src/` changed, and dark mode changed with it.** Ten fixes: six colour tokens, the
+toggle switch, disabled buttons, the Create New catalog's reachability, and a usage
+comment that told you to do the wrong thing. Every one was found by the reference site
+this release also adds — several of them within minutes of a page first rendering.
+
+**What a consumer will notice.** A page that looks right in light and uses
+`--praxis-color-interactive-active`, `border-subtle`, `surface-muted`, `status-info`,
+`status-danger` or `interactive-hover` **will render differently in dark**, because
+those six were wrong there. Nothing changes in light. Toggle to dark and look before
+you upgrade.
+
+### Fixed
+
+- **Four tokens had a dark value that could never apply.** Each was declared on
+  `:root` as `var(--rung)` while the rung's dark remap was declared on `body`.
+  Custom-property substitution happens at the element where the *declaration* lives,
+  so each was computed on `:root` against the light rung and `body` inherited that.
+
+  | Token | Was, in dark | Now |
+  |---|---|---|
+  | `--praxis-color-interactive-active` | `#135d63` — a light-mode ink | `#5CE0E5` |
+  | `--praxis-color-border-subtle` | `#edf0f2` | `#222b39` |
+  | `--praxis-color-surface-muted` | `#edf0f2` | `#222b39` |
+  | `--praxis-color-status-info` | `#4766eb` | `#7a93e0` |
+
+  `interactive-active` is the one that mattered: in dark, a control's resting state
+  was bright cyan `#29D2D7` and its pressed state resolved to a dark `#135d63`, so
+  pressing it made it go *darker*. `--praxis-color-surface-subtle` aliases the same
+  `neutral-10` and never had the bug, because it was always given its own dark value
+  rather than relying on the alias to carry the theme — that is the pattern.
+
+  `praxis_meta.frozen_aliases()` detects this class structurally and is now a build
+  gate at zero. It is deliberately not derived from resolved values: a resolver asked
+  for the dark value substitutes the dark rung and reports a difference the browser
+  never produces, which is why this went unseen.
+
+- **`--praxis-color-interactive-hover` restated for dark** (`#42D9DE`), which is a
+  deliberate widening of the fix. It was not frozen — it aliases `teal-70`, which has
+  no dark treatment — but fixing `active` alone would have produced a triad that goes
+  bright, then dark, then bright. The progression now mirrors light in *direction*:
+  each interaction step increases contrast against the ink on the fill. Measured with
+  `--px-primary-fg`: light `#fff` 4.50 → 5.88 → 7.57; dark `#08313a` 7.48 → 8.08 →
+  8.77. `#42D9DE` is the one invented value, the midpoint of the two it sits between.
+
+- **`--praxis-color-status-danger` failed contrast on dark.** At `#e22d38` it measured
+  **3.50:1** on the dark card against the 4.5:1 WCAG 1.4.3 asks of text, while
+  success, warning and info sat at 7.88, 7.89 and 5.30 — it was the only status ink
+  with no dark value. Now `red-40` (`#ed7b82`), an existing rung, at 5.81:1.
+
+- **The toggle switch had two markup forms and only one was styled.**
+  `praxis-admin.css` defines `.switch` as a wrapper containing `.track` and `.thumb`;
+  `praxis-filters.css` reads `.switch:checked`, which only matches with the class on
+  the input — and `praxis-filters.js` emits that second form plus `.switch__track`
+  and `.switch__thumb`, **neither of which any stylesheet defined**. `class="switch"`
+  on the input also excludes it from the Praxis checkbox rules, so the filter
+  drawer's On/Off row rendered as a bare browser checkbox between two labels.
+
+  Both forms are now defined from one set of values and render identically —
+  verified at 34×20 with `neutral-30` unchecked and `teal-60` checked in all four
+  permutations. The **wrapper form is canonical**, because `praxis-core.css` is
+  already committed to it: its checkbox exclusion is
+  `:not(.switch):not(.switch *)`, and that second clause only means anything if
+  `.switch` can have descendants. The sibling form was kept working rather than
+  removed because `praxis-filters.css` and its script agree with each other, and
+  rewriting either would mean touching JavaScript to fix something CSS could close.
+  `.switch__track` / `.switch__thumb` are the canonical part names; `.track` /
+  `.thumb` still work and are kept for consumers, but they are about as
+  collision-prone as class names get in a shared sheet.
+
+- **Disabled buttons had no appearance.** `praxis-core.css` excludes `:disabled` and
+  `[aria-disabled="true"]` from the hover wash and the press transform, so a disabled
+  button stopped responding while looking identical to an enabled one at rest.
+  `.tbtn` and `.admin-ghostbtn` now take `opacity:.45`, `cursor:not-allowed` and no
+  shadow on both. Opacity rather than a flat grey, because it has to work on
+  `.tbtn--primary`'s gradient. The other eight named button classes still have no
+  base at all, so their disabled state remains yours.
+
+- **`praxis-create-new.js` was unreachable under a bundler.** It declared
+  `CREATE_CATALOG` and `CN_TEMPLATES` with top-level `const` and never assigned them,
+  which in a classic script creates a global *lexical* binding — readable as a bare
+  identifier from another classic script, but not a property of `window`, so
+  `if (window.CREATE_CATALOG)` always failed. And because `package.json` declares
+  `"type": "module"` with no `export` anywhere in the package, importing the file
+  through a bundler made both arrays module-scoped and invisible, with no error:
+  `import '@ideagen-ax/praxis/dist/praxis-create-new.js'` was a silent no-op. Both are
+  now on `window`; the bare identifiers still work.
+
+- **`praxis-dotfield.js` rendered nothing if you followed its own usage comment,**
+  which showed `create` → `setMode` → `setParam` and never mentioned `start()`, which
+  the loop requires. The comment now includes it, plus `restart()`, `destroy()` and
+  the fact that the dots are drawn white and need a dark backdrop.
 
 ### Added
+
+Nothing below here changed CSS or JS. It is the reference site and the machinery
+behind it — which is what found every fix above.
 
 - **A reference website, at <https://ideagen-ax.github.io/praxis/>.** Every token
   viewable in both themes, and a page per component with live examples. Deployed
@@ -70,8 +162,9 @@ a consumer. This adds the reference site and the machinery behind it.
   `body`. Four tokens are in that state. Detected structurally, because asking a
   resolver would report a difference the browser does not produce. Advisory in the
   build output, not a gate, since it is a defect in `src/` rather than in the site.
+  **Now a gate**, at zero, since the four it found are fixed in this release.
 
-### Fixed
+### Fixed — measurement
 
 - **The class-family measurement counted `url()` paths and quoted strings.** A
   scan for `.name` read `url(fonts/Gilroy-Regular.woff2)` as a class called

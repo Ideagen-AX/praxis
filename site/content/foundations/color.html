@@ -125,52 +125,78 @@ declares and <code>praxis-core.css</code> then re-declares for the Praxis varian
 
 <praxis-block name="overrides"></praxis-block>
 
-<h2>Nine semantic tokens do not change in dark</h2>
+<h2>Four semantic tokens do not change in dark</h2>
 
-<p>Read the two resolved values under each swatch above and you will notice several
-matching. That is worth understanding rather than skimming, because it has three different
-causes and only one of them is a bug.</p>
+<p>Read the two resolved values under each swatch above and four of them match. That is worth
+understanding rather than skimming, because it used to be nine — and five of those nine were
+fixed in <code>src/</code> on 2026-08-18 after this page made them visible.</p>
 
-<h3>Deliberate</h3>
+<h3>What was fixed</h3>
 
-<p><code>--praxis-color-text-inverse</code> is <code>#ffffff</code> in both themes on
-purpose. It is the ink for a colored fill, and a fill dark enough to need inverse ink is
-dark in either theme.</p>
+<p>Four tokens were declared on <code>:root</code> as <code>var(--rung)</code> while the dark
+remap of that rung was declared on <code>body</code>. Custom-property substitution happens at
+the element where the <em>declaration</em> lives, so each was computed on <code>:root</code>
+against the light rung and <code>body</code> inherited that value. <strong>The dark value could
+never apply.</strong></p>
 
-<h3>The rung simply has no dark treatment</h3>
+<table>
+  <thead><tr><th>Token</th><th>Was, in dark</th><th>Now</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-color-interactive-active</code></td><td><code>#135d63</code> — a light-mode ink</td><td><code>#5CE0E5</code></td></tr>
+    <tr><td><code>--praxis-color-border-subtle</code></td><td><code>#edf0f2</code></td><td><code>#222b39</code></td></tr>
+    <tr><td><code>--praxis-color-surface-muted</code></td><td><code>#edf0f2</code></td><td><code>#222b39</code></td></tr>
+    <tr><td><code>--praxis-color-status-info</code></td><td><code>#4766eb</code></td><td><code>#7a93e0</code></td></tr>
+  </tbody>
+</table>
 
-<p><code>--praxis-color-border-strong</code>, <code>--praxis-color-border-focus</code>,
-<code>--praxis-color-interactive-hover</code> and <code>--praxis-color-status-danger</code>
-alias rungs the dark theme never remaps — <code>neutral-40</code>, <code>teal-50</code>,
-<code>teal-70</code>, <code>red-60</code>. Nothing is broken; the ramp just stops there. It
-is still worth a look, because <code>interactive-hover</code> staying a dark teal while
-<code>interactive-default</code> becomes bright cyan means hover moves the wrong direction
-in dark mode.</p>
+<p><code>interactive-active</code> was the one that mattered: in dark, a control's resting state
+was bright cyan <code>#29D2D7</code> and its pressed state resolved to a dark
+<code>#135d63</code>, so pressing it made it go <em>darker</em>. Inverted feedback.</p>
 
-<h3>The dark value exists and can never apply</h3>
+<p>Fixing it required widening the change by one token.
+<code>--praxis-color-interactive-hover</code> was not frozen — it aliases <code>teal-70</code>,
+which has no dark treatment at all — but leaving it would have produced a triad that goes
+bright, then dark, then bright. It now sits between the two, and the progression mirrors light
+in <em>direction</em>: every interaction step increases contrast against the ink on the fill.</p>
 
-<div class="note note--trap">
-  <p><strong>These four are a rule violation, not an omission.</strong> Each is declared on
-  <code>:root</code> as <code>var(--rung)</code>, and the dark remap of that rung is declared
-  on <code>body</code>. Custom-property substitution happens at the element where the
-  <em>declaration</em> lives, so the token is computed on <code>:root</code> against the light
-  rung, and <code>body</code> inherits that computed value. The dark remap is never reached.</p>
-  <p><code>--praxis-color-interactive-active</code> is the one to care about: in dark mode a
-  control's resting state is bright cyan <code>#29D2D7</code> and its pressed state resolves
-  to <code>#135d63</code>, so pressing it makes it go <em>darker</em>. Inverted feedback.</p>
-  <p>The fix is to give each its own value in the dark block, as
-  <code>--praxis-color-surface-subtle</code> already does — it aliases the same
-  <code>neutral-10</code> and themes correctly because it does not rely on the alias to carry
-  the theme.</p>
-</div>
+<table>
+  <thead><tr><th></th><th>default</th><th>hover</th><th>active</th></tr></thead>
+  <tbody>
+    <tr><td>light, ink <code>#fff</code></td><td><code>#1b838b</code> 4.50:1</td><td><code>#176f76</code> 5.88:1</td><td><code>#135d63</code> 7.57:1</td></tr>
+    <tr><td>dark, ink <code>#08313a</code></td><td><code>#29D2D7</code> 7.48:1</td><td><code>#42D9DE</code> 8.08:1</td><td><code>#5CE0E5</code> 8.77:1</td></tr>
+  </tbody>
+</table>
+
+<p>And <code>--praxis-color-status-danger</code> was the fifth. It was not frozen either — it
+simply had no dark value while its three siblings did — but at <code>#e22d38</code> it measured
+<strong>3.50:1</strong> on the dark card against the 4.5:1 WCAG 1.4.3 asks of text, while
+success, warning and info sat at 7.88, 7.89 and 5.30. It is now <code>red-40</code>
+(<code>#ed7b82</code>), an existing rung, at 5.81:1.</p>
 
 <praxis-block name="frozen-aliases"></praxis-block>
 
-<p>Detected from the structure of the stylesheets on every build, so this table cannot go
-stale and the bug class cannot come back unnoticed. It is deliberately <em>not</em> derived
-from the resolved values: a resolver asked for the dark value substitutes the dark rung and
-reports a difference the browser does not actually produce, which is the whole reason this
-was invisible.</p>
+<p>That table is generated from the structure of the stylesheets on every build, and an empty
+result is now a <strong>gate</strong>: a fifth frozen alias fails the build rather than waiting
+for someone to notice a control behaving backwards. It is deliberately not derived from the
+resolved values — a resolver asked for the dark value substitutes the dark rung and reports a
+difference the browser never produces, which is the whole reason this went unseen.</p>
+
+<h3>The four that remain, and why they are fine</h3>
+
+<table>
+  <thead><tr><th>Token</th><th>Both themes</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-color-text-inverse</code></td><td><code>#ffffff</code></td><td><strong>Deliberate.</strong> It is the ink for a coloured fill, and a fill dark enough to need inverse ink is dark in either theme.</td></tr>
+    <tr><td><code>--praxis-color-border-strong</code></td><td><code>#8898a9</code></td><td>Aliases <code>neutral-40</code>, which the dark theme does not remap. 5.33:1 on the dark card, well past the 3:1 a border needs.</td></tr>
+    <tr><td><code>--praxis-color-border-focus</code></td><td><code>#4499a0</code></td><td>Aliases <code>teal-50</code>, likewise unremapped. 4.73:1 — a focus ring that reads in both themes.</td></tr>
+    <tr><td><code>--praxis-color-status-danger</code></td><td>—</td><td>No longer in this list; see above.</td></tr>
+  </tbody>
+</table>
+
+<p>The distinction that matters: a token identical in both themes is <strong>not</strong>
+automatically a bug. Three of these are either intended or measurably adequate. What was a bug
+was a dark value that existed and could not be reached, which is a rule violation rather than
+an omission — and that is the thing the build now checks.</p>
 
 <h2>Two live traps</h2>
 

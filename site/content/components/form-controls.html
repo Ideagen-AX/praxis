@@ -5,7 +5,7 @@ tier: ready
 order: 40
 sheet: praxis-admin.css, praxis-core.css
 classes: switch, track, thumb, onoff, segmented, px-skip, visually-hidden, icon, toggle-group, chip-area
-summary: The checkbox, the toggle switch, the skip link and the scrollbar treatment — plus the one place two sheets disagree about what .switch means, with a visibly broken control as the result.
+summary: The checkbox, the toggle switch, the skip link and the scrollbar treatment — including the two markup forms of .switch, which now render identically after one of them turned out to be styled by nothing at all.
 keywords: checkbox switch toggle radio scrollbar skip link accessibility focus indeterminate segmented
 -->
 
@@ -88,49 +88,71 @@ bundle rather than picking sheets.</p>
   styling</strong> — see below.</p>
 </div>
 
-<h2>Two sheets disagree about <code>.switch</code></h2>
+<h2>Two markup forms, both supported</h2>
 
-<div class="note note--trap">
-  <p><strong>This produces a visibly broken control in the shipped filter drawer.</strong>
-  <code>praxis-admin.css</code> defines <code>.switch</code> as the <em>wrapper</em>, with
-  <code>.track</code> and <code>.thumb</code> inside it.
-  <code>praxis-filters.css</code> reads <code>.onoff:has(.switch:checked)</code>, which can
-  only match if <code>.switch</code> is on the <em>input</em>. Both cannot be right, and
-  <code>praxis-filters.js</code> emits the second form:</p>
-  <p><code>&lt;input type="checkbox" class="switch"&gt;</code> followed by
-  <code>&lt;span class="switch__track"&gt;&lt;span class="switch__thumb"&gt;</code></p>
-  <p>Neither <code>.switch__track</code> nor <code>.switch__thumb</code> is defined in any
-  Praxis stylesheet, and <code>class="switch"</code> on the input excludes it from the
-  checkbox rules. So the On/Off row in a filter drawer renders as a <strong>bare browser
-  checkbox between two labels</strong>, with two empty spans beside it.</p>
-</div>
+<p>Praxis shipped two contradictory ideas of what <code>.switch</code> means, and until
+2026-08-18 only one of them was styled. Both work now, from one set of values, and they render
+identically — verified as 34×20 with <code>neutral-30</code> unchecked and
+<code>teal-60</code> checked in all four permutations.</p>
 
-<template data-example="Left: what the filter engine emits. Right: the defined switch." data-height="160">
-  <div style="display:flex;gap:3rem;align-items:center;flex-wrap:wrap">
-    <div>
-      <p class="rfield__hint" style="margin:0 0 .5rem">From <code>praxis-filters.js</code></p>
-      <label class="onoff">
-        <span class="onoff__label onoff__label--off">Off</span>
-        <input type="checkbox" class="switch">
-        <span class="switch__track"><span class="switch__thumb"></span></span>
-        <span class="onoff__label onoff__label--on">On</span>
-      </label>
-    </div>
-    <div>
-      <p class="rfield__hint" style="margin:0 0 .5rem">From <code>praxis-admin.css</code></p>
-      <span class="switch">
-        <input type="checkbox" checked>
-        <span class="track"></span><span class="thumb"></span>
-      </span>
-    </div>
+<table>
+  <thead><tr><th>Form</th><th>Shape</th><th>Use it when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Wrapper</strong> — canonical</td><td><code>.switch</code> is the wrapper; the input is inside it</td><td>Always, in new markup</td></tr>
+    <tr><td><strong>Sibling</strong></td><td><code>.switch</code> is on the input; the track is its next sibling</td><td>Never by choice. It is what <code>praxis-filters.js</code> emits, so it is supported rather than removed.</td></tr>
+  </tbody>
+</table>
+
+<template data-example="Both forms, both states — identical geometry and colour" data-height="160">
+  <div style="display:flex;gap:2.5rem;align-items:center;flex-wrap:wrap">
+    <label class="onoff">
+      <span class="onoff__label onoff__label--off">Off</span>
+      <input type="checkbox" class="switch">
+      <span class="switch__track"><span class="switch__thumb"></span></span>
+      <span class="onoff__label onoff__label--on">On</span>
+    </label>
+    <label class="onoff">
+      <span class="onoff__label onoff__label--off">Off</span>
+      <input type="checkbox" class="switch" checked>
+      <span class="switch__track"><span class="switch__thumb"></span></span>
+      <span class="onoff__label onoff__label--on">On</span>
+    </label>
+    <span class="switch">
+      <input type="checkbox" checked>
+      <span class="switch__track"></span><span class="switch__thumb"></span>
+    </span>
   </div>
 </template>
 
-<p>Until it is fixed in <code>src/</code>, a page that renders its own On/Off row should use
-the wrapper form. If you need the filter drawer's row to look right today, the smallest
-correct patch is to define <code>.switch__track</code> and <code>.switch__thumb</code> in
-your own sheet against <code>input.switch:checked</code> — but the fix belongs in Praxis, so
-raise it rather than carrying it.</p>
+<h3>Why the wrapper is canonical</h3>
+
+<p><code>praxis-core.css</code> is already committed to it. Its checkbox rules are keyed
+<code>input[type="checkbox"]:not(.switch):not(.switch *)</code>, and that second clause only
+means anything if <code>.switch</code> can have descendants — which it can only do in the
+wrapper form.</p>
+
+<p>The sibling form was kept working rather than removed because
+<code>praxis-filters.css</code> reads <code>.onoff:has(.switch:checked)</code>, which needs the
+class on the input, so that sheet and its script agree with each other. Rewriting either would
+mean touching the JavaScript and that <code>:has()</code> selector to fix something CSS alone
+could close.</p>
+
+<h3>Part names</h3>
+
+<p><strong><code>.switch__track</code> and <code>.switch__thumb</code> are canonical.</strong>
+The original <code>.track</code> and <code>.thumb</code> still work and are kept because
+consumers use them, but they are two of the most collision-prone class names it is possible to
+put in a shared stylesheet. Do not use them in new markup.</p>
+
+<div class="note">
+  <p><strong>What this looked like before the fix,</strong> because it is a useful shape to
+  recognise: the sibling form rendered as a <em>bare browser checkbox</em> between two labels.
+  No sheet defined <code>.switch__track</code> or <code>.switch__thumb</code>, and
+  <code>class="switch"</code> on the input also opted it out of the Praxis checkbox rules — so
+  nothing styled it at all, and there was no error. A control that renders as an unstyled native
+  widget is usually this: a class that excludes it from one treatment without providing
+  another.</p>
+</div>
 
 <h2>Segmented control</h2>
 

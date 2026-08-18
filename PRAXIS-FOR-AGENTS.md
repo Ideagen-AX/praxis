@@ -7,7 +7,7 @@
      To change anything here, edit the matching file under site/content/ and
      re-run:  python3 build-site.py --agents-doc
 
-     Measured from src/ at Praxis 0.1.4. Where a statement is inferred from
+     Measured from src/ at Praxis 0.1.5. Where a statement is inferred from
      CSS structure rather than observed, it says so.
 -->
 
@@ -54,7 +54,7 @@ The frame above is a real document. Its head and body are exactly this:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My prototype</title>
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.4/dist/praxis.css">
+        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.5/dist/praxis.css">
 </head>
 
 <body data-variant="praxis" data-theme="light">
@@ -74,7 +74,7 @@ The frame above is a real document. Its head and body are exactly this:
   </div>
 
   <!-- Only if you use icons. Loads its own pinned Lucide from beside itself. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.4/dist/praxis-lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.5/dist/praxis-lucide.js"></script>
 </body>
 </html>
 ```
@@ -84,7 +84,7 @@ The frame above is a real document. Its head and body are exactly this:
 In a bundled app the requirements are identical — stylesheet, the two `<body>` attributes, the icon script if you want icons.
 
 >
-`npm install @ideagen-ax/praxis@0.1.4`
+`npm install @ideagen-ax/praxis@0.1.5`
 
 `import '@ideagen-ax/praxis'` — tokens, core and every component
 `import '@ideagen-ax/praxis/dist/praxis-lucide.js'` — optional, icons only
@@ -169,7 +169,7 @@ Rule counts and class families, read from `src/` at build time. "Families" count
 
 | Sheet | Rules | Main class families |
 |---|---|---|
-| `praxis-admin.css` | 251 | `.adminnav`, `.ws-item`, `.admin-field`, `.admin-table`, `.tbtn` |
+| `praxis-admin.css` | 259 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
 | `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.msel`, `.iconbtn-ghost` |
 | `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
 | `praxis-create-new.css` | 83 | `.cn-group`, `.cn-flyout`, `.cn-row`, `.material-symbols-rounded`, `.cn-tpl` |
@@ -198,6 +198,8 @@ Praxis names things in one style and expresses state in five. The naming is cons
 ### Naming, which is consistent
 
 BEM, with a component root, `__` for a part and `--` for a variant: `.rfield__label`, `.tbtn--primary`, `.ws-item__badge`, `.px-navdrawer__item--active`. Custom properties are `--praxis-*` for the foundation and `--px-*` for the Praxis material layer.
+
+**Part names are not always BEM, and one case is worth knowing.** The toggle switch accepts both `.switch__track` / `.switch__thumb` and the original `.track` / `.thumb`. The BEM pair is canonical; the bare pair is kept because consumers use it, and it is a good illustration of why the convention exists — `.track` and `.thumb` are about as collision-prone as class names get in a sheet you drop into someone else's application. See [form controls](#part-names).
 
 Two things that look like exceptions and are not. `.praxis-navrail` carries the full prefix because it collided with a host class during extraction. And `.px-*` classes — `.px-pop`, `.px-navdrawer`, `.px-skip` — use the short prefix rather than `praxis-`; they are the same family, just older.
 
@@ -293,9 +295,9 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
 | `--praxis-color-border-strong` | `var(--praxis-color-neutral-40)` | — |
-| `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | — |
+| `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
 | `--praxis-color-interactive-default` | `var(--praxis-color-teal-60)` | `#29D2D7` |
-| `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | — |
+| `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | `#42D9DE` |
 | `--praxis-color-surface-default` | `var(--praxis-color-white)` | `#192336` |
 | `--praxis-color-surface-subtle` | `var(--praxis-color-neutral-10)` | `#161c27` |
 | `--praxis-color-text-disabled` | `var(--praxis-color-neutral-40)` | `#62707e` |
@@ -304,8 +306,8 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-text-primary` | `var(--praxis-color-neutral-90)` | `#e7ebf1` |
 | `--praxis-color-text-secondary` | `var(--praxis-color-neutral-60)` | `#9aa7b4` |
 | `--praxis-color-text-tertiary` | `#616f7e` | `#8b98a6` |
-| `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | — |
-| `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | — |
+| `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
+| `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
 | `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
 | `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
 | `--praxis-type-font-sans` | `'Gilroy','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif` | — |
@@ -391,8 +393,8 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-yellow-80` | `#aa8d00` | — |
 | `--praxis-radius-card` | `20px` | — |
 | `--praxis-radius-xl` | `16px` | — |
-| `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | — |
-| `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | — |
+| `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | `#222b39` |
+| `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | `#222b39` |
 | `--praxis-space-20` | `1.25rem` | — |
 | `--praxis-space-40` | `2.5rem` | — |
 | `--praxis-space-48` | `3rem` | — |
@@ -486,7 +488,7 @@ Semantic color, not palette rungs. These are the tokens remapped per theme, so u
 |---|---|---|
 | `--praxis-color-surface-default` | `var(--praxis-color-white)` | `#192336` |
 | `--praxis-color-surface-subtle` | `var(--praxis-color-neutral-10)` | `#161c27` |
-| `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | — |
+| `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | `#222b39` |
 
 
 #### Border
@@ -497,7 +499,7 @@ Semantic color, not palette rungs. These are the tokens remapped per theme, so u
 | `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
 | `--praxis-color-border-strong` | `var(--praxis-color-neutral-40)` | — |
-| `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | — |
+| `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | `#222b39` |
 
 
 #### Interactive
@@ -505,9 +507,9 @@ Semantic color, not palette rungs. These are the tokens remapped per theme, so u
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | — |
+| `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
 | `--praxis-color-interactive-default` | `var(--praxis-color-teal-60)` | `#29D2D7` |
-| `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | — |
+| `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | `#42D9DE` |
 
 
 **Interactive teal is a light color in dark mode.** `--praxis-color-interactive-default` becomes `#29D2D7`, luminance .55. White text on it as a *fill* measures 1.86:1 against a 4.5 minimum. Use `--px-primary-fg` (dark ink, 12.4:1) whenever that color is a fill — which is the ink the swatches above are drawn with. Praxis already does this for the calls to action it defines; if you invent a filled cyan control, it is on you.
@@ -517,8 +519,8 @@ Semantic color, not palette rungs. These are the tokens remapped per theme, so u
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | — |
-| `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | — |
+| `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
+| `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
 | `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
 | `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
 
@@ -724,36 +726,48 @@ Measured, not asserted. Each row below is a token `praxis-tokens.css` declares a
 | `--praxis-radius-card` | `20px` | **`12px`** |
 
 
-### Nine semantic tokens do not change in dark
+### Four semantic tokens do not change in dark
 
-Read the two resolved values under each swatch above and you will notice several matching. That is worth understanding rather than skimming, because it has three different causes and only one of them is a bug.
+Read the two resolved values under each swatch above and four of them match. That is worth understanding rather than skimming, because it used to be nine — and five of those nine were fixed in `src/` on 2026-08-18 after this page made them visible.
 
-#### Deliberate
+#### What was fixed
 
-`--praxis-color-text-inverse` is `#ffffff` in both themes on purpose. It is the ink for a colored fill, and a fill dark enough to need inverse ink is dark in either theme.
+Four tokens were declared on `:root` as `var(--rung)` while the dark remap of that rung was declared on `body`. Custom-property substitution happens at the element where the *declaration* lives, so each was computed on `:root` against the light rung and `body` inherited that value. **The dark value could never apply.**
 
-#### The rung simply has no dark treatment
-
-`--praxis-color-border-strong`, `--praxis-color-border-focus`, `--praxis-color-interactive-hover` and `--praxis-color-status-danger` alias rungs the dark theme never remaps — `neutral-40`, `teal-50`, `teal-70`, `red-60`. Nothing is broken; the ramp just stops there. It is still worth a look, because `interactive-hover` staying a dark teal while `interactive-default` becomes bright cyan means hover moves the wrong direction in dark mode.
-
-#### The dark value exists and can never apply
-
-**These four are a rule violation, not an omission.** Each is declared on `:root` as `var(--rung)`, and the dark remap of that rung is declared on `body`. Custom-property substitution happens at the element where the *declaration* lives, so the token is computed on `:root` against the light rung, and `body` inherits that computed value. The dark remap is never reached.
-
-`--praxis-color-interactive-active` is the one to care about: in dark mode a control's resting state is bright cyan `#29D2D7` and its pressed state resolves to `#135d63`, so pressing it makes it go *darker*. Inverted feedback.
-
-The fix is to give each its own value in the dark block, as `--praxis-color-surface-subtle` already does — it aliases the same `neutral-10` and themes correctly because it does not rely on the alias to carry the theme.
-
-
-| Token | Aliases | Dark value that never applies |
+| Token | Was, in dark | Now |
 |---|---|---|
-| `--praxis-color-border-subtle` | `--praxis-color-neutral-10` | `#222b39` |
-| `--praxis-color-interactive-active` | `--praxis-color-teal-80` | `#5CE0E5` |
-| `--praxis-color-status-info` | `--praxis-color-blue-60` | `#7a93e0` |
-| `--praxis-color-surface-muted` | `--praxis-color-neutral-10` | `#222b39` |
+| `--praxis-color-interactive-active` | `#135d63` — a light-mode ink | `#5CE0E5` |
+| `--praxis-color-border-subtle` | `#edf0f2` | `#222b39` |
+| `--praxis-color-surface-muted` | `#edf0f2` | `#222b39` |
+| `--praxis-color-status-info` | `#4766eb` | `#7a93e0` |
+
+`interactive-active` was the one that mattered: in dark, a control's resting state was bright cyan `#29D2D7` and its pressed state resolved to a dark `#135d63`, so pressing it made it go *darker*. Inverted feedback.
+
+Fixing it required widening the change by one token. `--praxis-color-interactive-hover` was not frozen — it aliases `teal-70`, which has no dark treatment at all — but leaving it would have produced a triad that goes bright, then dark, then bright. It now sits between the two, and the progression mirrors light in *direction*: every interaction step increases contrast against the ink on the fill.
+
+|  | default | hover | active |
+|---|---|---|---|
+| light, ink `#fff` | `#1b838b` 4.50:1 | `#176f76` 5.88:1 | `#135d63` 7.57:1 |
+| dark, ink `#08313a` | `#29D2D7` 7.48:1 | `#42D9DE` 8.08:1 | `#5CE0E5` 8.77:1 |
+
+And `--praxis-color-status-danger` was the fifth. It was not frozen either — it simply had no dark value while its three siblings did — but at `#e22d38` it measured **3.50:1** on the dark card against the 4.5:1 WCAG 1.4.3 asks of text, while success, warning and info sat at 7.88, 7.89 and 5.30. It is now `red-40` (`#ed7b82`), an existing rung, at 5.81:1.
 
 
-Detected from the structure of the stylesheets on every build, so this table cannot go stale and the bug class cannot come back unnoticed. It is deliberately *not* derived from the resolved values: a resolver asked for the dark value substitutes the dark rung and reports a difference the browser does not actually produce, which is the whole reason this was invisible.
+None.
+
+
+That table is generated from the structure of the stylesheets on every build, and an empty result is now a **gate**: a fifth frozen alias fails the build rather than waiting for someone to notice a control behaving backwards. It is deliberately not derived from the resolved values — a resolver asked for the dark value substitutes the dark rung and reports a difference the browser never produces, which is the whole reason this went unseen.
+
+#### The four that remain, and why they are fine
+
+| Token | Both themes | Why |
+|---|---|---|
+| `--praxis-color-text-inverse` | `#ffffff` | **Deliberate.** It is the ink for a coloured fill, and a fill dark enough to need inverse ink is dark in either theme. |
+| `--praxis-color-border-strong` | `#8898a9` | Aliases `neutral-40`, which the dark theme does not remap. 5.33:1 on the dark card, well past the 3:1 a border needs. |
+| `--praxis-color-border-focus` | `#4499a0` | Aliases `teal-50`, likewise unremapped. 4.73:1 — a focus ring that reads in both themes. |
+| `--praxis-color-status-danger` | — | No longer in this list; see above. |
+
+The distinction that matters: a token identical in both themes is **not** automatically a bug. Three of these are either intended or measurably adequate. What was a bug was a dark value that existed and could not be reached, which is a rule violation rather than an omission — and that is the thing the build now checks.
 
 ### Two live traps
 
@@ -776,9 +790,9 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 | `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
 | `--praxis-color-border-strong` | `var(--praxis-color-neutral-40)` | — |
-| `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | — |
+| `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
 | `--praxis-color-interactive-default` | `var(--praxis-color-teal-60)` | `#29D2D7` |
-| `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | — |
+| `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | `#42D9DE` |
 | `--praxis-color-surface-default` | `var(--praxis-color-white)` | `#192336` |
 | `--praxis-color-surface-subtle` | `var(--praxis-color-neutral-10)` | `#161c27` |
 | `--praxis-color-text-disabled` | `var(--praxis-color-neutral-40)` | `#62707e` |
@@ -787,12 +801,12 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 | `--praxis-color-text-primary` | `var(--praxis-color-neutral-90)` | `#e7ebf1` |
 | `--praxis-color-text-secondary` | `var(--praxis-color-neutral-60)` | `#9aa7b4` |
 | `--praxis-color-text-tertiary` | `#616f7e` | `#8b98a6` |
-| `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | — |
-| `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | — |
+| `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
+| `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
 | `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
 | `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
-| `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | — |
-| `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | — |
+| `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | `#222b39` |
+| `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | `#222b39` |
 
 
 #### Tone pairs
@@ -1331,7 +1345,7 @@ Class names that appear in Praxis selectors and so look supported, but have no b
 
 These class names appear in Praxis selectors, which makes them look supported. They have no base definition. The distinction matters because the failure is silent: your `.btn` picks up the Praxis primary fill and none of the box it needs, so it renders as colored text.
 
-Verified by hand against `src/` at 0.1.4. The generated tables further down are measured every build.
+Verified by hand against `src/` at 0.1.5. The generated tables further down are measured every build.
 
 ### Classes with no base
 
@@ -1984,7 +1998,11 @@ This is the page most likely to save you an hour. Praxis names ten button classe
 
 `.tbtn` sets its icon ink to `--praxis-color-text-secondary` so a labelled button reads label-first, and `.tbtn--primary` overrides that to white. Give an icon-only button an `aria-label`; there is no text node for a screen reader to fall back on.
 
-**Disabled has no appearance.** Look at "Unavailable" above — it is a real `<button disabled>` and it is indistinguishable from an enabled button at rest. Praxis suppresses hover and the press transform on `:disabled` and `[aria-disabled="true"]`, so the button stops *responding*, but no sheet gives it a disabled *look*. You write that. An `opacity:.5` and `cursor:not-allowed` is enough, and it must go on your own class, not on `.tbtn`.
+**Disabled is styled as of 2026-08-18** — see "Unavailable" above. `.tbtn` and `.admin-ghostbtn` take `opacity:.45`, `cursor:not-allowed` and no shadow on both `:disabled` and `[aria-disabled="true"]`, the second because a link styled as a button cannot take `:disabled`.
+
+Before that, Praxis suppressed hover and the press transform on disabled controls but gave them no *appearance*, so a disabled button stopped responding while looking identical at rest. Opacity rather than a flat grey, because it has to work on `.tbtn--primary`'s gradient too, which no single colour could stand in for.
+
+**The other eight button classes still have nothing.** If you built your own base, style its disabled state yourself.
 
 ### The primary action
 
@@ -2038,7 +2056,7 @@ If you need a `.btn` scale — because you are porting markup that has one, or b
 
 ## Form controls
 
-The checkbox, the toggle switch, the skip link and the scrollbar treatment — plus the one place two sheets disagree about what .switch means, with a visibly broken control as the result.
+The checkbox, the toggle switch, the skip link and the scrollbar treatment — including the two markup forms of .switch, which now render identically after one of them turned out to be styled by nothing at all.
 
 
 Tier: **ready** · Sheet: `praxis-admin.css, praxis-core.css`
@@ -2101,36 +2119,47 @@ A wrapper, a hidden input, and two decorative spans. The input carries the state
 
 **The switch is deliberately excluded from the checkbox styling.** `praxis-core.css` keys its checkbox rules on `input[type="checkbox"]:not(.switch):not(.switch *)`. That second clause is what spares the switch's hidden input. It also means **putting `class="switch"` on the input itself opts that input out of all checkbox styling** — see below.
 
-### Two sheets disagree about `.switch`
+### Two markup forms, both supported
 
-**This produces a visibly broken control in the shipped filter drawer.** `praxis-admin.css` defines `.switch` as the *wrapper*, with `.track` and `.thumb` inside it. `praxis-filters.css` reads `.onoff:has(.switch:checked)`, which can only match if `.switch` is on the *input*. Both cannot be right, and `praxis-filters.js` emits the second form:
+Praxis shipped two contradictory ideas of what `.switch` means, and until 2026-08-18 only one of them was styled. Both work now, from one set of values, and they render identically — verified as 34×20 with `neutral-30` unchecked and `teal-60` checked in all four permutations.
 
-`<input type="checkbox" class="switch">` followed by `<span class="switch__track"><span class="switch__thumb">`
-
-Neither `.switch__track` nor `.switch__thumb` is defined in any Praxis stylesheet, and `class="switch"` on the input excludes it from the checkbox rules. So the On/Off row in a filter drawer renders as a **bare browser checkbox between two labels**, with two empty spans beside it.
+| Form | Shape | Use it when |
+|---|---|---|
+| **Wrapper** — canonical | `.switch` is the wrapper; the input is inside it | Always, in new markup |
+| **Sibling** | `.switch` is on the input; the track is its next sibling | Never by choice. It is what `praxis-filters.js` emits, so it is supported rather than removed. |
 
 ```html
-<div style="display:flex;gap:3rem;align-items:center;flex-wrap:wrap">
-  <div>
-    <p class="rfield__hint" style="margin:0 0 .5rem">From <code>praxis-filters.js</code></p>
-    <label class="onoff">
-      <span class="onoff__label onoff__label--off">Off</span>
-      <input type="checkbox" class="switch">
-      <span class="switch__track"><span class="switch__thumb"></span></span>
-      <span class="onoff__label onoff__label--on">On</span>
-    </label>
-  </div>
-  <div>
-    <p class="rfield__hint" style="margin:0 0 .5rem">From <code>praxis-admin.css</code></p>
-    <span class="switch">
-      <input type="checkbox" checked>
-      <span class="track"></span><span class="thumb"></span>
-    </span>
-  </div>
+<div style="display:flex;gap:2.5rem;align-items:center;flex-wrap:wrap">
+  <label class="onoff">
+    <span class="onoff__label onoff__label--off">Off</span>
+    <input type="checkbox" class="switch">
+    <span class="switch__track"><span class="switch__thumb"></span></span>
+    <span class="onoff__label onoff__label--on">On</span>
+  </label>
+  <label class="onoff">
+    <span class="onoff__label onoff__label--off">Off</span>
+    <input type="checkbox" class="switch" checked>
+    <span class="switch__track"><span class="switch__thumb"></span></span>
+    <span class="onoff__label onoff__label--on">On</span>
+  </label>
+  <span class="switch">
+    <input type="checkbox" checked>
+    <span class="switch__track"></span><span class="switch__thumb"></span>
+  </span>
 </div>
 ```
 
-Until it is fixed in `src/`, a page that renders its own On/Off row should use the wrapper form. If you need the filter drawer's row to look right today, the smallest correct patch is to define `.switch__track` and `.switch__thumb` in your own sheet against `input.switch:checked` — but the fix belongs in Praxis, so raise it rather than carrying it.
+#### Why the wrapper is canonical
+
+`praxis-core.css` is already committed to it. Its checkbox rules are keyed `input[type="checkbox"]:not(.switch):not(.switch *)`, and that second clause only means anything if `.switch` can have descendants — which it can only do in the wrapper form.
+
+The sibling form was kept working rather than removed because `praxis-filters.css` reads `.onoff:has(.switch:checked)`, which needs the class on the input, so that sheet and its script agree with each other. Rewriting either would mean touching the JavaScript and that `:has()` selector to fix something CSS alone could close.
+
+#### Part names
+
+**`.switch__track` and `.switch__thumb` are canonical.** The original `.track` and `.thumb` still work and are kept because consumers use them, but they are two of the most collision-prone class names it is possible to put in a shared stylesheet. Do not use them in new markup.
+
+**What this looked like before the fix,** because it is a useful shape to recognise: the sibling form rendered as a *bare browser checkbox* between two labels. No sheet defined `.switch__track` or `.switch__thumb`, and `class="switch"` on the input also opted it out of the Praxis checkbox rules — so nothing styled it at all, and there was no error. A control that renders as an unstyled native widget is usually this: a class that excludes it from one treatment without providing another.
 
 ### Segmented control
 
@@ -2400,11 +2429,11 @@ Two consequences that matter:
 
 A different thing with a similar name. `praxis-dotfield.js` is a single-canvas animated dot grid for hero and login moments — one `<canvas>`, one draw loop, every dot drawn with `arc()` each frame so it stays smooth past 4,000 dots. It is not the page texture and does not replace it.
 
-**Two things will make it render nothing, and the file's own usage comment omits one of them.**
+**Two things will make it render nothing, both silently.**
 
-`create()` builds the field but **does not start the loop** — you must call `.start()`. The usage block at the top of `praxis-dotfield.js` shows `create` then `setMode` then `setParam` and never mentions it, so following that comment gives you a blank canvas with no error.
+`create()` builds the field but **does not start the loop** — you must call `.start()`. And **the dots are drawn white**, shading to the teal signature under the pointer, so on a light surface they are invisible. It was built for the login page; give it a dark backdrop.
 
-And **the dots are drawn white**, shading to the teal signature under the pointer. On a light surface they are invisible. It was built for the login page; give it a dark backdrop.
+Until 2026-08-18 the usage block at the top of `praxis-dotfield.js` showed `create` → `setMode` → `setParam` and never mentioned `start()`, so following the file's own instructions gave you a blank canvas. Both facts are in that comment now.
 
 ```html
 <div style="background:#0f1720;border-radius:var(--praxis-radius-md);overflow:hidden">
@@ -2667,19 +2696,19 @@ The point of shipping the catalog without the renderer is that the workspace and
 
 ### Getting at the data, and the trap
 
-`CREATE_CATALOG` and `CN_TEMPLATES` are declared with top-level `const` and are **never assigned to `window`**. Measured in a browser:
+Both arrays are on `window`, and both bare identifiers still work. Measured in a browser:
 
 | Access | Result |
 |---|---|
-| `CREATE_CATALOG` from another classic `<script>` | Works — 6 groups |
-| `window.CREATE_CATALOG` | **`undefined`** |
-| `CN_TEMPLATES` / `window.CN_TEMPLATES` | Works / **`undefined`** |
+| `window.CREATE_CATALOG` | 6 groups |
+| `window.CN_TEMPLATES` | 5 templates |
+| `CREATE_CATALOG` from another classic `<script>` | Still works |
 
-A top-level `const` in a classic script creates a global *lexical* binding, which other classic scripts can read as a bare identifier but which is not a property of `window`. So a guard like `if (window.CREATE_CATALOG)` always fails.
+**This was broken until 2026-08-18, and the failure mode is worth recognising.** Both were declared with top-level `const` and never assigned anywhere. In a classic script that creates a global *lexical* binding — readable as a bare identifier from another classic script, but **not a property of `window`**, so a guard like `if (window.CREATE_CATALOG)` always failed.
 
-**Under a bundler, this file gives you nothing.** `package.json` declares `"type": "module"` and no shipped script has an `export`. Imported as a module, those two `const`s become module-scoped and are invisible to everything else, with no error. The other scripts survive the same import because they either self-wire as a side effect or assign to `window` explicitly — only three do that: `window.PraxisFilters`, `window.PraxisDotField` and the Mazlan globals.
+Worse, `package.json` declares `"type": "module"` and no shipped script has an `export`. Imported through a bundler, both `const`s became module-scoped and invisible to everything else, with no error — so `import '@ideagen-ax/praxis/dist/praxis-create-new.js'`, the documented npm path, was a silent no-op.
 
-So `import '@ideagen-ax/praxis/dist/praxis-create-new.js'` is a no-op. Load it with a classic `<script src>`, or copy the catalog into your own module.
+Only three shipped scripts assign to `window` at all: `PraxisFilters`, `PraxisDotField` and the Mazlan globals. The rest survive a module import because they self-wire as a side effect; a pure-data file had nothing to fall back on.
 
 ### The catalog shape
 
@@ -3378,7 +3407,7 @@ Tier: **unstable** · Sheet: `praxis-mazlan.css` · Script: `praxis-mazlan.js`
 
 Dot colors are slate, magenta, cyan, teal, clockwise from top-left; the slate dot lightens in dark mode.
 
-**Only two sizes are defined: base 20px and `.mazlan-mark--sm` at 16px.** `.mazlan-mark--xl` at 40px is *not* a Praxis class — it appears only inside a comment in `praxis-mazlan.css` describing what one consumer's own page did, and `PRAXIS-FOR-AGENTS.md` at 0.1.4 transcribes that comment as though it were a definition. Using it silently gets you the 20px base. Set `width` and `height` yourself instead: the dots are positioned in percentages, so the glyph scales from those two properties alone, as the third mark above does.
+**Only two sizes are defined: base 20px and `.mazlan-mark--sm` at 16px.** `.mazlan-mark--xl` at 40px is *not* a Praxis class — it appears only inside a comment in `praxis-mazlan.css` describing what one consumer's own page did. `PRAXIS-FOR-AGENTS.md` transcribed that comment as though it were a definition until 0.1.5 — the live example on this page is what caught it, and that guide is now generated from this content, so the two cannot disagree again. Using `--xl` silently gets you the 20px base. Set `width` and `height` yourself instead: the dots are positioned in percentages, so the glyph scales from those two properties alone, as the third mark above does.
 
 Its base rules live in **`praxis-admin.css`**, not `praxis-mazlan.css` — another reason to load the bundle rather than picking sheets. Inside the drawer, `.mazlan-welcome__logo > span` adds a calm 3.2s breathing animation, amplitude deliberately held to 8% for a regulated-industry context, and switched off under `prefers-reduced-motion`.
 
@@ -3675,24 +3704,24 @@ Zebra striping is `tbody tr:nth-child(even)`, and the same warning applies as fo
 
 | Family | Mentions |
 |---|---|
+| `.switch` | 30 |
 | `.adminnav` | 30 |
 | `.ws-item` | 23 |
 | `.admin-field` | 15 |
+| `.tbtn` | 14 |
 | `.admin-table` | 14 |
-| `.tbtn` | 12 |
 | `.material-symbols-rounded` | 12 |
 | `.admin-grid` | 11 |
 | `.appswitch` | 10 |
 | `.icon` | 8 |
 | `.admin-banner` | 8 |
 | `.mazlan-mark` | 8 |
+| `.admin-ghostbtn` | 7 |
 | `.admin-cols` | 7 |
 | `.admin-pill` | 7 |
 | `.admin-drill` | 7 |
 | `.admin-stat` | 7 |
-| `.switch` | 6 |
 | `.admin-card` | 5 |
-| `.admin-ghostbtn` | 5 |
 | `.admin-setting-row` | 5 |
 | `.admin-menurow` | 5 |
 | `.admin-note` | 5 |
@@ -3701,10 +3730,10 @@ Zebra striping is `tbody tr:nth-child(even)`, and the same warning applies as fo
 | `.ss-row` | 5 |
 | `.admin-tab` | 4 |
 | `.ss-pop` | 4 |
+| `.track` | 3 |
 | `.px-pop` | 3 |
 | `.admin-rowx` | 3 |
 | `.admin-settings-grid` | 3 |
-| `.track` | 2 |
 | `.thumb` | 2 |
 | `.req` | 2 |
 | `.admin-table-scroll` | 2 |

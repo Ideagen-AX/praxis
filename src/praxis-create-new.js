@@ -83,3 +83,26 @@ const CN_TEMPLATES = [
   { icon: 'visibility', label: 'Walkthrough observation card',type: 'Observation',       tone: 'pink',   sub: 'Area, category & prompts ready' },
   { icon: 'build',      label: 'Fastener-torque CAPA starter',type: 'CAPA',             tone: 'blue',   sub: 'Problem statement & 8D steps scaffolded' }
 ];
+
+/* =====================================================================
+   EXPOSE THE DATA. Added 2026-08-18.
+
+   CREATE_CATALOG and CN_TEMPLATES were declared with top-level `const` and never
+   assigned anywhere. In a classic <script> that creates a global LEXICAL binding:
+   another classic script can read `CREATE_CATALOG` as a bare identifier, but
+   `window.CREATE_CATALOG` is undefined, so a feature test like
+   `if (window.CREATE_CATALOG)` always failed.
+
+   Worse, package.json declares "type": "module" and no shipped script has an
+   export. Imported through a bundler, both consts became module-scoped and were
+   invisible to everything else — with no error. `import
+   '@ideagen-ax/praxis/dist/praxis-create-new.js'` was a silent no-op, which is the
+   documented npm integration path.
+
+   Assigning to window fixes the classic case and the bundler case at once, and the
+   bare identifiers keep working, so nothing that read them before breaks.
+   ===================================================================== */
+if (typeof window !== 'undefined') {
+  window.CREATE_CATALOG = CREATE_CATALOG;
+  window.CN_TEMPLATES = CN_TEMPLATES;
+}

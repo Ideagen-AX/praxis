@@ -23,34 +23,33 @@ They are free to differ on how it looks.</p>
 
 <h2>Getting at the data, and the trap</h2>
 
-<p><code>CREATE_CATALOG</code> and <code>CN_TEMPLATES</code> are declared with top-level
-<code>const</code> and are <strong>never assigned to <code>window</code></strong>. Measured
-in a browser:</p>
+<p>Both arrays are on <code>window</code>, and both bare identifiers still work. Measured in a
+browser:</p>
 
 <table>
   <thead><tr><th>Access</th><th>Result</th></tr></thead>
   <tbody>
-    <tr><td><code>CREATE_CATALOG</code> from another classic <code>&lt;script&gt;</code></td><td>Works — 6 groups</td></tr>
-    <tr><td><code>window.CREATE_CATALOG</code></td><td><strong><code>undefined</code></strong></td></tr>
-    <tr><td><code>CN_TEMPLATES</code> / <code>window.CN_TEMPLATES</code></td><td>Works / <strong><code>undefined</code></strong></td></tr>
+    <tr><td><code>window.CREATE_CATALOG</code></td><td>6 groups</td></tr>
+    <tr><td><code>window.CN_TEMPLATES</code></td><td>5 templates</td></tr>
+    <tr><td><code>CREATE_CATALOG</code> from another classic <code>&lt;script&gt;</code></td><td>Still works</td></tr>
   </tbody>
 </table>
 
-<p>A top-level <code>const</code> in a classic script creates a global <em>lexical</em>
-binding, which other classic scripts can read as a bare identifier but which is not a property
-of <code>window</code>. So a guard like <code>if (window.CREATE_CATALOG)</code> always fails.</p>
-
-<div class="note note--trap">
-  <p><strong>Under a bundler, this file gives you nothing.</strong>
-  <code>package.json</code> declares <code>"type": "module"</code> and no shipped script has an
-  <code>export</code>. Imported as a module, those two <code>const</code>s become
-  module-scoped and are invisible to everything else, with no error. The other scripts survive
-  the same import because they either self-wire as a side effect or assign to
-  <code>window</code> explicitly — only three do that:
-  <code>window.PraxisFilters</code>, <code>window.PraxisDotField</code> and the Mazlan
-  globals.</p>
-  <p>So <code>import '@ideagen-ax/praxis/dist/praxis-create-new.js'</code> is a no-op. Load it
-  with a classic <code>&lt;script src&gt;</code>, or copy the catalog into your own module.</p>
+<div class="note">
+  <p><strong>This was broken until 2026-08-18, and the failure mode is worth recognising.</strong>
+  Both were declared with top-level <code>const</code> and never assigned anywhere. In a classic
+  script that creates a global <em>lexical</em> binding — readable as a bare identifier from
+  another classic script, but <strong>not a property of <code>window</code></strong>, so a guard
+  like <code>if (window.CREATE_CATALOG)</code> always failed.</p>
+  <p>Worse, <code>package.json</code> declares <code>"type": "module"</code> and no shipped
+  script has an <code>export</code>. Imported through a bundler, both <code>const</code>s became
+  module-scoped and invisible to everything else, with no error — so
+  <code>import '@ideagen-ax/praxis/dist/praxis-create-new.js'</code>, the documented npm path,
+  was a silent no-op.</p>
+  <p>Only three shipped scripts assign to <code>window</code> at all:
+  <code>PraxisFilters</code>, <code>PraxisDotField</code> and the Mazlan globals. The rest
+  survive a module import because they self-wire as a side effect; a pure-data file had nothing
+  to fall back on.</p>
 </div>
 
 <h2>The catalog shape</h2>

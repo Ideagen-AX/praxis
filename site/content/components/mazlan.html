@@ -66,8 +66,10 @@ lightens in dark mode.</p>
   <p><strong>Only two sizes are defined: base 20px and <code>.mazlan-mark--sm</code> at
   16px.</strong> <code>.mazlan-mark--xl</code> at 40px is <em>not</em> a Praxis class —
   it appears only inside a comment in <code>praxis-mazlan.css</code> describing what one
-  consumer's own page did, and <code>PRAXIS-FOR-AGENTS.md</code> at 0.1.4 transcribes that
-  comment as though it were a definition. Using it silently gets you the 20px base. Set
+  consumer's own page did. <code>PRAXIS-FOR-AGENTS.md</code> transcribed that comment as though
+  it were a definition until 0.1.5 — the live example on this page is what caught it, and that
+  guide is now generated from this content, so the two cannot disagree again. Using
+  <code>--xl</code> silently gets you the 20px base. Set
   <code>width</code> and <code>height</code> yourself instead: the dots are positioned in
   percentages, so the glyph scales from those two properties alone, as the third mark above
   does.</p>

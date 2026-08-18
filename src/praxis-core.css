@@ -137,6 +137,21 @@ body[data-theme="dark"]{
   --praxis-color-border-default:rgba(255,255,255,.10);
   --praxis-color-text-primary:#e7ebf1; --praxis-color-text-secondary:#9aa7b4; --praxis-color-text-disabled:#62707e;
   --praxis-color-text-tertiary:#8b98a6;  /* 4.6:1 on the dark card (was 3.65:1) */
+
+  /* FROZEN ALIASES, fixed 2026-08-18. Both are declared on :root as
+     var(--praxis-color-neutral-10). Custom-property substitution happens at the
+     element where the DECLARATION lives, so they were computed on :root against
+     the LIGHT neutral-10 and body inherited that value — the remap two lines
+     above never reached them, and both resolved to #edf0f2 in dark. Restating
+     them here is the fix; --praxis-color-surface-subtle above never had the bug
+     because it was always given its own value rather than relying on the alias
+     to carry the theme.
+
+     Verified before and after with getComputedStyle in both themes, not by
+     reading the file: a resolver asked for the dark value substitutes the dark
+     rung and reports a difference the browser does not produce, which is exactly
+     why this was invisible for so long. */
+  --praxis-color-border-subtle:#222b39; --praxis-color-surface-muted:#222b39;
 }
 
 /* ---- Praxis DARK: Mazlan dark surfaces + materials ---- */
@@ -173,6 +188,46 @@ body[data-variant="praxis"][data-theme="dark"]{
 
   /* Status inks brighten on dark for the same reason. */
   --praxis-color-status-success:#3ecf8e; --praxis-color-status-warning:#ffa32e;
+
+  /* status-danger was the one status ink with no dark treatment, and unlike its
+     siblings that was a measurable failure rather than a stylistic gap: red-60
+     (#e22d38) is 3.50:1 on the dark card #192336, against the 4.5:1 that WCAG
+     1.4.3 asks of text. Its three siblings sit at 5.30, 7.88 and 7.89:1.
+
+     #ed7b82 is red-40, an existing palette rung rather than a new value, at
+     5.81:1 — inside the band the other three occupy. red-50 was the closer step
+     in hue but measures 4.34:1 and still fails. Added 2026-08-18. */
+  --praxis-color-status-danger:#ed7b82;
+
+  /* status-info was the third of these and was missed: it aliases blue-60 on
+     :root, and blue-60 IS remapped for the Praxis variant, so the alias froze at
+     the light #4766eb while its two siblings themed correctly. #7a93e0 is the
+     dark blue-60 this variant already declares — 5.30:1 on the dark card. */
+  --praxis-color-status-info:#7a93e0;
+
+  /* THE INTERACTIVE TRIAD, fixed 2026-08-18.
+
+     --praxis-color-interactive-active aliases teal-80, which the remap below
+     turns into #5CE0E5 — but the alias is declared on :root, so it froze at the
+     light #135d63. In dark that made the resting state bright cyan and the
+     PRESSED state a dark ink: pressing a control made it go darker. Inverted
+     feedback, and the most user-visible of the four frozen aliases.
+
+     interactive-hover is restated too, and that is a deliberate widening of the
+     fix rather than an accident. It aliases teal-70, which has no dark treatment
+     at all, so it was not frozen — merely left behind. Fixing active alone would
+     have produced default #29D2D7 -> hover #176f76 (dark) -> active #5CE0E5
+     (bright): a triad that goes dark then bright, which is worse than the bug it
+     replaces.
+
+     #42D9DE is the one invented value in this fix, the arithmetic midpoint of the
+     two existing theme values it sits between. The progression now mirrors light
+     in DIRECTION: each interaction step increases contrast against the ink on the
+     fill. Measured with --px-primary-fg (#08313a in dark):
+         light, ink #fff:    4.50 -> 5.88 -> 7.57
+         dark,  ink #08313a: 7.48 -> 8.08 -> 8.77 */
+  --praxis-color-interactive-hover:#42D9DE;
+  --praxis-color-interactive-active:#5CE0E5;
 
   --praxis-color-text-primary:#e7ebf1; --praxis-color-text-secondary:#9aa7b4;
   --praxis-color-border-default:rgba(255,255,255,.10);

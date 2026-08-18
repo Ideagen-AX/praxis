@@ -66,13 +66,62 @@ svg{display:block;}
 .appswitch__item--active{color:var(--praxis-color-text-link);font-weight:600;}
 body[data-theme="dark"] .appswitch__item:hover{background:rgba(255,255,255,.06);}
 
-/* Toggle switch (shared: profile appearance, admin toggles) */
+/* =====================================================================
+   Toggle switch (shared: profile appearance, admin toggles, filter On/Off)
+
+   TWO MARKUP FORMS, ONE DEFINITION. Praxis shipped two contradictory ideas of
+   what `.switch` means, and until 2026-08-18 only one of them was styled:
+
+     WRAPPER form — canonical. `.switch` is the wrapper; the input is inside it.
+       <span class="switch">
+         <input type="checkbox">
+         <span class="switch__track"></span><span class="switch__thumb"></span>
+       </span>
+
+     SIBLING form — what praxis-filters.js emits. `.switch` is ON the input and
+     the track is its next sibling.
+       <input type="checkbox" class="switch">
+       <span class="switch__track"><span class="switch__thumb"></span></span>
+
+   The sibling form rendered as a BARE BROWSER CHECKBOX between two labels: no
+   sheet defined .switch__track or .switch__thumb, and `class="switch"` on the
+   input also opts it out of the Praxis checkbox rules in praxis-core.css, which
+   are keyed `input[type="checkbox"]:not(.switch):not(.switch *)`.
+
+   WHY THE WRAPPER IS CANONICAL AND THE SIBLING FORM IS SUPPORTED ANYWAY
+   The wrapper form works and real pages use it, and praxis-core.css is already
+   committed to it — the `:not(.switch *)` clause in that exclusion only means
+   anything if `.switch` can have descendants. So the wrapper wins.
+   But praxis-filters.css reads `.onoff:has(.switch:checked)`, which only matches
+   with the class on the input, so its sheet and its script agree with each other.
+   Rewriting either would mean touching the JS and that `:has()` selector to fix a
+   problem that CSS alone can close. So both forms are defined here, from one set
+   of values, and they render identically.
+
+   PART NAMES: `.switch__track` / `.switch__thumb` are canonical. The original
+   `.track` / `.thumb` still work and are kept because consumers use them, but
+   they are two of the most collision-prone class names it is possible to put in a
+   shared stylesheet, so new markup should not use them.
+   ===================================================================== */
 .switch{position:relative;display:inline-flex;align-items:center;width:34px;height:20px;flex-shrink:0;}
 .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;}
-.switch .track{position:absolute;inset:0;border-radius:999px;background:var(--praxis-color-neutral-30);transition:background var(--praxis-motion-fast);}
-.switch .thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--praxis-color-white);box-shadow:0 1px 2px rgba(16,36,58,.35);transition:transform var(--praxis-motion-fast);pointer-events:none;}
-.switch input:checked + .track{background:var(--praxis-color-teal-60);}
-.switch input:checked ~ .thumb{transform:translateX(14px);}
+.switch .track,.switch .switch__track{position:absolute;inset:0;border-radius:999px;background:var(--praxis-color-neutral-30);transition:background var(--praxis-motion-fast);}
+.switch .thumb,.switch .switch__thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--praxis-color-white);box-shadow:0 1px 2px rgba(16,36,58,.35);transition:transform var(--praxis-motion-fast);pointer-events:none;}
+.switch input:checked + .track,.switch input:checked + .switch__track{background:var(--praxis-color-teal-60);}
+.switch input:checked ~ .thumb,.switch input:checked ~ .switch__thumb{transform:translateX(14px);}
+.switch input:focus-visible + .track,.switch input:focus-visible + .switch__track{outline:2px solid var(--praxis-color-border-focus);outline-offset:2px;}
+
+/* Sibling form. `input.switch` matches ONLY this form — in the wrapper form the
+   input carries no class — so these rules cannot reach the markup above.
+   The input is collapsed rather than absolutely positioned because its parent
+   (.onoff, a <label>) is not a positioned ancestor; the label makes the whole row
+   clickable, which is the better target anyway. */
+input.switch{width:0;height:0;opacity:0;margin:0;padding:0;border:0;flex:none;}
+input.switch + .switch__track{position:relative;display:inline-block;width:34px;height:20px;flex-shrink:0;border-radius:999px;background:var(--praxis-color-neutral-30);transition:background var(--praxis-motion-fast);cursor:pointer;}
+input.switch + .switch__track .switch__thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--praxis-color-white);box-shadow:0 1px 2px rgba(16,36,58,.35);transition:transform var(--praxis-motion-fast);pointer-events:none;}
+input.switch:checked + .switch__track{background:var(--praxis-color-teal-60);}
+input.switch:checked + .switch__track .switch__thumb{transform:translateX(14px);}
+input.switch:focus-visible + .switch__track{outline:2px solid var(--praxis-color-border-focus);outline-offset:2px;}
 /* Profile menu — shared component, see praxis-profile-menu.css */
 
 /* ============================================================== LAYOUT */
@@ -104,6 +153,19 @@ body[data-variant="praxis"] .px-pop{border:0;box-shadow:var(--px-overlay);}
 .tbtn--primary:hover{filter:brightness(1.05);color:var(--praxis-color-white);box-shadow:var(--px-primary-shadow);}
 /* ghost variant — flat labelled action (used by Search Logs / Activity) */
 .tbtn--ghost{background:transparent;box-shadow:none;}
+/* Disabled had no APPEARANCE, only suppressed behaviour. praxis-core.css excludes
+   :disabled and [aria-disabled="true"] from the hover wash and the press
+   transform, so a disabled button stopped responding while looking identical to an
+   enabled one at rest — indistinguishable in a screenshot, and worse than useless
+   to a user deciding whether to click. Added 2026-08-18.
+
+   Opacity rather than a flat grey so it works on every variant at once, including
+   .tbtn--primary's gradient, which no single colour could stand in for.
+   [aria-disabled] is covered too: a link styled as a button cannot take :disabled. */
+.tbtn:disabled,.tbtn[aria-disabled="true"],
+.admin-ghostbtn:disabled,.admin-ghostbtn[aria-disabled="true"]{
+  opacity:.45;cursor:not-allowed;box-shadow:none;
+}
 .tbtn--ghost:hover{background:var(--px-hover);box-shadow:none;}
 
 /* ===================================================================

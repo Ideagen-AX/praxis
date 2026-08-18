@@ -60,14 +60,19 @@ labelled button reads label-first, and <code>.tbtn--primary</code> overrides tha
 Give an icon-only button an <code>aria-label</code>; there is no text node for a screen
 reader to fall back on.</p>
 
-<div class="note note--trap">
-  <p><strong>Disabled has no appearance.</strong> Look at "Unavailable" above — it is a real
-  <code>&lt;button disabled&gt;</code> and it is indistinguishable from an enabled button at
-  rest. Praxis suppresses hover and the press transform on <code>:disabled</code> and
-  <code>[aria-disabled="true"]</code>, so the button stops <em>responding</em>, but no sheet
-  gives it a disabled <em>look</em>. You write that. An <code>opacity:.5</code> and
-  <code>cursor:not-allowed</code> is enough, and it must go on your own class, not on
-  <code>.tbtn</code>.</p>
+<p><strong>Disabled is styled as of 2026-08-18</strong> — see "Unavailable" above.
+<code>.tbtn</code> and <code>.admin-ghostbtn</code> take <code>opacity:.45</code>,
+<code>cursor:not-allowed</code> and no shadow on both <code>:disabled</code> and
+<code>[aria-disabled="true"]</code>, the second because a link styled as a button cannot take
+<code>:disabled</code>.</p>
+
+<div class="note">
+  <p>Before that, Praxis suppressed hover and the press transform on disabled controls but gave
+  them no <em>appearance</em>, so a disabled button stopped responding while looking identical
+  at rest. Opacity rather than a flat grey, because it has to work on
+  <code>.tbtn--primary</code>'s gradient too, which no single colour could stand in for.</p>
+  <p><strong>The other eight button classes still have nothing.</strong> If you built your own
+  base, style its disabled state yourself.</p>
 </div>
 
 <h2>The primary action</h2>

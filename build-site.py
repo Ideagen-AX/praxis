@@ -1188,7 +1188,11 @@ def build():
 
     for page in pages:
         block_pages.root = page['root']
-        body = expand_blocks(page['body'], page['rel'])
+        # {{version}} in a content body, so a CDN URL in an example cannot drift
+        # from package.json. The README's pins drifted two versions this way
+        # before CI started warning about them; content should not be able to.
+        body = page['body'].replace('{{version}}', ver)
+        body = expand_blocks(body, page['rel'])
         body, examples = extract_examples(body, page, page['rel'])
         body, toc = headings(body)
 
@@ -1229,6 +1233,20 @@ def build():
              % (len(_missing) + len(_states),
                 ', '.join('.' + f for f in (_missing + _states)[:10])
                 + (' …' if len(_missing) + len(_states) > 10 else '')))
+
+    # A GATE as of 2026-08-18, when the last four were fixed. It was advisory
+    # while they existed, because failing here would have turned main red for a
+    # pre-existing bug in src/ that nobody had a way to see until this site
+    # measured it. At zero there is no reason to let a fifth one in.
+    frozen_now = praxis_meta.frozen_aliases()
+    if frozen_now:
+        fail('frozen aliases',
+             '%d token(s) alias a rung the dark theme remaps, declared on :root, so '
+             'their dark value can never apply: %s. Substitution happens where the '
+             'declaration lives, so give each its own value in the dark block \u2014 '
+             'see --praxis-color-surface-subtle for the pattern.'
+             % (len(frozen_now),
+                ', '.join('%s -> %s' % (t, r) for t, r, _d in frozen_now)))
 
     every = {name for _g, name, _l, _d in praxis_meta.token_rows()}
     every |= {name for _g, name, _l, _d in praxis_meta.material_rows()}
@@ -1474,7 +1492,8 @@ def agents_doc(pages):
         if page['section'] == 'overview':
             continue
         blocks = []
-        body = expand_blocks(page['body'], page['rel'], markdown=True, collected=blocks)
+        body = page['body'].replace('{{version}}', version())
+        body = expand_blocks(body, page['rel'], markdown=True, collected=blocks)
         parser = ToMarkdown(page['rel'])
         parser.feed(body)
         parser.close()
@@ -1673,12 +1692,7 @@ def main():
           % (m['tokens'], len(praxis_meta.token_cycles()), len(m['undef'])))
     frozen = praxis_meta.frozen_aliases()
     if frozen:
-        print('  note: %d token(s) alias a rung the dark theme remaps, on :root, so '
-              'their dark value can never apply:' % len(frozen))
-        for token, rung, dark in frozen:
-            print('        %s -> %s (dark %s)' % (token, rung, dark))
-        print('        Advisory: this is a defect in src/, not in the site. Make it a '
-              'gate once fixed.')
+        print('  %d frozen alias(es) — see the failure above' % len(frozen))
 
     if '--check' in argv:
         # Exercise the markdown conversion too, in memory. Otherwise CI can pass

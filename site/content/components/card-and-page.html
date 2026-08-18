@@ -110,16 +110,15 @@ every dot drawn with <code>arc()</code> each frame so it stays smooth past 4,000
 not the page texture and does not replace it.</p>
 
 <div class="note note--trap">
-  <p><strong>Two things will make it render nothing, and the file's own usage comment omits
-  one of them.</strong></p>
-  <p><code>create()</code> builds the field but <strong>does not start the loop</strong> —
-  you must call <code>.start()</code>. The usage block at the top of
-  <code>praxis-dotfield.js</code> shows <code>create</code> then <code>setMode</code> then
-  <code>setParam</code> and never mentions it, so following that comment gives you a blank
-  canvas with no error.</p>
-  <p>And <strong>the dots are drawn white</strong>, shading to the teal signature under the
-  pointer. On a light surface they are invisible. It was built for the login page; give it a
-  dark backdrop.</p>
+  <p><strong>Two things will make it render nothing, both silently.</strong></p>
+  <p><code>create()</code> builds the field but <strong>does not start the loop</strong> — you
+  must call <code>.start()</code>. And <strong>the dots are drawn white</strong>, shading to the
+  teal signature under the pointer, so on a light surface they are invisible. It was built for
+  the login page; give it a dark backdrop.</p>
+  <p>Until 2026-08-18 the usage block at the top of <code>praxis-dotfield.js</code> showed
+  <code>create</code> → <code>setMode</code> → <code>setParam</code> and never mentioned
+  <code>start()</code>, so following the file's own instructions gave you a blank canvas. Both
+  facts are in that comment now.</p>
 </div>
 
 <template data-example="The dot field, wave mode, on the dark backdrop it needs" data-height="270" data-scripts="dotfield">
