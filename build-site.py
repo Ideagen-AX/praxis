@@ -157,6 +157,11 @@ def parse_content(path):
             fail(rel, 'tier must be ready, settling or unstable (got %r)' % section)
             section = 'settling'
 
+    # Old paths this page should answer for, so a rename does not 404 a URL
+    # someone has already shared. Site-root-relative, comma separated.
+    redirects = [r.strip().lstrip('/') for r in (meta.get('redirect_from') or '').split(',')
+                 if r.strip()]
+
     slug = meta.get('slug') or os.path.splitext(os.path.basename(path))[0]
     subdir = os.path.dirname(rel)
     return {
@@ -165,6 +170,7 @@ def parse_content(path):
         'href': os.path.join(subdir, slug + '.html').replace(os.sep, '/'),
         'root': '../' if subdir else '',
         'order': int(meta.get('order', '50')),
+        'redirects': redirects,
         'body': raw[m.end():],
     }
 
@@ -1176,6 +1182,7 @@ def build():
     page_tpl = read(os.path.join(TEMPLATES, 'page.html'))
     ex_tpl = read(os.path.join(TEMPLATES, 'example.html'))
     probe_tpl = read(os.path.join(TEMPLATES, 'probe.html'))
+    redirect_tpl = read(os.path.join(TEMPLATES, 'redirect.html'))
     ver = version()
 
     for theme in ('light', 'dark'):
@@ -1214,6 +1221,34 @@ def build():
             'version': ver,
             'root': page['root'],
         }))
+
+    # Redirect stubs. Written last so a stub can never overwrite a real page:
+    # every real href already exists on disk by this point.
+    real = {p['href'] for p in pages}
+    n_redirects = 0
+    for page in pages:
+        for old in page['redirects']:
+            if old in real:
+                fail(page['rel'], 'redirect_from: %s is a real page on this site. A stub '
+                                  'would overwrite it.' % old)
+                continue
+            old_path = os.path.join(OUT, old)
+            if os.path.exists(old_path):
+                fail(page['rel'], 'redirect_from: %s already exists in the output' % old)
+                continue
+            os.makedirs(os.path.dirname(old_path), exist_ok=True)
+            # Relative, so the site keeps working under a path prefix — it is
+            # served from /praxis/ on Pages, not from the domain root.
+            target = os.path.relpath(page['href'], os.path.dirname(old)).replace(os.sep, '/')
+            depth = old.count('/')
+            open(old_path, 'w', encoding='utf-8').write(fill(redirect_tpl, {
+                'target': html.escape(target),
+                'targetjson': json.dumps(target),
+                'title': html.escape(page['meta']['title']),
+                'from': html.escape('/' + old),
+                'root': '../' * depth,
+            }))
+            n_redirects += 1
 
     # The docs script needs to know how far up examples/ is to load the probes.
     for page in pages:
@@ -1259,7 +1294,7 @@ def build():
              % (len(unseen), ', '.join(unseen[:8]) + (' …' if len(unseen) > 8 else '')))
 
     return {'pages': pages, 'examples': n_examples, 'version': ver,
-            'unseen_tokens': unseen}
+            'redirects': n_redirects, 'unseen_tokens': unseen}
 
 
 # ---------------------------------------------------------------------------
@@ -1682,6 +1717,8 @@ def main():
         return 0
 
     print('Praxis %s reference site → _site/' % result['version'])
+    if result['redirects']:
+        print('  %d redirect stub(s) for renamed pages' % result['redirects'])
     print('  %d pages (%s), %d live examples'
           % (len(pages),
              ', '.join('%d %s' % (counts[k], l.lower().replace('components — ', ''))

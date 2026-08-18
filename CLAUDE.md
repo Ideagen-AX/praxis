@@ -80,6 +80,13 @@ matter more than the rest:
   self-size, so it is not a cap. `data-source-only` shows markup without running
   it. A `<script>` inside a template is inert on the docs page and live in the
   generated example.
+- **`redirect_from:` keeps an old URL alive after a rename.** Site-root-relative,
+  comma separated. Renaming a content file changes the deployed URL, and Pages
+  serves static files only, so the stub is the client-side equivalent of a 301:
+  `meta refresh` for the no-JavaScript case, `location.replace` because it fires
+  sooner and adds no history entry, a visible link if both are blocked, plus
+  `noindex` and a canonical tag. The build **fails** if an old path collides with a
+  real page. `colour.html` → `color.html` is the one in use.
 - **`<praxis-block name="…">` inserts a measured fact.** Token tables, the palette
   grid, per-hue ramps, role-aware swatches, scales, sheet inventories. All come
   from `praxis_meta.py`, which `build-ds.py` also uses, so the site and

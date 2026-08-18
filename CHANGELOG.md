@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+**Site only.** No CSS or JS changed, so there is nothing to publish.
+
+### Added
+
+- **`redirect_from:` in content metadata**, and a stub at
+  `/foundations/colour.html` pointing at `/foundations/color.html` — that URL 404'd
+  from the 0.1.5 rename. Pages serves static files only, so the stub does what a 301
+  would: `meta refresh` for the no-JavaScript case, `location.replace` because it
+  fires sooner and adds no history entry so Back behaves, a visible link if both are
+  blocked, and `noindex` with a canonical tag so the stub stays out of search results
+  while the real page keeps any ranking. The build fails if an old path collides with
+  a real page.
+
 ## 0.1.5 — 2026-08-18
 
 **`src/` changed, and dark mode changed with it.** Ten fixes: six colour tokens, the
