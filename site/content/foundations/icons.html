@@ -1,0 +1,58 @@
+<!--praxis
+title: Icons
+summary: Two icon vocabularies that both work, one script that makes them agree, and the specificity gotcha that will cost you an hour.
+order: 80
+keywords: icon icons lucide material symbols svg ligature
+scripts: praxis-lucide.js
+-->
+
+<p>Praxis accepts two icon vocabularies and <code>praxis-lucide.js</code> is what makes
+them agree. Both of the following render the same glyph.</p>
+
+<template data-example="Both vocabularies, converted live" data-height="150" data-scripts="lucide">
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <span class="material-symbols-rounded">crisis_alert</span>
+    <i data-lucide="triangle-alert"></i>
+    <span class="material-symbols-rounded">assignment</span>
+    <span class="material-symbols-rounded">notifications</span>
+    <span class="material-symbols-rounded">expand_more</span>
+    <i data-lucide="search"></i>
+  </div>
+</template>
+
+<h2>How it works</h2>
+
+<p>The script maps around 500 Material Symbols ligatures to Lucide names, rewrites the
+spans to <code>&lt;svg&gt;</code>, and re-runs on a debounced
+<code>MutationObserver</code> so icons you inject later convert too. It loads a pinned
+Lucide from beside itself, so over a CDN it needs no extra tag. Point it elsewhere with
+<code>window.PRAXIS_LUCIDE_SRC</code> before loading it.</p>
+
+<p>Pinning matters: the fallback originally asked for <code>lucide@latest</code>, an
+unpinned dependency that could change under consumers without warning. The package build
+rewrites it to this package's own bundled copy and fails if the unpinned reference ever
+comes back.</p>
+
+<h2>The gotcha</h2>
+
+<div class="note note--trap">
+  <p><strong>A converted span cannot be reliably restyled from your stylesheet.</strong>
+  The converter injects <code>svg.material-symbols-rounded{…}</code> at specificity
+  (0,1,1), which outranks a plain class selector. Size it through the existing
+  <code>.material-symbols-rounded{font-size:Npx}</code> convention, or give the element its
+  own wrapper and style that.</p>
+</div>
+
+<h2>Without the script</h2>
+
+<p>If you do not load <code>praxis-lucide.js</code>, a
+<code>.material-symbols-rounded</code> span renders its ligature text as literal words —
+"crisis_alert" in the flow of your toolbar. That is the symptom to recognise; it is not a
+missing font, it is a missing script.</p>
+
+<template data-example="The same markup with no converter loaded — what a missing script looks like" data-height="120">
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <span class="material-symbols-rounded">crisis_alert</span>
+    <i data-lucide="triangle-alert"></i>
+  </div>
+</template>

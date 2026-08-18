@@ -47,7 +47,7 @@
 | Measure | Value |
 |---|---|
 | Distinct custom properties defined | **224** |
-| `var()` usages | **1,501** |
+| `var()` usages | **1,502** |
 | Raw colour literals remaining | 798 (349 hex / 449 rgb·rgba) |
 | Tokenization coverage | **65%** |
 | Tokens defined in more than one file | 69 |
@@ -738,20 +738,20 @@ Measured by CSS class-block frequency across all sources. Grouped by area.
 <!-- GENERATED:components -->
 | Sheet | Rules | Main class families |
 |---|---|---||
-| `praxis-admin.css` | 251 | `.adminnav`, `.ws-item`, `.admin-field`, `.admin-table`, `.material-symbols-rounded` |
-| `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.page`, `.msel`, `.iconbtn-ghost` |
-| `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.praxis-navrail`, `.pill-btn` |
+| `praxis-admin.css` | 251 | `.adminnav`, `.ws-item`, `.admin-field`, `.admin-table`, `.tbtn` |
+| `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.msel`, `.iconbtn-ghost` |
+| `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
 | `praxis-create-new.css` | 83 | `.cn-group`, `.cn-flyout`, `.cn-row`, `.material-symbols-rounded`, `.cn-tpl` |
-| `praxis-filters.css` | 403 | `.filter-row`, `.filter-drawer`, `.select-menu`, `.qfilter`, `.btn` |
+| `praxis-filters.css` | 403 | `.filter-row`, `.filter-drawer`, `.select-menu`, `.qfilter`, `.filter-chips` |
 | `praxis-mazlan.css` | 270 | `.mazlan-drawer`, `.mazlan-menu`, `.mazlan-reasoning`, `.material-symbols-rounded`, `.mazlan-msg` |
 | `praxis-module-selector.css` | 55 | `.msel`, `.cn-group`, `.cn-item`, `.cn-grid`, `.is-sel` |
-| `praxis-navrail.css` | 95 | `.ws-item`, `.praxis-navrail`, `.px-navdrawer`, `.ws-pop`, `.px-navtoggle` |
+| `praxis-navrail.css` | 95 | `.praxis-navrail`, `.px-navdrawer`, `.ws-item`, `.ws-pop`, `.px-navtoggle` |
 | `praxis-pageheader.css` | 21 | `.pageheader`, `.breadcrumb`, `.toolbar`, `.material-symbols-rounded`, `.icon` |
-| `praxis-profile-menu.css` | 27 | `.profile-menu`, `.verswitch`, `.css`, `.icon`, `.material-symbols-rounded` |
-| `praxis-quick-rail.css` | 37 | `.tb-is-compact`, `.qrail-pop`, `.qrail`, `.qfilter`, `.css` |
-| `praxis-reset.css` | 6 | `.css` |
+| `praxis-profile-menu.css` | 27 | `.profile-menu`, `.verswitch`, `.icon`, `.material-symbols-rounded` |
+| `praxis-quick-rail.css` | 37 | `.tb-is-compact`, `.qrail-pop`, `.qrail`, `.qfilter`, `.is-open` |
+| `praxis-reset.css` | 6 |  |
 | `praxis-rfield.css` | 124 | `.rfield`, `.rtable`, `.admin-field`, `.rref`, `.pill` |
-| `praxis-tokens.css` | 1 | `.css`, `.record`, `.html` |
+| `praxis-tokens.css` | 1 |  |
 | `praxis-toolbar-compact.css` | 82 | `.tb-options`, `.tb-compact`, `.viewswitch`, `.tb-display`, `.tb-is-compact` |
 | `praxis-workspace.css` | 81 | `.appbar`, `.praxis-navrail`, `.persona-trigger`, `.persona-picker`, `.appswitch` |
 <!-- /GENERATED:components -->

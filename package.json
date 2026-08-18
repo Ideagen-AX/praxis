@@ -33,6 +33,9 @@
   ],
   "scripts": {
     "build": "python3 build-package.py",
+    "site": "python3 build-site.py",
+    "site:serve": "python3 build-site.py --serve",
+    "site:check": "python3 build-site.py --check",
     "check": "python3 build-package.py --check",
     "prepublishOnly": "python3 build-package.py",
     "docs": "python3 build-ds.py"

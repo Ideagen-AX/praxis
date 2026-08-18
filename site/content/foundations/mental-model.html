@@ -1,0 +1,66 @@
+<!--praxis
+title: The one mental model
+summary: Praxis styles component contents. Your page owns container positioning. Nearly every "Praxis looks broken" report traces to this.
+order: 20
+keywords: positioning shell layout bundle piecemeal admin
+-->
+
+<p><strong>Praxis styles component contents. Your page owns container
+positioning.</strong></p>
+
+<p>This is stated outright in three sheets. <code>praxis-appbar.css</code>: "this file owns
+the header's visual treatment … but deliberately does not set the bar's positioning."
+<code>praxis-navrail.css</code>: "the <code>.praxis-navrail</code> container positioning
+stays per-page." <code>praxis-admin.css</code>: "container positioning only —
+fill, brand, search and right cluster come from <code>praxis-appbar.css</code>."</p>
+
+<p>The consequence: an <code>.appbar</code> with correct children and no shell CSS is a
+pile of unpositioned elements. It is not broken. You have not written the shell yet.</p>
+
+<h2>The shell is in the bundle</h2>
+
+<p>The good news is that you do not have to write it.
+<code>praxis-admin.css</code> carries the shell — <code>.app</code>, <code>.main</code>,
+<code>.content</code>, the <code>.appbar</code> positioning, the
+<code>.praxis-navrail</code> container, <code>--appbar-h</code>,
+<code>--navrail-w</code> — and <code>praxis.css</code> includes that sheet.</p>
+
+<blockquote>
+  <p>Load the <code>praxis.css</code> bundle and use the shell from
+  <a href="../components/app-shell.html">the app shell</a>. Do not hand-roll the
+  layout.</p>
+</blockquote>
+
+<h2>What piecemeal importing costs you</h2>
+
+<p>If you import individual sheets and skip <code>praxis-admin.css</code>, you lose the
+shell, <code>.tbtn</code>, <code>.switch</code>, <code>.icon</code>,
+<code>.px-pop</code>, <code>.mazlan-mark</code> and
+<code>*{box-sizing:border-box}</code>. That trap is real and the sheet's name hides it.</p>
+
+<p>Two other bases sit in surprising places for the same reason — they were extracted from
+the page that happened to need them first:</p>
+
+<table>
+  <thead><tr><th>Class</th><th>Actually defined in</th></tr></thead>
+  <tbody>
+    <tr><td><code>.material-symbols-rounded</code></td><td><code>praxis-create-new.css</code></td></tr>
+    <tr><td><code>.card</code>, <code>.page</code></td><td><code>praxis-workspace.css</code></td></tr>
+    <tr><td>the shell, <code>.tbtn</code>, <code>.switch</code>, <code>.icon</code>, <code>.px-pop</code></td><td><code>praxis-admin.css</code></td></tr>
+  </tbody>
+</table>
+
+<p>The bundle makes all of this moot, which is the argument for using it.</p>
+
+<h2>What actually ships</h2>
+
+<praxis-block name="manifest"></praxis-block>
+
+<h2>Every sheet, measured</h2>
+
+<p>Rule counts and class families, read from <code>src/</code> at build time. "Families"
+counts distinct class-name roots after stripping comments, <code>url()</code> values and
+quoted strings — unstripped, prose like "see <code>praxis-core.css</code>" reads as a class
+called <code>.css</code>.</p>
+
+<praxis-block name="inventory"></praxis-block>

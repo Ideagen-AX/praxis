@@ -1,0 +1,94 @@
+<!--praxis
+title: Theming
+summary: How the two body attributes drive everything, where dark mode is remapped, and why nearly every regression in this system is dark-only.
+order: 70
+keywords: theme dark light data-variant data-theme localStorage gl-theme flash contrast
+-->
+
+<p>Praxis has one variant and two themes, and both are attributes on
+<code>&lt;body&gt;</code>. There is no class, no provider, no context. The cost of that
+simplicity is that both attributes are load-bearing: forget either and the page renders as
+something that is not Praxis.</p>
+
+<h2>The two attributes</h2>
+
+<table>
+  <thead><tr><th>Attribute</th><th>Values</th><th>What depends on it</th></tr></thead>
+  <tbody>
+    <tr><td><code>data-variant</code></td><td><code>praxis</code></td>
+        <td>Every <code>--px-*</code> material, the dot grid, the 8/12/16 radius scale, the primary button, and the nine token overrides. Without it you get the unstyled base layer, not a fallback theme.</td></tr>
+    <tr><td><code>data-theme</code></td><td><code>light</code>, <code>dark</code></td>
+        <td>Every dark remap. Absent, dark mode never engages regardless of the system setting.</td></tr>
+  </tbody>
+</table>
+
+<h2>The cascade, in order</h2>
+
+<ol>
+  <li><code>praxis-tokens.css</code> declares the foundation on <code>:root</code>.</li>
+  <li><code>praxis-core.css</code> layers the Praxis light values, the
+      <code>--px-*</code> materials and the dark remaps on
+      <code>body[data-variant="praxis"]</code>.</li>
+  <li>Because that selector outranks <code>:root</code> on specificity, step 2 wins
+      regardless of load order. Loading tokens first anyway means the cascade reads the way
+      it behaves.</li>
+</ol>
+
+<p>There are two dark blocks, not one. <code>body[data-theme="dark"]</code> recolours the
+token-driven basics and applies to any variant;
+<code>body[data-variant="praxis"][data-theme="dark"]</code> adds the Praxis surfaces,
+glass, tone pairs and the teal remap.</p>
+
+<h2>Setting the theme before first paint</h2>
+
+<p>The script must be the first thing inside <code>&lt;body&gt;</code>. It cannot run from
+<code>&lt;head&gt;</code>, because the attribute lives on <code>&lt;body&gt;</code>, which
+does not exist yet at that point. Put it later and the page paints light before turning
+dark — a visible flash on every navigation.</p>
+
+<template data-example="The boot script, as it must appear" data-source-only>
+  <body data-variant="praxis" data-theme="light">
+  <script>
+    try {
+      var t = localStorage.getItem('gl-theme');
+      if (t) document.body.setAttribute('data-theme', t);
+    } catch (e) {}
+  </script>
+</template>
+
+<h2>Toggling</h2>
+
+<p><code>praxis-profile-menu.js</code> renders a theme switch into the profile pop and
+writes <code>localStorage['gl-theme']</code> when the user uses it. If you build your own
+control, write the same key or your boot script will not see it. See
+<a href="../components/app-shell.html">the app shell</a> for the menu markup.</p>
+
+<h2>Dark is where the bugs are</h2>
+
+<div class="note note--trap">
+  <p><strong>Toggle to dark and look at it.</strong> Most regressions in this system are
+  dark-only, and they fall into three shapes: a token with no dark treatment, a light-mode
+  ink placed on a dark panel, and white text on a cyan fill.</p>
+</div>
+
+<p>Three real instances, all fixed in the theme rather than in the page that hit them:</p>
+
+<ul>
+  <li><strong>The teal scale had no dark treatment at all,</strong> so four pages each
+      patched it locally. <code>teal-80</code> is a light-mode ink and measured 1.55:1 on a
+      dark panel — illegible — while <code>teal-10</code> and <code>teal-20</code> are
+      near-white and glared as light blocks.</li>
+  <li><strong><code>--praxis-color-border-subtle</code> resolved to nothing on 23 of 27
+      pages,</strong> because its only definition lived in a legacy sheet that four pages
+      loaded. A foundation layer has to carry the whole ramp, not the subset the current
+      screens happen to use.</li>
+  <li><strong>The tone foregrounds are literals on dark, not palette references,</strong>
+      because the palette's 70 steps are tuned for light surfaces and go muddy.</li>
+</ul>
+
+<h2>What resolves identically in both themes</h2>
+
+<p>Very little. <code>--praxis-color-white</code> and most palette primitives — but not
+all of them: the dark theme remaps <code>neutral-05</code> through <code>neutral-20</code>
+and three teal rungs. The <a href="colour.html">colour page</a> shows every rung in both
+themes side by side, so you can see which move rather than assuming.</p>

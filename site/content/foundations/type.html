@@ -1,0 +1,47 @@
+<!--praxis
+title: Type
+summary: A nine-step size scale on a deliberately dense 14px semibold base, and the font stack Praxis asks for but does not ship.
+order: 40
+keywords: type typography font size gilroy scale weight
+-->
+
+<p>Body type is <strong>14px at weight 600</strong> — a deliberately dense, semibold base.
+Do not "fix" it to 16/400. The density is a decision about screens that show a hundred
+records at once, and the weight is what keeps a small size legible against the page
+texture.</p>
+
+<h2>The scale</h2>
+
+<praxis-block name="scale" kind="type" prefix="--praxis-type-size"></praxis-block>
+
+<h2>The font stack</h2>
+
+<praxis-block name="tokens" prefix="--praxis-type-font"></praxis-block>
+
+<p>Praxis sets <code>font-family: 'Gilroy'</code> and ships <strong>no font
+files</strong>. Gilroy is licensed and cannot be redistributed, so the build strips the
+<code>@font-face</code> blocks and emits <code>praxis-fonts.example.css</code> instead,
+showing how to point the same family at your own licensed copy. The build fails if a font
+binary ever enters the package.</p>
+
+<p>Without Gilroy you get the fallback stack — <code>'Segoe UI'</code>, Roboto, Helvetica
+Neue, Arial — which is what this site is rendering unless you happen to have Gilroy
+installed locally. Metrics are close enough that the layout is unaffected; only the
+letterforms change.</p>
+
+<h2>In use</h2>
+
+<template data-example="The scale on a card, at the real body weight" data-height="260">
+  <div class="card" style="padding:1.25rem;max-width:34rem">
+    <p style="font-size:var(--praxis-type-size-3xl);margin:0 0 .25rem;line-height:1.2">Forklift near-miss, bay 4</p>
+    <p style="font-size:var(--praxis-type-size-xl);margin:0 0 .75rem;color:var(--praxis-color-text-secondary)">Incident management</p>
+    <p style="font-size:var(--praxis-type-size-base);margin:0 0 .5rem">
+      Body copy sits at <code>base</code>, 14px, weight 600. This is the size almost
+      everything on a record page is set in.</p>
+    <p style="font-size:var(--praxis-type-size-sm);margin:0 0 .5rem;color:var(--praxis-color-text-secondary)">
+      <code>sm</code> is the field label size, 13px.</p>
+    <p style="font-size:var(--praxis-type-size-xs);margin:0;color:var(--praxis-color-text-tertiary)">
+      <code>xs</code> and <code>2xs</code> are for hints and metadata only. Below
+      <code>xs</code>, check it against the page texture in dark before you commit.</p>
+  </div>
+</template>

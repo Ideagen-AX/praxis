@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{caption}} · Praxis example</title>
+<link rel="stylesheet" href="{{root}}praxis/praxis-reset.css">
+<link rel="stylesheet" href="{{root}}praxis/praxis.css">
+<style>
+  /* Example padding only. Nothing here styles a Praxis component — if an
+     example needs a rule to look right, that rule belongs in src/. */
+  html,body{margin:0}
+  body{padding:{{pad}};background:var(--px-bg,var(--praxis-color-surface-subtle))}
+  body[data-shell="1"]{padding:0}
+</style>
+</head>
+<body data-variant="praxis" data-theme="{{theme}}" data-shell="{{shell}}">
+<script>
+  /* First thing inside <body>, before first paint, or the frame flashes light
+     before turning dark. gl-theme is the key the shipped profile menu writes;
+     px-docs-theme is what the docs chrome writes so a frame follows the site. */
+  try {
+    var t = localStorage.getItem('px-docs-theme') || localStorage.getItem('gl-theme');
+    if (t && !{{pinned}}) document.body.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+{{markup}}
+{{scripts}}
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!--praxis
+title: Fields
+slug: rfield
+tier: ready
+order: 10
+sheet: praxis-rfield.css
+classes: rfield, rfield__label, rfield__control, rfield__hint, rfield__group, pillset, pill, rref, rtable, subsec, form-alert, mazbtn, admin-field, req
+summary: The record form system — the most exercised component in Praxis and the one place every page that shows data agrees.
+keywords: field form input label locked static readonly validation picklist reference table
+-->
+
+<p>A field is either <strong>interactive</strong> — this workflow step owns it — or
+<strong>static</strong>, because it belongs to a passed step or is read-only. They are
+deliberately different shapes, because the same record body is editable in one step and
+frozen in the next, and the user has to tell at a glance which is which.</p>
+
+<h2>Interactive versus static</h2>
+
+<table>
+  <thead><tr><th></th><th>Interactive</th><th>Static</th></tr></thead>
+  <tbody>
+    <tr><td>Layout</td><td>Label above, control below</td><td>Label beside value, 200px gutter</td></tr>
+    <tr><td>Class</td><td><code>.rfield</code></td><td><code>.rfield--locked</code></td></tr>
+    <tr><td>Height</td><td>40px control</td><td>64px row (<code>--px-static-field-h</code>)</td></tr>
+    <tr><td>Affordance</td><td><code>--px-field</code> grey fill, no border</td><td>No fill, no border; hairline rules between rows</td></tr>
+    <tr><td>Type</td><td>Label 13px, value 14px</td><td>Both 14px / 21px line-height</td></tr>
+    <tr><td>Label</td><td>Sentence case, no colon</td><td>Terminates in a colon, added via <code>::after</code></td></tr>
+  </tbody>
+</table>
+
+<template data-example="Interactive and static, side by side" data-height="330">
+  <div style="display:grid;gap:1.5rem;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr))">
+    <div>
+      <div class="rfield">
+        <label class="rfield__label" for="title">Title <span class="req">*</span></label>
+        <input class="rfield__control" id="title" type="text" value="Forklift near-miss, bay 4">
+        <p class="rfield__hint">Shown in the record list.</p>
+      </div>
+      <div class="rfield">
+        <label class="rfield__label" for="sev">Severity</label>
+        <select class="rfield__control" id="sev">
+          <option>Near miss</option>
+          <option>Minor injury</option>
+          <option>Lost time</option>
+        </select>
+      </div>
+      <div class="rfield">
+        <label class="rfield__label" for="desc">What happened</label>
+        <textarea class="rfield__control" id="desc" rows="3">Pallet stack shifted as the truck turned into bay 4. No contact.</textarea>
+      </div>
+    </div>
+    <div>
+      <div class="rfield rfield--locked">
+        <label class="rfield__label">Reported by</label>
+        <input class="rfield__control" value="Marcus Silva" readonly>
+      </div>
+      <div class="rfield rfield--locked">
+        <label class="rfield__label">Reported on</label>
+        <input class="rfield__control" value="8 July 2026, 14:12" readonly>
+      </div>
+      <div class="rfield rfield--locked">
+        <label class="rfield__label" data-label-nocolon>Was high energy present?</label>
+        <input class="rfield__control" value="No" readonly>
+      </div>
+    </div>
+  </div>
+</template>
+
+<p><code>[data-label-nocolon]</code> opts a static label out of the automatic colon. Use
+it for labels that are already questions — "Was high energy present?<strong>:</strong>" is
+not an improvement.</p>
+
+<h2>Groups</h2>
+
+<p>A <code>.rfield__group</code> puts fields side by side and stacks them automatically
+once locked, because a static row is already a two-column layout and nesting one inside
+another reads as noise.</p>
+
+<template data-example="A group, interactive then locked — resize the frame to see it stack" data-height="300">
+  <div class="rfield__group">
+    <div class="rfield">
+      <label class="rfield__label" for="site">Site</label>
+      <input class="rfield__control" id="site" type="text" value="Teesside works">
+    </div>
+    <div class="rfield">
+      <label class="rfield__label" for="area">Area</label>
+      <input class="rfield__control" id="area" type="text" value="Warehouse, bay 4">
+    </div>
+  </div>
+  <div class="rfield__group">
+    <div class="rfield rfield--locked">
+      <label class="rfield__label">Shift</label>
+      <input class="rfield__control" value="Late" readonly>
+    </div>
+    <div class="rfield rfield--locked">
+      <label class="rfield__label">Supervisor</label>
+      <input class="rfield__control" value="Aoife Byrne" readonly>
+    </div>
+  </div>
+</template>
+
+<h2>Validation</h2>
+
+<p><code>.rfield--invalid</code> is set by your save or submit check <strong>only</strong>
+— never on load. A field the user has not reached yet is not wrong.</p>
+
+<template data-example="An invalid field and the summary that points at it" data-height="330">
+  <div class="form-alert" role="alert">
+    <span class="form-alert__icon"><i data-lucide="triangle-alert"></i></span>
+    <div class="form-alert__body">
+      <p class="form-alert__title">Two fields need attention</p>
+      <p class="form-alert__detail">Complete them before submitting.</p>
+      <ul class="form-alert__list">
+        <li><button type="button">Immediate action taken</button></li>
+        <li><button type="button">Severity</button></li>
+      </ul>
+    </div>
+  </div>
+  <div class="rfield rfield--invalid">
+    <label class="rfield__label" for="act">Immediate action taken <span class="req">*</span></label>
+    <input class="rfield__control" id="act" type="text" value="">
+    <p class="rfield__hint">Required before this step can be submitted.</p>
+  </div>
+  <script>
+    /* Nothing here is Praxis behaviour — the sheet has no JS. This only shows the
+       summary links doing what you would wire them to do. */
+    document.querySelectorAll('.form-alert__list button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var f = document.querySelector('.rfield--invalid .rfield__control');
+        if (f) f.focus();
+      });
+    });
+  </script>
+</template>
+
+<h2>Picklists</h2>
+
+<p><code>.pill</code> wraps a real <code>&lt;input type="radio"&gt;</code>
+<strong>followed by a <code>&lt;span&gt;</code></strong> — the styling hangs off
+<code>input:checked + span</code>. Not <code>&lt;button aria-checked&gt;</code>: that
+carried no state and no keyboard model while looking selectable.</p>
+
+<template data-example="A picklist with a real radio group behind it" data-height="180">
+  <div class="rfield rfield--choice">
+    <span class="rfield__label">Severity</span>
+    <div class="pillset">
+      <label class="pill"><input type="radio" name="sev2" checked><span>Near miss</span></label>
+      <label class="pill"><input type="radio" name="sev2"><span>First aid</span></label>
+      <label class="pill"><input type="radio" name="sev2"><span>Medical treatment</span></label>
+      <label class="pill"><input type="radio" name="sev2"><span>Lost time</span></label>
+    </div>
+  </div>
+</template>
+
+<h2>Reference field</h2>
+
+<p><code>.rref__input</code> plus <code>.rref__btn</code> plus a
+<code>.rref__menu[hidden]</code> of <code>.rref__opt</code> buttons. Options live in
+markup so each page configures its own list. Typing filters; only click or Enter commits;
+blur reverts uncommitted free text.</p>
+
+<div class="note">
+  <p>Store the committed value in <code>data-committed</code> on the element, not in a
+  closure, so a value restored from storage survives the next blur.</p>
+</div>
+
+<template data-example="Reference field, with its menu open" data-height="280">
+  <div class="rfield">
+    <label class="rfield__label" for="own">Owner</label>
+    <div class="rref" data-committed="Marcus Silva">
+      <input class="rref__input" id="own" type="text" value="Marcus Silva" autocomplete="off">
+      <button class="rref__btn" type="button" aria-label="Browse people">
+        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+      </button>
+      <div class="rref__menu">
+        <button class="rref__opt" type="button">Marcus Silva</button>
+        <button class="rref__opt" type="button">Aoife Byrne</button>
+        <button class="rref__opt" type="button">Priya Raman</button>
+        <button class="rref__opt" type="button">Tom Okafor</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h2>In-record table</h2>
+
+<p><code>.rtable__actions</code> plus a <code>&lt;table&gt;</code>. White fill, not the
+field grey — a table of rows is content, and the grey read as one large input.
+<code>.rtable--locked</code> keeps the rows and drops the controls.</p>
+
+<template data-example="An in-record table with its empty state in a second tbody" data-height="300">
+  <div class="rtable">
+    <div class="rtable__actions">
+      <button class="rtable__action" type="button">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span> Add witness
+      </button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Role</th><th>Statement</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Aoife Byrne</td><td>Supervisor</td><td>Taken 8 July</td>
+            <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
+              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
+        <tr><td>Tom Okafor</td><td>Driver</td><td>Pending</td>
+            <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
+              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
+      </tbody>
+      <!-- Own tbody, deliberately. See the striping gotcha below. -->
+      <tbody hidden>
+        <tr class="rtable__empty"><td colspan="4">No witnesses recorded.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<h2>Sub-sections and the Mazlan hand-off</h2>
+
+<template data-example="A titled run of fields, with the quiet AI pill beside the title" data-height="260" data-scripts="lucide">
+  <div class="subsec">
+    <p class="subsec__title">Immediate actions
+      <button class="mazbtn" type="button">
+        <span class="mazlan-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Ask Mazlan
+      </button>
+    </p>
+    <div class="rfield">
+      <label class="rfield__label" for="cont">Containment</label>
+      <input class="rfield__control" id="cont" type="text" value="Bay 4 cordoned, stack re-banded">
+    </div>
+    <div class="rfield rfield--locked">
+      <label class="rfield__label">Verified by</label>
+      <input class="rfield__control" value="Priya Raman" readonly>
+    </div>
+  </div>
+</template>
+
+<p><code>.mazbtn</code> uses <code>.mazlan-mark</code>, so link
+<code>praxis-mazlan.css</code> too if you use it — the four child spans
+<em>are</em> the four dots.</p>
+
+<h2>Four gotchas, each learned the hard way</h2>
+
+<ul>
+  <li><strong>Zebra striping counts hidden rows.</strong> <code>nth-of-type</code> counts
+      every <code>&lt;tr&gt;</code>, including a hidden empty-state row, which made the
+      first <em>real</em> row strike as even. Put the empty state in its own
+      <code>&lt;tbody&gt;</code> so data rows count from one.</li>
+  <li><strong><code>background-color</code>, never the <code>background</code>
+      shorthand,</strong> on a select. Selects layer a chevron image on top and the
+      shorthand wipes it.</li>
+  <li><strong>Placeholders are content</strong> and answer to WCAG 1.4.3 like any other
+      text. <code>--praxis-color-text-disabled</code> measured 2.73:1 light and 2.77:1 dark
+      on the field fill — a clear failure. Placeholders take
+      <code>--praxis-color-text-secondary</code> (4.94:1 / 5.48:1); the weight drop to 500
+      is what separates a placeholder from a real value.</li>
+  <li><strong><code>.admin-field</code> read-outs get the static treatment
+      automatically,</strong> selected with <code>:has(&gt; .admin-field__value)</code> so
+      generated pages needed no markup change. Emit
+      <code>.admin-field &gt; .admin-field__value</code> and you get it for free.</li>
+</ul>
+
+<h2>Everything this sheet defines</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-rfield.css"></praxis-block>

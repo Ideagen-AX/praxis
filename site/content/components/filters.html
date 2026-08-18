@@ -1,0 +1,148 @@
+<!--praxis
+title: Filters
+slug: filters
+tier: settling
+order: 10
+sheet: praxis-filters.css
+scripts: praxis-filters.js
+classes: filter-drawer, filter-row, filter-chips, select-menu, qfilter, chip, btn--neutral, btn--clear
+summary: The largest component in Praxis — 403 rules and a filter engine where Standard and Custom are two views onto one expression tree.
+keywords: filter filters drawer modal chip quick expression custom standard PraxisFilters
+-->
+
+<p>A centred filter modal, a quick-filter strip and an active-filter chip bar, where
+<strong>Standard and Custom are two views onto one expression tree</strong>. Rich fields
+live in the custom tree, quick and scope fields in a flat state; no field is in both, so
+ANDing the two never double-filters.</p>
+
+<p><strong>The host owns rendering.</strong> <code>onChange</code> receives the filtered
+records; the engine never touches your results DOM. The example below renders its own
+results list in exactly that way.</p>
+
+<template data-example="A working filter modal over six records — press Filters" data-height="420" data-scripts="lucide,filters">
+  <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem">
+    <button class="tbtn" data-action="open-filter-drawer" type="button">
+      <span class="material-symbols-rounded" aria-hidden="true">filter_list</span> Filters
+    </button>
+    <div data-chips></div>
+  </div>
+
+  <div data-quick-filters></div>
+
+  <div id="results"></div>
+
+  <div data-drawer-scrim hidden></div>
+  <div data-filter-drawer class="filter-drawer" hidden>
+    <div data-filter-list></div>
+  </div>
+
+  <script>
+    var RECORDS = [
+      { id: 'CA-1041', title: 'Re-band pallet stacks', status: 'Open',      owner: 'Marcus Silva', site: 'Teesside works',  priority: 'High' },
+      { id: 'CA-1042', title: 'Refresh bay markings', status: 'Open',       owner: 'Aoife Byrne',  site: 'Teesside works',  priority: 'Medium' },
+      { id: 'CA-1043', title: 'Retrain late shift',   status: 'In review',  owner: 'Priya Raman',  site: 'Rotherham plant', priority: 'High' },
+      { id: 'CA-1044', title: 'Replace bay 4 mirror', status: 'Closed',     owner: 'Tom Okafor',   site: 'Rotherham plant', priority: 'Low' },
+      { id: 'CA-1045', title: 'Audit truck logs',     status: 'In review',  owner: 'Marcus Silva', site: 'Teesside works',  priority: 'Medium' },
+      { id: 'CA-1046', title: 'Update permit form',   status: 'Open',       owner: 'Aoife Byrne',  site: 'Grangemouth',     priority: 'Low' }
+    ];
+
+    function renderResults(rows) {
+      document.getElementById('results').innerHTML = rows.length
+        ? '<div class="rtable"><table><thead><tr><th>Reference</th><th>Action</th>'
+          + '<th>Status</th><th>Owner</th><th>Site</th></tr></thead><tbody>'
+          + rows.map(function (r) {
+              return '<tr><td>' + r.id + '</td><td>' + r.title + '</td><td>' + r.status
+                   + '</td><td>' + r.owner + '</td><td>' + r.site + '</td></tr>';
+            }).join('') + '</tbody></table></div>'
+        : '<p class="rfield__hint">No records match.</p>';
+    }
+
+    PraxisFilters.init({
+      records: RECORDS,
+      fieldMap: {
+        'Status': function (r) { return r.status; },
+        'Action Owner': function (r) { return r.owner; },
+        'Site': function (r) { return r.site; },
+        'Priority': function (r) { return r.priority; },
+        'Action Title': function (r) { return r.title; }
+      },
+      // Replace the ported CAPA vocabularies with your own, or the menus offer
+      // values your data has never heard of and every selection returns nothing.
+      statuses:   ['Open', 'In review', 'Closed'],
+      people:     ['Marcus Silva', 'Aoife Byrne', 'Priya Raman', 'Tom Okafor'],
+      sites:      ['Teesside works', 'Rotherham plant', 'Grangemouth'],
+      priorities: ['High', 'Medium', 'Low'],
+      scopeChip:  null,
+      onChange:   renderResults
+    });
+
+    renderResults(RECORDS);
+  </script>
+</template>
+
+<h2>Initialising</h2>
+
+<p>Everything application-specific enters through <code>init</code>. It returns
+<code>null</code> if <code>[data-filter-drawer]</code> is absent, so a page with no modal is
+fine.</p>
+
+<table>
+  <thead><tr><th>Option</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>records</code></td><td>The unfiltered set</td></tr>
+    <tr><td><code>fieldMap</code></td><td>Filter name to accessor: <code>{ 'Status': r => r.status }</code></td></tr>
+    <tr><td><code>today</code></td><td>"Now" for the relative date operators. Pass a fixed date to make a demo reproducible.</td></tr>
+    <tr><td><code>parseDate</code></td><td>Optional, for non-ISO date strings</td></tr>
+    <tr><td><code>onChange</code></td><td>Receives the filtered records. You render them.</td></tr>
+    <tr><td><code>people</code>, <code>sites</code>, <code>tasks</code>, <code>statuses</code>, <code>priorities</code>, <code>actionTypes</code>, <code>tree</code></td><td>Value vocabularies. <strong>Replace these.</strong> Left at the defaults, the menus offer ported CAPA values your data has never heard of and every selection returns nothing.</td></tr>
+    <tr><td><code>options</code></td><td>Override outright, by field name</td></tr>
+    <tr><td><code>defaultFavorites</code>, <code>defaultQuick</code></td><td>Which filters start pinned</td></tr>
+    <tr><td><code>scopeChip</code></td><td>Omit entirely if you have no fixed scope</td></tr>
+  </tbody>
+</table>
+
+<p>The returned object also exposes <code>setRecords</code>, <code>apply</code>,
+<code>state</code>, <code>clearAll</code>, <code>open</code>, <code>close</code> and
+<code>FILTERS</code> — the real field catalog, so you can build a field map against it
+rather than guessing names.</p>
+
+<h2>Markup contract</h2>
+
+<p>Four hooks, all data attributes. The engine renders filter rows into
+<code>[data-filter-list]</code>.</p>
+
+<blockquote>
+  <p><code>[data-action="open-filter-drawer"]</code> · <code>[data-chips]</code> ·
+  <code>[data-quick-filters]</code> · <code>[data-drawer-scrim]</code> ·
+  <code>[data-filter-drawer] &gt; [data-filter-list]</code></p>
+</blockquote>
+
+<p>It sets <code>data-filter-mode="modal"</code> on <code>&lt;html&gt;</code> itself if you
+have not — the centred-modal rules are gated on that attribute.</p>
+
+<h2>Three things to know before you commit to filters</h2>
+
+<ol>
+  <li><strong>The drawer's full chrome is not shipped as markup.</strong> The engine renders
+      filter rows into <code>[data-filter-list]</code>, but the surrounding head, footer and
+      resize handles came from the originating prototype's own page. The skeleton above is
+      the minimum the engine needs; you will be assembling the rest yourself from
+      <code>praxis-filters.css</code>.</li>
+  <li><strong>This sheet is a port</strong> from the Responsive Search project, now owned
+      here. Do not re-extract over it — that would reintroduce the parallel
+      <code>--s</code>/<code>--r</code>/<code>--t</code> token vocabulary and silently revert
+      the field treatment.</li>
+  <li><strong>Its dark mode does not follow a host theme override.</strong> It themes itself
+      by flipping palette primitives inside its own scope, 21 declarations, instead of using
+      the semantic tokens. Everything else in Praxis follows a host override; this does not.
+      Known rough edge — toggle this page to dark and open the modal to see it.</li>
+</ol>
+
+<p>It also adds <code>.btn--neutral</code> and <code>.btn--clear</code>, scoped to
+<code>.filter-drawer</code> so they cannot leak into your own button scale — and it expects
+<strong>your</strong> <code>.btn</code> base underneath them. Praxis does not define one;
+see <a href="../foundations/gaps.html">what Praxis does not define</a>.</p>
+
+<h2>Everything this sheet defines</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-filters.css"></praxis-block>

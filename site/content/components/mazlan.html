@@ -1,0 +1,132 @@
+<!--praxis
+title: Mazlan — AI surfaces
+slug: mazlan
+tier: unstable
+order: 10
+sheet: praxis-mazlan.css
+scripts: praxis-mazlan.js
+classes: mazlan-mark, mazlan-drawer, mazlan-menu, mazlan-reasoning, mazlan-msg, mazlan-suggestions, mazlan-content, mazbtn
+summary: The four-dot signature glyph, the agentic gradient, and the one real blocker in Praxis — the conversational drawer whose markup the package does not ship.
+keywords: mazlan ai agentic gradient dots drawer reasoning glyph blocker
+-->
+
+<div class="note note--trap">
+  <p><strong>You cannot use the drawer from the package alone.</strong>
+  <code>praxis-mazlan.js</code> requires a large fixed-id DOM —
+  <code>#mazlan-drawer</code>, <code>#mazlan-scrim</code>, <code>#mazlan-thread</code>,
+  <code>#mazlan-welcome</code>, <code>#mazlan-suggestions</code>,
+  <code>#mazlan-drawer-textarea</code>, <code>#mazlan-primary-btn</code>,
+  <code>#mazlan-menu</code>, <code>#mazlan-more</code> and about a dozen more — and that
+  markup is <strong>not shipped in this package</strong>. The script queries the ids and
+  returns silently when they are absent, so the trigger will simply do nothing. There is no
+  error to see.</p>
+  <p><strong>If your prototype needs the Mazlan drawer, raise it.</strong> The markup should
+  be extracted into the package rather than reinvented per prototype.</p>
+</div>
+
+<p><code>praxis-mazlan.css</code> is the largest sheet in Praxis and covers the
+conversational drawer, the menu, reasoning timeline, message bubbles, follow-ups and content
+panel. All of that CSS is here and ready. What is missing is the markup it styles.</p>
+
+<h2>What you can use today</h2>
+
+<h3>The four-dot signature</h3>
+
+<p><code>.mazlan-mark</code> is the AI signature glyph. It works standalone and needs no
+JavaScript, but it needs <strong>four empty child spans</strong> — they <em>are</em> the
+dots, positioned by <code>nth-child</code>. An empty <code>.mazlan-mark</code> renders
+nothing at all, which is the single most common mistake with it.</p>
+
+<template data-example="Both defined sizes, a hand-sized one, and what an empty mark renders" data-height="130">
+  <div style="display:flex;gap:2rem;align-items:center">
+    <span class="mazlan-mark mazlan-mark--sm" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </span>
+    <span class="mazlan-mark" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </span>
+    <!-- There is no --xl. Size it yourself; the dots are percentage-positioned,
+         so the glyph scales from width and height alone. -->
+    <span class="mazlan-mark" aria-hidden="true" style="width:40px;height:40px">
+      <span></span><span></span><span></span><span></span>
+    </span>
+    <span style="display:inline-flex;align-items:center;gap:.5rem;
+                 color:var(--praxis-color-text-tertiary);
+                 font-size:var(--praxis-type-size-sm)">
+      <span class="mazlan-mark" aria-hidden="true"></span>
+      no child spans, renders nothing
+    </span>
+  </div>
+</template>
+
+<p>Dot colours are slate, magenta, cyan, teal, clockwise from top-left; the slate dot
+lightens in dark mode.</p>
+
+<div class="note note--trap">
+  <p><strong>Only two sizes are defined: base 20px and <code>.mazlan-mark--sm</code> at
+  16px.</strong> <code>.mazlan-mark--xl</code> at 40px is <em>not</em> a Praxis class —
+  it appears only inside a comment in <code>praxis-mazlan.css</code> describing what one
+  consumer's own page did, and <code>PRAXIS-FOR-AGENTS.md</code> at 0.1.4 transcribes that
+  comment as though it were a definition. Using it silently gets you the 20px base. Set
+  <code>width</code> and <code>height</code> yourself instead: the dots are positioned in
+  percentages, so the glyph scales from those two properties alone, as the third mark above
+  does.</p>
+</div>
+
+<div class="note">
+  <p>Its base rules live in <strong><code>praxis-admin.css</code></strong>, not
+  <code>praxis-mazlan.css</code> — another reason to load the bundle rather than picking
+  sheets. Inside the drawer, <code>.mazlan-welcome__logo &gt; span</code> adds a calm 3.2s
+  breathing animation, amplitude deliberately held to 8% for a regulated-industry context,
+  and switched off under <code>prefers-reduced-motion</code>.</p>
+</div>
+
+<h3>The agentic gradient</h3>
+
+<p>The teal to magenta gradient, <code>#29D2D7 → #E30072</code>, is reserved for agentic
+moments: gradient borders, insight bands, the mark itself. Do not use it for ordinary
+emphasis — its whole job is to mean "a machine did this".</p>
+
+<template data-example="Gradient border and insight band" data-height="230">
+  <div style="display:grid;gap:1rem;max-width:30rem">
+    <div style="padding:1px;border-radius:var(--praxis-radius-md);
+                background:linear-gradient(135deg,#29D2D7,#E30072)">
+      <div style="padding:.875rem 1rem;border-radius:calc(var(--praxis-radius-md) - 1px);
+                  background:var(--px-surface)">
+        <strong>Suggested cause</strong>
+        <p style="margin:.25rem 0 0;color:var(--praxis-color-text-secondary)">
+          Three near-misses in bay 4 this quarter share a pallet-stacking pattern.</p>
+      </div>
+    </div>
+    <div style="padding:.875rem 1rem;border-radius:var(--praxis-radius-md);color:#fff;
+                background:linear-gradient(135deg,#29D2D7,#E30072)">
+      <strong>Insight band</strong>
+      <p style="margin:.25rem 0 0;opacity:.9">Full-bleed gradient. Check the ink contrast
+        before you commit to white on the teal end.</p>
+    </div>
+  </div>
+</template>
+
+<h3>The section hand-off pill</h3>
+
+<p><code>.mazbtn</code> is the quiet section-level hand-off, and it lives in
+<code>praxis-rfield.css</code> rather than here. See
+<a href="rfield.html#sub-sections-and-the-mazlan-hand-off">fields</a>.</p>
+
+<h2>Configuration, for when you have the markup</h2>
+
+<p><code>window.MAZLAN_CONFIG</code> takes
+<code>{ greeting, suggestions: [{icon, cat, text, reply, action}], scope }</code> and is
+read lazily on each open, so you can refresh it on the trigger click. This only matters once
+you have the drawer markup.</p>
+
+<p>The drawer is a prototype surface with canned replies, not an integration with a model.
+It references no host globals directly; it uses <code>window.announce</code> when present
+and optionally <code>window.openAgentic</code> and <code>window.closeDetailPanel</code>.</p>
+
+<h2>Everything this sheet defines</h2>
+
+<p>All of this CSS ships. Most of it has no markup in the package to attach to, which is
+what "unstable" means on this page rather than "unfinished".</p>
+
+<praxis-block name="sheet-classes" sheet="praxis-mazlan.css"></praxis-block>

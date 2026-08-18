@@ -1,0 +1,54 @@
+<!--praxis
+title: What Praxis does not define
+summary: Class names that appear in Praxis selectors and so look supported, but have no base definition. If you use one, you write it.
+order: 90
+keywords: missing undefined gap btn section chip callout toggle field px-menu
+-->
+
+<p>These class names appear in Praxis selectors, which makes them look supported. They
+have no base definition. The distinction matters because the failure is silent: your
+<code>.btn</code> picks up the Praxis primary fill and none of the box it needs, so it
+renders as coloured text.</p>
+
+<p>Verified by hand against <code>src/</code> at 0.1.4. The generated tables further down
+are measured every build.</p>
+
+<h2>Classes with no base</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><code>.btn</code></td><td>No base. <code>.btn--primary</code> styles the fill only. <code>praxis-filters.css</code> says outright that its variants sit "on top of the host's <code>.btn</code> set".</td></tr>
+    <tr><td><code>.section</code>, <code>.section__header</code>, <code>.section__title</code></td><td>No base. Praxis only adds the teal tick, the flex <code>order</code> across the header, and the collapse rotation. Layout is yours.</td></tr>
+    <tr><td><code>.chevron-btn</code></td><td>No base. Positioned by the section-header rules only.</td></tr>
+    <tr><td><code>.callout</code>, <code>.toggle</code>, <code>.viewswitch</code>, <code>.chip</code></td><td>No base outside <code>praxis-filters.css</code>'s own scoped <code>.chip</code>.</td></tr>
+    <tr><td><code>.px-menu</code>, <code>.px-menu__head</code></td><td><strong>Not defined</strong>, but referenced by <code>praxis-navrail.css</code> for the dashboards flyout. Use <code>.px-pop</code> (defined in <code>praxis-admin.css</code>) instead.</td></tr>
+    <tr><td><code>.field</code></td><td>Only the Praxis rule correcting <code>::before</code> alignment and raising rows to 64px. The base row is not here.</td></tr>
+    <tr><td><code>.page-body</code></td><td>Yours entirely. The name appears in the shell markup but Praxis styles nothing on it — see <a href="../components/app-shell.html">the app shell</a> for the two rules you must write.</td></tr>
+  </tbody>
+</table>
+
+<h2>Tokens read but never defined</h2>
+
+<p>Measured every build. Each falls back safely; set one to control that spacing.</p>
+
+<praxis-block name="undefined-tokens"></praxis-block>
+
+<p><code>--px-phone</code> is named in a comment as 640px but is not defined as a token
+either. That breakpoint is hard-coded in the media queries.</p>
+
+<h2>Families Praxis never keys a rule on</h2>
+
+<p>Also measured every build: class families that appear in <code>src/</code> only as a
+modifier or a descendant, never as a bare selector. This is a weaker signal than the hand
+verified table above — <code>.btn:hover</code> counts as keyed while styling nothing at
+rest — but anything listed here has no rule of its own at all, which makes it a strong
+candidate for the same treatment.</p>
+
+<praxis-block name="unkeyed-families"></praxis-block>
+
+<h2>Excluded on purpose</h2>
+
+<p>Not missing — removed, with reasons recorded in <code>dist/manifest.json</code>. Each
+was bound to the prototype Praxis was extracted from rather than to the system. See
+<a href="mental-model.html#what-actually-ships">what actually ships</a>.</p>

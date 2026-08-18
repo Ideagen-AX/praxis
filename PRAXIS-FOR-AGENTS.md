@@ -817,7 +817,11 @@ What you *can* use today:
   ```
 
   Dot colours are slate, magenta, cyan, teal, clockwise from top-left; the slate dot
-  lightens in dark mode. `.mazlan-mark--sm` is 16px, `--xl` 40px, base 20px. Its base
+  lightens in dark mode. Two sizes are defined: base 20px and `.mazlan-mark--sm` at
+  16px. **`.mazlan-mark--xl` is not a Praxis class** — it appears only inside a
+  comment in `praxis-mazlan.css` describing one consumer's own page, and using it
+  silently gets you the 20px base. Set `width`/`height` yourself; the dots are
+  positioned in percentages, so the glyph scales from those alone. Its base
   rules live in **`praxis-admin.css`**, not `praxis-mazlan.css` — another reason to
   load the bundle. Inside the drawer, `.mazlan-welcome__logo > span` adds a calm 3.2s
   breathing animation, amplitude deliberately held to 8% for a regulated-industry

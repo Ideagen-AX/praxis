@@ -1,0 +1,74 @@
+<!--praxis
+title: Space, radius and chrome
+summary: A 4-to-48 spacing scale, the 8/12/16 radius scale, and the fixed chrome metrics the four-band shell is built from.
+order: 50
+keywords: space spacing radius corner border-radius chrome appbar navrail height width gutter
+-->
+
+<h2>Space</h2>
+
+<praxis-block name="scale" kind="space" prefix="--praxis-space-"></praxis-block>
+
+<h2>Radius</h2>
+
+<p>The Praxis radius scale is 8/12/16. Note that <code>lg</code> and <code>xl</code> are
+both 16px — <code>xl</code> exists for callers that expect a five-step scale, not because
+there is a fifth value.</p>
+
+<praxis-block name="scale" kind="radius" prefix="--praxis-radius-"></praxis-block>
+
+<div class="note note--trap">
+  <p><strong><code>--praxis-radius-card</code> is 20px in the token file and 12px under
+  Praxis.</strong> The Praxis override is the one that renders, so 12px is the card
+  geometry. The resolved columns above show the real value; see
+  <a href="colour.html#the-praxis-variant-overrides-nine-tokens">the nine overrides</a> for
+  the rest.</p>
+</div>
+
+<h2>Chrome metrics</h2>
+
+<p>The four bands of <a href="../components/app-shell.html">the app shell</a> are fixed
+heights, and the dot grid's clearance is derived from their sum. Change a band by changing
+the token, once — not one page — or the texture will cut across your header.</p>
+
+<praxis-block name="scale" kind="chrome" prefix="--praxis-appbar-h|--praxis-navrail-width|--praxis-record-rail-w|--praxis-control-h"></praxis-block>
+
+<table>
+  <thead><tr><th>Band</th><th>Size</th><th>Token</th></tr></thead>
+  <tbody>
+    <tr><td>App bar</td><td>64px tall</td><td><code>--praxis-appbar-h</code>, and <code>--appbar-h</code> locally</td></tr>
+    <tr><td>Nav rail</td><td>56px wide, 240px expanded</td><td><code>--praxis-navrail-width</code>, <code>--praxis-navrail-width-expanded</code></td></tr>
+    <tr><td>Page header</td><td>68px min</td><td><code>--ph-h</code></td></tr>
+    <tr><td>Toolbar band</td><td>60px min</td><td><code>--px-toolbar-h</code></td></tr>
+  </tbody>
+</table>
+
+<p>Page content therefore starts at <strong>192px</strong>, and
+<code>--px-dot-clear</code> is set to exactly that so the dot grid stops short of the
+chrome.</p>
+
+<h2>Gutters</h2>
+
+<p><code>--px-toolbar-gutter</code> is the canonical 16px gap between the toolbar band and
+the first card of content. It exists because that gap was set per section and drifted — 8px
+on one page, 6px on another. <code>--ph-pad-x</code> is declared on <code>.content</code>
+and inherited by the header, the toolbar band and your body, so changing it once resets the
+page rhythm.</p>
+
+<praxis-block name="tokens" prefix="--px-toolbar-gutter|--px-gutter|--ph-pad-x|--home-gutter|--sp-gutter"></praxis-block>
+
+<p>Four of those read <em>unset</em> in the resolved columns, and both reasons are
+correct rather than broken:</p>
+
+<ul>
+  <li><code>--px-gutter</code>, <code>--home-gutter</code> and <code>--sp-gutter</code>
+      are declared <strong>only inside a media query</strong>. They exist at 640px and
+      below and nowhere else. The table below is measured every build.</li>
+  <li><code>--ph-pad-x</code> is declared on <strong><code>.content</code></strong>, in
+      <code>praxis-admin.css</code>, not on <code>&lt;body&gt;</code>. The header, the
+      toolbar band and your page body inherit it from there — which is what makes changing
+      it once reset the whole page rhythm. A probe reading
+      <code>&lt;body&gt;</code> cannot see a token declared on a descendant.</li>
+</ul>
+
+<praxis-block name="media-only-tokens"></praxis-block>

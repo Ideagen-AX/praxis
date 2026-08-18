@@ -1,5 +1,57 @@
 # Changelog
 
+## Unreleased
+
+**No CSS or JS changed.** `src/` is untouched, so nothing renders differently for
+a consumer. This adds the reference site and the machinery behind it.
+
+### Added
+
+- **A reference website, at <https://ideagen-ax.github.io/praxis/>.** Every token
+  viewable in both themes, and a page per component with live examples. Deployed
+  from `main` only by `.github/workflows/pages.yml`; branches and pull requests get
+  no public URL, only the `build-site.py --check` gate in CI.
+
+  Two properties make it trustworthy rather than decorative. It renders the real
+  `dist/`, built from `src/` at deploy time, so there is no second copy of Praxis
+  to keep in step. And each example's live frame and source panel come from the
+  same `<template>`, so they cannot disagree — the failure mode of every
+  hand-maintained gallery.
+
+  Resolved token values are read in the browser off two hidden probe documents,
+  one per theme, rather than computed by the build. A build can only report what a
+  token is *declared* as, and this is a system where that is regularly the wrong
+  answer.
+
+- **`build-site.py`** — the generator, plus `--serve` (rebuild on each request),
+  `--check` (the CI gate), `--coverage` (undocumented class families) and
+  `--agents-doc` (render the content to markdown). Stdlib-only, like the other two
+  build scripts.
+
+- **`site/content/`** — the prose, one HTML file per page. This is now the source
+  for component documentation. `PRAXIS-FOR-AGENTS.md` stays hand-written and keeps
+  shipping in the tarball until the site covers every component, at which point it
+  becomes generated from the same content.
+
+- **`praxis_meta.py`** — one measurement implementation, shared by `build-ds.py`
+  and `build-site.py`, so the site and `DESIGN-SYSTEM.md` cannot state different
+  numbers. It also gained cycle detection over `var()` chains, and extraction of
+  the `--px-*` material layer and the nine `--praxis-*` tokens that
+  `praxis-core.css` overrides under the Praxis variant.
+
+### Fixed
+
+- **The class-family measurement counted `url()` paths and quoted strings.** A
+  scan for `.name` read `url(fonts/Gilroy-Regular.woff2)` as a class called
+  `.woff2` and an SVG namespace as `.w3` and `.org`, on top of the `.css` in prose
+  that comment-stripping already had to handle. This inflated the apparent surface
+  of the system from 234 real class families to about 370, and it showed in the
+  component inventory in `DESIGN-SYSTEM.md`, where `praxis-reset.css` and
+  `praxis-tokens.css` appeared to define classes they do not.
+
+- **`DESIGN-SYSTEM.md` was one `var()` usage stale** — 1,501 against a real 1,502,
+  from the 0.1.4 profile-menu fix landing without `npm run docs` being re-run.
+
 ## 0.1.4 — 2026-08-14
 
 ### Fixed

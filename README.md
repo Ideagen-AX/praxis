@@ -8,10 +8,12 @@ No framework, no build step, no runtime dependency. Drop in a stylesheet and use
 the classes. It works the same in a React app, a Vue app, a Rails view or a
 static HTML file.
 
-**Building a prototype, with or without an AI agent?** Start from
-[PRAXIS-FOR-AGENTS.md](./PRAXIS-FOR-AGENTS.md) — the canonical app shell, the
-markup each component expects, the full token list, and what Praxis leaves for
-you to define. This README covers installing; that file covers building.
+**Building a prototype?** Start from the **[reference site](https://ideagen-ax.github.io/praxis/)**
+— every token in both themes, a page per component with live examples you can
+resize and read the source of, and an explicit list of what Praxis leaves for you
+to define. Working with an AI agent instead? The same content as one markdown
+file is [PRAXIS-FOR-AGENTS.md](./PRAXIS-FOR-AGENTS.md), which ships in the
+package. This README covers installing; those cover building.
 
 ---
 
@@ -245,10 +247,16 @@ is no second copy of Praxis to keep in step — edit the sheet in `src/` and
 rebuild.
 
 ```sh
-npm run build     # regenerate dist/ from src/, and verify the output
-npm run check     # exit non-zero if your local dist/ is stale
-npm run docs      # regenerate the measured sections of DESIGN-SYSTEM.md
+npm run build       # regenerate dist/ from src/, and verify the output
+npm run check       # exit non-zero if your local dist/ is stale
+npm run docs        # regenerate the measured sections of DESIGN-SYSTEM.md
+npm run site        # build the reference site into _site/
+npm run site:serve  # serve it on :8000, rebuilding on each page request
 ```
+
+The reference site is generated from `site/content/` and the `dist/` built above,
+so its examples render the same bytes a consumer installs. `_site/` is generated
+and gitignored for the same reason `dist/` is. It deploys from `main` only.
 
 Praxis was extracted from the [groom-lake](https://github.com/ideagen-ehsqe/groom-lake)
 prototype on 2026-08-13, with history. That prototype is now a consumer of the

@@ -1,0 +1,158 @@
+<!--praxis
+title: Getting started
+summary: The six non-negotiables, a complete working page, and how to diagnose a page that looks wrong.
+order: 10
+keywords: install boot cdn npm data-variant data-theme broken
+-->
+
+<p>Praxis has no build step for consumers. A stylesheet, two attributes on
+<code>&lt;body&gt;</code>, and one inline script is the entire integration. What follows
+is the whole of it.</p>
+
+<h2>The six non-negotiables</h2>
+
+<p>Miss any one of these and the page renders wrong in a way that looks like a Praxis
+bug.</p>
+
+<ol>
+  <li><strong><code>data-variant="praxis"</code> on <code>&lt;body&gt;</code>.</strong>
+      The entire Praxis look — every <code>--px-*</code> material, the dot grid, the
+      8/12/16 radius scale, the primary button — is scoped to
+      <code>body[data-variant="praxis"]</code>. Without it you get the unstyled base
+      layer, not a fallback theme.</li>
+  <li><strong><code>data-theme="light"</code> or <code>"dark"</code> on
+      <code>&lt;body&gt;</code>.</strong> Dark mode never engages without it.</li>
+  <li><strong>Set the theme before first paint,</strong> from an inline script that is the
+      first thing inside <code>&lt;body&gt;</code>. It cannot run from
+      <code>&lt;head&gt;</code> — the attribute lives on <code>&lt;body&gt;</code>, which
+      does not exist yet at that point.</li>
+  <li><strong><code>praxis-tokens.css</code> loads before
+      <code>praxis-core.css</code>.</strong> The <code>praxis.css</code> bundle handles
+      this for you. Do not reorder them if you import piecemeal.</li>
+  <li><strong>Never redefine a <code>--praxis-*</code> or <code>--px-*</code> token to
+      point at itself.</strong> <code>--praxis-space-24: var(--praxis-space-24)</code> is a
+      cycle, invalid at computed-value time, and every use of that token in scope silently
+      resolves to <code>unset</code>. This has happened for real. If you want a page-local
+      name, keep it page-local.</li>
+  <li><strong>No uppercase text.</strong> No <code>text-transform: uppercase</code>, no
+      manually capitalised labels — not on section labels, table headers, chips, tabs,
+      buttons or headings. Sentence case; get emphasis from weight, size or colour.
+      Acronyms that are already uppercase (EHSQ, CAPA, PDF, NCR) are fine.</li>
+</ol>
+
+<h2>From a CDN</h2>
+
+<p>Save as <code>index.html</code> and open it. No install, no build, no server.</p>
+
+<template data-example="Boot — a live field on a correctly booted page" data-height="170">
+  <div class="rfield">
+    <label class="rfield__label" for="ref">Reference</label>
+    <input class="rfield__control" id="ref" type="text" value="INC-2024-0417">
+    <p class="rfield__hint">Generated when the record is created.</p>
+  </div>
+</template>
+
+<p>The frame above is a real document. Its head and body are exactly this:</p>
+
+<template data-example="The page that frame is running in" data-source-only>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My prototype</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.4/dist/praxis.css">
+  </head>
+
+  <body data-variant="praxis" data-theme="light">
+  <script>
+    /* First thing inside <body>. Before first paint, or the page flashes light
+       before turning dark. gl-theme is the key the shipped profile menu writes. */
+    try {
+      var t = localStorage.getItem('gl-theme');
+      if (t) document.body.setAttribute('data-theme', t);
+    } catch (e) {}
+  </script>
+
+    <div class="rfield">
+      <label class="rfield__label" for="ref">Reference</label>
+      <input class="rfield__control" id="ref" type="text" value="INC-2024-0417">
+      <p class="rfield__hint">Generated when the record is created.</p>
+    </div>
+
+    <!-- Only if you use icons. Loads its own pinned Lucide from beside itself. -->
+    <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.4/dist/praxis-lucide.js"></script>
+  </body>
+  </html>
+</template>
+
+<h2>From npm</h2>
+
+<p>In a bundled app the requirements are identical — stylesheet, the two
+<code>&lt;body&gt;</code> attributes, the icon script if you want icons.</p>
+
+<blockquote>
+  <p><code>npm install @ideagen-ax/praxis@0.1.4</code></p>
+  <p><code>import '@ideagen-ax/praxis'</code> — tokens, core and every component<br>
+     <code>import '@ideagen-ax/praxis/dist/praxis-lucide.js'</code> — optional, icons only</p>
+</blockquote>
+
+<p>Set the attributes in the host HTML template. In React that means
+<code>index.html</code>, not a component — they must be present before first paint. Then
+use the classes directly; Praxis ships no framework bindings, so there is nothing to
+wrap.</p>
+
+<p><code>praxis-reset.css</code> is shipped but <strong>deliberately not in the
+bundle</strong> — it restyles bare elements and would clobber a host application's own
+styles. Import it only if you want that. For a standalone prototype you usually do, and it
+is safe.</p>
+
+<h2>Diagnosing a broken-looking page</h2>
+
+<p>In this order. It is almost always the first item.</p>
+
+<ol>
+  <li><strong>Is <code>data-variant="praxis"</code> on <code>&lt;body&gt;</code>?</strong>
+      Everything that makes Praxis look like Praxis hangs off it.</li>
+  <li><strong>Is <code>data-theme</code> set?</strong> No attribute means no dark mode,
+      ever, regardless of the system setting.</li>
+  <li><strong>Did you import piecemeal and skip
+      <code>praxis-admin.css</code>?</strong> That sheet carries the application shell,
+      <code>.tbtn</code>, <code>.switch</code>, <code>.icon</code>, <code>.px-pop</code>,
+      <code>.mazlan-mark</code> and <code>*{box-sizing:border-box}</code>. Its name hides
+      all of that. Use the bundle.</li>
+  <li><strong>Is the theme script inside <code>&lt;body&gt;</code>, first?</strong> In
+      <code>&lt;head&gt;</code> it runs before <code>&lt;body&gt;</code> exists and does
+      nothing.</li>
+  <li><strong>Have you written the shell?</strong> An <code>.appbar</code> with correct
+      children and no shell CSS is a pile of unpositioned elements. That is not a bug —
+      see <a href="mental-model.html">the mental model</a>.</li>
+</ol>
+
+<div class="note note--trap">
+  <p><strong>An HTTP 200 proves nothing about rendering.</strong> Two real regressions in
+  this system — an unbalanced comment that ate a stylesheet's closing
+  <code>*/</code>, and a token defined as a cycle so every use resolved to
+  <code>unset</code> — both passed a green smoke test. Check comment balance, brace
+  balance, and that no token points at itself.</p>
+</div>
+
+<h2>Before you call it done</h2>
+
+<p>Each item catches a failure that a green page load does not.</p>
+
+<ul>
+  <li><code>data-variant="praxis"</code> and <code>data-theme</code> both on
+      <code>&lt;body&gt;</code>.</li>
+  <li>Theme bootstrap is the first thing inside <code>&lt;body&gt;</code>, not in
+      <code>&lt;head&gt;</code>.</li>
+  <li><strong>Toggled to dark and looked at it.</strong> Most regressions are dark-only: a
+      token with no dark treatment, a light-mode ink on a dark panel, white text on a cyan
+      fill. Use the theme control at the top of this page — it retints every frame on the
+      page at once.</li>
+  <li>No uppercase text anywhere.</li>
+  <li>Nothing in your page redefines a <code>--praxis-*</code> or <code>--px-*</code>
+      token.</li>
+  <li>Resized a frame down past 768px and looked again.</li>
+</ul>

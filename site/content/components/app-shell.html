@@ -1,0 +1,266 @@
+<!--praxis
+title: The app shell
+slug: app-shell
+tier: ready
+order: 20
+sheet: praxis-appbar.css, praxis-navrail.css, praxis-pageheader.css, praxis-workspace.css, praxis-admin.css
+scripts: praxis-lucide.js, praxis-navdrawer.js, praxis-profile-menu.js
+classes: app, main, content, appbar, praxis-navrail, pageheader, breadcrumb, toolbar, tbtn, page-body, profile-menu, px-skip, mazlan-mark
+summary: Four bands, one composition. The app bar, nav rail, page header and toolbar that every Praxis page is built from — and the two rules your page still has to own.
+keywords: shell layout appbar navrail pageheader toolbar breadcrumb scroll responsive drawer avatar
+-->
+
+<p>Every Praxis page is the same four bands. This is the one page on this site where the
+frame is worth making tall and then resizing: the shell is where all the responsive
+behaviour lives, and none of it is a fixed breakpoint you can read off a stylesheet.</p>
+
+<template data-example="The complete shell — resize the frame down past 1024, 768 and 640px" data-height="520" data-shell data-scripts="lucide,navdrawer,profile-menu">
+  <a class="px-skip" href="#content">Skip to content</a>
+
+  <div class="app">
+
+    <!-- ============ App bar (64px) ============ -->
+    <header class="appbar">
+      <!-- Praxis ships no logo files. The real markup is two <img> tags, one per
+           theme: .appbar__logo-img--onlight and --ondark. -->
+      <a class="appbar__brand" href="#" style="font-weight:600">Ideagen</a>
+
+      <!-- Absolutely centred on the viewport above 768px; in-flow below it. -->
+      <div class="appbar__search">
+        <button class="appbar__module" type="button">
+          All modules
+          <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+        </button>
+        <input type="search" aria-label="Search records" placeholder="Search records">
+        <button class="appbar__search-btn" type="button" aria-label="Search">
+          <span class="material-symbols-rounded" aria-hidden="true">search</span>
+        </button>
+      </div>
+
+      <div class="appbar__right">
+        <div class="appbar__ai">
+          <button class="appbar__mazlan" type="button">
+            <!-- Four child spans, in this order. They ARE the four dots. -->
+            <span class="mazlan-mark" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </span>
+            Mazlan
+          </button>
+        </div>
+        <button class="appbar__iconbtn" type="button" aria-label="Notifications">
+          <span class="material-symbols-rounded" aria-hidden="true">notifications</span>
+        </button>
+        <div class="profile-menu">
+          <button class="appbar__avatar" type="button" aria-expanded="false">ms</button>
+          <div class="profile-menu__pop" hidden>
+            <!-- Your persona. praxis-profile-menu.js renders everything below it. -->
+            <div class="profile-menu__head">
+              <div class="profile-menu__name">Marcus Silva</div>
+              <div class="profile-menu__role">EHS coordinator</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="main">
+
+      <!-- ============ Nav rail (56px) ============ -->
+      <nav class="praxis-navrail" aria-label="Primary">
+        <div class="praxis-navrail__core">
+          <div class="praxis-navrail__item">
+            <button class="praxis-navrail__btn" type="button" aria-label="Home hub">
+              <span class="material-symbols-rounded" aria-hidden="true">home</span>
+            </button>
+          </div>
+          <div class="praxis-navrail__item">
+            <button class="praxis-navrail__btn praxis-navrail__btn--create"
+                    type="button" aria-label="Create new">
+              <span class="material-symbols-rounded" aria-hidden="true">add</span>
+            </button>
+          </div>
+          <div class="praxis-navrail__item">
+            <button class="praxis-navrail__btn praxis-navrail__btn--active"
+                    type="button" aria-label="Incidents">
+              <span class="material-symbols-rounded" aria-hidden="true">crisis_alert</span>
+            </button>
+          </div>
+          <div class="praxis-navrail__item">
+            <button class="praxis-navrail__btn" type="button" aria-label="Audits">
+              <span class="material-symbols-rounded" aria-hidden="true">fact_check</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- ============ Content column ============ -->
+      <!-- .content declares --ph-pad-x:24px, which the header, the toolbar band and
+           your body all inherit. Change it here, once, to reset the page rhythm. -->
+      <div class="content">
+
+        <div class="pageheader">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a class="breadcrumb__home" href="#" aria-label="Home">
+              <span class="material-symbols-rounded" aria-hidden="true">home</span>
+            </a>
+            <span class="breadcrumb__sep" aria-hidden="true">
+              <span class="material-symbols-rounded">chevron_right</span>
+            </span>
+            <a href="#">Incident management</a>
+            <span class="breadcrumb__sep" aria-hidden="true">
+              <span class="material-symbols-rounded">chevron_right</span>
+            </span>
+            <span class="breadcrumb__current">INC-2024-0417</span>
+          </nav>
+          <div class="pageheader__titlerow">
+            <span class="pageheader__icon" aria-hidden="true">
+              <span class="material-symbols-rounded">assignment</span>
+            </span>
+            <h1 class="pageheader__title">Forklift near-miss, bay 4</h1>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar__inner">
+            <button class="tbtn tbtn--icon" type="button" aria-label="Back">
+              <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+            </button>
+            <button class="tbtn" type="button">
+              <span class="material-symbols-rounded" aria-hidden="true">save</span> Save
+            </button>
+            <span class="toolbar__spacer"></span>
+            <button class="tbtn tbtn--primary" type="button">Submit</button>
+          </div>
+        </div>
+
+        <main class="page-body" id="content">
+          <div class="rfield">
+            <label class="rfield__label" for="ref">Reference</label>
+            <input class="rfield__control" id="ref" type="text" value="INC-2024-0417">
+          </div>
+          <div class="rfield rfield--locked">
+            <label class="rfield__label">Reported by</label>
+            <input class="rfield__control" value="Marcus Silva" readonly>
+          </div>
+        </main>
+
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Praxis does not style .page-body — that name is yours. These are the two
+       rules your page must own; see below. */
+    .page-body{
+      flex:1; min-height:0; overflow:auto;
+      padding: var(--px-toolbar-gutter) var(--ph-pad-x) var(--praxis-space-32);
+    }
+    .toolbar__inner{max-width:60rem}
+  </style>
+  <script>
+    /* You wire the profile trigger yourself. The script deliberately does not
+       touch the trigger or the pop, so each page keeps its own binding. */
+    var trigger = document.querySelector('.appbar__avatar');
+    var pop = document.querySelector('.profile-menu__pop');
+    trigger.addEventListener('click', function () {
+      var open = pop.hidden;
+      pop.hidden = !open;
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.profile-menu')) { pop.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false'); }
+    });
+  </script>
+</template>
+
+<h2>The four bands</h2>
+
+<table>
+  <thead><tr><th>Band</th><th>Height</th><th>Token</th></tr></thead>
+  <tbody>
+    <tr><td>App bar</td><td>64px</td><td><code>--praxis-appbar-h</code>, and <code>--appbar-h</code> locally</td></tr>
+    <tr><td>Nav rail</td><td>56px wide</td><td><code>--praxis-navrail-width</code>, and <code>--navrail-w</code> locally</td></tr>
+    <tr><td>Page header</td><td>68px min</td><td><code>--ph-h</code></td></tr>
+    <tr><td>Toolbar band</td><td>60px min</td><td><code>--px-toolbar-h</code></td></tr>
+  </tbody>
+</table>
+
+<p>Page content therefore starts at <strong>192px</strong>, and
+<code>--px-dot-clear</code> is set to exactly that so the dot grid stops short of the
+chrome. If you change a band height, change the token — not one page — or the dot grid will
+cut across your header.</p>
+
+<h2>The two rules your page must own</h2>
+
+<p><code>.app</code> is <code>height:100vh; overflow:hidden</code>, so the page does
+<strong>not</strong> scroll — the content column does. Praxis does not style
+<code>.page-body</code>; that name is yours. Add:</p>
+
+<blockquote>
+  <p><code>.page-body{ flex:1; min-height:0; overflow:auto; padding: var(--px-toolbar-gutter) var(--ph-pad-x) var(--praxis-space-32); }</code></p>
+</blockquote>
+
+<p><code>--px-toolbar-gutter</code> (16px) is the canonical gap between the toolbar band
+and the first card of content. It exists because that gap was set per section and drifted —
+8px on one page, 6px on another. Use the token.</p>
+
+<p>The body dot grid is <code>background-attachment:fixed</code>, so an inner scroll
+container is correct: the texture reads as page material and stays put while content
+moves.</p>
+
+<h3><code>.toolbar__inner</code> — when to use it</h3>
+
+<p>Only when your content is a centred max-width column. The band stays full-bleed so its
+closing hairline lines up with the page header's; <code>.toolbar__inner</code> centres the
+controls so they align with the cards below. Set its <code>max-width</code> to the same
+number as your content column. For a full-width page, put the controls straight in
+<code>.toolbar</code> and drop the wrapper.</p>
+
+<h2>Responsive behaviour you get for free</h2>
+
+<table>
+  <thead><tr><th>Width</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td>≤1024px</td><td>Centred search pill narrows to <code>min(600px, 100vw - 420px)</code></td></tr>
+    <tr><td>≤1024px, or toolbar overflow</td><td><code>praxis-toolbar-compact.js</code> sets <code>body.tb-is-compact</code> and collapses the toolbar into a Tools menu — measured, not a fixed breakpoint</td></tr>
+    <tr><td>≤768px</td><td>Search pill goes in-flow; the Mazlan pill is hidden, still reachable from the rail and profile menu</td></tr>
+    <tr><td>≤640px</td><td>Nav rail hidden, <code>--navrail-w</code> zeroed, nav drawer takes over; <code>--px-gutter</code> becomes the single 16px inset for app bar, header and content</td></tr>
+    <tr><td>≤480px</td><td>Logo 22px, avatar 30px, tighter app-bar gap</td></tr>
+  </tbody>
+</table>
+
+<h2>Nav drawer — free, from the rail</h2>
+
+<p><code>praxis-navdrawer.js</code> reads the rail you already wrote and builds the
+narrow-width drawer from it. There is no second markup contract: label a rail button with
+<code>aria-label</code> and the drawer picks the label up. Mark the current item with
+<code>.praxis-navrail__btn--active</code> and the drawer marks it too.</p>
+
+<h2>Profile menu</h2>
+
+<p>You supply the trigger, the <code>.profile-menu__pop</code> element and — optionally —
+a <code>.profile-menu__head</code> carrying your persona's name and role.
+<code>praxis-profile-menu.js</code> renders everything else inside the pop: navigation, the
+theme switch, sign out, the current-page marker, the version footer. It preserves your
+<code>.profile-menu__head</code>, because the persona is yours, not chrome.</p>
+
+<p>It writes <code>localStorage['gl-theme']</code> when the user toggles the theme. That is
+the key your boot script reads — use a different one and you must persist it yourself.</p>
+
+<p>You still wire open and close on the trigger yourself, as the example above does. The
+script deliberately does not touch the trigger or the pop element, so each page keeps its
+own binding.</p>
+
+<div class="note">
+  <p>The pop is height-capped with its own scroll as of 0.1.4. Before that it extended past
+  the bottom of the window on short viewports and Sign out was unreachable.</p>
+</div>
+
+<h2>What each sheet contributes</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-appbar.css"></praxis-block>
+
+<praxis-block name="sheet-classes" sheet="praxis-navrail.css"></praxis-block>
+
+<praxis-block name="sheet-classes" sheet="praxis-pageheader.css"></praxis-block>

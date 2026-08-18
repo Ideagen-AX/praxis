@@ -1,0 +1,77 @@
+<!--praxis
+title: Praxis
+summary: The design system for Ideagen EHSQ Enterprise. Plain CSS and vanilla JS — no framework, no build step, no runtime dependency.
+order: 0
+keywords: home overview start install
+-->
+
+<p>Praxis is the foundation and component layer every EHSQ Enterprise surface is built
+on: tokens, application chrome, and the record-form system, as plain stylesheets and
+vanilla scripts. There is nothing to compile and nothing to import at runtime. A single
+<code>&lt;link&gt;</code> and two attributes on <code>&lt;body&gt;</code> is the whole
+integration.</p>
+
+<p>Every example on this site is real Praxis running in its own frame, loading the same
+<code>dist/</code> that <code>npm install</code> gives you. The tables are measured from
+<code>src/</code> at build time. Nothing here is transcribed by hand, which is the only
+way a reference stays true to the thing it describes.</p>
+
+<praxis-block name="stats"></praxis-block>
+
+<h2>Start here</h2>
+
+<p>Two sections account for nearly every "Praxis looks broken" report. Read them before
+writing markup.</p>
+
+<div class="cardgrid">
+  <a href="foundations/getting-started.html"><strong>Getting started</strong><span>The six non-negotiables, a complete working page, and how to diagnose a page that looks wrong</span></a>
+  <a href="foundations/mental-model.html"><strong>The one mental model</strong><span>Praxis styles component contents. Your page owns container positioning.</span></a>
+</div>
+
+<h2>Foundations</h2>
+
+<praxis-block name="pages" section="foundations"></praxis-block>
+
+<h2>Components</h2>
+
+<p>Tiered by how much use each has actually had. The tiers are a statement about churn
+risk, not quality — everything here works.</p>
+
+<praxis-block name="pages" section="ready,settling,unstable"></praxis-block>
+
+<h2>Install</h2>
+
+<p>Pin the exact version. <code>@0.1</code>, <code>^0.1.0</code> and <code>@latest</code>
+will all pick up breaking changes while Praxis is pre-1.0.</p>
+
+<template data-example="A complete working page — this is the whole integration" data-height="190">
+  <!-- The two body attributes are in the frame document, not here: the entire
+       Praxis look is scoped to body[data-variant="praxis"], and dark mode never
+       engages without body[data-theme]. See Getting started. -->
+  <div class="rfield">
+    <label class="rfield__label" for="ref">Reference</label>
+    <input class="rfield__control" id="ref" type="text" value="INC-2024-0417">
+    <p class="rfield__hint">Generated when the record is created.</p>
+  </div>
+</template>
+
+<h2>The four documents</h2>
+
+<table>
+  <thead><tr><th>Where</th><th>Use it for</th></tr></thead>
+  <tbody>
+    <tr><td>This site</td><td>Building a page: markup, tokens, live behaviour, what is missing</td></tr>
+    <tr><td><code>README.md</code></td><td>Installing, publishing, fonts, licence</td></tr>
+    <tr><td><code>PRAXIS-FOR-AGENTS.md</code></td><td>The same content as this site, as one markdown file, shipped in the npm tarball for agents</td></tr>
+    <tr><td><code>DESIGN-SYSTEM.md</code></td><td>Design rationale, and <em>why</em> a component looks the way it does. Also carries an audit history that is notes to maintainers, not instructions.</td></tr>
+  </tbody>
+</table>
+
+<h2>Fonts</h2>
+
+<p>Praxis sets <code>font-family: 'Gilroy'</code> and ships <strong>no font files</strong>
+— Gilroy is licensed and cannot be redistributed. The build strips the
+<code>@font-face</code> blocks and emits <code>praxis-fonts.example.css</code> showing how
+to point the same family at your own licensed copy. Without it you get the fallback stack,
+which is <code>'Segoe UI'</code> then Roboto then Helvetica Neue then Arial. The layout is
+unaffected; only the letterforms change.</p>

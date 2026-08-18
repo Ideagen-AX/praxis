@@ -1,0 +1,84 @@
+# Deploy the reference site to GitHub Pages, from main only.
+#
+# WHY THIS IS A SEPARATE FILE FROM ci.yml
+#   This job needs `pages: write` and `id-token: write`. Adding those to the
+#   shared CI workflow would widen the token on every unrelated pull-request run,
+#   including runs from forks. And it cannot go in publish.yml at all: npm's
+#   trusted publisher validates that file's NAME as part of the OIDC
+#   job_workflow_ref claim, so publish.yml must not grow responsibilities that
+#   might one day justify renaming it.
+#
+# WHY ONLY main
+#   The production site should be exactly what is on main, and a branch should
+#   get no public URL. Pages serves one site per repository, so a branch deploy
+#   would overwrite production rather than sit beside it. Pull requests are
+#   covered by the `build-site.py --check` step in ci.yml, which proves the site
+#   builds without publishing anything.
+#
+# ONE-TIME SETUP, and the first run fails without it:
+#   Settings → Pages → Build and deployment → Source: GitHub Actions
+#
+# The site lands at https://ideagen-ax.github.io/praxis/
+
+name: Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. `cancel-in-progress: false` because cancelling a
+# half-finished deploy can leave Pages serving a partial site.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Both build scripts are stdlib-only — no pip install. Pinned anyway so a
+      # runner image changing its default python3 cannot move the site under a
+      # deploy.
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # dist/ is gitignored, so it does not exist in a fresh clone: this step
+      # creates it, and it is what the site's examples actually load. The site
+      # therefore renders the same bytes a consumer installs, not a copy of them.
+      # This also runs the package verify() pass, so a deploy cannot ship a site
+      # built on output that would fail to publish.
+      - name: Build and verify dist/
+        run: npm run build
+
+      - name: Build the reference site
+        run: python3 build-site.py
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

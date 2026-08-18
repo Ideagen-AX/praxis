@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Praxis token probe</title>
+<link rel="stylesheet" href="{{root}}praxis/praxis.css">
+</head>
+<!-- Loaded hidden, twice, by site.js: once per theme. Reading
+     getComputedStyle().getPropertyValue() off these bodies is the only way to
+     show what a token RESOLVES to rather than what it is declared as. The
+     difference is not academic — --t-sm looks like it maps to
+     --praxis-type-size-sm but its fallback resolved to type-size-base. -->
+<body data-variant="praxis" data-theme="{{theme}}"></body>
+</html>
