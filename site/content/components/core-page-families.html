@@ -1,0 +1,102 @@
+<!--praxis
+title: Page families and part-only names
+slug: core-page-families
+tier: unstable
+order: 30
+sheet: praxis-core.css
+classes: home, view, record, demo, rm-body, ws-body, ws-toolbar, rp-toolbar, admin-toolbar, admin-body, pager, subtab, rep, upnext, capa-prio, segswitch, mz-input, nav-menu-drawer, filter-toggle, qa, lg-btn, icon-btn, sortbtn, adminnav, appswitch, cn-item, view-toggle
+summary: Fourteen class names praxis-core.css mentions and does not define. Some are page-family hooks doing one job; the rest are components whose parts are styled while the container never was.
+keywords: core page family gutter home view record pager subtab rep upnext leftovers undefined part
+-->
+
+<p>Grep <code>praxis-core.css</code> for a class name and you will find several that look like
+components and are not. They fall into two groups, and neither gives you anything to build
+with — which is exactly why they are worth a page rather than a footnote.</p>
+
+<h2>Page families — one job each</h2>
+
+<p><code>.home</code>, <code>.view</code>, <code>.record</code>, <code>.demo</code>,
+<code>.rm-body</code>, <code>.ws-body</code> and <code>.admin-body</code> appear in
+<strong>exactly one rule</strong> between them:</p>
+
+<template data-example="The only rule that mentions them" data-source-only>
+  body[data-variant="praxis"] .home,
+  body[data-variant="praxis"] .view,
+  body[data-variant="praxis"] .record,
+  body[data-variant="praxis"] .demo,
+  body[data-variant="praxis"] .rm-body,
+  body[data-variant="praxis"] .ws-body,
+  body[data-variant="praxis"] .admin-body {
+    padding-inline: var(--px-gutter);
+  }
+  /* inside @media (max-width: 640px) */
+</template>
+
+<p>That is the whole contribution. They are <strong>markers for which page family you are
+on</strong>, so the phone gutter applies to the content wrapper whatever it happens to be
+called on that screen. They carry no layout, no surface and no type.</p>
+
+<div class="note">
+  <p><strong>What to do with this:</strong> if you are writing a new page, put one of these on
+  your content wrapper — or better, use <a href="card-and-page.html"><code>.page</code></a>,
+  which is a real definition — and you inherit the phone inset in step with the app bar and
+  the header. If you were hoping <code>.record</code> gave you a record layout, it does not.
+  See <a href="app-shell.html">the app shell</a>.</p>
+</div>
+
+<h2>Toolbar band variants</h2>
+
+<p><code>.rp-toolbar</code>, <code>.ws-toolbar</code> and <code>.admin-toolbar</code> are
+alternative names for the toolbar band on different page families. Core mentions them only in
+one place: the dark-mode treatment that swaps a primary button inside a toolbar band from the
+full gradient to the softer <code>--px-primary-soft</code>. The band itself is
+<code>.toolbar</code>, defined in <a href="app-shell.html">the shell</a>.</p>
+
+<p>So they are aliases for the purposes of that one rule. If you name your band
+<code>.rp-toolbar</code> you get the dark primary treatment and nothing else — you still need
+<code>.toolbar</code> for the band.</p>
+
+<h2>Part-only names — the container was never styled</h2>
+
+<p>These seven have <strong>no rule keyed on the bare class at all</strong>. Core styles their
+<em>parts</em> and leaves the container to the page:</p>
+
+<table>
+  <thead><tr><th>Family</th><th>What core actually styles</th><th>What you write</th></tr></thead>
+  <tbody>
+    <tr><td><code>.pager</code></td><td><code>.pager__btn</code> hover, and <code>.pager__btn--active</code> exclusion</td><td>The strip itself — layout, gaps, the button box</td></tr>
+    <tr><td><code>.rep</code></td><td><code>.rep__pin</code> press transform</td><td>Everything else</td></tr>
+    <tr><td><code>.upnext</code></td><td><code>.upnext__open</code> press transform</td><td>Everything else</td></tr>
+    <tr><td><code>.subtab</code></td><td>Nothing on the bare class</td><td>All of it</td></tr>
+    <tr><td><code>.capa-prio</code></td><td>Nothing on the bare class</td><td>All of it</td></tr>
+    <tr><td><code>.mz-input</code></td><td><code>.mz-input__send</code> gets the dark primary ink</td><td>The input shell — see <a href="mazlan.html">Mazlan</a>, and note the drawer markup is not shipped either</td></tr>
+    <tr><td><code>.nav-menu-drawer</code></td><td>Nothing on the bare class</td><td>All of it. Use <a href="nav-drawer.html"><code>.px-navdrawer</code></a>, which is fully defined.</td></tr>
+    <tr><td><code>.segswitch</code></td><td><code>.segswitch &gt; button</code> press transform</td><td>The switch. Or use <a href="form-controls.html#segmented-control"><code>.segmented</code></a>, which is complete.</td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong>Two of these have a complete alternative and you should prefer it.</strong>
+  <code>.nav-menu-drawer</code> → <code>.px-navdrawer</code>.
+  <code>.segswitch</code> → <code>.segmented</code>. Reaching for the part-only name gets you a
+  press animation on an unstyled box, which is a worse starting point than nothing because it
+  looks half-wired.</p>
+</div>
+
+<h2>Interaction-only names</h2>
+
+<p>A last group appears solely in the shared hover and press lists:
+<code>.qa</code>, <code>.lg-btn</code>, <code>.icon-btn</code>, <code>.sortbtn</code>,
+<code>.filter-toggle</code>, <code>.pill-btn</code>. They are covered on
+<a href="buttons.html">Buttons</a>, where the table says which of them has a base and which
+does not. The short answer is <code>.tbtn</code> and <code>.admin-ghostbtn</code> only.</p>
+
+<h2>Why this page is in the unstable tier</h2>
+
+<p>Because none of it is a decision anyone would make on purpose. These names are the residue
+of extracting a shared sheet from twenty pages: the interaction rules were general enough to
+promote, the containers were not. The right end state is that each either gets a real
+definition or stops being mentioned in <code>src/</code> — this page exists so the current
+state is visible instead of surprising, and it is measured by the
+<a href="../foundations/gaps.html#families-praxis-never-keys-a-rule-on">unkeyed families</a>
+table on every build.</p>

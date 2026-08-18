@@ -46,6 +46,25 @@ a consumer. This adds the reference site and the machinery behind it.
   the semantic layer drawn by role — inks as text, borders as a hairline, fills as a
   control — in both themes, each sample on the surface its own theme provides.
 
+- **Every remaining component page — the site now documents all 234 class families
+  in `src/`.** Twelve new pages: buttons, form controls, nav drawer and rail flyouts,
+  card/page/texture, Create New, module selector, quick-filter rail, compact toolbar,
+  workspace chrome, breadcrumb back button, the admin shell, and the page-family and
+  part-only names in core. Plus two new foundation pages — naming and state
+  conventions, and the corrections to `DESIGN-SYSTEM.md` — and depth on filters
+  (the custom-filter expression tree) and Mazlan (the drawer inventory).
+
+- **`PRAXIS-FOR-AGENTS.md` is now generated** from `site/content/`, and grew from 918
+  hand-written lines to 3,799. It still ships in the tarball; `site:check` fails if the
+  committed file is stale.
+
+- **Class-family coverage is a gate, not advisory.** It went from 15% to 100% while
+  those pages were written. It also now checks whether a page *claims* a family in its
+  `classes:` metadata rather than whether the string appears anywhere in a content file
+  — the looser test counted `.card` as documented because seven pages mentioned it in
+  prose while it had no page and no example. Counts are distinct rather than per sheet;
+  the old report said 197 where 177 families were real.
+
 - **`praxis_meta.frozen_aliases()`**, which finds tokens whose dark value can never
   apply: declared on `:root` as `var(--rung)` while the rung's dark remap lands on
   `body`. Four tokens are in that state. Detected structurally, because asking a
@@ -61,6 +80,26 @@ a consumer. This adds the reference site and the machinery behind it.
   of the system from 234 real class families to about 370, and it showed in the
   component inventory in `DESIGN-SYSTEM.md`, where `praxis-reset.css` and
   `praxis-tokens.css` appeared to define classes they do not.
+
+- **The filter drawer's On/Off toggle renders as a bare browser checkbox.**
+  `praxis-admin.css` defines `.switch` as a wrapper containing `.track` and `.thumb`;
+  `praxis-filters.css` reads `.switch:checked`, which only matches with `.switch` on the
+  input — and `praxis-filters.js` emits that second form, plus `.switch__track` and
+  `.switch__thumb`, neither of which is defined in any stylesheet. `class="switch"` on
+  the input also excludes it from the Praxis checkbox rules, so nothing styles it at
+  all. Documented on the form-controls page with both forms side by side; the fix
+  belongs in `src/`.
+
+- **`praxis-create-new.js` is unreachable under a bundler.** It declares
+  `CREATE_CATALOG` and `CN_TEMPLATES` as top-level `const` and never assigns them to
+  `window`, so they are global lexical bindings that another classic `<script>` can read
+  but `window.CREATE_CATALOG` cannot. `package.json` declares `"type": "module"` and no
+  shipped script has an `export`, so importing that file makes both arrays module-scoped
+  and invisible, with no error.
+
+- **`praxis-dotfield.js` renders nothing if you follow its own usage comment.** The
+  comment shows `create` → `setMode` → `setParam` and never mentions `start()`, which
+  the loop requires. The dots are also drawn white, so it needs a dark backdrop.
 
 - **`.mazlan-mark--xl` is documented in `PRAXIS-FOR-AGENTS.md` as 40px and does not
   exist.** It appears only inside a comment in `praxis-mazlan.css` describing one

@@ -1,0 +1,115 @@
+<!--praxis
+title: Compact toolbar
+slug: compact-toolbar
+tier: settling
+order: 40
+sheet: praxis-toolbar-compact.css
+scripts: praxis-toolbar-compact.js
+classes: tb-compact, tb-is-compact, tb-options, tb-options-scrim, tb-display, tb-menu, tb-viewlabel, colmenu, sortmenu, sortbtn, exp-head, viewswitch, is-open
+summary: The toolbar collapses when its contents would no longer fit on one line — measured, not at a breakpoint. Three toolbars have three natural widths, so any single pixel value is wrong for two of them.
+keywords: toolbar compact collapse overflow tools options sort display measured breakpoint
+-->
+
+<p>Nothing here needs wiring. <code>praxis-toolbar-compact.js</code> is self-wiring: it
+measures your toolbar's contents and collapses them the moment they would no longer fit on one
+line, setting <code>body.tb-is-compact</code>.</p>
+
+<div class="note">
+  <p><strong>Measured, not at a fixed breakpoint</strong> — and this is the interesting
+  decision on the page. Three toolbars in the application have three different natural widths,
+  so any single pixel value is early for one page and late for another. Measuring means each
+  page collapses exactly when it has to.</p>
+  <p>The consequence for you: <strong>you cannot predict the collapse point from CSS</strong>.
+  Resize the frame below and watch it happen rather than looking for a media query.</p>
+</div>
+
+<p>It collapses to <code>[back] [Tools ▾] [Filters] [Options] [▤]</code>, and it builds the
+Options popover <strong>only if the page actually has sort or display controls</strong> — an
+empty Options button would be worse than none.</p>
+
+<h2>Live</h2>
+
+<template data-example="Drag the frame narrower until the toolbar collapses" data-height="400" data-shell data-scripts="lucide,toolbar-compact">
+  <div class="app">
+    <header class="appbar">
+      <a class="appbar__brand" href="#" style="font-weight:600">Ideagen</a>
+    </header>
+    <div class="main">
+      <div class="content">
+        <div class="pageheader">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="#">Corrective actions</a>
+            <span class="breadcrumb__sep" aria-hidden="true"><span class="material-symbols-rounded">chevron_right</span></span>
+            <span class="breadcrumb__current">CA-1041</span>
+          </nav>
+          <div class="pageheader__titlerow">
+            <h1 class="pageheader__title">Re-band pallet stacks</h1>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar__inner">
+            <button class="tbtn tbtn--icon" type="button" aria-label="Back">
+              <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+            </button>
+            <button class="tbtn" type="button">
+              <span class="material-symbols-rounded" aria-hidden="true">save</span> Save
+            </button>
+            <button class="tbtn" type="button">
+              <span class="material-symbols-rounded" aria-hidden="true">content_copy</span> Duplicate
+            </button>
+            <button class="tbtn" type="button">
+              <span class="material-symbols-rounded" aria-hidden="true">print</span> Print
+            </button>
+            <button class="tbtn" type="button">
+              <span class="material-symbols-rounded" aria-hidden="true">share</span> Share
+            </button>
+            <button class="tbtn" type="button">
+              <span class="material-symbols-rounded" aria-hidden="true">delete</span> Delete
+            </button>
+            <span class="toolbar__spacer"></span>
+            <button class="tbtn tbtn--primary" type="button">Submit</button>
+          </div>
+        </div>
+
+        <main class="page-body" style="flex:1;min-height:0;overflow:auto;
+              padding:var(--px-toolbar-gutter) var(--ph-pad-x,24px)">
+          <p>Six actions plus a primary. Narrow the frame and they fold into a Tools menu;
+             widen it and they come back. There is no width in any stylesheet that predicts
+             where.</p>
+        </main>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h2>The vocabulary</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>body.tb-is-compact</code></td><td>The switch. Set by this script, read by this sheet <strong>and by <a href="quick-rail.html">the quick-filter rail</a></strong>, which watches the body class rather than a media query so both change at the same instant.</td></tr>
+    <tr><td><code>.tb-compact</code></td><td>The collapsed cluster. <code>__menu</code>, <code>__btn</code>, <code>__caret</code>, <code>__pop</code>.</td></tr>
+    <tr><td><code>.tb-options</code></td><td>The Options sheet, with <code>.is-open</code> and <code>[hidden]</code>. Paired with <code>.tb-options-scrim</code>.</td></tr>
+    <tr><td><code>.tb-options__head</code>, <code>__title</code>, <code>__close</code>, <code>__search</code>, <code>__body</code>, <code>__panel</code>, <code>__sechead</code>, <code>__label</code>, <code>__empty</code></td><td>Its internals. <code>__sr</code> is a screen-reader-only live region.</td></tr>
+    <tr><td><code>.tb-display__btn</code>, <code>.tb-display__pop</code></td><td>The density and column switch. <code>[aria-expanded="true"]</code> is the open state.</td></tr>
+    <tr><td><code>.tb-viewlabel</code></td><td>The current view's name, shown when the switcher itself does not fit</td></tr>
+    <tr><td><code>.colmenu</code>, <code>.sortmenu</code>, <code>.sortbtn</code></td><td>Column and sort menus. Praxis styles these <strong>only inside</strong> <code>.tb-options__body</code> and <code>.tb-display__pop</code> — see the trap.</td></tr>
+    <tr><td><code>.exp-head</code></td><td>Expandable section head inside the options panel</td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong><code>.colmenu</code>, <code>.sortmenu</code>, <code>.sortbtn</code>,
+  <code>.tb-display</code> and <code>.panel</code> have no base rule in Praxis.</strong> The
+  only rules that mention them are <em>inside</em> the compact popovers, and several are
+  <code>display:none !important</code> — this sheet's job for those classes is to
+  <em>suppress</em> your full-width controls once they have been folded into the Options
+  sheet, not to define them. If you use one outside a popover you get nothing. The
+  <a href="../foundations/gaps.html#families-praxis-never-keys-a-rule-on">unkeyed families</a>
+  table measures this every build.</p>
+</div>
+
+<h2>Everything this sheet defines</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-toolbar-compact.css"></praxis-block>

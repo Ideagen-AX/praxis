@@ -1,0 +1,80 @@
+<!--praxis
+title: Breadcrumb back button
+slug: breadcrumb-back
+tier: settling
+order: 70
+sheet: praxis-pageheader.css
+scripts: praxis-breadcrumb-back.js
+classes: breadcrumb, pageheader, toolbar, tbtn
+summary: The toolbar's back button, driven by the breadcrumb trail rather than history. Twenty lines of behaviour that exists because six pages point their breadcrumb ancestors at "#".
+keywords: breadcrumb back button navigation history trail ancestor
+-->
+
+<p>Every page's toolbar carries a back button, and it used to do nothing. It should step one
+level up the breadcrumb trail, ending at the workspace.
+<code>praxis-breadcrumb-back.js</code> is self-wiring: include it, and the button in your
+toolbar starts working.</p>
+
+<h2>Why it is not one line</h2>
+
+<p>The obvious implementation is <code>location.href = lastCrumb.href</code>. It does not work
+here, and the reason is worth knowing because it is a property of real markup rather than a
+design choice:</p>
+
+<p>The breadcrumb <em>structure</em> is consistent — a <code>&lt;nav class="breadcrumb"&gt;</code>
+with <code>&lt;a&gt;</code> ancestors, <code>.breadcrumb__sep</code> separators and a final
+<code>.breadcrumb__current</code>. The <strong>hrefs are not</strong>. Six of the twenty pages
+point their ancestor links at <code>"#"</code>. Following those takes you nowhere and adds a
+history entry, so the script has to resolve a real destination rather than trusting the
+attribute.</p>
+
+<div class="note">
+  <p>The practical instruction: <strong>give your breadcrumb ancestors real hrefs.</strong> The
+  script copes with <code>"#"</code>, but it copes by guessing, and a correct href is always
+  better than a good guess.</p>
+</div>
+
+<h2>The markup it reads</h2>
+
+<template data-example="A breadcrumb and the back button it drives" data-height="230" data-scripts="lucide,breadcrumb-back">
+  <div class="pageheader">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a class="breadcrumb__home" href="index.html" aria-label="Home">
+        <span class="material-symbols-rounded" aria-hidden="true">home</span>
+      </a>
+      <span class="breadcrumb__sep" aria-hidden="true">
+        <span class="material-symbols-rounded">chevron_right</span>
+      </span>
+      <a href="incidents.html">Incident management</a>
+      <span class="breadcrumb__sep" aria-hidden="true">
+        <span class="material-symbols-rounded">chevron_right</span>
+      </span>
+      <span class="breadcrumb__current">INC-2024-0417</span>
+    </nav>
+    <div class="pageheader__titlerow">
+      <h1 class="pageheader__title">Forklift near-miss, bay 4</h1>
+    </div>
+  </div>
+  <div class="toolbar">
+    <div class="toolbar__inner">
+      <button class="tbtn tbtn--icon" type="button" aria-label="Back">
+        <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+      </button>
+      <button class="tbtn" type="button">Save</button>
+    </div>
+  </div>
+</template>
+
+<p>The script finds the back button by looking for the toolbar's <code>aria-label="Back"</code>
+control, so <strong>label it</strong>. An icon-only button with no label is both inaccessible
+and invisible to this script — the same requirement, for two reasons.</p>
+
+<h2>What the breadcrumb itself defines</h2>
+
+<p><code>praxis-pageheader.css</code> is a small sheet and fully covers the breadcrumb:
+<code>.breadcrumb</code>, <code>.breadcrumb__home</code>, <code>.breadcrumb__sep</code> and
+<code>.breadcrumb__current</code>. The separators are decorative and take
+<code>aria-hidden</code>; the trail is a <code>&lt;nav&gt;</code> with a label so it is
+announced as navigation rather than a run of links.</p>
+
+<praxis-block name="sheet-classes" sheet="praxis-pageheader.css"></praxis-block>

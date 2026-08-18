@@ -1,0 +1,235 @@
+<!--praxis
+title: The admin shell
+slug: admin
+tier: unstable
+order: 20
+sheet: praxis-admin.css
+scripts: praxis-admin-chrome.js
+classes: app, main, content, adminnav, admin-cols, admin-card, admin-subhead, admin-grid, admin-field, admin-tabs, admin-tab, admin-table, admin-table-wrap, admin-table-scroll, admin-tabletools, admin-rowx, admin-pill, admin-panel, admin-setting-row, admin-setting-card, admin-settings-grid, admin-drill, admin-stat, admin-banner, admin-menurow, admin-menulist, admin-note, admin-addmenu, admin-cnbtn, admin-cngrid, admin-cngroup, admin-check, admin-link, admin-preview, admin-body, admin-toolbar, ss-pop, ss-row, ss-sec, lg-btn, lg-cs, lg-err, lg-jv, lg-tm, thumb, track, visually-hidden, px-pop, px-skip
+summary: Read this even if you are not building admin. Despite the name, this sheet carries the application shell, the toolbar button, the switch, the icon base and the popover — and praxis.css includes it.
+keywords: admin shell app main content adminnav table settings tabs stat banner drill nav
+-->
+
+<div class="note note--trap">
+  <p><strong>The name hides what this sheet actually is.</strong> It carries the application
+  shell every Praxis page needs — <code>.app</code>, <code>.main</code>,
+  <code>.content</code>, the <code>.appbar</code> positioning and the
+  <code>.praxis-navrail</code> container — plus <code>.tbtn</code>, <code>.switch</code>,
+  <code>.icon</code>, <code>.px-pop</code>, <code>.px-skip</code>,
+  <code>.mazlan-mark</code> and <code>*{box-sizing:border-box}</code>. Import piecemeal
+  without it and you lose all of that. Loading the <code>praxis.css</code> bundle makes it
+  moot, which is the argument for the bundle.</p>
+</div>
+
+<p>Everything from <code>.adminnav</code> onward <em>is</em> admin-specific, and it is the
+largest single component surface in Praxis. It sits in the <strong>unstable</strong> tier
+because it is page-scoped: the ten admin pages emit an identical shell and this sheet was
+extracted from them, so it is shaped by those screens rather than by a general case.</p>
+
+<h2>The shell primitives</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.app</code></td><td><code>display:flex; flex-direction:column; height:100vh; overflow:hidden</code>. The reason the page does not scroll — the content column does.</td></tr>
+    <tr><td><code>.main</code></td><td><code>flex:1; display:flex; min-height:0</code>. The rail and content sit side by side inside it. The <code>min-height:0</code> is what lets the inner column actually scroll.</td></tr>
+    <tr><td><code>.content</code></td><td>The column. Declares <code>--ph-pad-x:24px</code>, which the page header, toolbar band and your body all inherit — change it here, once, to reset the page rhythm.</td></tr>
+  </tbody>
+</table>
+
+<h2>The admin nav</h2>
+
+<p>A third navigation level, beside the rail: <code>.adminnav</code> at
+<code>--adminnav-w</code>, with a head, a type-to-filter field, a scrolling group list and
+items. It is the largest family in the sheet at 24 rules.</p>
+
+<div class="note note--trap">
+  <p><strong><code>praxis-core.css</code> hides it outright:</strong>
+  <code>body[data-variant="praxis"] .adminnav { display:none !important }</code>. So under
+  the Praxis variant — which is every Praxis page — the admin nav does not render at all. The
+  styling is here for the pages that predate the variant. If you want a third nav level under
+  Praxis you are overriding an <code>!important</code>, which is a signal to build it as your
+  own component rather than reviving this one.</p>
+</div>
+
+<h2>Layout and cards</h2>
+
+<template data-example="The admin layout primitives" data-height="420" data-scripts="lucide">
+  <div class="admin-cols">
+    <div>
+      <div class="admin-card">
+        <p class="admin-subhead">Notification defaults</p>
+        <div class="admin-grid">
+          <div class="admin-field">
+            <span class="admin-field__label">Digest frequency</span>
+            <span class="admin-field__value">Daily</span>
+          </div>
+          <div class="admin-field">
+            <span class="admin-field__label">Escalation window</span>
+            <span class="admin-field__value">48 hours</span>
+          </div>
+          <div class="admin-field">
+            <span class="admin-field__label">Reply-to</span>
+            <span class="admin-field__value">ehsq@example.com</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card" style="margin-top:1rem">
+        <p class="admin-subhead">Status</p>
+        <div class="admin-grid">
+          <div class="admin-stat">
+            <span class="admin-stat__n">1,284</span>
+            <span class="admin-stat__k">Active users</span>
+          </div>
+          <div class="admin-stat">
+            <span class="admin-stat__n">37</span>
+            <span class="admin-stat__k">Pending invites</span>
+          </div>
+          <div class="admin-stat">
+            <span class="admin-stat__n">4</span>
+            <span class="admin-stat__k">Failed jobs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="admin-banner">
+        <span class="material-symbols-rounded" aria-hidden="true">info</span>
+        <div>
+          <strong>Scheduled maintenance</strong>
+          <p style="margin:.125rem 0 0">Sunday 02:00–04:00 UTC.</p>
+        </div>
+      </div>
+      <p class="admin-note" style="margin-top:1rem">Changes here apply to every workspace in
+         the tenant.</p>
+    </div>
+  </div>
+</template>
+
+<p><code>.admin-field</code> is the read-out row, and it is worth knowing that
+<code>praxis-rfield.css</code> gives it
+<a href="rfield.html#four-gotchas-each-learned-the-hard-way">the static-field treatment
+automatically</a>, selected with <code>:has(&gt; .admin-field__value)</code> — so generated
+admin pages needed no markup change to pick up the record-form look.</p>
+
+<h2>Tables</h2>
+
+<p>Three wrappers, and they are not interchangeable: <code>.admin-table-wrap</code> is the
+outer container, <code>.admin-table-scroll</code> adds the horizontal scroll for wide column
+sets, and <code>.admin-tabletools</code> is the control strip above.</p>
+
+<template data-example="An admin table with tools, pills and a row action" data-height="380" data-scripts="lucide">
+  <div class="admin-card">
+    <div class="admin-tabs">
+      <button class="admin-tab admin-tab--active" type="button">All users</button>
+      <button class="admin-tab" type="button">Pending</button>
+      <button class="admin-tab" type="button">Disabled</button>
+    </div>
+    <div class="admin-tabletools">
+      <button class="admin-ghostbtn" type="button">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span> Invite user
+      </button>
+    </div>
+    <div class="admin-table-wrap">
+      <div class="admin-table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Name</th><th>Role</th><th>Site</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Marcus Silva</td><td>EHS coordinator</td><td>Teesside works</td>
+              <td><span class="admin-pill admin-pill--success">Active</span></td>
+              <td><button class="admin-rowx" type="button" aria-label="Remove">
+                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+            </tr>
+            <tr>
+              <td>Aoife Byrne</td><td>Supervisor</td><td>Teesside works</td>
+              <td><span class="admin-pill admin-pill--warning">Invited</span></td>
+              <td><button class="admin-rowx" type="button" aria-label="Remove">
+                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+            </tr>
+            <tr>
+              <td>Tom Okafor</td><td>Driver</td><td>Rotherham plant</td>
+              <td><span class="admin-pill">Disabled</span></td>
+              <td><button class="admin-rowx" type="button" aria-label="Remove">
+                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+
+<p>Zebra striping is <code>tbody tr:nth-child(even)</code>, and the same warning applies as
+for <a href="rfield.html">in-record tables</a>: <strong>a hidden empty-state row still
+counts</strong>. Put it in its own <code>&lt;tbody&gt;</code>.</p>
+
+<h2>Settings rows and drill-downs</h2>
+
+<template data-example="Settings rows with switches, and a drill-down" data-height="330" data-scripts="lucide">
+  <div class="admin-settings-grid">
+    <div class="admin-setting-card">
+      <div class="admin-setting-row">
+        <div>
+          <strong>Require two-factor</strong>
+          <p class="admin-note" style="margin:.125rem 0 0">For every account in the tenant.</p>
+        </div>
+        <span class="switch">
+          <input type="checkbox" checked>
+          <span class="track"></span><span class="thumb"></span>
+        </span>
+      </div>
+      <div class="admin-setting-row">
+        <div>
+          <strong>Allow personal API tokens</strong>
+          <p class="admin-note" style="margin:.125rem 0 0">Tokens inherit the user's role.</p>
+        </div>
+        <span class="switch">
+          <input type="checkbox">
+          <span class="track"></span><span class="thumb"></span>
+        </span>
+      </div>
+      <a class="admin-drill" href="#">
+        Reporting authorities
+        <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+      </a>
+    </div>
+  </div>
+</template>
+
+<h2>Search suggestions</h2>
+
+<p><code>.ss-pop</code>, <code>.ss-sec</code> and <code>.ss-row</code> are the app-bar search
+suggestion popover, wired by <code>praxis-admin-chrome.js</code>. <code>.ss-row mark</code>
+is styled for match highlighting — transparent background, interactive-teal ink, weight 700 —
+so wrap the matched substring in <code>&lt;mark&gt;</code> rather than a span.</p>
+
+<div class="note">
+  <p><code>.ss-sec</code> has no base rule; only <code>.ss-sec__head</code> is defined. So the
+  section wrapper is yours, and it appears in the
+  <a href="../foundations/gaps.html#families-praxis-never-keys-a-rule-on">unkeyed families</a>
+  table for that reason.</p>
+</div>
+
+<h2>Chrome wiring</h2>
+
+<p><code>praxis-admin-chrome.js</code> wires the shared chrome for all ten admin pages at
+once, because they emit an identical shell with the same <code>ad-</code> element IDs: the
+Create New flyout, the search module selector, the Dashboards popout, search suggestions and
+the Mazlan drawer.</p>
+
+<div class="note note--trap">
+  <p><strong>It is ID-driven, so it only works on markup that uses those exact IDs</strong>,
+  and it <strong>depends on <code>praxis-create-new.js</code> being loaded first</strong> for
+  the catalog data. It also deliberately does <em>not</em> wire the app switcher, profile menu,
+  theme button or side-nav filter — those stay in each page's own inline script. So loading
+  this file does not give you a working admin header on its own.</p>
+</div>
+
+<h2>Everything this sheet defines</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-admin.css"></praxis-block>

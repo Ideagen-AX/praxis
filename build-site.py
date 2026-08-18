@@ -446,6 +446,53 @@ def block_frozen_aliases_md(args):
                      + ['| `%s` | `%s` | `%s` |' % r for r in rows])
 
 
+def block_absent_tokens(args):
+    """Assert that named tokens do NOT exist, and verify it every build.
+
+    The corrections page claims things like "--praxis-type-weight-* does not
+    exist". Transcribed, that claim rots the moment someone adds one — and it
+    rots silently, into a reference telling readers not to use a token that now
+    works. So the claim is checked instead: the names are listed here and the
+    build confirms each is still absent.
+    """
+    names = [n.strip() for n in (args.get('names') or '').split(',') if n.strip()]
+    if not names:
+        fail('block absent-tokens', 'names="..." is required')
+        return ''
+    light, dark = praxis_meta.token_map()
+    defined = set(light) | set(dark)
+    prefixes = [n[:-1] for n in names if n.endswith('*')]
+    exact = [n for n in names if not n.endswith('*')]
+
+    present = [t for t in exact if t in defined]
+    for pre in prefixes:
+        present += sorted(t for t in defined if t.startswith(pre))
+    if present:
+        fail('block absent-tokens',
+             'this page claims these do not exist, but they are defined in src/: %s. '
+             'The claim is now wrong — update the page.' % ', '.join(present))
+
+    out = ['<table><thead><tr><th>Claimed absent</th><th>Verified</th></tr></thead><tbody>']
+    for n in names:
+        hit = ([t for t in defined if t.startswith(n[:-1])] if n.endswith('*')
+               else ([n] if n in defined else []))
+        out.append('<tr><td><code>%s</code></td><td>%s</td></tr>'
+                   % (html.escape(n),
+                      'still absent' if not hit
+                      else '<strong>NOW DEFINED — this page is out of date</strong>'))
+    out.append('</tbody></table>')
+    out.append('<p class="sw__val">Checked against <code>src/</code> on every build. If any '
+               'of these is ever defined, the build fails rather than the page quietly '
+               'telling you not to use something that works.</p>')
+    return '\n'.join(out)
+
+
+def block_absent_tokens_md(args):
+    names = [n.strip() for n in (args.get('names') or '').split(',') if n.strip()]
+    return '\n'.join(['| Claimed absent | Verified |', '|---|---|']
+                     + ['| `%s` | still absent |' % n for n in names])
+
+
 def block_media_only(args):
     rows = praxis_meta.media_only_tokens()
     if not rows:
@@ -854,6 +901,7 @@ BLOCKS = {
     'overrides': (block_overrides, block_overrides_md),
     'media-only-tokens': (block_media_only, block_media_only_md),
     'frozen-aliases': (block_frozen_aliases, block_frozen_aliases_md),
+    'absent-tokens': (block_absent_tokens, block_absent_tokens_md),
     'manifest': (block_manifest, block_manifest_md),
     'pages': (block_pages, block_pages_md),
 }
@@ -1169,6 +1217,19 @@ def build():
         s = read(p).replace('<body>', '<body data-root="%s">' % page['root'], 1)
         open(p, 'w', encoding='utf-8').write(s)
 
+    # Coverage is a GATE now, not advisory. It went from 15% to 100% while these
+    # pages were written; leaving it advisory would let the next component sheet
+    # land undocumented and nobody would notice until a teammate could not find
+    # the class. The threshold is every family, because that is where it is.
+    _everywhere, _claimed, _missing, _states = coverage(pages)
+    if _missing or _states:
+        fail('coverage', '%d class family/families are not claimed by any page\'s '
+                         '`classes:` metadata: %s. Add them to the page that documents '
+                         'them, or write that page.'
+             % (len(_missing) + len(_states),
+                ', '.join('.' + f for f in (_missing + _states)[:10])
+                + (' …' if len(_missing) + len(_states) > 10 else '')))
+
     every = {name for _g, name, _l, _d in praxis_meta.token_rows()}
     every |= {name for _g, name, _l, _d in praxis_meta.material_rows()}
     every |= {name for _g, name, _l, _d in praxis_meta.variant_extras()}
@@ -1444,23 +1505,40 @@ def agents_doc(pages):
 # Coverage
 # ---------------------------------------------------------------------------
 
-def coverage(pages):
-    """Which class families no content file mentions yet.
+# Modifier conventions shared across sheets, not components. Documented once, in
+# one place, rather than counted against every sheet that uses them.
+STATE_FAMILIES = {'is-active', 'is-checked', 'is-collapsed', 'is-expanded', 'is-mixed',
+                  'is-on', 'is-open', 'is-sel', 'is-selected', 'is-spinning', 'is-current',
+                  'is-dragging', 'is-hidden', 'is-loading'}
 
-    Advisory, not a gate. 238 families across the sheets is a real backlog and a
-    hard failure on day one would just get switched off. Once the list is short
-    this becomes a gate, and adding a sheet without documenting it fails CI.
+
+def coverage(pages):
+    """Which class families no page CLAIMS in its `classes:` metadata.
+
+    The first version of this asked whether the family appeared anywhere in a
+    content file, which was far too generous: `.card` counted as documented
+    because seven pages mention it in prose, while it had no example and no page
+    of its own. A page has to claim a family for it to count.
+
+    Counted DISTINCT, not per sheet. The per-sheet count reported 197 where 177
+    families were real, because `.appswitch`, `.ws-item` and twelve others appear
+    in several sheets and were counted once each time.
     """
-    documented = set()
+    claimed = set()
     for page in pages:
-        text = page['body'] + ' ' + page['meta'].get('classes', '')
-        for c in re.findall(r'\.?\b([a-z][a-z0-9_-]*)\b', text):
-            documented.add(re.split(r'__|--', c)[0])
-    rows = []
+        for c in re.split(r'[,\s]+', page['meta'].get('classes', '')):
+            c = c.strip().lstrip('.')
+            if c:
+                claimed.add(re.split(r'__|--', c)[0])
+
+    everywhere = collections.defaultdict(set)
     for base, _rules, _used, fams in praxis_meta.sheet_inventory():
-        missing = sorted(f for f in fams if f not in documented)
-        rows.append((base, len(fams), missing))
-    return rows
+        for fam in fams:
+            everywhere[fam].add(base)
+
+    missing = sorted(f for f in everywhere if f not in claimed and f not in STATE_FAMILIES)
+    states = sorted(f for f in everywhere if f in STATE_FAMILIES and f not in claimed)
+    return everywhere, claimed, missing, states
 
 
 # ---------------------------------------------------------------------------
@@ -1522,7 +1600,7 @@ def main():
         counts[key] = len([p for p in pages if p['section'] == key])
 
     if '--agents-doc' in argv:
-        out = os.path.join(HERE, 'PRAXIS-FOR-AGENTS.generated.md')
+        out = os.path.join(HERE, 'PRAXIS-FOR-AGENTS.md')
         doc = agents_doc(pages)
         # An unreplaced placeholder is silent corruption of exactly the kind this
         # repo keeps getting bitten by: the file writes, the byte count looks
@@ -1541,27 +1619,47 @@ def main():
         if stray:
             fail('agents-doc', 'raw HTML survived conversion to markdown: %s'
                  % ', '.join(sorted(set(stray))))
-        open(out, 'w', encoding='utf-8').write(doc)
         if problems:
             print('FAILED — %d problem(s) converting content to markdown:' % len(problems))
             for p in problems:
                 print('  - %s' % p)
             return 1
-        print('wrote %s (%d pages)' % (os.path.basename(out), len(pages) - counts['overview']))
-        print('NOT yet promoted over PRAXIS-FOR-AGENTS.md — the hand-written guide '
-              'still covers components this site does not. Promote when coverage is complete.')
+        before = read(out) if os.path.exists(out) else None
+        open(out, 'w', encoding='utf-8').write(doc)
+        print('wrote %s (%d pages, %d lines)%s'
+              % (os.path.basename(out), len(pages) - counts['overview'],
+                 doc.count('\n'), '' if before == doc else '  — CHANGED'))
         return 0
 
     if '--coverage' in argv:
-        rows = coverage(pages)
-        total = sum(len(m) for _b, _n, m in rows)
-        print('Class families not yet mentioned by any content file:\n')
-        for base, n, missing in rows:
-            print('  %-28s %3d/%-3d undocumented' % (base, len(missing), n))
-            if missing:
-                print('      %s' % ', '.join('.' + f for f in missing[:14])
-                      + (' …' if len(missing) > 14 else ''))
-        print('\n  %d undocumented families. Advisory in this pass.' % total)
+        everywhere, claimed, missing, states = coverage(pages)
+        total = len(everywhere)
+        done = total - len(missing) - len(states)
+        print('Class-family coverage \u2014 a family counts only when a page claims it '
+              'in its `classes:` metadata.\n')
+        print('  %d of %d distinct families claimed (%d%%)'
+              % (done, total, round(100.0 * done / total)))
+        if states:
+            print('  %d shared state modifier(s) unclaimed: %s'
+                  % (len(states), ', '.join('.' + f for f in states)))
+        print()
+        by_sheet = collections.defaultdict(list)
+        for fam in missing:
+            for sheet in sorted(everywhere[fam]):
+                by_sheet[sheet].append(fam)
+        for sheet in sorted(by_sheet):
+            fams = by_sheet[sheet]
+            print('  %-28s %3d unclaimed' % (sheet, len(fams)))
+            line = '      '
+            for f in fams:
+                if len(line) + len(f) > 92:
+                    print(line)
+                    line = '      '
+                line += '.' + f + ' '
+            if line.strip():
+                print(line)
+        print('\n  %d distinct families unclaimed. Advisory until the list is short.'
+              % len(missing))
         return 0
 
     print('Praxis %s reference site → _site/' % result['version'])
@@ -1586,13 +1684,20 @@ def main():
         # Exercise the markdown conversion too, in memory. Otherwise CI can pass
         # while --agents-doc is broken, and the breakage only surfaces when
         # someone regenerates the guide that ships in the tarball.
-        agents_doc(pages)
+        doc = agents_doc(pages)
         if problems:
             print('FAILED — %d problem(s) in the agent-doc conversion:' % len(problems))
             for p in problems:
                 print('  - %s' % p)
             return 1
-        print('  markdown conversion clean')
+        guide = os.path.join(HERE, 'PRAXIS-FOR-AGENTS.md')
+        if not os.path.exists(guide) or read(guide) != doc:
+            print('FAILED — PRAXIS-FOR-AGENTS.md is STALE. It is generated from '
+                  'site/content/ and ships in the npm tarball, so a content edit that '
+                  'does not reach it publishes a guide that disagrees with the site. '
+                  'Run: python3 build-site.py --agents-doc')
+            return 1
+        print('  markdown conversion clean, PRAXIS-FOR-AGENTS.md current')
         print('  check passed')
         return 0
 

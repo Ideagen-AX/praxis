@@ -5,7 +5,7 @@ tier: unstable
 order: 10
 sheet: praxis-mazlan.css
 scripts: praxis-mazlan.js
-classes: mazlan-mark, mazlan-drawer, mazlan-menu, mazlan-reasoning, mazlan-msg, mazlan-suggestions, mazlan-content, mazbtn
+classes: mazlan-mark, mazlan-drawer, mazlan-menu, mazlan-reasoning, mazlan-msg, mazlan-suggestions, mazlan-content, mazbtn, mazlan-thread, mazlan-welcome, mazlan-sugg, mazlan-followup, mazlan-followups, mazlan-sources, mazlan-source, mazlan-typing, mazlan-scrim, mazlan-dropdown, mazlan-more, mazlan-more-wrap, mazlan-tool-btn, mazlan-scope-btn, mazlan-chat-only, mazlan-plus-wrap, mz-input, is-spinning
 summary: The four-dot signature glyph, the agentic gradient, and the one real blocker in Praxis — the conversational drawer whose markup the package does not ship.
 keywords: mazlan ai agentic gradient dots drawer reasoning glyph blocker
 -->
@@ -124,9 +124,76 @@ you have the drawer markup.</p>
 It references no host globals directly; it uses <code>window.announce</code> when present
 and optionally <code>window.openAgentic</code> and <code>window.closeDetailPanel</code>.</p>
 
-<h2>Everything this sheet defines</h2>
+<h2>The drawer inventory</h2>
 
-<p>All of this CSS ships. Most of it has no markup in the package to attach to, which is
-what "unstable" means on this page rather than "unfinished".</p>
+<p>Everything below is <strong>fully styled and has no shipped markup</strong>. There is
+nothing to demonstrate — an example would be me inventing the markup, which is exactly what
+this page is telling you not to do. It is inventoried so that when the markup is extracted,
+whoever does it knows what the sheet already expects, and so a reader who greps for one of
+these names finds out why it does nothing.</p>
+
+<h3>The shell</h3>
+
+<table>
+  <thead><tr><th>Class</th><th>What it styles</th></tr></thead>
+  <tbody>
+    <tr><td><code>.mazlan-drawer</code></td><td>The panel. Its transitions use <code>--praxis-motion-drawer</code> and the two spring easings — the three tokens that were once defined on one page only, which is why the drawer had no transition anywhere else.</td></tr>
+    <tr><td><code>.mazlan-scrim</code>, <code>--open</code></td><td>Backdrop. Note <code>--open</code> as a BEM modifier here, against <code>.is-open</code> elsewhere in Praxis.</td></tr>
+    <tr><td><code>.mazlan-thread</code></td><td>The scrolling conversation column</td></tr>
+    <tr><td><code>.mazlan-welcome</code></td><td>The pre-conversation state. <code>.mazlan-welcome__logo &gt; span</code> is where the 3.2s breathing animation lives — amplitude held to 8% deliberately, and switched off under <code>prefers-reduced-motion</code>.</td></tr>
+    <tr><td><code>.mazlan-chat-only</code></td><td>A layout mode for when the content panel is closed</td></tr>
+  </tbody>
+</table>
+
+<h3>Messages and reasoning</h3>
+
+<table>
+  <thead><tr><th>Class</th><th>What it styles</th></tr></thead>
+  <tbody>
+    <tr><td><code>.mazlan-msg</code></td><td>A bubble</td></tr>
+    <tr><td><code>.mazlan-typing</code></td><td>The pending indicator</td></tr>
+    <tr><td><code>.mazlan-reasoning</code></td><td>The step timeline shown while an answer is assembled</td></tr>
+    <tr><td><code>.is-spinning</code></td><td>Shared in-progress state, used on the tool and refresh affordances</td></tr>
+    <tr><td><code>.mazlan-content</code></td><td>The side panel a message can open</td></tr>
+  </tbody>
+</table>
+
+<h3>Citations</h3>
+
+<p>The most developed part of the sheet, and the part most worth having when the markup lands:
+<code>.mazlan-sources</code> with <code>__label</code>, <code>__avatars</code>,
+<code>__toggle</code>, <code>__chev</code> and <code>__list</code>, opened with
+<code>--open</code>; and each <code>.mazlan-source__item</code> carrying an
+<code>__avatar</code>, <code>__title</code>, <code>__text</code>, <code>__origin</code> and
+<code>__arrow</code>. A collapsed row of avatars that expands into attributed sources is a
+specific, considered answer to "where did this come from", and it is all here.</p>
+
+<h3>Input and menus</h3>
+
+<table>
+  <thead><tr><th>Class</th><th>What it styles</th></tr></thead>
+  <tbody>
+    <tr><td><code>.mz-input</code></td><td>The composer. <strong>Only <code>.mz-input__send</code> is styled</strong> — it gets the dark primary ink in dark mode from <code>praxis-core.css</code>. The shell itself is unkeyed; see <a href="core-page-families.html">part-only names</a>.</td></tr>
+    <tr><td><code>.mazlan-sugg</code>, <code>__icon</code>, <code>__icon--blue</code></td><td>A starter prompt. The tinted icon variants map to the suggestion categories in <code>MAZLAN_CONFIG</code>.</td></tr>
+    <tr><td><code>.mazlan-followups</code>, <code>.mazlan-followup</code></td><td>Suggested next questions under an answer</td></tr>
+    <tr><td><code>.mazlan-scope-btn</code></td><td>What the conversation is scoped to</td></tr>
+    <tr><td><code>.mazlan-tool-btn</code>, <code>.mazlan-plus-wrap</code></td><td>Tool and attach affordances beside the composer</td></tr>
+    <tr><td><code>.mazlan-dropdown</code>, <code>__title</code>, <code>__item</code>, <code>__icon</code></td><td>The model or mode picker</td></tr>
+    <tr><td><code>.mazlan-more</code>, <code>-wrap</code>, <code>__item</code>, <code>__item--danger</code>, <code>__divider</code></td><td>The overflow menu, including a destructive item treatment</td></tr>
+    <tr><td><code>.mazlan-menu</code></td><td>The launcher menu from the app bar</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <p><strong>What to do if you need this.</strong> Do not reconstruct the DOM from the class
+  list above — the script requires specific <em>ids</em>, not classes, and getting 30 of them
+  right by inference is not a good use of an afternoon. Raise it, and the markup gets extracted
+  into the package once, correctly. Meanwhile
+  <a href="#the-four-dot-signature">the mark</a>, the gradient and
+  <a href="rfield.html#sub-sections-and-the-mazlan-hand-off"><code>.mazbtn</code></a> are all
+  usable today and cover most of what a prototype needs to signal an agentic moment.</p>
+</div>
+
+<h2>Everything this sheet defines</h2>
 
 <praxis-block name="sheet-classes" sheet="praxis-mazlan.css"></praxis-block>

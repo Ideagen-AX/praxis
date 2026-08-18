@@ -1,0 +1,120 @@
+<!--praxis
+title: Workspace chrome
+slug: workspace
+tier: settling
+order: 60
+sheet: praxis-workspace.css
+classes: appswitch, persona-trigger, persona-picker, persona-popover, gl-theme-btn, gl-sun, gl-moon, appbar, ws-body, ws-toolbar
+summary: A second app-bar vocabulary, the app switcher, the persona picker and the theme button. Loaded last, so where it overlaps praxis-appbar.css it wins.
+keywords: workspace appbar appswitch persona theme toggle switcher hub avatar
+-->
+
+<div class="note note--trap">
+  <p><strong>This sheet defines a second, competing app-bar vocabulary.</strong>
+  <code>praxis-appbar.css</code> gives you <code>.appbar__module</code>,
+  <code>.appbar__search-btn</code> and <code>.appbar__iconbtn</code>. This sheet gives you
+  <code>.appbar__module-selector</code>, <code>.appbar__search-go</code>,
+  <code>.appbar__icon-btn</code> and <code>.appbar__action-btn</code>, plus
+  <code>.appbar__logo-area</code>, <code>.appbar__input-area</code> and
+  <code>.appbar__search-input</code>.</p>
+  <p>Both work. They are not interchangeable, and <strong>this sheet loads later in the
+  bundle</strong>, so wherever the two key on the same selector, this one wins.
+  <a href="app-shell.html">The app shell</a> uses the <code>praxis-appbar.css</code> vocabulary,
+  which is what the agent guide documents; pick one per page and do not mix them.</p>
+</div>
+
+<h2>App switcher</h2>
+
+<p><code>.appswitch</code> is the product switcher in the app bar's left corner — a trigger and
+a popover of products, with <code>--active</code> marking the current one.</p>
+
+<template data-example="The app switcher, open" data-height="300" data-scripts="lucide">
+  <div class="appswitch" style="position:relative">
+    <button class="appswitch__trigger" type="button" aria-expanded="true">
+      <span class="material-symbols-rounded" aria-hidden="true">apps</span>
+      EHSQ Enterprise
+    </button>
+    <div class="appswitch__pop" style="position:relative;inset:auto;margin-top:.5rem">
+      <button class="appswitch__item appswitch__item--active" type="button">EHSQ Enterprise</button>
+      <button class="appswitch__item" type="button">Quality Management</button>
+      <button class="appswitch__item" type="button">Risk Management</button>
+      <button class="appswitch__item" type="button">Audit Manager</button>
+    </div>
+  </div>
+</template>
+
+<h2>Persona picker</h2>
+
+<p>A prototype-only affordance for switching who you are looking at the screen as. It has two
+forms: standalone in the app bar (<code>.persona-trigger</code>), and folded into the profile
+menu (<code>.persona-picker--in-menu</code>), which restyles the trigger to sit as a menu row
+rather than a bar control.</p>
+
+<template data-example="Both forms of the persona trigger" data-height="230" data-scripts="lucide">
+  <div style="display:flex;flex-direction:column;gap:1.25rem;align-items:flex-start">
+    <button class="persona-trigger" type="button" aria-expanded="false">
+      Marcus Silva
+      <span class="persona-trigger__sub">EHS coordinator</span>
+    </button>
+
+    <div class="px-pop persona-picker persona-picker--in-menu"
+         style="position:relative;inset:auto;width:17rem">
+      <div class="profile-menu__row--persona">
+        <button class="persona-trigger" type="button" aria-expanded="false">
+          <span class="persona-trigger__icon">
+            <span class="material-symbols-rounded" aria-hidden="true">switch_account</span>
+          </span>
+          <span class="persona-trigger__text">
+            <span class="persona-trigger__label">Viewing as</span>
+            <span class="persona-trigger__sub">Marcus Silva</span>
+          </span>
+          <span class="persona-trigger__chev">
+            <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<p>The in-menu form expects the full set — <code>__icon</code>, <code>__text</code> wrapping
+<code>__label</code> and <code>__sub</code>, and <code>__chev</code>. The standalone form uses
+only the label text and <code>__sub</code>. <code>.persona-popover</code> is the list it opens;
+Praxis styles the container and leaves the rows to you.</p>
+
+<div class="note">
+  <p><code>.persona-trigger</code> rules are keyed on <code>body .persona-trigger</code> — a
+  descendant of <code>body</code> purely for specificity, because this sheet loads before a
+  page's own <code>&lt;style&gt;</code> and needed to outrank it. Overriding it takes the same
+  or better specificity, not a plain class.</p>
+</div>
+
+<h2>Theme button</h2>
+
+<p><code>.gl-theme-btn</code> holds two glyphs, <code>.gl-sun</code> and
+<code>.gl-moon</code>, and the theme swaps which is visible. Both are always in the DOM — the
+sheet hides one per theme rather than the script replacing the icon, so there is no flash and
+no state to keep.</p>
+
+<template data-example="The theme button — toggle this page's theme to see it swap" data-height="150" data-scripts="lucide">
+  <button class="gl-theme-btn" type="button" aria-label="Switch theme">
+    <span class="gl-sun"><span class="material-symbols-rounded" aria-hidden="true">light_mode</span></span>
+    <span class="gl-moon"><span class="material-symbols-rounded" aria-hidden="true">dark_mode</span></span>
+  </button>
+</template>
+
+<p>It does not persist anything by itself. The key to write is
+<code>localStorage['gl-theme']</code> — the one
+<a href="../foundations/theming.html">the boot script reads</a> and the one
+<code>praxis-profile-menu.js</code> writes.</p>
+
+<h2>Logo, and the two-image pattern</h2>
+
+<p><code>.appbar__logo-img</code> with <code>--onlight</code> and <code>--ondark</code>: both
+images ship in the markup and the sheet hides one per theme. Praxis ships no logo files, so
+these are yours. The same reasoning as the theme button — swapping a <code>src</code> in
+script gives you a visible reload on every theme change.</p>
+
+<h2>Everything this sheet defines</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-workspace.css"></praxis-block>

@@ -7,8 +7,3 @@ node_modules/
 # the same reason dist/ is: src/ and site/content/ are the sources, and a second
 # committed copy is a second thing to keep in step.
 _site/
-
-# Staging output of `build-site.py --agents-doc`, not yet promoted over the
-# hand-written PRAXIS-FOR-AGENTS.md. Promotion is a rename, once site/content/
-# covers every component the hand-written guide does.
-PRAXIS-FOR-AGENTS.generated.md
