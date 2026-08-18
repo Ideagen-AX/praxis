@@ -1,0 +1,108 @@
+<!--praxis
+title: Module selector
+slug: module-selector
+tier: settling
+order: 50
+sheet: praxis-module-selector.css
+scripts: praxis-module-chip.js
+classes: msel, cn-grid, cn-group, cn-item, is-sel, is-open, is-collapsed
+summary: The search-scope picker in the app bar, and the chip that represents its result in the filter bar — because the modules a search is scoped to are a filter in every sense the user cares about.
+keywords: module selector search scope chip msel filter modules
+-->
+
+<p>The app bar's search is scoped to one or more modules. <code>.msel</code> is the picker;
+<code>praxis-module-chip.js</code> puts the result in the applied-filter bar rather than
+leaving it as separate state the user has to remember.</p>
+
+<div class="note">
+  <p>The reasoning, from the script's own header: the modules a search is scoped to are a
+  filter in every sense the user cares about, so they belong alongside the rest.
+  <strong>No modules selected means the search covers everything</strong> — that is the
+  default, not a filter, so no chip appears.</p>
+</div>
+
+<h2>The picker</h2>
+
+<p>It reuses the Create New grid vocabulary — <code>.cn-grid</code>,
+<code>.cn-group</code>, <code>.cn-item</code> — rather than inventing a parallel one, so a
+module tile and a record-type tile are the same object. Selection is
+<code>.is-sel</code>, and the menu's own parts are <code>.msel__*</code>.</p>
+
+<template data-example="The module selector, open" data-height="420" data-scripts="lucide">
+  <div class="msel is-open" style="position:relative;max-width:26rem">
+    <div class="msel__input">
+      All modules
+      <span class="msel__caret"><span class="material-symbols-rounded">expand_more</span></span>
+    </div>
+    <div class="msel__menu" style="position:relative;inset:auto;margin-top:.5rem">
+      <div class="msel__titlebar">
+        <span class="msel__title">Scope the search</span>
+        <button class="msel__clear" type="button">Clear</button>
+      </div>
+      <input class="msel__filter" type="search" placeholder="Filter modules" aria-label="Filter modules">
+      <div class="msel__groups">
+        <div class="cn-group cn-group--pink">
+          <div class="cn-group__head">
+            <span class="cn-group__icon"><span class="material-symbols-rounded">emergency_home</span></span>
+            <span class="cn-group__title">Incidents &amp; Events</span>
+          </div>
+          <div class="cn-grid">
+            <button class="cn-item is-sel" type="button">
+              <span class="cn-item__icon"><span class="material-symbols-rounded">crisis_alert</span></span>
+              <span class="cn-item__label">Incidents</span>
+            </button>
+            <button class="cn-item" type="button">
+              <span class="cn-item__icon"><span class="material-symbols-rounded">warning</span></span>
+              <span class="cn-item__label">Near-misses</span>
+            </button>
+          </div>
+        </div>
+        <div class="cn-group cn-group--teal">
+          <div class="cn-group__head">
+            <span class="cn-group__icon"><span class="material-symbols-rounded">frame_inspect</span></span>
+            <span class="cn-group__title">Audit &amp; Findings</span>
+          </div>
+          <div class="cn-grid">
+            <button class="cn-item is-sel" type="button">
+              <span class="cn-item__icon"><span class="material-symbols-rounded">fact_check</span></span>
+              <span class="cn-item__label">Audits</span>
+            </button>
+            <button class="cn-item" type="button">
+              <span class="cn-item__icon"><span class="material-symbols-rounded">flag</span></span>
+              <span class="cn-item__label">Findings</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h2>The vocabulary</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.msel</code></td><td>The wrapper. <code>.is-open</code> rotates the caret.</td></tr>
+    <tr><td><code>.msel__input</code></td><td>The trigger, styled as a field. Has its own dark treatment.</td></tr>
+    <tr><td><code>.msel__caret</code></td><td>Chevron; rotated by <code>.msel.is-open</code></td></tr>
+    <tr><td><code>.msel__scrim</code>, <code>.msel__menu</code></td><td>Backdrop and panel, both <code>[hidden]</code>-driven</td></tr>
+    <tr><td><code>.msel__titlebar</code>, <code>__title</code>, <code>__clear</code></td><td>Head. <code>__clear</code> takes <code>[hidden]</code> for the nothing-selected case.</td></tr>
+    <tr><td><code>.msel__filter</code></td><td>Type-to-narrow field</td></tr>
+    <tr><td><code>.msel__groups</code>, <code>.msel__empty</code></td><td>The group list and its no-results state</td></tr>
+  </tbody>
+</table>
+
+<h2>The chip, and why it is awkward</h2>
+
+<div class="note note--trap">
+  <p><strong><code>praxis-filters.js</code> owns <code>[data-chips]</code> and rewrites it
+  wholesale on every <code>renderChips()</code> call</strong>, which would wipe anything the
+  module chip injected. So <code>praxis-module-chip.js</code> cannot simply append — it has to
+  re-inject after each rebuild. If you render your own chips into that container, expect the
+  same fight, and read the script before adding a third writer.</p>
+</div>
+
+<h2>Everything this sheet defines</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-module-selector.css"></praxis-block>

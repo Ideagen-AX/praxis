@@ -1,0 +1,156 @@
+<!--praxis
+title: Quick-filter rail
+slug: quick-rail
+tier: settling
+order: 30
+sheet: praxis-quick-rail.css, praxis-filters.css
+scripts: praxis-quick-rail.js
+classes: qrail, qrail-pop, qfilter, quick-filters, tb-is-compact, is-open
+summary: At narrow widths the quick-filter cards become a scrolling row of pills. It moves the existing cards rather than rebuilding them, so no filter logic is duplicated.
+keywords: quick filter rail pill popover compact narrow qfilter scroller
+-->
+
+<p>At full width, quick filters are cards stacked in <code>[data-quick-filters]</code>. When
+the toolbar goes compact they become a horizontal scrolling row of pills, each opening a
+popover anchored under it.</p>
+
+<p>The design decision worth copying: it <strong>moves</strong> the existing
+<code>.qfilter</code> card into the popover rather than rebuilding it. Because
+<code>praxis-filters.js</code> binds every quick-card interaction by delegation from
+<code>document</code>, a moved card keeps working with no filter logic duplicated anywhere.</p>
+
+<div class="note note--trap">
+  <p><strong>Every rule in this sheet is scoped to <code>body.tb-is-compact</code>.</strong>
+  Nothing in it applies at full width, and the class is set by
+  <code>praxis-toolbar-compact.js</code>, not by this script. So the rail is inert unless the
+  <a href="compact-toolbar.html">compact toolbar</a> is also loaded — the two are a pair, and
+  it watches the body class rather than a media query precisely so both switch at exactly the
+  same moment.</p>
+</div>
+
+<h2>The quick-filter card</h2>
+
+<p><code>.qfilter</code> comes from <code>praxis-filters.css</code>, not this sheet, and it is
+what both forms display. Each card needs
+<code>data-filter-name</code> — the script and the filter engine both look the card up by it.</p>
+
+<template data-example="Two quick-filter cards, full width" data-height="330" data-scripts="lucide">
+  <div data-quick-filters style="display:grid;gap:.75rem;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr))">
+    <div class="qfilter" data-filter-name="Status">
+      <div class="qfilter__head"><span class="qfilter__title">Status</span></div>
+      <div class="qfilter__controls">
+        <div class="qfilter__list">
+          <div class="qfilter__row qfilter__row--selected">
+            <span class="qfilter__check"><span class="material-symbols-rounded">check</span></span>
+            <span class="qfilter__row-label">Open</span>
+          </div>
+          <div class="qfilter__row">
+            <span class="qfilter__check"></span>
+            <span class="qfilter__row-label">In review</span>
+          </div>
+          <div class="qfilter__row">
+            <span class="qfilter__check"></span>
+            <span class="qfilter__row-label">Closed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="qfilter" data-filter-name="Site">
+      <div class="qfilter__head"><span class="qfilter__title">Site</span></div>
+      <div class="qfilter__controls">
+        <div class="qfilter__list">
+          <div class="qfilter__row qfilter__row--selected">
+            <span class="qfilter__check"><span class="material-symbols-rounded">check</span></span>
+            <span class="qfilter__row-label">Teesside works</span>
+          </div>
+          <div class="qfilter__row">
+            <span class="qfilter__check"></span>
+            <span class="qfilter__row-label">Rotherham plant</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<p><code>.qfilter__row--selected</code> is what the script counts to render the pill's badge —
+<code>.qrail__count</code> is <code>querySelectorAll('.qfilter__row--selected').length</code>.
+So the count is derived from the same DOM the user is clicking, never from a parallel state
+object that could disagree.</p>
+
+<h2>The compact form</h2>
+
+<template data-example="The rail, with body.tb-is-compact set by hand" data-height="330" data-scripts="lucide,quick-rail">
+  <div class="qrail">
+    <div class="qrail__scroller">
+      <button class="qrail__pill" type="button" aria-expanded="false">
+        <span class="qrail__bolt"><span class="material-symbols-rounded">bolt</span></span>
+        Status
+        <span class="qrail__count">1</span>
+        <span class="qrail__caret"><span class="material-symbols-rounded">expand_more</span></span>
+      </button>
+      <button class="qrail__pill" type="button" aria-expanded="false">
+        Site <span class="qrail__count">1</span>
+        <span class="qrail__caret"><span class="material-symbols-rounded">expand_more</span></span>
+      </button>
+      <button class="qrail__pill" type="button" aria-expanded="false">
+        Owner
+        <span class="qrail__caret"><span class="material-symbols-rounded">expand_more</span></span>
+      </button>
+      <button class="qrail__pill" type="button" aria-expanded="false">
+        Priority
+        <span class="qrail__caret"><span class="material-symbols-rounded">expand_more</span></span>
+      </button>
+    </div>
+  </div>
+  <div class="qrail-pop is-open" style="position:relative;margin-top:.5rem">
+    <div class="qrail-pop__head">
+      <span class="qrail-pop__title">Status</span>
+      <button class="qrail-pop__close" type="button" aria-label="Close">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div class="qrail-pop__body">
+      <div class="qfilter" data-filter-name="Status">
+        <div class="qfilter__controls">
+          <div class="qfilter__list">
+            <div class="qfilter__row qfilter__row--selected">
+              <span class="qfilter__check"><span class="material-symbols-rounded">check</span></span>
+              <span class="qfilter__row-label">Open</span>
+            </div>
+            <div class="qfilter__row">
+              <span class="qfilter__check"></span>
+              <span class="qfilter__row-label">In review</span>
+            </div>
+          </div>
+        </div>
+        <button class="qfilter__more" type="button">Show all 6</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    /* The sheet is entirely scoped to this class, and normally
+       praxis-toolbar-compact.js sets it by measuring the toolbar. Set here so the
+       compact form is visible without a toolbar to measure. */
+    document.body.classList.add('tb-is-compact');
+  </script>
+</template>
+
+<h2>The vocabulary</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.qrail</code></td><td>The band. Hidden with <code>[hidden]</code>.</td></tr>
+    <tr><td><code>.qrail__scroller</code></td><td>The horizontal scroll container. Its <code>::-webkit-scrollbar</code> is hidden — one of the few places Praxis does that, because a visible bar under four pills reads as chrome.</td></tr>
+    <tr><td><code>.qrail__pill</code></td><td>One filter. <code>[aria-expanded="true"]</code> is the open state — an attribute, not a class, so the accessible state and the visual state cannot drift.</td></tr>
+    <tr><td><code>.qrail__bolt</code></td><td>Leading glyph, for a pill that is a saved or favourite filter</td></tr>
+    <tr><td><code>.qrail__count</code></td><td>Selected-value badge. Omit it entirely at zero rather than rendering a 0.</td></tr>
+    <tr><td><code>.qrail__caret</code></td><td>Trailing chevron</td></tr>
+    <tr><td><code>.qrail-pop</code></td><td>The popover, with <code>.is-open</code> and <code>[hidden]</code>. <code>__head</code>, <code>__title</code>, <code>__close</code>, <code>__body</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Everything this sheet defines</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-quick-rail.css"></praxis-block>

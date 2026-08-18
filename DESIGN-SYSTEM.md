@@ -47,10 +47,10 @@
 | Measure | Value |
 |---|---|
 | Distinct custom properties defined | **224** |
-| `var()` usages | **1,502** |
-| Raw colour literals remaining | 798 (349 hex / 449 rgb·rgba) |
+| `var()` usages | **1,510** |
+| Raw colour literals remaining | 820 (370 hex / 450 rgb·rgba) |
 | Tokenization coverage | **65%** |
-| Tokens defined in more than one file | 69 |
+| Tokens defined in more than one file | 75 |
 | Used but never defined (excluding runtime-set) | 3 — `--muted`, `--ph-pad-top`, `--praxis-filters-gutter` |
 | Defined but never referenced | 106 |
 | Stylesheets measured | 16 |
@@ -330,9 +330,9 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
 | `--praxis-color-border-strong` | `var(--praxis-color-neutral-40)` | — |
-| `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | — |
+| `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
 | `--praxis-color-interactive-default` | `var(--praxis-color-teal-60)` | `#29D2D7` |
-| `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | — |
+| `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | `#42D9DE` |
 | `--praxis-color-surface-default` | `var(--praxis-color-white)` | `#192336` |
 | `--praxis-color-surface-subtle` | `var(--praxis-color-neutral-10)` | `#161c27` |
 | `--praxis-color-text-disabled` | `var(--praxis-color-neutral-40)` | `#62707e` |
@@ -346,8 +346,8 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | — |
-| `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | — |
+| `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
+| `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
 | `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
 | `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
 
@@ -478,8 +478,8 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | — |
-| `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | — |
+| `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | `#222b39` |
+| `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | `#222b39` |
 
 **Spacing completed**
 
@@ -738,7 +738,7 @@ Measured by CSS class-block frequency across all sources. Grouped by area.
 <!-- GENERATED:components -->
 | Sheet | Rules | Main class families |
 |---|---|---||
-| `praxis-admin.css` | 251 | `.adminnav`, `.ws-item`, `.admin-field`, `.admin-table`, `.tbtn` |
+| `praxis-admin.css` | 259 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
 | `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.msel`, `.iconbtn-ghost` |
 | `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
 | `praxis-create-new.css` | 83 | `.cn-group`, `.cn-flyout`, `.cn-row`, `.material-symbols-rounded`, `.cn-tpl` |

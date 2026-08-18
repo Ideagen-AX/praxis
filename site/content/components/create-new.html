@@ -1,0 +1,181 @@
+<!--praxis
+title: Create New menu
+slug: create-new
+tier: settling
+order: 20
+sheet: praxis-create-new.css
+scripts: praxis-create-new.js
+classes: cn-overlay, cn-scrim, cn-flyout, cn-modal, cn-head, cn-close, cn-controls, cn-find, cn-seg, cn-body, cn-content, cn-group, cn-grid, cn-item, cn-tpl, cn-tpl-list, cn-manage-note, cn-footer, cn-list, cn-section-label, cn-row, material-symbols-rounded
+summary: A full flyout stylesheet and a shared catalog of record types — with no render logic between them. The CSS and the data ship; the markup is yours.
+keywords: create new flyout menu catalog templates record types solution tone modal
+-->
+
+<div class="note note--trap">
+  <p><strong><code>praxis-create-new.js</code> is pure data.</strong> Its own header says so:
+  "Render logic and wiring live per-page; this file is pure data." It ships two arrays,
+  <code>CREATE_CATALOG</code> and <code>CN_TEMPLATES</code>, and nothing that draws them. The
+  stylesheet is complete and there is no component to call — you write the render.</p>
+</div>
+
+<p>The point of shipping the catalog without the renderer is that the workspace and the record
+page both build a Create New menu, and the two must not drift on <em>what</em> can be created.
+They are free to differ on how it looks.</p>
+
+<h2>Getting at the data, and the trap</h2>
+
+<p>Both arrays are on <code>window</code>, and both bare identifiers still work. Measured in a
+browser:</p>
+
+<table>
+  <thead><tr><th>Access</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td><code>window.CREATE_CATALOG</code></td><td>6 groups</td></tr>
+    <tr><td><code>window.CN_TEMPLATES</code></td><td>5 templates</td></tr>
+    <tr><td><code>CREATE_CATALOG</code> from another classic <code>&lt;script&gt;</code></td><td>Still works</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <p><strong>This was broken until 2026-08-18, and the failure mode is worth recognising.</strong>
+  Both were declared with top-level <code>const</code> and never assigned anywhere. In a classic
+  script that creates a global <em>lexical</em> binding — readable as a bare identifier from
+  another classic script, but <strong>not a property of <code>window</code></strong>, so a guard
+  like <code>if (window.CREATE_CATALOG)</code> always failed.</p>
+  <p>Worse, <code>package.json</code> declares <code>"type": "module"</code> and no shipped
+  script has an <code>export</code>. Imported through a bundler, both <code>const</code>s became
+  module-scoped and invisible to everything else, with no error — so
+  <code>import '@ideagen-ax/praxis/dist/praxis-create-new.js'</code>, the documented npm path,
+  was a silent no-op.</p>
+  <p>Only three shipped scripts assign to <code>window</code> at all:
+  <code>PraxisFilters</code>, <code>PraxisDotField</code> and the Mazlan globals. The rest
+  survive a module import because they self-wire as a side effect; a pure-data file had nothing
+  to fall back on.</p>
+</div>
+
+<h2>The catalog shape</h2>
+
+<p>Six groups, each with a brand <code>tone</code> that drives the group header colour, and a
+Material Symbols ligature for its icon.</p>
+
+<template data-example="The catalog shape" data-source-only>
+  CREATE_CATALOG = [
+    { group: 'Incidents & Events', icon: 'emergency_home', tone: 'pink', items: [
+      { id: 'incident',    icon: 'crisis_alert', label: 'Incident' },
+      { id: 'near-miss',   icon: 'warning',      label: 'Near-Miss' },
+      …
+    ]},
+    { group: 'Audit & Findings', icon: 'frame_inspect', tone: 'teal', items: [ … ]},
+    …
+  ]
+
+  CN_TEMPLATES = [
+    { icon: 'fact_check', label: 'Boeing audit-prep checklist', type: 'Audit',
+      tone: 'teal', sub: 'Scope, standard & 12 checkpoints pre-filled' },
+    …
+  ]
+</template>
+
+<p>The tone values are <code>pink</code>, <code>teal</code>, <code>blue</code>,
+<code>orange</code>, <code>purple</code> and <code>green</code>, matching the
+<code>.cn-group--*</code> modifiers exactly, so a group renders correctly by passing its tone
+straight through.</p>
+
+<h2>Rendering it</h2>
+
+<p>The example below reads the real shipped catalog and builds the flyout from it with the
+real classes. This is roughly the minimum render, and it is the part you own.</p>
+
+<template data-example="The Create New flyout, built from the shipped catalog" data-height="480" data-scripts="lucide,create-new">
+  <div class="cn-flyout cn-flyout--wide" style="position:relative;inset:auto">
+    <div class="cn-head">
+      <p class="cn-head__title">Create new</p>
+      <button class="cn-close" type="button" aria-label="Close">
+        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+      </button>
+    </div>
+    <div class="cn-controls">
+      <input class="cn-find" type="search" placeholder="Find a record type" aria-label="Find a record type">
+      <div class="cn-seg">
+        <button class="cn-seg__btn cn-seg__btn--active" type="button">Records</button>
+        <button class="cn-seg__btn" type="button">Templates</button>
+      </div>
+    </div>
+    <div class="cn-body" id="cnbody"></div>
+  </div>
+  <script>
+    /* CREATE_CATALOG is a bare global from the classic script — not window.CREATE_CATALOG. */
+    var body = document.getElementById('cnbody');
+    body.innerHTML = CREATE_CATALOG.slice(0, 3).map(function (g) {
+      return '<div class="cn-group cn-group--' + g.tone + '">'
+        + '<div class="cn-group__head">'
+        + '<span class="cn-group__icon"><span class="material-symbols-rounded">' + g.icon + '</span></span>'
+        + '<span class="cn-group__title">' + g.group + '</span></div>'
+        + '<div class="cn-grid">'
+        + g.items.map(function (i) {
+            return '<button class="cn-item" type="button" data-cn-create="' + i.id + '">'
+              + '<span class="cn-item__icon"><span class="material-symbols-rounded">' + i.icon + '</span></span>'
+              + '<span class="cn-item__label">' + i.label + '</span></button>';
+          }).join('')
+        + '</div></div>';
+    }).join('');
+  </script>
+</template>
+
+<h2>Templates</h2>
+
+<template data-example="The template list, from CN_TEMPLATES" data-height="330" data-scripts="lucide,create-new">
+  <div class="cn-flyout" style="position:relative;inset:auto">
+    <div class="cn-head"><p class="cn-head__title">Start from a template</p></div>
+    <div class="cn-body"><div class="cn-tpl-list" id="tpls"></div></div>
+    <div class="cn-footer">
+      <p class="cn-manage-note">Templates are managed per solution.</p>
+    </div>
+  </div>
+  <script>
+    document.getElementById('tpls').innerHTML = CN_TEMPLATES.map(function (t) {
+      return '<button class="cn-tpl" type="button">'
+        + '<span class="cn-tpl__icon"><span class="material-symbols-rounded">' + t.icon + '</span></span>'
+        + '<span class="cn-tpl__body">'
+        + '<div class="cn-tpl__name">' + t.label + '</div>'
+        + '<div class="cn-tpl__meta">' + t.type + ' · ' + t.sub + '</div>'
+        + '</span></button>';
+    }).join('');
+  </script>
+</template>
+
+<div class="note note--trap">
+  <p><strong><code>.cn-tpl__name</code> and <code>.cn-tpl__meta</code> must be block-level,
+  and nothing in the sheet enforces it.</strong> The name sets
+  <code>white-space:nowrap</code> with <code>text-overflow:ellipsis</code> and the meta sets
+  <code>margin-top</code> — both meaningless on an inline element. Their parent
+  <code>.cn-tpl__body</code> is <code>flex:1; min-width:0</code>, not a flex column, so
+  <code>&lt;span&gt;</code>s run together on one line with no truncation.</p>
+  <p>The equivalent <code>.ws-item__text</code> in <code>praxis-navrail.css</code>
+  <em>is</em> <code>display:flex; flex-direction:column</code>, so spans stack there. Two
+  near-identical two-line rows, two different contracts. Use <code>&lt;div&gt;</code>s in
+  <code>.cn-tpl__body</code> and you are safe in both.</p>
+</div>
+
+<h2>The rest of the vocabulary</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.cn-overlay</code>, <code>.cn-scrim</code></td><td>The backdrop pair, both <code>[hidden]</code>-driven</td></tr>
+    <tr><td><code>.cn-flyout</code>, <code>--wide</code></td><td>The panel. <code>--wide</code> is the full record-type grid; the base width suits a single column.</td></tr>
+    <tr><td><code>.cn-modal</code></td><td>The centred variant, for when the flyout is not anchored</td></tr>
+    <tr><td><code>.cn-seg</code>, <code>.cn-seg__btn--active</code></td><td>Records / Templates switch. Note <code>--active</code>, not <code>.is-active</code>.</td></tr>
+    <tr><td><code>.cn-list</code>, <code>.cn-row</code>, <code>.cn-row__check</code>, <code>.cn-section-label</code></td><td>The manage view — a checkable list rather than a grid. <code>.cn-row--selected</code> tints the icon.</td></tr>
+    <tr><td><code>.cn-flyout--manage .cn-find</code></td><td>The find field is restyled in the manage view</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <p><code>.material-symbols-rounded</code> — the icon base every Praxis page uses — is
+  defined in <strong>this</strong> sheet, not in core. One of the three surprising-location
+  bases. Another reason to load the bundle.</p>
+</div>
+
+<h2>Everything this sheet defines</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-create-new.css"></praxis-block>

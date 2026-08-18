@@ -1,0 +1,209 @@
+<!--praxis
+title: Form controls
+slug: form-controls
+tier: ready
+order: 40
+sheet: praxis-admin.css, praxis-core.css
+classes: switch, track, thumb, onoff, segmented, px-skip, visually-hidden, icon, toggle-group, chip-area
+summary: The checkbox, the toggle switch, the skip link and the scrollbar treatment — including the two markup forms of .switch, which now render identically after one of them turned out to be styled by nothing at all.
+keywords: checkbox switch toggle radio scrollbar skip link accessibility focus indeterminate segmented
+-->
+
+<p>Praxis restyles bare <code>&lt;input type="checkbox"&gt;</code> and defines one toggle
+switch. Everything else on a form is <a href="rfield.html">a field</a>. The interesting part
+of this page is the last section, where two sheets disagree.</p>
+
+<h2>Checkbox</h2>
+
+<p>Styled on the bare element, so you get it without a class. 16px, 4px radius, 1.5px
+border, and it fills with <code>--praxis-color-text-primary</code> rather than the brand
+teal — a checked checkbox in a list of forty is a data point, not a call to action.</p>
+
+<template data-example="All four states, on the bare element" data-height="150">
+  <div style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap">
+    <label style="display:inline-flex;gap:.5rem;align-items:center">
+      <input type="checkbox"> Unchecked
+    </label>
+    <label style="display:inline-flex;gap:.5rem;align-items:center">
+      <input type="checkbox" checked> Checked
+    </label>
+    <label style="display:inline-flex;gap:.5rem;align-items:center">
+      <input type="checkbox" id="ind"> Indeterminate
+    </label>
+    <label style="display:inline-flex;gap:.5rem;align-items:center;opacity:.5">
+      <input type="checkbox" disabled> Disabled
+    </label>
+  </div>
+  <script>
+    /* Indeterminate has no HTML attribute — it is a property, so it can only be
+       set from script. Praxis styles it; you have to switch it on. */
+    document.getElementById('ind').indeterminate = true;
+  </script>
+</template>
+
+<p>The indeterminate state draws a bar rather than a tick, and it has <strong>no HTML
+attribute</strong> — it is a DOM property, so a three-state header checkbox has to set
+<code>el.indeterminate = true</code> from script. Praxis styles it either way.</p>
+
+<p>Focus is a 2px outline in the interactive teal at 60% mix, offset 2px. Do not remove it;
+the fill alone does not indicate focus, only state.</p>
+
+<h2>Toggle switch</h2>
+
+<p>A wrapper, a hidden input, and two decorative spans. The input carries the state and the
+label association; <code>.track</code> and <code>.thumb</code> are painted from it with
+sibling selectors, so <strong>the order matters</strong>: the rules are
+<code>input:checked + .track</code> and <code>input:checked ~ .thumb</code>.</p>
+
+<template data-example="The switch, in both states" data-height="150">
+  <div style="display:flex;gap:2rem;align-items:center">
+    <label style="display:inline-flex;gap:.625rem;align-items:center">
+      <span class="switch">
+        <input type="checkbox">
+        <span class="track"></span><span class="thumb"></span>
+      </span>
+      Email digest
+    </label>
+    <label style="display:inline-flex;gap:.625rem;align-items:center">
+      <span class="switch">
+        <input type="checkbox" checked>
+        <span class="track"></span><span class="thumb"></span>
+      </span>
+      Push alerts
+    </label>
+  </div>
+</template>
+
+<p>34×20, thumb travels 14px, checked track is <code>teal-60</code>. It is the one control
+that <em>does</em> use the brand colour, because a switch is a commitment rather than a
+selection. Its base rules live in <code>praxis-admin.css</code> — another reason to load the
+bundle rather than picking sheets.</p>
+
+<div class="note note--trap">
+  <p><strong>The switch is deliberately excluded from the checkbox styling.</strong>
+  <code>praxis-core.css</code> keys its checkbox rules on
+  <code>input[type="checkbox"]:not(.switch):not(.switch *)</code>. That second clause is what
+  spares the switch's hidden input. It also means <strong>putting
+  <code>class="switch"</code> on the input itself opts that input out of all checkbox
+  styling</strong> — see below.</p>
+</div>
+
+<h2>Two markup forms, both supported</h2>
+
+<p>Praxis shipped two contradictory ideas of what <code>.switch</code> means, and until
+2026-08-18 only one of them was styled. Both work now, from one set of values, and they render
+identically — verified as 34×20 with <code>neutral-30</code> unchecked and
+<code>teal-60</code> checked in all four permutations.</p>
+
+<table>
+  <thead><tr><th>Form</th><th>Shape</th><th>Use it when</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Wrapper</strong> — canonical</td><td><code>.switch</code> is the wrapper; the input is inside it</td><td>Always, in new markup</td></tr>
+    <tr><td><strong>Sibling</strong></td><td><code>.switch</code> is on the input; the track is its next sibling</td><td>Never by choice. It is what <code>praxis-filters.js</code> emits, so it is supported rather than removed.</td></tr>
+  </tbody>
+</table>
+
+<template data-example="Both forms, both states — identical geometry and colour" data-height="160">
+  <div style="display:flex;gap:2.5rem;align-items:center;flex-wrap:wrap">
+    <label class="onoff">
+      <span class="onoff__label onoff__label--off">Off</span>
+      <input type="checkbox" class="switch">
+      <span class="switch__track"><span class="switch__thumb"></span></span>
+      <span class="onoff__label onoff__label--on">On</span>
+    </label>
+    <label class="onoff">
+      <span class="onoff__label onoff__label--off">Off</span>
+      <input type="checkbox" class="switch" checked>
+      <span class="switch__track"><span class="switch__thumb"></span></span>
+      <span class="onoff__label onoff__label--on">On</span>
+    </label>
+    <span class="switch">
+      <input type="checkbox" checked>
+      <span class="switch__track"></span><span class="switch__thumb"></span>
+    </span>
+  </div>
+</template>
+
+<h3>Why the wrapper is canonical</h3>
+
+<p><code>praxis-core.css</code> is already committed to it. Its checkbox rules are keyed
+<code>input[type="checkbox"]:not(.switch):not(.switch *)</code>, and that second clause only
+means anything if <code>.switch</code> can have descendants — which it can only do in the
+wrapper form.</p>
+
+<p>The sibling form was kept working rather than removed because
+<code>praxis-filters.css</code> reads <code>.onoff:has(.switch:checked)</code>, which needs the
+class on the input, so that sheet and its script agree with each other. Rewriting either would
+mean touching the JavaScript and that <code>:has()</code> selector to fix something CSS alone
+could close.</p>
+
+<h3>Part names</h3>
+
+<p><strong><code>.switch__track</code> and <code>.switch__thumb</code> are canonical.</strong>
+The original <code>.track</code> and <code>.thumb</code> still work and are kept because
+consumers use them, but they are two of the most collision-prone class names it is possible to
+put in a shared stylesheet. Do not use them in new markup.</p>
+
+<div class="note">
+  <p><strong>What this looked like before the fix,</strong> because it is a useful shape to
+  recognise: the sibling form rendered as a <em>bare browser checkbox</em> between two labels.
+  No sheet defined <code>.switch__track</code> or <code>.switch__thumb</code>, and
+  <code>class="switch"</code> on the input also opted it out of the Praxis checkbox rules — so
+  nothing styled it at all, and there was no error. A control that renders as an unstyled native
+  widget is usually this: a class that excludes it from one treatment without providing
+  another.</p>
+</div>
+
+<h2>Segmented control</h2>
+
+<p><code>.segmented</code> is defined in <code>praxis-filters.css</code> and is not scoped to
+the drawer, so it is usable anywhere. A 1px neutral border, 12px radius, and
+<code>.segmented__opt</code> children at 36px; <code>.segmented--lg</code> raises them to
+40px. The selected option is <code>.segmented__opt--active</code> — a BEM modifier, not the
+<code>.is-selected</code> convention the filter rows use elsewhere.</p>
+
+<template data-example="Segmented, default and large" data-height="160">
+  <div style="display:flex;flex-direction:column;gap:.75rem;align-items:flex-start">
+    <div class="segmented">
+      <button class="segmented__opt segmented__opt--active" type="button">All</button>
+      <button class="segmented__opt" type="button">Open</button>
+      <button class="segmented__opt" type="button">Closed</button>
+    </div>
+    <div class="segmented segmented--lg">
+      <button class="segmented__opt segmented__opt--active" type="button">Standard</button>
+      <button class="segmented__opt" type="button">Custom</button>
+    </div>
+  </div>
+</template>
+
+<h2>Skip link</h2>
+
+<p><code>.px-skip</code> is fully defined: fixed at top left, 36px tall, 10px radius, and it
+overrides the global press transform to <code>none</code> because a skip link that shrinks
+under the pointer reads as broken. Put it first in <code>&lt;body&gt;</code> and point it at
+your scroll container.</p>
+
+<template data-example="Shown focused, which is the only state it is visible in" data-height="150">
+  <a class="px-skip" href="#c" id="skip">Skip to content</a>
+  <p class="rfield__hint" style="margin-top:3rem">Focused on load so there is something to
+     see. In a real page it sits off the visible flow until the first Tab press.</p>
+  <div id="c"></div>
+  <script>document.getElementById('skip').focus();</script>
+</template>
+
+<h2>Scrollbars</h2>
+
+<p>Praxis sets <code>scrollbar-color</code> only, using <code>--px-scroll</code> and
+<code>--px-scroll-hover</code>. That is deliberate and worth not "improving": it is the one
+scrollbar property that does not change the gutter, so Chrome and Firefox keep their overlay
+scrollbars and nothing reflows when the thumb appears. Declaring
+<code>::-webkit-scrollbar</code> or <code>scrollbar-width</code> switches those elements to
+classic scrollbars and shifts your layout by the scrollbar's width.</p>
+
+<h2>Icons and hidden text</h2>
+
+<p>Two small utilities from <code>praxis-admin.css</code> you will want:
+<code>.icon</code> sizes an inline SVG to 22px square with <code>fill:currentColor</code>, and
+takes <code>--20</code>, <code>--18</code> and <code>--16</code>.
+<code>.visually-hidden</code> is the standard clip-rect pattern, for a label a screen reader
+needs and the layout does not.</p>

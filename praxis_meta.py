@@ -202,6 +202,52 @@ def variant_extras():
             if name not in declared and not name.startswith('--px-')]
 
 
+def frozen_aliases():
+    """Tokens whose dark value can never take effect. [(token, rung, dark_value)]
+
+    A precise, decidable bug class. `:root { --a: var(--b) }` with the dark remap
+    of `--b` declared on `body` cannot work: custom-property substitution happens
+    at the element where the DECLARATION lives, so `--a` is computed on :root
+    against the LIGHT `--b`, and body inherits that computed value. The dark remap
+    never reaches it.
+
+    This is not something the resolved-value probes can be asked to derive
+    either — a naive resolve() over a merged dark table substitutes the dark rung
+    and reports a difference the browser does not produce. So it is detected from
+    the structure instead: aliased on :root, remapped on body.
+
+    Distinct from a token that is simply the same in both themes because its rung
+    has no dark treatment at all. That is an omission; this is a rule violation.
+    """
+    tokens_css = read_css(os.path.join(SRC, 'praxis-tokens.css'))
+    root_aliases = {}
+    for m in re.finditer(r':root\s*\{(.*?)\n\}', tokens_css, re.S):
+        for d in DEF.finditer(m.group(1)):
+            value = d.group(2).split('/*')[0].strip()
+            inner = re.fullmatch(r'var\(\s*(--[A-Za-z0-9_-]+)\s*\)', value)
+            if inner:
+                root_aliases[d.group(1)] = inner.group(1)
+
+    dark = dark_remaps()
+    # A token re-declared for the Praxis variant is computed on <body>, where the
+    # dark remap is in scope, so it is not frozen.
+    variant = set(variant_block())
+
+    out = []
+    for token, rung in sorted(root_aliases.items()):
+        if token in variant:
+            continue
+        # And a token given its OWN dark value is fine however its light value is
+        # written: surface-subtle aliases neutral-10 but is remapped directly, so
+        # the alias never has to carry the theme. Without this the check reports
+        # every such token and reads as noise.
+        if token in dark:
+            continue
+        if rung in dark:
+            out.append((token, rung, dark[rung]))
+    return out
+
+
 def media_only_tokens():
     """Tokens declared ONLY inside an @media block. [(name, [conditions])]
 

@@ -9,9 +9,18 @@
    Usage:
      var field = PraxisDotField.create(canvasEl, { global:{...} });
      field.setMode('wave');            // or any PraxisDotField.MODES key
+     field.start();                    // REQUIRED — create() does not begin the
+                                       // loop. Without it the canvas stays blank
+                                       // and there is no error to see. This line
+                                       // was missing from these instructions until
+                                       // 2026-08-18.
      field.setParam('speed', 0.4);     // live mode param
      field.setGlobal('spacing', 22);   // live global param (rebuilds grid)
-     field.destroy();
+     field.restart();                  // replay from t=0
+     field.destroy();                  // stops the loop; call it on teardown
+
+   The dots are drawn WHITE, shading to the teal signature under the pointer, so
+   this needs a dark backdrop. It was built for the login page.
 
    Registries for UI generation:
      PraxisDotField.GLOBAL  -> [{key,label,min,max,step,def,type}]

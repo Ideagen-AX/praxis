@@ -1,0 +1,148 @@
+<!--praxis
+title: Buttons
+slug: buttons
+tier: ready
+order: 30
+sheet: praxis-admin.css, praxis-core.css
+classes: tbtn, admin-ghostbtn, btn, pill-btn, icon-btn, iconbtn-ghost, lg-btn, qa, sortbtn, filter-toggle
+summary: One button is fully defined — .tbtn. Everything else named here is a variant or an interaction layer that assumes a base you write yourself.
+keywords: button buttons tbtn primary ghost icon cta press hover disabled
+-->
+
+<p>This is the page most likely to save you an hour. Praxis names ten button classes and
+<strong>defines exactly two of them completely</strong>. The rest get a fill, a hover wash or
+a press transform on top of a base box that is yours. Use one without writing that base and
+you get colored text where you expected a button.</p>
+
+<h2>What is actually defined</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>Praxis gives you</th><th>Where</th></tr></thead>
+  <tbody>
+    <tr><td><code>.tbtn</code></td><td><strong>Everything.</strong> 40px tall, 14px inline padding, 10px radius, <code>--px-tool</code> fill, icon color, hover shadow, active state. Plus <code>--icon</code> (40px square), <code>--primary</code> (gradient fill), <code>--ghost</code> (transparent), <code>--run</code>.</td><td><code>praxis-admin.css</code></td></tr>
+    <tr><td><code>.admin-ghostbtn</code></td><td><strong>Everything.</strong> 34px tall, transparent, secondary ink, hover wash.</td><td><code>praxis-admin.css</code></td></tr>
+    <tr><td><code>.btn--primary</code>, <code>.pill-btn</code>, <code>.tbtn--primary</code>, <code>.tbtn--run</code></td><td>The primary fill only — 40px height, 18px padding, 10px radius, <code>--px-primary-grad</code>, <code>--px-primary-fg</code> ink, shadow. No base box.</td><td><code>praxis-core.css</code></td></tr>
+    <tr><td><code>.btn</code>, <code>.qa</code>, <code>.lg-btn</code>, <code>.iconbtn-ghost</code>, <code>.sortbtn</code></td><td>A press transform, and a hover wash for some. <strong>No base at all.</strong></td><td><code>praxis-core.css</code></td></tr>
+    <tr><td><code>.icon-btn</code></td><td>36px square, but <strong>only inside <code>.filter-drawer</code></strong>. Outside it, nothing.</td><td><code>praxis-filters.css</code></td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong>Reach for <code>.tbtn</code> unless you have a reason not to.</strong> It is the
+  only button in Praxis you can use without writing CSS, and its variants cover the primary
+  action, the icon-only button and the quiet one. <code>.btn</code> exists in Praxis
+  selectors because the originating application had a <code>.btn</code> scale;
+  <code>praxis-filters.css</code> says outright that its variants sit "on top of the host's
+  <code>.btn</code> set".</p>
+</div>
+
+<h2>The toolbar button</h2>
+
+<template data-example="Every .tbtn variant, at rest" data-height="150" data-scripts="lucide">
+  <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+    <button class="tbtn" type="button">
+      <span class="material-symbols-rounded" aria-hidden="true">save</span> Save
+    </button>
+    <button class="tbtn tbtn--icon" type="button" aria-label="Back">
+      <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+    </button>
+    <button class="tbtn tbtn--ghost" type="button">Cancel</button>
+    <button class="tbtn tbtn--primary" type="button">Submit</button>
+    <button class="tbtn" type="button" disabled>Unavailable</button>
+    <button class="admin-ghostbtn" type="button">
+      <span class="material-symbols-rounded" aria-hidden="true">add</span> Add row
+    </button>
+  </div>
+</template>
+
+<p><code>.tbtn</code> sets its icon ink to <code>--praxis-color-text-secondary</code> so a
+labelled button reads label-first, and <code>.tbtn--primary</code> overrides that to white.
+Give an icon-only button an <code>aria-label</code>; there is no text node for a screen
+reader to fall back on.</p>
+
+<p><strong>Disabled is styled as of 2026-08-18</strong> — see "Unavailable" above.
+<code>.tbtn</code> and <code>.admin-ghostbtn</code> take <code>opacity:.45</code>,
+<code>cursor:not-allowed</code> and no shadow on both <code>:disabled</code> and
+<code>[aria-disabled="true"]</code>, the second because a link styled as a button cannot take
+<code>:disabled</code>.</p>
+
+<div class="note">
+  <p>Before that, Praxis suppressed hover and the press transform on disabled controls but gave
+  them no <em>appearance</em>, so a disabled button stopped responding while looking identical
+  at rest. Opacity rather than a flat grey, because it has to work on
+  <code>.tbtn--primary</code>'s gradient too, which no single colour could stand in for.</p>
+  <p><strong>The other eight button classes still have nothing.</strong> If you built your own
+  base, style its disabled state yourself.</p>
+</div>
+
+<h2>The primary action</h2>
+
+<p>One definition for the whole application: <code>--px-primary-grad</code> fill,
+<code>--px-primary-fg</code> ink, <code>--px-primary-shadow</code>. It is applied to
+<code>.btn--primary</code>, <code>.tbtn--primary</code>, <code>.tbtn--run</code> and
+<code>.pill-btn</code> together, so all four look identical by construction rather than by
+four people agreeing.</p>
+
+<div class="note note--trap">
+  <p><strong>Never put white text on the interactive teal as a fill.</strong> In dark mode
+  <code>--praxis-color-interactive-default</code> becomes <code>#29D2D7</code> and white
+  measures 1.86:1 against a 4.5 minimum. <code>--px-primary-fg</code> is the dark ink that
+  belongs there, at 12.4:1, and the shipped primary already uses it. If you invent a filled
+  cyan control, it is on you. See <a href="../foundations/color.html">Color</a>.</p>
+</div>
+
+<p>In dark mode, a primary button <em>inside a toolbar band</em> gets a different, softer
+treatment — <code>--px-primary-soft</code> rather than the gradient — scoped to
+<code>.toolbar</code>, <code>.rp-toolbar</code>, <code>.ws-toolbar</code> and
+<code>.admin-toolbar</code>. The full-strength gradient was too loud against a dark band.</p>
+
+<template data-example="Primary in a toolbar band — toggle to dark to see the softer treatment" data-height="140">
+  <div class="toolbar">
+    <div class="toolbar__inner">
+      <button class="tbtn" type="button">Save</button>
+      <span class="toolbar__spacer"></span>
+      <button class="tbtn tbtn--primary" type="button">Submit</button>
+    </div>
+  </div>
+</template>
+
+<h2>Press feedback is global</h2>
+
+<p>Praxis applies a press transform to a broad <code>:where()</code> list — every
+<code>button</code> and <code>[role="button"]</code>, plus <code>.btn</code>,
+<code>.tbtn</code>, <code>.qa</code>, <code>.pill-btn</code>, <code>.icon-btn</code>,
+<code>.praxis-navrail__btn</code>, <code>.card__link</code>, <code>.rep__pin</code> and
+<code>.segswitch &gt; button</code>. Small controls scale to <code>.95</code>, larger pill
+buttons to <code>.97</code>, and it is suppressed on <code>:disabled</code> and
+<code>[aria-disabled="true"]</code>.</p>
+
+<p>Two consequences worth knowing. Your own custom button gets the press feel for free if it
+is a real <code>&lt;button&gt;</code>. And because the selector is <code>:where()</code>, it
+carries zero specificity, so overriding it takes only a plain class selector.</p>
+
+<h2>Writing the base Praxis does not give you</h2>
+
+<p>If you need a <code>.btn</code> scale — because you are porting markup that has one, or
+because you want a link-shaped button — this is the minimum that makes the Praxis variants
+land correctly on top of it.</p>
+
+<template data-example="A minimal .btn base, with the Praxis primary variant on top" data-height="150">
+  <style>
+    /* Yours, not Praxis's. Match the .tbtn geometry so the two can sit in one
+       row without a half-pixel step: 40px tall, 10px radius. */
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:7px;
+      height:40px; padding:0 14px; border:0; border-radius:10px;
+      background:var(--px-tool); color:var(--praxis-color-text-primary);
+      font:inherit; font-size:var(--praxis-type-size-base); font-weight:600;
+      cursor:pointer; box-shadow:var(--px-tool-shadow);
+    }
+    .btn:disabled{opacity:.5; cursor:not-allowed}
+  </style>
+  <div style="display:flex;gap:.5rem;align-items:center">
+    <button class="btn" type="button">Your base</button>
+    <button class="btn btn--primary" type="button">Praxis primary on top</button>
+    <button class="tbtn" type="button">.tbtn, for comparison</button>
+  </div>
+</template>
+

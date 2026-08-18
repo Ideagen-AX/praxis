@@ -1,0 +1,106 @@
+<!--praxis
+title: Naming and state conventions
+summary: Five different ways Praxis expresses "this thing is on", why that happened, and how to tell which one applies before you guess.
+order: 25
+classes: is-active, is-checked, is-collapsed, is-expanded, is-mixed, is-on, is-open, is-sel, is-selected, is-spinning
+keywords: convention naming state is- active open selected BEM aria hidden data attribute modifier
+-->
+
+<p>Praxis names things in one style and expresses state in five. The naming is consistent
+enough to predict; the state is not, and guessing wrong is silent — your class does nothing and
+there is no error. This page exists so you can look it up instead.</p>
+
+<h2>Naming, which is consistent</h2>
+
+<p>BEM, with a component root, <code>__</code> for a part and <code>--</code> for a variant:
+<code>.rfield__label</code>, <code>.tbtn--primary</code>, <code>.ws-item__badge</code>,
+<code>.px-navdrawer__item--active</code>. Custom properties are
+<code>--praxis-*</code> for the foundation and <code>--px-*</code> for the Praxis material
+layer.</p>
+
+<p><strong>Part names are not always BEM, and one case is worth knowing.</strong> The toggle
+switch accepts both <code>.switch__track</code> / <code>.switch__thumb</code> and the original
+<code>.track</code> / <code>.thumb</code>. The BEM pair is canonical; the bare pair is kept
+because consumers use it, and it is a good illustration of why the convention exists —
+<code>.track</code> and <code>.thumb</code> are about as collision-prone as class names get in a
+sheet you drop into someone else's application. See
+<a href="../components/form-controls.html#part-names">form controls</a>.</p>
+
+<p>Two things that look like exceptions and are not.
+<code>.praxis-navrail</code> carries the full prefix because it collided with a host class
+during extraction. And <code>.px-*</code> classes — <code>.px-pop</code>,
+<code>.px-navdrawer</code>, <code>.px-skip</code> — use the short prefix rather than
+<code>praxis-</code>; they are the same family, just older.</p>
+
+<h2>State, which is not</h2>
+
+<p>All five of these are in the shipped sheets. None is wrong; each was right in the file it
+came from, and extraction brought the disagreement along.</p>
+
+<table>
+  <thead><tr><th>Form</th><th>Used by</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><code>.is-*</code> class</td><td>Filters, quick rail, compact toolbar, module selector, nav drawer, custom filter tree</td><td><code>.px-navdrawer.is-open</code>, <code>.cf-cond.is-selected</code>, <code>.msel.is-open</code></td></tr>
+    <tr><td><code>--modifier</code> (BEM)</td><td>Create New, segmented, admin, workspace, Mazlan, nav drawer items</td><td><code>.cn-seg__btn--active</code>, <code>.segmented__opt--active</code>, <code>.mazlan-scrim--open</code>, <code>.admin-tab--active</code></td></tr>
+    <tr><td><code>[aria-expanded]</code></td><td>Quick-rail pills, display switch, persona trigger</td><td><code>.qrail__pill[aria-expanded="true"]</code></td></tr>
+    <tr><td><code>[aria-pressed]</code></td><td>Filter type buttons</td><td><code>.filter-type-btn[aria-pressed="true"]</code></td></tr>
+    <tr><td><code>[data-*]</code></td><td>Filter drawer scrim, collapsed controls</td><td><code>.drawer-scrim[data-open]</code>, <code>.filter-controls[data-collapsed]</code></td></tr>
+    <tr><td><code>[hidden]</code></td><td>Nearly every popover and panel in the system</td><td><code>.cn-flyout[hidden]</code>, <code>.px-pop[hidden]</code>, <code>.ws-pop[hidden]</code></td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong>Two of these disagree inside a single sheet.</strong>
+  <code>praxis-filters.css</code> uses <code>.is-active</code> on the view switch,
+  <code>[aria-pressed="true"]</code> on the type buttons, <code>[data-open]</code> on the scrim,
+  and both <code>.cf-cond.is-selected</code> and <code>.cf-group-selected</code> for the same
+  idea at two levels of the same tree. It is the clearest single symptom of that sheet being a
+  port.</p>
+</div>
+
+<h2>How to tell, without guessing</h2>
+
+<ol>
+  <li><strong>Read the selector.</strong> Every one of these is discoverable in ten seconds:
+      grep the component's sheet for the family name and look at what follows it.</li>
+  <li><strong>Prefer the ARIA form when both exist.</strong> Where a control has
+      <code>[aria-expanded]</code> styling, use it and skip the class — the accessible state and
+      the visual state then cannot drift, which is the whole argument for attribute-driven
+      state.</li>
+  <li><strong><code>[hidden]</code> is the safest default for show and hide.</strong> It is
+      honoured across the system, it is a real HTML attribute with real semantics, and it does
+      not need a matching CSS rule to do the right thing.</li>
+</ol>
+
+<h2>The state modifiers, in full</h2>
+
+<p>Measured from <code>src/</code>: these are the <code>.is-*</code> families the sheets
+actually define. They are conventions rather than components, which is why the
+<a href="../index.html">coverage check</a> counts them separately.</p>
+
+<table>
+  <thead><tr><th>Class</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>.is-open</code></td><td>Panel, drawer or popover is showing. The most widely used.</td></tr>
+    <tr><td><code>.is-active</code></td><td>Currently selected option in a switch or view picker</td></tr>
+    <tr><td><code>.is-selected</code>, <code>.is-sel</code></td><td>Selected row, condition or module tile. <strong>Two spellings</strong>: <code>.is-sel</code> in the module selector, <code>.is-selected</code> in the filter tree.</td></tr>
+    <tr><td><code>.is-checked</code>, <code>.is-mixed</code></td><td>Checkbox-like states, including indeterminate</td></tr>
+    <tr><td><code>.is-on</code></td><td>Toggle in its on position</td></tr>
+    <tr><td><code>.is-expanded</code>, <code>.is-collapsed</code></td><td>Disclosure state. <strong>Both exist</strong>, on different components, meaning opposite things — check which one the sheet keys on before you add either.</td></tr>
+    <tr><td><code>.is-spinning</code></td><td>In-progress, on Mazlan's tool affordances</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <p><code>body.tb-is-compact</code> is not one of these despite the name. It is a
+  <strong>document-level</strong> flag set by
+  <a href="../components/compact-toolbar.html">the compact toolbar</a> and read by two
+  different sheets, which is why it lives on <code>body</code> rather than on a component.</p>
+</div>
+
+<h2>What this means for a new component</h2>
+
+<p>Pick one form and use it consistently within the component. If the component has an
+accessible state that maps to it — expanded, pressed, selected — use the attribute and let CSS
+key on that. Otherwise use <code>.is-*</code>, because it is the most common form in the system
+and a reader's first guess. Do not introduce a sixth.</p>

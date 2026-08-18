@@ -5,7 +5,7 @@ tier: settling
 order: 10
 sheet: praxis-filters.css
 scripts: praxis-filters.js
-classes: filter-drawer, filter-row, filter-chips, select-menu, qfilter, chip, btn--neutral, btn--clear
+classes: filter-drawer, filter-row, filter-chips, select-menu, qfilter, chip, btn--neutral, btn--clear, filter-controls, filter-toolbar-row, filter-search, filter-search-input, filter-select, filter-date, filter-date-range, filter-cond, filter-expr, filter-menu, filter-more, filter-type-btn, filter-type-buttons, filter-type-select, filter-view-switch, filter-toggle, frow-chip, drawer-scrim, quick-filters, custom-builder, custom-summary, cf-group, cf-cond, cf-join, cf-drag, cf-select, cf-value, cf-input, cf-pick, cf-remove, cf-empty, cf-enter, cf-exit, cf-dragging, cf-drop-before, cf-drop-after, cf-group-selected, cf-example-btn, cf-date-range, cfx-bool, cfx-val, cfx-paren, cfx-opword, cfx-incomplete, segmented, onoff, icon-btn
 summary: The largest component in Praxis — 403 rules and a filter engine where Standard and Custom are two views onto one expression tree.
 keywords: filter filters drawer modal chip quick expression custom standard PraxisFilters
 -->
@@ -142,6 +142,87 @@ have not — the centred-modal rules are gated on that attribute.</p>
 <code>.filter-drawer</code> so they cannot leak into your own button scale — and it expects
 <strong>your</strong> <code>.btn</code> base underneath them. Praxis does not define one;
 see <a href="../foundations/gaps.html">what Praxis does not define</a>.</p>
+
+<h2>The two views onto one tree</h2>
+
+<p>Standard and Custom are not two filter systems. They are two editors for one expression
+tree, and <code>.filter-view-switch</code> moves between them —
+<code>__opt</code> with <code>.is-active</code>, which is this sheet's convention rather than
+the <code>--active</code> BEM modifier the create-new and segmented controls use.</p>
+
+<h3>Standard view</h3>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.filter-toolbar-row</code></td><td>The row above the list: search, type filter, view switch</td></tr>
+    <tr><td><code>.filter-search-input</code>, <code>.filter-search</code></td><td>Two search fields — the drawer's own, and the one inside a value menu. Both wrap an <code>input</code> plus a <code>.material-symbols-rounded</code> glyph.</td></tr>
+    <tr><td><code>.filter-type-select</code>, <code>.filter-type-buttons</code>, <code>.filter-type-btn</code></td><td>Filter-type narrowing. <code>.filter-type-btn</code> uses <strong><code>[aria-pressed="true"]</code></strong> for its on state, and <code>.filter-type-select</code> uses <code>.is-active</code> — two conventions, one row.</td></tr>
+    <tr><td><code>.filter-row</code></td><td>One filter. The engine renders these into <code>[data-filter-list]</code>.</td></tr>
+    <tr><td><code>.filter-select</code>, <code>.filter-date</code>, <code>.filter-date-range</code></td><td>Value controls. <code>.filter-date__input</code> is the bare input inside.</td></tr>
+    <tr><td><code>.filter-cond</code></td><td>An additional condition on a row; adjacent ones get a separator via <code>+</code></td></tr>
+    <tr><td><code>.filter-more</code></td><td>The collapsed overflow group. <code>__head</code>, <code>__count</code>, <code>__body</code>, <code>__list</code>, <code>__empty</code>, opened with <code>.is-open</code>.</td></tr>
+    <tr><td><code>.frow-chip</code></td><td>A selected value inside a row, with <code>__x</code> to remove it</td></tr>
+    <tr><td><code>.filter-controls</code></td><td>The host-side strip. Note it resets <code>:where(button)</code> and <code>:where(*)</code> inside itself — a deliberate zero-specificity reset so a host's own button styles do not leak in.</td></tr>
+    <tr><td><code>.drawer-scrim</code></td><td>Uses <code>[data-open]</code>, not <code>.is-open</code>. A third convention in the same sheet.</td></tr>
+  </tbody>
+</table>
+
+<h3>Custom view — the expression tree</h3>
+
+<p>This is the largest single structure in Praxis and the reason the sheet is 403 rules.
+<code>.custom-builder</code> holds a <code>__head</code> and a <code>__tree</code>; the tree is
+nested <code>.cf-group</code>s containing <code>.cf-cond</code> rows.</p>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.cf-group</code></td><td>A bracket. <code>--d0</code> is the root depth, and <code>.cf-group .cf-group</code> styles nesting, so depth is expressed structurally rather than with a depth class per level.</td></tr>
+    <tr><td><code>.cf-group__bar</code>, <code>__hint</code>, <code>__children</code></td><td>The group's own controls, its explanatory line, and the slot its members sit in</td></tr>
+    <tr><td><code>.cf-join</code></td><td>The AND/OR toggle between members. <code>.cf-join__and.is-active</code> and <code>.cf-join__or.is-active</code> are styled separately, because the two get different colours.</td></tr>
+    <tr><td><code>.cf-cond</code></td><td>One condition. <code>__lead</code> is its leading cell.</td></tr>
+    <tr><td><code>.cf-select</code>, <code>.cf-value</code>, <code>.cf-input</code>, <code>.cf-pick</code></td><td>Field, operator and value controls within a condition</td></tr>
+    <tr><td><code>.cf-remove</code>, <code>.cf-empty</code></td><td>Delete affordance, and the empty-group state</td></tr>
+    <tr><td><code>.cf-example-btn</code></td><td>"Show me an example" in the builder head</td></tr>
+    <tr><td><code>.cf-date-range</code></td><td>The two-field date control, in condition form</td></tr>
+  </tbody>
+</table>
+
+<h3>Drag and drop</h3>
+
+<p>Conditions and groups are reorderable, and the states are all classes on the moving or
+target element rather than inline styles — so a host can restyle them:</p>
+
+<ul>
+  <li><code>.cf-drag</code> is the handle, with <code>:hover</code> and <code>:active</code>
+      treatments. Inside a group bar it is <code>.cf-group__bar .cf-drag</code>.</li>
+  <li><code>.cf-dragging</code> is on the element in flight.</li>
+  <li><code>.cf-drop-before</code> and <code>.cf-drop-after</code> draw the insertion line with
+      <code>::before</code> and <code>::after</code> — so the indicator costs no extra
+      element.</li>
+  <li><code>.cf-cond.is-selected</code> and <code>.cf-group-selected</code> mark a
+      multi-select. Note the two spellings: a modifier state on one, a separate class on the
+      other.</li>
+  <li><code>.cf-enter</code> and <code>.cf-exit</code> are the add and remove transitions.</li>
+</ul>
+
+<h3>The expression summary</h3>
+
+<p><code>.custom-summary</code> renders the tree back as a readable sentence, and the
+<code>.cfx-*</code> family is its syntax highlighting: <code>.cfx-bool</code> for AND/OR,
+<code>.cfx-opword</code> for operators, <code>.cfx-val</code> for values,
+<code>.cfx-paren</code> for brackets, and <code>.cfx-incomplete</code> for a condition that is
+not yet valid. That last one is the useful part — the summary shows you what is missing rather
+than refusing to render.</p>
+
+<div class="note note--trap">
+  <p><strong>Four state conventions in one sheet.</strong> <code>.is-active</code> on the view
+  switch and type select, <code>[aria-pressed="true"]</code> on the type buttons,
+  <code>[data-open]</code> on the scrim, and <code>.is-selected</code> versus
+  <code>.cf-group-selected</code> for the same idea at two levels. This is the clearest symptom
+  of the sheet being a port: each convention was right in its original file. Read the selector
+  before assuming which one applies.</p>
+</div>
 
 <h2>Everything this sheet defines</h2>
 

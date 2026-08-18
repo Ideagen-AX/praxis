@@ -11,20 +11,20 @@ Published as [`@ideagen-ax/praxis`](https://www.npmjs.com/package/@ideagen-ax/pr
 | File | Audience | Regenerated? |
 |---|---|---|
 | `README.md` | Installing, publishing, fonts, licence | Hand-written |
-| `PRAXIS-FOR-AGENTS.md` | Building a prototype: shell, markup, tokens, gaps | Hand-written today; **being replaced** by `build-site.py --agents-doc` |
+| `PRAXIS-FOR-AGENTS.md` | Building a prototype: shell, markup, tokens, gaps | **Generated** from `site/content/` by `build-site.py --agents-doc` |
 | `DESIGN-SYSTEM.md` | Design rationale + audit history | Partly, via `npm run docs` |
 | `CHANGELOG.md` | Release notes | Hand-written |
 
-Both agent-facing docs state what is *defined*, not what is intended — including
-the classes Praxis references but never defines (`.btn`, `.section`, `.px-menu`,
-`.callout`).
+Both agent-facing surfaces state what is *defined*, not what is intended —
+including the classes Praxis references but never defines (`.btn`, `.section`,
+`.px-menu`, `.callout`).
 
-**After adding or renaming a component, write its page under `site/content/`** —
-see [The reference site](#the-reference-site). That is where the prose lives now.
-`PRAXIS-FOR-AGENTS.md` is still hand-written and still ships in the tarball, and
-until the site's coverage is complete it remains the fuller document; keep its
-*Corrections to DESIGN-SYSTEM.md* section current. It gets replaced by
-`build-site.py --agents-doc` output once every component has a page.
+**`PRAXIS-FOR-AGENTS.md` is generated. Do not edit it.** It is
+`site/content/` rendered to one markdown file, and it still ships in the npm
+tarball. After adding or renaming a component, write its page under
+`site/content/` and run `python3 build-site.py --agents-doc`. `npm run
+site:check` fails if the committed file is stale, because a content edit that
+does not reach it publishes a guide that disagrees with the site.
 
 Keep the version strings in `README.md` in step with `package.json` — they drifted
 to 0.1.0 while the package was at 0.1.2, so the quickstart's CDN URLs served a
@@ -58,10 +58,13 @@ component with live examples. Generated, deployed from `main` only, and served a
 ```sh
 npm run site         # build _site/
 npm run site:serve   # build, then serve on :8000, rebuilding on each request
-npm run site:check   # CI gate — every page builds, every token is surfaced
-python3 build-site.py --coverage    # which class families are still undocumented
-python3 build-site.py --agents-doc  # render the content to markdown
+npm run site:check   # CI gate — pages build, tokens surfaced, guide current
+python3 build-site.py --coverage    # class-family coverage report
+python3 build-site.py --agents-doc  # regenerate PRAXIS-FOR-AGENTS.md
 ```
+
+29 pages as of 2026-08-18, and **every one of the 234 class families in `src/` is
+claimed by a page**.
 
 **`site/content/` is the source of the prose. `_site/` is generated and
 gitignored.** Same rule as `src/` and `dist/`. Adding a page means adding one file
@@ -77,9 +80,26 @@ matter more than the rest:
   self-size, so it is not a cap. `data-source-only` shows markup without running
   it. A `<script>` inside a template is inert on the docs page and live in the
   generated example.
-- **`<praxis-block name="…">` inserts a measured fact.** Token tables, swatches,
-  scales, sheet inventories. All come from `praxis_meta.py`, which `build-ds.py`
-  also uses, so the site and `DESIGN-SYSTEM.md` cannot state different numbers.
+- **`<praxis-block name="…">` inserts a measured fact.** Token tables, the palette
+  grid, per-hue ramps, role-aware swatches, scales, sheet inventories. All come
+  from `praxis_meta.py`, which `build-ds.py` also uses, so the site and
+  `DESIGN-SYSTEM.md` cannot state different numbers.
+
+**Colour blocks draw, they do not tabulate.** A grid of identical squares is the
+default and it is close to useless for this palette: six semantic tokens are inks
+and four are borders, and neither can be judged as a filled square. So
+`role-swatches` picks the form from the token's role — inks as text, borders as a
+hairline, fills as a control — and draws **both themes, each on the surface its own
+theme provides**. That last part is not cosmetic: showing a light-theme ink on
+whatever surface the docs chrome happens to be using made
+`--praxis-color-text-primary` look unreadable in dark when it is nothing of the
+kind. Where an ink genuinely has no contrast on its own surface, the sample moves
+to a fill — decided by measuring the contrast ratio, not by guessing from
+lightness, which is what got `text-primary` wrong the first time.
+
+Use American spelling in `site/content/` and any user-visible label: **color**, not
+colour. The older hand-written docs and the `src/` comments still say colour;
+matching them is the wrong instinct for the site.
 
 Every example runs in an **iframe**, and that is not cosmetic:
 `praxis-profile-menu.js`, `praxis-navdrawer.js`, `praxis-toolbar-compact.js`,
@@ -95,21 +115,44 @@ build can only report what a token is *declared* as, and in this system that is
 regularly the wrong answer: `praxis-core.css` overrides nine `--praxis-*` tokens
 under `body[data-variant="praxis"]`, at a higher specificity than `:root`.
 
-Two gates that fail the build, both on purpose:
+Four gates that fail the build, all on purpose:
 
 - **Every token defined in `src/` must appear on some page.** A token nobody can
-  look up is invisible to every consumer, and it is decidable, so it is checked
-  rather than hoped for.
+  look up is invisible to every consumer, and it is decidable.
+- **Every class family in `src/` must be claimed by a page's `classes:`
+  metadata.** This was advisory at 15% coverage and is a gate at 100%, so a new
+  component sheet cannot land undocumented. It checks the *claim*, not a mention:
+  an earlier version counted `.card` as covered because seven pages said the word
+  in prose while it had no page and no example.
+- **`PRAXIS-FOR-AGENTS.md` must not be stale.** It ships in the tarball.
 - **The markdown conversion must produce no stray HTML and no unreplaced
-  placeholder.** `--check` runs it in memory, so CI catches a broken agent doc
-  before anyone regenerates the file that ships in the tarball. That check exists
-  because an unreplaced placeholder wrote NUL bytes into the output, which turned
-  the whole document binary and made `grep` stop seeing it — silent, and the byte
-  count looked right.
+  placeholder.** That one exists because an unreplaced placeholder wrote NUL bytes
+  into the output, which turned the whole document binary and made `grep` stop
+  seeing it — silent, and the byte count looked right.
 
-`--coverage` is advisory, not a gate: 234 class families is a real backlog and a
-day-one failure would just get switched off. Make it a gate when the list is
-short.
+Two things are reported but deliberately **not** gates, because both are defects
+in `src/` rather than in the site and failing here would turn `main` red for a
+pre-existing bug: `frozen_aliases()` (below) and the used-but-never-defined token
+count.
+
+### `frozen_aliases()` — a decidable bug class
+
+`praxis_meta.frozen_aliases()` finds tokens whose dark value **can never apply**:
+declared on `:root` as `var(--rung)` while the rung's dark remap is declared on
+`body`. Substitution happens at the element where the declaration lives, so the
+token computes on `:root` against the light rung and `body` inherits that. Four
+tokens are in this state today — `--praxis-color-interactive-active`,
+`border-subtle`, `surface-muted` and `status-info`.
+
+It is detected structurally rather than from resolved values on purpose: asking a
+resolver for the dark value substitutes the dark rung and reports a difference the
+browser never produces, which is exactly why this went unnoticed. The build prints
+it as an advisory, **not** a gate — it is a defect in `src/`, and failing here
+would have turned `main` red for a pre-existing bug. Make it a gate once fixed.
+
+Do not confuse it with a token that is merely the same in both themes because its
+rung has no dark treatment at all. That is an omission; this is a rule violation.
+`--praxis-color-text-inverse` is white in both by design.
 
 ### Deploy
 

@@ -5,7 +5,7 @@ tier: ready
 order: 20
 sheet: praxis-appbar.css, praxis-navrail.css, praxis-pageheader.css, praxis-workspace.css, praxis-admin.css
 scripts: praxis-lucide.js, praxis-navdrawer.js, praxis-profile-menu.js
-classes: app, main, content, appbar, praxis-navrail, pageheader, breadcrumb, toolbar, tbtn, page-body, profile-menu, px-skip, mazlan-mark
+classes: app, main, content, appbar, praxis-navrail, pageheader, breadcrumb, toolbar, tbtn, page-body, profile-menu, verswitch, px-skip, mazlan-mark
 summary: Four bands, one composition. The app bar, nav rail, page header and toolbar that every Praxis page is built from — and the two rules your page still has to own.
 keywords: shell layout appbar navrail pageheader toolbar breadcrumb scroll responsive drawer avatar
 -->
@@ -251,6 +251,10 @@ the key your boot script reads — use a different one and you must persist it y
 <p>You still wire open and close on the trigger yourself, as the example above does. The
 script deliberately does not touch the trigger or the pop element, so each page keeps its
 own binding.</p>
+
+<p><code>.verswitch</code> is the version switcher the script renders into the pop's footer.
+You do not build it; it is listed here because it is the one <code>.profile-menu</code> family
+member that is not part of your markup contract.</p>
 
 <div class="note">
   <p>The pop is height-capped with its own scroll as of 0.1.4. Before that it extended past

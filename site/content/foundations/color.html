@@ -1,0 +1,239 @@
+<!--praxis
+title: Color
+slug: color
+summary: The whole palette in one look, each ramp at a size you can judge, and the semantic layer drawn as what it is for. Every value resolved live in both themes.
+order: 30
+keywords: color color palette swatch ramp neutral teal pink semantic status tone brand contrast ink
+-->
+
+<p>Every color on this page is painted from a live document, once per theme, rather than
+copied out of the stylesheet. That matters more here than anywhere else in Praxis: several
+color tokens are declared one way in <code>praxis-tokens.css</code> and
+<a href="#the-praxis-variant-overrides-nine-tokens">overridden</a> under the Praxis variant,
+so the token file is not the answer to "what color is this".</p>
+
+<h2>The whole palette</h2>
+
+<praxis-block name="palette"></praxis-block>
+
+<h2>Reach for these first</h2>
+
+<p>Semantic color, not palette rungs. These are the tokens remapped per theme, so using
+them is what makes your page theme correctly for free. Each is drawn as what it is for — an
+ink as text, a border as a hairline, a fill as a control — because a text color shown as a
+filled square tells you almost nothing about whether you can read it.</p>
+
+<h3>Text</h3>
+
+<praxis-block name="role-swatches" prefix="--praxis-color-text-"></praxis-block>
+
+<h3>Surface</h3>
+
+<praxis-block name="role-swatches" prefix="--praxis-color-surface-"></praxis-block>
+
+<h3>Border</h3>
+
+<praxis-block name="role-swatches" prefix="--praxis-color-border-"></praxis-block>
+
+<h3>Interactive</h3>
+
+<praxis-block name="role-swatches" prefix="--praxis-color-interactive-"></praxis-block>
+
+<div class="note note--trap">
+  <p><strong>Interactive teal is a light color in dark mode.</strong>
+  <code>--praxis-color-interactive-default</code> becomes <code>#29D2D7</code>, luminance
+  .55. White text on it as a <em>fill</em> measures 1.86:1 against a 4.5 minimum. Use
+  <code>--px-primary-fg</code> (dark ink, 12.4:1) whenever that color is a fill — which is
+  the ink the swatches above are drawn with. Praxis already does this for the calls to
+  action it defines; if you invent a filled cyan control, it is on you.</p>
+</div>
+
+<h3>Status</h3>
+
+<praxis-block name="role-swatches" prefix="--praxis-color-status-"></praxis-block>
+
+<h3>Tone pairs</h3>
+
+<p>The paired background and foreground used by status chips and badges, shown as the chips
+they are. <strong>Always use the pair, never one half</strong> — the foregrounds are literals
+rather than palette references on dark, because the palette's 70 steps are tuned for light
+surfaces and go muddy.</p>
+
+<praxis-block name="tone-pairs"></praxis-block>
+
+<h2>Brand</h2>
+
+<p>Teal <code>#1b838b</code> (<code>teal-60</code>) and pink <code>#e30072</code>
+(<code>pink-60</code>). The Mazlan signature is the teal to magenta gradient,
+<code>#29D2D7 → #E30072</code>, reserved for agentic moments — see
+<a href="../components/mazlan.html">Mazlan</a>.</p>
+
+<h2>The ramps</h2>
+
+<p>Reach for a rung only when no semantic token fits. Each ramp is drawn light then dark, at
+a size where you can judge the step between rungs rather than infer it from a hex. The label
+ink flips from dark to white where the rung itself crosses over, so where a ramp stops taking
+dark text is visible rather than something you work out.</p>
+
+<h3>Neutral</h3>
+
+<praxis-block name="ramp" hue="neutral"></praxis-block>
+
+<h3>Teal</h3>
+
+<praxis-block name="ramp" hue="teal"></praxis-block>
+
+<h3>Pink</h3>
+
+<praxis-block name="ramp" hue="pink"></praxis-block>
+
+<h3>Blue</h3>
+
+<praxis-block name="ramp" hue="blue"></praxis-block>
+
+<h3>Green</h3>
+
+<praxis-block name="ramp" hue="green"></praxis-block>
+
+<h3>Orange</h3>
+
+<praxis-block name="ramp" hue="orange"></praxis-block>
+
+<h3>Red</h3>
+
+<praxis-block name="ramp" hue="red"></praxis-block>
+
+<h3>Yellow</h3>
+
+<praxis-block name="ramp" hue="yellow"></praxis-block>
+
+<h3>Purple</h3>
+
+<p>One rung, and it is defined only under the Praxis variant in
+<code>praxis-core.css</code>. There is no purple ramp in the token file.</p>
+
+<praxis-block name="ramp" hue="purple"></praxis-block>
+
+<h3>White</h3>
+
+<praxis-block name="swatches" prefix="--praxis-color-white"></praxis-block>
+
+<h2>The Praxis variant overrides nine tokens</h2>
+
+<p>Measured, not asserted. Each row below is a token <code>praxis-tokens.css</code>
+declares and <code>praxis-core.css</code> then re-declares for the Praxis variant.</p>
+
+<praxis-block name="overrides"></praxis-block>
+
+<h2>Four semantic tokens do not change in dark</h2>
+
+<p>Read the two resolved values under each swatch above and four of them match. That is worth
+understanding rather than skimming, because it used to be nine — and five of those nine were
+fixed in <code>src/</code> on 2026-08-18 after this page made them visible.</p>
+
+<h3>What was fixed</h3>
+
+<p>Four tokens were declared on <code>:root</code> as <code>var(--rung)</code> while the dark
+remap of that rung was declared on <code>body</code>. Custom-property substitution happens at
+the element where the <em>declaration</em> lives, so each was computed on <code>:root</code>
+against the light rung and <code>body</code> inherited that value. <strong>The dark value could
+never apply.</strong></p>
+
+<table>
+  <thead><tr><th>Token</th><th>Was, in dark</th><th>Now</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-color-interactive-active</code></td><td><code>#135d63</code> — a light-mode ink</td><td><code>#5CE0E5</code></td></tr>
+    <tr><td><code>--praxis-color-border-subtle</code></td><td><code>#edf0f2</code></td><td><code>#222b39</code></td></tr>
+    <tr><td><code>--praxis-color-surface-muted</code></td><td><code>#edf0f2</code></td><td><code>#222b39</code></td></tr>
+    <tr><td><code>--praxis-color-status-info</code></td><td><code>#4766eb</code></td><td><code>#7a93e0</code></td></tr>
+  </tbody>
+</table>
+
+<p><code>interactive-active</code> was the one that mattered: in dark, a control's resting state
+was bright cyan <code>#29D2D7</code> and its pressed state resolved to a dark
+<code>#135d63</code>, so pressing it made it go <em>darker</em>. Inverted feedback.</p>
+
+<p>Fixing it required widening the change by one token.
+<code>--praxis-color-interactive-hover</code> was not frozen — it aliases <code>teal-70</code>,
+which has no dark treatment at all — but leaving it would have produced a triad that goes
+bright, then dark, then bright. It now sits between the two, and the progression mirrors light
+in <em>direction</em>: every interaction step increases contrast against the ink on the fill.</p>
+
+<table>
+  <thead><tr><th></th><th>default</th><th>hover</th><th>active</th></tr></thead>
+  <tbody>
+    <tr><td>light, ink <code>#fff</code></td><td><code>#1b838b</code> 4.50:1</td><td><code>#176f76</code> 5.88:1</td><td><code>#135d63</code> 7.57:1</td></tr>
+    <tr><td>dark, ink <code>#08313a</code></td><td><code>#29D2D7</code> 7.48:1</td><td><code>#42D9DE</code> 8.08:1</td><td><code>#5CE0E5</code> 8.77:1</td></tr>
+  </tbody>
+</table>
+
+<p>And <code>--praxis-color-status-danger</code> was the fifth. It was not frozen either — it
+simply had no dark value while its three siblings did — but at <code>#e22d38</code> it measured
+<strong>3.50:1</strong> on the dark card against the 4.5:1 WCAG 1.4.3 asks of text, while
+success, warning and info sat at 7.88, 7.89 and 5.30. It is now <code>red-40</code>
+(<code>#ed7b82</code>), an existing rung, at 5.81:1.</p>
+
+<praxis-block name="frozen-aliases"></praxis-block>
+
+<p>That table is generated from the structure of the stylesheets on every build, and an empty
+result is now a <strong>gate</strong>: a fifth frozen alias fails the build rather than waiting
+for someone to notice a control behaving backwards. It is deliberately not derived from the
+resolved values — a resolver asked for the dark value substitutes the dark rung and reports a
+difference the browser never produces, which is the whole reason this went unseen.</p>
+
+<h3>The four that remain, and why they are fine</h3>
+
+<table>
+  <thead><tr><th>Token</th><th>Both themes</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-color-text-inverse</code></td><td><code>#ffffff</code></td><td><strong>Deliberate.</strong> It is the ink for a coloured fill, and a fill dark enough to need inverse ink is dark in either theme.</td></tr>
+    <tr><td><code>--praxis-color-border-strong</code></td><td><code>#8898a9</code></td><td>Aliases <code>neutral-40</code>, which the dark theme does not remap. 5.33:1 on the dark card, well past the 3:1 a border needs.</td></tr>
+    <tr><td><code>--praxis-color-border-focus</code></td><td><code>#4499a0</code></td><td>Aliases <code>teal-50</code>, likewise unremapped. 4.73:1 — a focus ring that reads in both themes.</td></tr>
+    <tr><td><code>--praxis-color-status-danger</code></td><td>—</td><td>No longer in this list; see above.</td></tr>
+  </tbody>
+</table>
+
+<p>The distinction that matters: a token identical in both themes is <strong>not</strong>
+automatically a bug. Three of these are either intended or measurably adequate. What was a bug
+was a dark value that existed and could not be reached, which is a rule violation rather than
+an omission — and that is the thing the build now checks.</p>
+
+<h2>Two live traps</h2>
+
+<div class="note note--trap">
+  <p><strong>Never substitute one token for another by name.</strong> Check the resolved
+  value in both themes first. <code>--t-sm</code> looks like it maps to
+  <code>--praxis-type-size-sm</code>, but its fallback actually resolved to
+  <code>type-size-base</code>. <code>--r-lg</code> is <code>1rem</code> against a canonical
+  <code>16px</code> — equal only because nothing overrides the root font size. The resolved
+  values on this page exist so you do not have to take a name on trust.</p>
+</div>
+
+<p>Two more, worth knowing before you go hunting:</p>
+
+<ul>
+  <li><strong><code>--praxis-radius-card</code> is 20px in the token file and 12px under
+      Praxis.</strong> The override is the one that renders. 12px is the card geometry.</li>
+  <li><strong>Most <code>--praxis-*</code> and <code>--px-*</code> tokens are redefined per
+      theme.</strong> Only <code>--praxis-color-white</code> and the palette primitives
+      resolve identically everywhere — and as the palette grid above shows, not even all of
+      those: the dark theme moves <code>neutral-05</code> through <code>neutral-20</code>
+      and three teal rungs.</li>
+</ul>
+
+<h2>All values</h2>
+
+<p>The exact declarations and what they resolve to, for copying. The visual blocks above are
+for judging; this is for reading.</p>
+
+<h3>Semantic</h3>
+
+<praxis-block name="tokens" prefix="--praxis-color-text|--praxis-color-surface|--praxis-color-border|--praxis-color-interactive|--praxis-color-status"></praxis-block>
+
+<h3>Tone pairs</h3>
+
+<praxis-block name="tokens" prefix="--praxis-tone-"></praxis-block>
+
+<h3>Palette</h3>
+
+<praxis-block name="tokens" prefix="--praxis-color-neutral|--praxis-color-white|--praxis-color-teal|--praxis-color-pink|--praxis-color-blue|--praxis-color-green|--praxis-color-orange|--praxis-color-red|--praxis-color-yellow|--praxis-color-purple"></praxis-block>

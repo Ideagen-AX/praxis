@@ -1,0 +1,153 @@
+<!--praxis
+title: Card, page and texture
+slug: card-and-page
+tier: ready
+order: 60
+sheet: praxis-workspace.css, praxis-core.css
+classes: card, page, px-dot, px-dot-clear
+summary: The two layout surfaces every screen is made of, the dot texture behind them, and why the card radius is 12px and not the 20px the token says.
+keywords: card page surface texture dot grid elevation radius panel
+-->
+
+<p><code>.card</code> and <code>.page</code> are the two surfaces almost every screen is
+assembled from, and they are defined in <strong><code>praxis-workspace.css</code></strong> —
+not in core, not in a card sheet. That is one of the three "base in a surprising place"
+traps; the bundle makes it moot.</p>
+
+<h2>Card</h2>
+
+<template data-example="Cards at the three elevation tiers" data-height="230">
+  <div style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))">
+    <div class="card" style="padding:1rem;box-shadow:var(--px-card-rail)">
+      <strong>Rail</strong>
+      <p style="margin:.25rem 0 0;color:var(--praxis-color-text-secondary)">Recedes. For a
+         side panel that supports the subject.</p>
+    </div>
+    <div class="card" style="padding:1rem">
+      <strong>Default</strong>
+      <p style="margin:.25rem 0 0;color:var(--praxis-color-text-secondary)">The card's own
+         shadow, <code>--praxis-card</code>.</p>
+    </div>
+    <div class="card" style="padding:1rem;box-shadow:var(--px-card-raised)">
+      <strong>Raised</strong>
+      <p style="margin:.25rem 0 0;color:var(--praxis-color-text-secondary)">The subject of
+         the screen.</p>
+    </div>
+  </div>
+</template>
+
+<div class="note note--trap">
+  <p><strong>The card radius is 12px, not the 20px <code>--praxis-radius-card</code>
+  declares.</strong> <code>praxis-core.css</code> overrides that token to 12px under
+  <code>body[data-variant="praxis"]</code>, at a higher specificity than <code>:root</code>,
+  so 12px is what renders. Reading the token file gives the wrong answer. See
+  <a href="../foundations/color.html#the-praxis-variant-overrides-nine-tokens">the nine
+  overrides</a>.</p>
+</div>
+
+<p><code>.card</code> gives you the surface, the radius and the shadow. It does
+<strong>not</strong> give you padding — that varies by what is inside, and a card of table
+rows wants none. Every example above sets its own.</p>
+
+<h2>Page</h2>
+
+<p><code>.page</code> is the content wrapper inside the scroll container. Its job is the
+horizontal rhythm: it inherits <code>--ph-pad-x</code> from <code>.content</code> so the page
+body lines up with the header and the toolbar above it. Below 640px it switches to
+<code>--px-gutter</code>, the single 16px phone inset, along with the app bar and header — so
+all three step in together rather than by different amounts.</p>
+
+<h2>The dot texture</h2>
+
+<p>The dot grid is not a class. It is painted on <code>body</code> by
+<code>praxis-core.css</code> as a repeating <code>radial-gradient</code> at
+<code>18px</code>, using <code>--px-dot</code>, with
+<code>background-attachment:fixed</code>.</p>
+
+<p>Two consequences that matter:</p>
+
+<ul>
+  <li><strong>An inner scroll container is correct, not a workaround.</strong> Because the
+      texture is fixed, it reads as page material and stays put while content moves over it.
+      That is why <code>.app</code> is <code>height:100vh; overflow:hidden</code> and the
+      content column scrolls.</li>
+  <li><strong><code>--px-dot-clear</code> stops the grid under the chrome.</strong> It is set
+      to exactly 192px — the sum of the app bar, page header and toolbar band. Change a band
+      height without changing the token and the texture cuts across your header. See
+      <a href="../foundations/space-radius.html#chrome-metrics">chrome metrics</a>.</li>
+</ul>
+
+<template data-example="Texture behind a card, with the clearance visible at the top" data-height="240" data-shell>
+  <div class="app">
+    <header class="appbar">
+      <a class="appbar__brand" href="#" style="font-weight:600">Ideagen</a>
+    </header>
+    <div class="main">
+      <div class="content">
+        <div class="pageheader">
+          <div class="pageheader__titlerow">
+            <h1 class="pageheader__title">The grid stops here</h1>
+          </div>
+        </div>
+        <main class="page" style="flex:1;min-height:0;overflow:auto;padding-top:var(--px-toolbar-gutter)">
+          <div class="card" style="padding:1rem;max-width:26rem">
+            <strong>On the texture</strong>
+            <p style="margin:.25rem 0 0;color:var(--praxis-color-text-secondary)">Scroll
+               inside this frame — the dots stay put because the texture is fixed.</p>
+          </div>
+          <div style="height:14rem"></div>
+        </main>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h2>The animated dot field</h2>
+
+<p>A different thing with a similar name. <code>praxis-dotfield.js</code> is a single-canvas
+animated dot grid for hero and login moments — one <code>&lt;canvas&gt;</code>, one draw loop,
+every dot drawn with <code>arc()</code> each frame so it stays smooth past 4,000 dots. It is
+not the page texture and does not replace it.</p>
+
+<div class="note note--trap">
+  <p><strong>Two things will make it render nothing, both silently.</strong></p>
+  <p><code>create()</code> builds the field but <strong>does not start the loop</strong> — you
+  must call <code>.start()</code>. And <strong>the dots are drawn white</strong>, shading to the
+  teal signature under the pointer, so on a light surface they are invisible. It was built for
+  the login page; give it a dark backdrop.</p>
+  <p>Until 2026-08-18 the usage block at the top of <code>praxis-dotfield.js</code> showed
+  <code>create</code> → <code>setMode</code> → <code>setParam</code> and never mentioned
+  <code>start()</code>, so following the file's own instructions gave you a blank canvas. Both
+  facts are in that comment now.</p>
+</div>
+
+<template data-example="The dot field, wave mode, on the dark backdrop it needs" data-height="270" data-scripts="dotfield">
+  <div style="background:#0f1720;border-radius:var(--praxis-radius-md);overflow:hidden">
+    <canvas id="field" style="width:100%;height:210px;display:block"></canvas>
+  </div>
+  <script>
+    var field = PraxisDotField.create(document.getElementById('field'), {
+      global: { spacing: 22, dotRadius: 1.6, teal: '#29D2D7', magenta: '#E30072' }
+    });
+    field.setMode('wave');
+    field.start();          /* required — create() does not begin the loop */
+  </script>
+</template>
+
+<p>The rest of the surface: <code>setParam(key, value)</code> for a live mode parameter,
+<code>setGlobal(key, value)</code> for a global one (rebuilds the grid),
+<code>restart()</code>, and <code>destroy()</code> — call that one when you tear the canvas
+down, or the loop keeps running.</p>
+
+<p>Modes are the keys of <code>PraxisDotField.MODES</code>: <code>wave</code>,
+<code>sweep</code>, <code>rippleLoop</code>, <code>sonar</code>, <code>radar</code>,
+<code>diagonal</code>, <code>breathe</code>, <code>flow</code>, <code>rain</code>,
+<code>constellation</code>, <code>organic</code>, <code>vortex</code>, <code>logo</code> and
+<code>magnet</code>. Each entry is <code>{label, controls:[…]}</code>, and
+<code>field.setMode(key)</code> resets the parameters to that mode's defaults.</p>
+
+<p>Global options include <code>spacing</code>, <code>dotRadius</code>,
+<code>restAlpha</code>, <code>teal</code>, <code>magenta</code>, <code>originX</code>,
+<code>originY</code>, <code>glow</code>, <code>ring</code>, <code>edgeFade</code> and
+<code>loop</code>. It is a real animation running a real loop, so mind it on a page that is
+already busy.</p>
