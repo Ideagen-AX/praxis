@@ -1,0 +1,66 @@
+<!--praxis
+title: Materials and glass
+summary: The --px-* surfaces, shadows and washes that carry the Praxis look, plus the glass recipe for drawers and floating panels.
+order: 35
+keywords: px material surface shadow card hover field glass drawer elevation blur
+-->
+
+<p>The <code>--px-*</code> layer is where the Praxis look actually lives. It is not in
+<code>praxis-tokens.css</code> — every one of these is declared in
+<code>praxis-core.css</code> under <code>body[data-variant="praxis"]</code>, twice, once
+per theme. That is the single most common reason someone greps the token file for
+<code>--px-surface</code> and concludes it does not exist.</p>
+
+<h2>The material layer</h2>
+
+<praxis-block name="materials"></praxis-block>
+
+<h3>How to choose</h3>
+
+<table>
+  <thead><tr><th>Reaching for</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>The page itself</td><td><code>--px-page</code></td></tr>
+    <tr><td>A card or panel on the page</td><td><code>--px-surface</code>, then <code>--px-surface-2</code> for one nested inside it</td></tr>
+    <tr><td>A form field fill</td><td><code>--px-field</code>, <code>--px-field-hover</code>. The field has no border, so this is the entire affordance.</td></tr>
+    <tr><td>A hover wash on a large row target</td><td><code>--px-hover</code> — a 2.5% wash</td></tr>
+    <tr><td>A hover wash on a small raised control</td><td><code>--px-hover-btn</code> — stronger, because the target is smaller</td></tr>
+    <tr><td>Three elevation tiers: recede, default, subject</td><td><code>--px-card-rail</code>, <code>--praxis-card</code>, <code>--px-card-raised</code></td></tr>
+    <tr><td>A toolbar or floating control</td><td><code>--px-tool</code>, <code>--px-tool-shadow</code>, <code>--px-tool-shadow-hover</code></td></tr>
+    <tr><td>A filled primary action</td><td><code>--px-primary-grad</code> with <code>--px-primary-fg</code> as the ink. Never white ink on this fill.</td></tr>
+  </tbody>
+</table>
+
+<h2>Glass</h2>
+
+<p>A frosted translucent surface for drawers and floating panels. Three pages each had
+their own slightly different recipe before this was centralised; use the tokens rather than
+inventing a fourth.</p>
+
+<praxis-block name="tokens" prefix="--praxis-glass-"></praxis-block>
+
+<template data-example="Glass panel over the page texture" data-height="200">
+  <div style="position:relative;height:150px;border-radius:var(--praxis-radius-md);overflow:hidden">
+    <div style="position:absolute;inset:0;background:var(--px-dot,transparent);
+                background-image:radial-gradient(var(--praxis-color-teal-60) 1px,transparent 1px);
+                background-size:18px 18px;opacity:.35"></div>
+    <div style="position:absolute;left:1.5rem;top:1.5rem;right:1.5rem;padding:1rem;
+                background:var(--praxis-glass-drawer);
+                backdrop-filter:var(--praxis-glass-blur);
+                border:1px solid var(--praxis-glass-border);
+                border-radius:var(--praxis-radius-md);
+                box-shadow:var(--praxis-glass-shadow),var(--praxis-glass-inset)">
+      <strong style="font-size:var(--praxis-type-size-md)">Glass drawer</strong>
+      <p style="margin:.25rem 0 0;color:var(--praxis-color-text-secondary)">
+        Toggle the theme to see the dark recipe. The blur and the sheen both change, not
+        just the tint.</p>
+    </div>
+  </div>
+</template>
+
+<h2>Praxis-only layout hooks</h2>
+
+<p>Declared under the variant and nowhere else. These are the ones a page reads or sets
+rather than consumes.</p>
+
+<praxis-block name="variant-extras"></praxis-block>

@@ -46,6 +46,14 @@ jobs:
       - name: Build and verify dist/
         run: npm run build
 
+      # The reference site is generated from site/content/ and the dist/ built
+      # above. --check builds every page, asserts that every token defined in
+      # src/ appears on some page, and exercises the markdown conversion that
+      # produces PRAXIS-FOR-AGENTS.md. It publishes nothing — the Pages deploy
+      # is a separate workflow that runs on main only.
+      - name: Build and check the reference site
+        run: python3 build-site.py --check
+
       # Catches the drift that shipped a two-versions-stale CDN URL in the
       # README: package.json said 0.1.2 while the quickstart pinned 0.1.0, so
       # anyone copying the snippet got the wrong build. Advisory, not fatal —

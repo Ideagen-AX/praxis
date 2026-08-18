@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}} · Praxis</title>
+<meta name="description" content="{{summary}}">
+<!-- The docs chrome consumes Praxis tokens so it is on-brand and theme-aware,
+     but its layout is site.css. Praxis defines no layout primitives and its
+     chrome components assume they own the page, so the site is not built out of
+     them — every live example is, inside its own iframe. -->
+<link rel="stylesheet" href="{{root}}praxis/praxis-tokens.css">
+<link rel="stylesheet" href="{{root}}assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="brand" href="{{root}}index.html">
+    <span class="brand__mark" aria-hidden="true"></span>
+    <span class="brand__name">Praxis</span>
+    <span class="brand__ver">{{version}}</span>
+  </a>
+  <div class="topbar__spacer"></div>
+  <label class="search">
+    <span class="search__icon" aria-hidden="true"></span>
+    <input type="search" id="navsearch" placeholder="Filter pages" aria-label="Filter pages">
+  </label>
+  <button class="themetoggle" type="button" id="themetoggle" aria-pressed="false">
+    <span data-when="light">Dark</span><span data-when="dark">Light</span>
+  </button>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="Reference">
+{{nav}}
+  </nav>
+
+  <main class="main" id="main">
+    <article class="doc">
+      <header class="doc__head">
+        <h1>{{title}}</h1>
+        <p class="doc__summary">{{summary}}</p>
+        <p class="doc__meta">{{meta}}</p>
+      </header>
+{{body}}
+      <nav class="pagenav" aria-label="Previous and next">
+{{pagenav}}
+      </nav>
+      <footer class="doc__foot">
+        <p>Generated from <code>src/</code> by <code>build-site.py</code> at Praxis
+           {{version}}. Nothing on this page is transcribed by hand from the
+           stylesheets — the tables and the live examples both read the same
+           <code>dist/</code> this site ships.</p>
+      </footer>
+    </article>
+
+    <aside class="toc" aria-label="On this page">
+{{toc}}
+    </aside>
+  </main>
+</div>
+
+<script src="{{root}}assets/site.js"></script>
+</body>
+</html>
