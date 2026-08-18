@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- GENERATED redirect stub. GitHub Pages serves static files only, so there is
+     no server-side redirect available: this is the client-side equivalent, and it
+     uses all three mechanisms because each covers a case the others do not.
+
+     meta refresh   works with JavaScript disabled
+     location.replace  fires sooner, and does NOT add a history entry, so Back
+                       goes where the reader came from rather than bouncing here
+     the visible link  the fallback if both are blocked
+
+     noindex keeps the stub out of search results while the canonical tag hands
+     any accumulated ranking to the real page. -->
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0; url={{target}}">
+<link rel="canonical" href="{{target}}">
+<title>Moved to {{title}} · Praxis</title>
+<link rel="stylesheet" href="{{root}}praxis/praxis-tokens.css">
+<link rel="stylesheet" href="{{root}}assets/site.css">
+</head>
+<body>
+<main class="main" style="display:block;max-width:34rem;margin:0 auto;padding:4rem 1.5rem">
+  <h1 style="font-size:1.5rem;font-weight:600;margin:0 0 .5rem">This page moved</h1>
+  <p style="color:var(--doc-ink-2)"><code>{{from}}</code> is now
+     <a href="{{target}}">{{title}}</a>.</p>
+  <p style="color:var(--doc-ink-3);font-size:.875rem">Taking you there now. If nothing
+     happens, use the link above.</p>
+</main>
+<script>location.replace({{targetjson}});</script>
+</body>
+</html>
