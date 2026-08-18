@@ -40,6 +40,7 @@ USAGE
     python3 build-site.py --agents-doc    render content to PRAXIS-FOR-AGENTS.generated.md
 """
 
+import collections
 import html
 import http.server
 import json
@@ -420,6 +421,31 @@ def block_overrides_md(args):
                      + ['| `%s` | `%s` | **`%s`** |' % (n, a, b) for n, a, b, _d in rows])
 
 
+def block_frozen_aliases(args):
+    rows = praxis_meta.frozen_aliases()
+    if not rows:
+        return '<p>None. Every aliased token can carry its dark value.</p>'
+    out = ['<table><thead><tr><th>Token</th><th>Aliases</th>'
+           '<th>Dark value that never applies</th></tr></thead><tbody>']
+    for token, rung, dark in rows:
+        out.append('<tr><td><code>%s</code></td><td><code>%s</code></td>'
+                   '<td><code>%s</code></td></tr>'
+                   % (html.escape(token), html.escape(rung), html.escape(dark)))
+    out.append('</tbody></table>')
+    out.append('<p class="sw__val">Detected from structure every build, not from the '
+               'resolved values \u2014 asking a resolver would give the wrong answer, '
+               'because it substitutes the dark rung the browser never reaches.</p>')
+    return '\n'.join(out)
+
+
+def block_frozen_aliases_md(args):
+    rows = praxis_meta.frozen_aliases()
+    if not rows:
+        return 'None.'
+    return '\n'.join(['| Token | Aliases | Dark value that never applies |', '|---|---|---|']
+                     + ['| `%s` | `%s` | `%s` |' % r for r in rows])
+
+
 def block_media_only(args):
     rows = praxis_meta.media_only_tokens()
     if not rows:
@@ -443,6 +469,186 @@ def block_media_only_md(args):
         return 'None.'
     return '\n'.join(['| Token | Declared only inside |', '|---|---|']
                      + ['| `%s` | `@media %s` |' % (n, '; '.join(c)) for n, c in rows])
+
+
+RUNG = re.compile(r'^--praxis-color-([a-z]+)-(\d+)$')
+
+
+def _colour_rungs():
+    """{hue: {rung: token}} over every place a colour token can be defined."""
+    out = collections.defaultdict(dict)
+    for _g, name, _l, _d in (praxis_meta.token_rows() + praxis_meta.variant_extras()):
+        m = RUNG.match(name)
+        if m:
+            out[m.group(1)][int(m.group(2))] = name
+    return out
+
+
+def block_palette(args):
+    """The whole palette at once, hues down and rungs across.
+
+    The point of this block is seeing, not reading: one grid where a hue's
+    progression and two hues' relative weight at the same rung are both directly
+    comparable. Values live in the tables further down each section.
+
+    Each cell carries two bands, light above dark. Most rungs are identical in
+    both themes, so a cell reading as one solid block is information too — it
+    says the dark theme does not touch that rung. Only neutral 05 to 20 and three
+    teal rungs actually move.
+    """
+    hues = _colour_rungs()
+    rungs = sorted({r for h in hues.values() for r in h})
+    out = ['<div class="palette" style="--palette-cols:%d">' % len(rungs)]
+    out.append('<span class="palette__corner"></span>')
+    for r in rungs:
+        out.append('<span class="palette__rung">%d</span>' % r)
+    for hue in sorted(hues):
+        out.append('<span class="palette__hue">%s</span>' % html.escape(hue))
+        for r in rungs:
+            token = hues[hue].get(r)
+            if not token:
+                out.append('<span class="palette__gap" aria-hidden="true"></span>')
+                continue
+            rendered_tokens.add(token)
+            esc = html.escape(token)
+            out.append(
+                '<span class="palette__cell" title="%s">'
+                '<b data-computed-swatch="%s" data-theme="light"></b>'
+                '<i data-computed-swatch="%s" data-theme="dark"></i>'
+                '</span>' % (esc, esc, esc))
+    out.append('</div>')
+    out.append('<p class="sw__val">Light above, dark below, in every cell. A cell that '
+               'reads as one block is a rung the dark theme does not remap \u2014 which is '
+               'most of them. Hover for the token name.</p>')
+    return '\n'.join(out)
+
+
+def block_ramp(args):
+    """One hue as a continuous ramp, big enough to judge, with values on the swatch.
+
+    Adjacent rather than gridded: a ramp with gaps between the steps reads as
+    separate colours instead of one progression, which is the thing you are
+    actually assessing when you pick a rung.
+    """
+    hue = (args.get('hue') or '').strip()
+    hues = _colour_rungs()
+    if hue not in hues:
+        fail('block ramp', 'hue=%r is not a Praxis colour family. Known: %s'
+             % (hue, ', '.join(sorted(hues))))
+        return ''
+    steps = sorted(hues[hue])
+    out = []
+    for theme in ('light', 'dark'):
+        out.append('<div class="ramp" data-ramp-theme="%s">' % theme)
+        for r in steps:
+            token = hues[hue][r]
+            rendered_tokens.add(token)
+            out.append('<span class="ramp__step" data-computed-swatch="%s" data-theme="%s" '
+                       'data-ink title="%s"><b>%d</b><small></small></span>'
+                       % (html.escape(token), theme, html.escape(token), r))
+        out.append('</div>')
+        out.append('<p class="ramp__label">%s</p>' % theme)
+    return '\n'.join(out)
+
+
+def block_ramp_md(args):
+    hue = (args.get('hue') or '').strip()
+    hues = _colour_rungs()
+    if hue not in hues:
+        return ''
+    return block_tokens_md({'prefix': '--praxis-color-%s-' % hue})
+
+
+# How a colour token should be DRAWN, by what it is for. A text colour shown as a
+# filled square tells you almost nothing — you cannot judge an ink without seeing
+# it as text, and you cannot judge a border without seeing it as a hairline.
+ROLE_FORMS = {
+    'surface': 'surface',
+    'text': 'ink',
+    'border': 'border',
+    'interactive': 'fill',
+    'status': 'fill',
+}
+
+
+def _role_of(name):
+    for key, form in ROLE_FORMS.items():
+        if name.startswith('--praxis-color-%s-' % key):
+            return form
+    return 'surface'
+
+
+def block_role_swatches(args):
+    """Semantic colors drawn as the thing they are for, in both themes.
+
+    Two decisions worth keeping:
+
+    Form follows role. A grid of identical squares is the default and close to
+    useless here — six of these tokens are inks and four are borders, and neither
+    can be judged as a filled square.
+
+    Both themes, each on its OWN surface. A light-theme ink shown on whatever
+    surface the docs happen to be using is worse than useless: with the docs in
+    dark, the light value of --praxis-color-text-primary rendered on a dark card
+    and read as an unreadable token when it is nothing of the kind. Every sample
+    now carries the surface it was designed against, so what you see is what a
+    consumer gets.
+    """
+    rows = _group_rows(args)
+    if not rows:
+        fail('block role-swatches', 'no tokens matched prefix=%r' % args.get('prefix'))
+    out = ['<div class="roleswatches">']
+    for _grp, name, _light, _dark in rows:
+        form = args.get('form') or _role_of(name)
+        esc = html.escape(name)
+        out.append('<div class="rs">')
+        for theme in ('light', 'dark'):
+            demo = {
+                'surface': '<span class="rs__block" data-computed-swatch="%s" '
+                           'data-theme="%s"></span>' % (esc, theme),
+                'ink': '<span class="rs__ink" data-computed-ink="%s" data-theme="%s">'
+                       'Aa Sample text</span>' % (esc, theme),
+                'border': '<span class="rs__border" data-computed-border="%s" '
+                          'data-theme="%s"></span>' % (esc, theme),
+                'fill': '<span class="rs__fill" data-computed-swatch="%s" data-theme="%s">'
+                        '<span data-computed-ink="--px-primary-fg" data-theme="%s">Action'
+                        '</span></span>' % (esc, theme, theme),
+            }[form]
+            out.append('<div class="rs__sample" data-theme="%s">%s'
+                       '<span class="rs__val" data-computed="%s" data-theme="%s"></span>'
+                       '</div>' % (theme, demo, esc, theme))
+        out.append('<code class="rs__name">%s</code></div>' % esc)
+    out.append('</div>')
+    return '\n'.join(out)
+
+
+def block_tone_pairs(args):
+    """The tone pairs as actual chips, both halves at once.
+
+    Showing the background and the foreground separately invites using one
+    without the other, which is the documented mistake with these.
+    """
+    tones = ['neutral', 'info', 'success', 'warning', 'danger']
+    out = ['<div class="tonepairs">']
+    for tone in tones:
+        bg, fg = '--praxis-tone-%s-bg' % tone, '--praxis-tone-%s-fg' % tone
+        rendered_tokens.update((bg, fg))
+        for theme in ('light', 'dark'):
+            # The dark recipes are translucent — the neutral background is
+            # rgba(255,255,255,.08) — so a dark chip shown on the light page is
+            # invisible. It needs the surface it was designed against.
+            out.append('<div class="tone" data-theme="%s">'
+                       '<span class="tone__chip" data-computed-swatch="%s" data-theme="%s">'
+                       '<span data-computed-ink="%s" data-theme="%s">%s</span></span>'
+                       '<span class="tone__theme">%s</span></div>'
+                       % (theme, bg, theme, fg, theme,
+                          html.escape(tone.capitalize()), theme))
+    out.append('</div>')
+    return '\n'.join(out)
+
+
+def block_tone_pairs_md(args):
+    return block_tokens_md({'prefix': '--praxis-tone-'})
 
 
 def block_sheet_classes(args):
@@ -639,10 +845,15 @@ BLOCKS = {
     'stats': (block_stats, block_stats_md),
     'undefined-tokens': (block_undefined_tokens, block_undefined_tokens_md),
     'unkeyed-families': (block_unkeyed, block_unkeyed_md),
+    'palette': (block_palette, block_tokens_md),
+    'ramp': (block_ramp, block_ramp_md),
+    'role-swatches': (block_role_swatches, block_tokens_md),
+    'tone-pairs': (block_tone_pairs, block_tone_pairs_md),
     'materials': (block_materials, block_materials_md),
     'variant-extras': (block_variant_extras, block_variant_extras_md),
     'overrides': (block_overrides, block_overrides_md),
     'media-only-tokens': (block_media_only, block_media_only_md),
+    'frozen-aliases': (block_frozen_aliases, block_frozen_aliases_md),
     'manifest': (block_manifest, block_manifest_md),
     'pages': (block_pages, block_pages_md),
 }
@@ -1362,6 +1573,14 @@ def main():
     m = praxis_meta.measure()
     print('  %d tokens measured, %d cyclic var() chains, %d used-but-undefined'
           % (m['tokens'], len(praxis_meta.token_cycles()), len(m['undef'])))
+    frozen = praxis_meta.frozen_aliases()
+    if frozen:
+        print('  note: %d token(s) alias a rung the dark theme remaps, on :root, so '
+              'their dark value can never apply:' % len(frozen))
+        for token, rung, dark in frozen:
+            print('        %s -> %s (dark %s)' % (token, rung, dark))
+        print('        Advisory: this is a defect in src/, not in the site. Make it a '
+              'gate once fixed.')
 
     if '--check' in argv:
         # Exercise the markdown conversion too, in memory. Otherwise CI can pass

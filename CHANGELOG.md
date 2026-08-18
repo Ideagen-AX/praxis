@@ -39,6 +39,19 @@ a consumer. This adds the reference site and the machinery behind it.
   the `--px-*` material layer and the nine `--praxis-*` tokens that
   `praxis-core.css` overrides under the Praxis variant.
 
+- **Color blocks that draw rather than tabulate.** The full palette as one grid
+  (hues down, rungs across, light over dark in each cell, so which rungs the dark
+  theme remaps is visible at a glance); each hue as a continuous ramp with its rung
+  and hex on every step and the label ink flipping where the rung crosses over; and
+  the semantic layer drawn by role — inks as text, borders as a hairline, fills as a
+  control — in both themes, each sample on the surface its own theme provides.
+
+- **`praxis_meta.frozen_aliases()`**, which finds tokens whose dark value can never
+  apply: declared on `:root` as `var(--rung)` while the rung's dark remap lands on
+  `body`. Four tokens are in that state. Detected structurally, because asking a
+  resolver would report a difference the browser does not produce. Advisory in the
+  build output, not a gate, since it is a defect in `src/` rather than in the site.
+
 ### Fixed
 
 - **The class-family measurement counted `url()` paths and quoted strings.** A
@@ -48,6 +61,11 @@ a consumer. This adds the reference site and the machinery behind it.
   of the system from 234 real class families to about 370, and it showed in the
   component inventory in `DESIGN-SYSTEM.md`, where `praxis-reset.css` and
   `praxis-tokens.css` appeared to define classes they do not.
+
+- **`.mazlan-mark--xl` is documented in `PRAXIS-FOR-AGENTS.md` as 40px and does not
+  exist.** It appears only inside a comment in `praxis-mazlan.css` describing one
+  consumer's own page, so using it silently gets the 20px base. The live example on
+  the Mazlan page is what caught it.
 
 - **`DESIGN-SYSTEM.md` was one `var()` usage stale** — 1,501 against a real 1,502,
   from the 0.1.4 profile-menu fix landing without `npm run docs` being re-run.

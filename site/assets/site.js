@@ -71,8 +71,36 @@
 
   /* ---- 2. token probes ----------------------------------------------- */
 
+  /* Relative luminance, so a label sitting ON a swatch is legible against the
+     swatch's OWN colour rather than a guess. The palette runs light inks on the
+     dark end of a ramp and dark inks on the light end, and where that flips is
+     itself worth being able to see. */
+  function luminance(value) {
+    var probe = document.createElement('span');
+    probe.style.cssText = 'position:absolute;left:-9999px;color:' + value;
+    document.body.appendChild(probe);
+    var rgb = getComputedStyle(probe).color.match(/[\d.]+/g);
+    probe.remove();
+    if (!rgb) return null;
+    var c = rgb.slice(0, 3).map(function (n) {
+      n = n / 255;
+      return n <= 0.03928 ? n / 12.92 : Math.pow((n + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+
+  /* WCAG contrast ratio, so "is this legible on that" is measured rather than
+     guessed from lightness alone. */
+  function contrast(a, b) {
+    var la = luminance(a), lb = luminance(b);
+    if (la === null || lb === null) return 21;
+    var hi = Math.max(la, lb), lo = Math.min(la, lb);
+    return (hi + 0.05) / (lo + 0.05);
+  }
+
   function fillComputed() {
-    var cells = document.querySelectorAll('[data-computed], [data-computed-swatch]');
+    var cells = document.querySelectorAll(
+      '[data-computed], [data-computed-swatch], [data-computed-ink], [data-computed-border]');
     if (!cells.length) return;
 
     var root = document.body.dataset.root || '';
@@ -91,7 +119,8 @@
         var cs = probe.contentWindow.getComputedStyle(body);
         Array.prototype.forEach.call(cells, function (cell) {
           if (cell.dataset.theme !== theme) return;
-          var name = cell.dataset.computed || cell.dataset.computedSwatch;
+          var name = cell.dataset.computed || cell.dataset.computedSwatch
+            || cell.dataset.computedInk || cell.dataset.computedBorder;
           var value = cs.getPropertyValue(name).trim();
           if (!value) {
             cell.textContent = 'unset';
@@ -108,6 +137,29 @@
           if (cell.dataset.computedSwatch) {
             cell.style.setProperty('--sw', value);
             cell.setAttribute('data-label', value);
+            var hex = cell.querySelector('small');
+            if (hex) hex.textContent = value;
+            if (cell.hasAttribute('data-ink')) {
+              var l = luminance(value);
+              if (l !== null) cell.style.setProperty('--ink', l > 0.42 ? '#111a24' : '#ffffff');
+            }
+          } else if (cell.dataset.computedInk) {
+            cell.style.setProperty('--ink', value);
+            /* Only move an ink onto a fill when it is genuinely illegible on the
+               surface its own theme provides. Judging that by "is the ink light"
+               was wrong: --praxis-color-text-primary is #e7ebf1 in dark and
+               belongs on the dark surface, not a teal fill. Contrast against the
+               actual surface is the question, so ask that. */
+            var host = cell.closest('.rs__sample');
+            if (host) {
+              var bg = getComputedStyle(host).backgroundColor;
+              if (contrast(value, bg) < 1.6) {
+                host.style.background = 'var(--praxis-color-teal-60,#1b838b)';
+                host.setAttribute('data-inverse', '');
+              }
+            }
+          } else if (cell.dataset.computedBorder) {
+            cell.style.setProperty('--sw', value);
           } else {
             cell.textContent = value;
             if (cell.tagName === 'TD'
@@ -121,8 +173,31 @@
       });
       document.body.appendChild(probe);
 
+      function markUnchanged() {
+        /* A SEMANTIC token resolving to the same value in both themes is almost
+           always a bug: the whole point of the semantic layer is that it is
+           remapped. Palette rungs are exempt — most of those legitimately do
+           not move. */
+        document.querySelectorAll('.rs').forEach(function (card) {
+          var l = card.querySelector('.rs__sample[data-theme="light"] .rs__val');
+          var d = card.querySelector('.rs__sample[data-theme="dark"] .rs__val');
+          if (!l || !d || !l.textContent.trim() || !d.textContent.trim()) return;
+          if (l.textContent.trim() === d.textContent.trim()) {
+            d.classList.add('rs__val--same');
+            /* Neutral wording on purpose. Nine semantic tokens are identical in
+               both themes and they are not all wrong: --praxis-color-text-inverse
+               is white in both by design. Four are the frozen-alias rule
+               violation, and the build names those specifically. */
+            d.title = 'Resolves to the same value in both themes. Sometimes deliberate '
+              + '(text-inverse is white on any theme), sometimes because the rung has no '
+              + 'dark treatment, and in four cases because the token aliases a remapped '
+              + 'rung on :root — see "Tokens whose dark value never applies".';
+          }
+        });
+      }
+
       function done() {
-        if (--pending === 0) { /* both probes reported */ }
+        if (--pending === 0) markUnchanged();
       }
     });
   }

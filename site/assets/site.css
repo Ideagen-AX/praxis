@@ -286,15 +286,100 @@ h2:hover .anchor,h3:hover .anchor,.anchor:focus{opacity:1}
 .tokentable td[data-computed]:not([data-swatch])::before{display:none}
 .tokentable .is-missing{color:var(--praxis-tone-danger-fg);background:var(--praxis-tone-danger-bg)}
 
+/* ---- colour: seeing, not reading -------------------------------------- */
+
+/* The whole palette at once. Hues down, rungs across, so a hue's progression
+   and two hues' relative weight at the same rung are both comparable in one
+   look. Each cell is two bands, light over dark. */
+.palette{
+  display:grid;
+  grid-template-columns:3.5rem repeat(var(--palette-cols),minmax(0,1fr));
+  gap:3px;align-items:center;
+  margin:0 0 .75rem;
+}
+.palette__corner{}
+.palette__rung{text-align:center;font-size:.6875rem;font-family:var(--doc-mono);color:var(--doc-ink-3)}
+.palette__hue{font-size:.75rem;color:var(--doc-ink-2);padding-right:.5rem}
+.palette__gap{}
+.palette__cell{
+  display:flex;flex-direction:column;
+  height:3.25rem;border-radius:5px;overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgb(0 0 0 / .08);
+}
+.palette__cell b{flex:2;background:var(--sw,transparent)}
+.palette__cell i{flex:1;background:var(--sw,transparent)}
+
+/* One hue, continuous. Gaps between steps read as separate colours instead of
+   one progression, which is the thing you are actually judging. */
+.ramp{display:flex;border-radius:var(--doc-radius-sm);overflow:hidden;box-shadow:inset 0 0 0 1px rgb(0 0 0 / .08)}
+.ramp__step{
+  flex:1;min-width:0;min-height:5rem;
+  display:flex;flex-direction:column;justify-content:flex-end;gap:.125rem;
+  padding:.375rem .375rem .4375rem;
+  background:var(--sw,transparent);
+  color:var(--ink,inherit);
+}
+.ramp__step b{font-size:.75rem;font-weight:600;line-height:1}
+.ramp__step small{font-size:.5625rem;font-family:var(--doc-mono);opacity:.85;line-height:1;overflow:hidden;text-overflow:ellipsis}
+.ramp__label{margin:.25rem 0 1rem;font-size:.6875rem;color:var(--doc-ink-3)}
+
+/* Semantic colours drawn as what they are for. */
+.roleswatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:.75rem;margin:0 0 1rem}
+.rs{
+  padding:.5rem;border:1px solid var(--doc-line);
+  border-radius:var(--doc-radius);background:var(--doc-panel);
+}
+.rs__name{display:block;margin:.375rem .25rem .125rem;font-family:var(--doc-mono);font-size:.6875rem;word-break:break-all;color:var(--doc-ink)}
+
+/* Each sample sits on the surface its own theme provides, not on whatever the
+   docs chrome is currently using. */
+.rs__sample{padding:.375rem;border-radius:var(--doc-radius-sm);background:var(--praxis-color-white)}
+.rs__sample[data-theme="dark"]{background:#161c27;margin-top:.25rem}
+.rs__val{display:block;margin-top:.25rem;font-family:var(--doc-mono);font-size:.625rem;color:#718499}
+.rs__sample[data-theme="dark"] .rs__val{color:#8b98a6}
+.rs__val--same::after{
+  content:"same in both";
+  margin-left:.375rem;padding:0 .25rem;border-radius:3px;
+  background:var(--doc-panel-2);color:var(--doc-ink-3);
+}
+
+.rs__block{display:block;height:2.5rem;border-radius:5px;
+  background:var(--sw,transparent);box-shadow:inset 0 0 0 1px rgb(128 128 128 / .35)}
+.rs__ink{display:flex;align-items:center;height:2.5rem;padding:0 .5rem;
+  color:var(--ink,inherit);font-size:.9375rem;font-weight:600}
+/* text-inverse is white in both themes; only a colored fill shows it at all. */
+.rs__sample[data-inverse]::after{
+  content:"on a fill";display:block;margin-top:.125rem;
+  font-size:.5625rem;font-family:var(--doc-mono);color:rgb(255 255 255 / .75);
+}
+.rs__sample[data-inverse] .rs__val{color:rgb(255 255 255 / .8)}
+.rs__border{display:block;height:2.5rem;border-radius:5px;
+  background:transparent;border:2px solid var(--sw,transparent)}
+.rs__fill{display:flex;align-items:center;justify-content:center;height:2.5rem;
+  border-radius:5px;background:var(--sw,transparent);font-size:.8125rem;font-weight:600}
+.rs__fill > span{color:var(--ink,#fff)}
+
+/* Tone pairs, both halves at once. Showing them apart invites using one
+   without the other, which is the documented mistake with these. */
+.tonepairs{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr));gap:.5rem;margin:0 0 1rem}
+.tone{padding:.5rem;border-radius:var(--doc-radius-sm);background:var(--doc-panel)}
+/* A dark chip needs the surface it was designed against — several dark tone
+   backgrounds are translucent white and vanish on a light page. */
+.tone[data-theme="dark"]{background:#161c27}
+.tone[data-theme="dark"] .tone__theme{color:#8b98a6}
+.tone__chip{
+  display:flex;align-items:center;justify-content:center;
+  height:2.5rem;border-radius:999px;
+  background:var(--sw,transparent);font-size:.8125rem;font-weight:600;
+}
+.tone__chip > span{color:var(--ink,inherit)}
+.tone__theme{display:block;margin-top:.25rem;font-size:.625rem;color:var(--doc-ink-3);text-align:center}
+
+/* The compact grid, still used for the small sets. */
 .swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:.625rem;margin:0 0 1.5rem}
 .sw{border:1px solid var(--doc-line);border-radius:var(--doc-radius-sm);overflow:hidden;background:var(--doc-panel)}
 .sw__chip{height:3rem;display:flex}
-.sw__half{flex:1;position:relative}
-.sw__half::after{
-  content:attr(data-label);position:absolute;bottom:2px;left:3px;
-  font-size:.5625rem;font-family:var(--doc-mono);color:rgb(255 255 255 / .8);
-  mix-blend-mode:difference;
-}
+.sw__half{flex:1;position:relative;background:var(--sw,transparent)}
 .sw__body{padding:.375rem .5rem}
 .sw__name{display:block;font-family:var(--doc-mono);font-size:.6875rem;word-break:break-all;color:var(--doc-ink)}
 .sw__val{display:block;font-family:var(--doc-mono);font-size:.625rem;color:var(--doc-ink-3)}

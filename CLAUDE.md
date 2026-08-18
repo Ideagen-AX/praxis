@@ -77,9 +77,26 @@ matter more than the rest:
   self-size, so it is not a cap. `data-source-only` shows markup without running
   it. A `<script>` inside a template is inert on the docs page and live in the
   generated example.
-- **`<praxis-block name="…">` inserts a measured fact.** Token tables, swatches,
-  scales, sheet inventories. All come from `praxis_meta.py`, which `build-ds.py`
-  also uses, so the site and `DESIGN-SYSTEM.md` cannot state different numbers.
+- **`<praxis-block name="…">` inserts a measured fact.** Token tables, the palette
+  grid, per-hue ramps, role-aware swatches, scales, sheet inventories. All come
+  from `praxis_meta.py`, which `build-ds.py` also uses, so the site and
+  `DESIGN-SYSTEM.md` cannot state different numbers.
+
+**Colour blocks draw, they do not tabulate.** A grid of identical squares is the
+default and it is close to useless for this palette: six semantic tokens are inks
+and four are borders, and neither can be judged as a filled square. So
+`role-swatches` picks the form from the token's role — inks as text, borders as a
+hairline, fills as a control — and draws **both themes, each on the surface its own
+theme provides**. That last part is not cosmetic: showing a light-theme ink on
+whatever surface the docs chrome happens to be using made
+`--praxis-color-text-primary` look unreadable in dark when it is nothing of the
+kind. Where an ink genuinely has no contrast on its own surface, the sample moves
+to a fill — decided by measuring the contrast ratio, not by guessing from
+lightness, which is what got `text-primary` wrong the first time.
+
+Use American spelling in `site/content/` and any user-visible label: **color**, not
+colour. The older hand-written docs and the `src/` comments still say colour;
+matching them is the wrong instinct for the site.
 
 Every example runs in an **iframe**, and that is not cosmetic:
 `praxis-profile-menu.js`, `praxis-navdrawer.js`, `praxis-toolbar-compact.js`,
@@ -110,6 +127,25 @@ Two gates that fail the build, both on purpose:
 `--coverage` is advisory, not a gate: 234 class families is a real backlog and a
 day-one failure would just get switched off. Make it a gate when the list is
 short.
+
+### `frozen_aliases()` — a decidable bug class
+
+`praxis_meta.frozen_aliases()` finds tokens whose dark value **can never apply**:
+declared on `:root` as `var(--rung)` while the rung's dark remap is declared on
+`body`. Substitution happens at the element where the declaration lives, so the
+token computes on `:root` against the light rung and `body` inherits that. Four
+tokens are in this state today — `--praxis-color-interactive-active`,
+`border-subtle`, `surface-muted` and `status-info`.
+
+It is detected structurally rather than from resolved values on purpose: asking a
+resolver for the dark value substitutes the dark rung and reports a difference the
+browser never produces, which is exactly why this went unnoticed. The build prints
+it as an advisory, **not** a gate — it is a defect in `src/`, and failing here
+would have turned `main` red for a pre-existing bug. Make it a gate once fixed.
+
+Do not confuse it with a token that is merely the same in both themes because its
+rung has no dark treatment at all. That is an omission; this is a rule violation.
+`--praxis-color-text-inverse` is white in both by design.
 
 ### Deploy
 
