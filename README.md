@@ -15,6 +15,9 @@ to define. Working with an AI agent instead? The same content as one markdown
 file is [PRAXIS-FOR-AGENTS.md](./PRAXIS-FOR-AGENTS.md), which ships in the
 package. This README covers installing; those cover building.
 
+**The site is alpha too, and it is built from `main` rather than from a release** —
+see [the note below](#alpha--under-active-development) before you rely on it.
+
 ---
 
 > ### Alpha — under active development
@@ -29,6 +32,25 @@ package. This README covers installing; those cover building.
 >   have exactly one consumer and have never been tested by a second use. See
 >   [Stability](#stability) for the tier-by-tier breakdown, and the known rough
 >   edges listed under it.
+> - **The reference site is alpha, and it tracks `main`, not the release.** It is
+>   rebuilt and redeployed on every push to `main`, from that commit's `src/` — so
+>   when `main` is ahead of the latest tag, **the site documents code you cannot
+>   install yet**. Check the version in its header against the version you have
+>   pinned. There is no versioned archive of the site and no way to view the docs
+>   for an older release.
+>
+>   It is also incomplete in ways worth knowing before you treat a silence as an
+>   answer. Every class family in `src/` is named on some page, but that is coverage
+>   of the *vocabulary*, not depth: the 44 live examples show each component's
+>   markup contract rather than every variant and state combination. Some things
+>   cannot be demonstrated at all — the Mazlan drawer's CSS ships without its
+>   markup, so 15 of its class families are documented as an inventory with no
+>   working example. Pages get added, rewritten and renamed without notice.
+>
+>   Treat it as the most accurate description of Praxis that exists, not as a
+>   specification. It found six real defects in `src/` on its first day, which is
+>   the honest summary of both its value and the state of what it describes.
+>
 > - **No support commitment.** There is no release schedule, no LTS, and no
 >   guarantee that an issue gets looked at.
 > - **Pin the exact version** — `@0.1.5`, never `@0.1`, `^0.1.5` or `@latest`.
