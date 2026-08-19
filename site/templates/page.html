@@ -21,6 +21,12 @@
     <span class="brand__name">Praxis</span>
     <span class="brand__ver">{{version}}</span>
   </a>
+  <!-- A sibling of .brand, not a child: an anchor inside an anchor is invalid
+       markup and browsers recover from it unpredictably. Present on every page,
+       because someone arriving from a shared link never sees the README. -->
+  <a class="alphachip" href="{{root}}index.html#alpha">
+    <span class="alphachip__dot" aria-hidden="true"></span>Alpha
+  </a>
   <div class="topbar__spacer"></div>
   <label class="search">
     <span class="search__icon" aria-hidden="true"></span>

@@ -18,6 +18,32 @@ way a reference stays true to the thing it describes.</p>
 
 <praxis-block name="stats"></praxis-block>
 
+<div class="note note--alpha" id="alpha">
+  <p><strong>Alpha, and so is this site.</strong> Praxis is at {{version}} and is not
+  production-ready. Class names, token names and markup structure are all still moving, and
+  pre-1.0 releases contain breaking changes without a deprecation cycle. <strong>Pin the exact
+  version</strong> — <code>@{{version}}</code>, never <code>@0.1</code>,
+  <code>^{{version}}</code> or <code>@latest</code>.</p>
+
+  <p><strong>This site is built from <code>main</code>, not from a release.</strong> It
+  redeploys on every push, from that commit's <code>src/</code>, so when <code>main</code> is
+  ahead of the latest tag it documents code you cannot install yet. The version in the header
+  above is the one these pages describe — check it against the version you have pinned. There
+  is no archive, so there is no way to read the docs for an older release.</p>
+
+  <p><strong>Where it is thin.</strong> Every class family in <code>src/</code> is named on
+  some page, but that is coverage of the vocabulary rather than depth: the live examples show
+  each component's markup contract, not every variant and state. Some things cannot be
+  demonstrated at all — <a href="components/mazlan.html">the Mazlan drawer</a> ships its CSS
+  without its markup, so fifteen of its class families are an inventory with no working
+  example. Pages get added, rewritten and renamed without notice.</p>
+
+  <p>Treat it as the most accurate description of Praxis that exists, not as a specification.
+  The full statement is in
+  <a href="https://github.com/Ideagen-AX/praxis#alpha--under-active-development">the
+  README</a>.</p>
+</div>
+
 <h2>Start here</h2>
 
 <p>Two sections account for nearly every "Praxis looks broken" report. Read them before
