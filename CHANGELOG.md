@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.7 — 2026-08-20
+
+**One line of CSS, for a reason worth writing down.** 0.1.6 raised the filter
+checkboxes' border from 2.01:1 to 3.84:1 and left the thickness at 2px. Contrast
+and thickness multiply, so the visible weight nearly doubled and the controls read
+as heavy — reported from review, not from a measurement.
+
+### Fixed
+
+- **`.qfilter__check` and `.select-menu__check` drop 2px → 1.5px.** They were the
+  only checkboxes in the system at 2px; `.sm-opt__box`, the 18px box used across
+  the record pages, has always been 1.5px. So this is the house convention being
+  applied, not a contrast trade-off — the border still measures 3.84:1 on
+  `surface-default` and 3.55:1 on `surface-subtle`, unchanged from 0.1.6.
+
+  Worth stating the general rule, because 0.1.6 got it wrong: raising a border's
+  contrast to clear 1.4.11 raises its visible weight by the same factor. If the
+  stroke was already thicker than it needed to be, the fix lands twice. Check the
+  thickness at the same time as the colour.
+
 ## 0.1.6 — 2026-08-20
 
 **`src/` changed.** Three colour tokens move and nine control borders darken, all of
