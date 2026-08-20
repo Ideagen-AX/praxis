@@ -7,7 +7,7 @@
      To change anything here, edit the matching file under site/content/ and
      re-run:  python3 build-site.py --agents-doc
 
-     Measured from src/ at Praxis 0.1.5. Where a statement is inferred from
+     Measured from src/ at Praxis 0.1.6. Where a statement is inferred from
      CSS structure rather than observed, it says so.
 -->
 
@@ -54,7 +54,7 @@ The frame above is a real document. Its head and body are exactly this:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My prototype</title>
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.5/dist/praxis.css">
+        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.6/dist/praxis.css">
 </head>
 
 <body data-variant="praxis" data-theme="light">
@@ -74,7 +74,7 @@ The frame above is a real document. Its head and body are exactly this:
   </div>
 
   <!-- Only if you use icons. Loads its own pinned Lucide from beside itself. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.5/dist/praxis-lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.6/dist/praxis-lucide.js"></script>
 </body>
 </html>
 ```
@@ -84,7 +84,7 @@ The frame above is a real document. Its head and body are exactly this:
 In a bundled app the requirements are identical — stylesheet, the two `<body>` attributes, the icon script if you want icons.
 
 >
-`npm install @ideagen-ax/praxis@0.1.5`
+`npm install @ideagen-ax/praxis@0.1.6`
 
 `import '@ideagen-ax/praxis'` — tokens, core and every component
 `import '@ideagen-ax/praxis/dist/praxis-lucide.js'` — optional, icons only
@@ -294,7 +294,7 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-yellow-90` | `#887100` | — |
 | `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
-| `--praxis-color-border-strong` | `var(--praxis-color-neutral-40)` | — |
+| `--praxis-color-border-strong` | `var(--praxis-color-neutral-50)` | — |
 | `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
 | `--praxis-color-interactive-default` | `var(--praxis-color-teal-60)` | `#29D2D7` |
 | `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | `#42D9DE` |
@@ -309,7 +309,7 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
 | `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
 | `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
-| `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
+| `--praxis-color-status-warning` | `var(--praxis-color-orange-70)` | `#ffa32e` |
 | `--praxis-type-font-sans` | `'Gilroy','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif` | — |
 | `--praxis-type-size-base` | `0.875rem` | — |
 | `--praxis-type-size-lg` | `1.125rem` | — |
@@ -428,7 +428,7 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-tone-success-bg` | `var(--praxis-color-green-10)` | `rgba(9,139,83,.16)` |
 | `--praxis-tone-success-fg` | `var(--praxis-color-green-70)` | `#4cd08a` |
 | `--praxis-tone-warning-bg` | `var(--praxis-color-orange-10)` | `rgba(239,129,0,.16)` |
-| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-70)` | `#f5b45c` |
+| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-90)` | `#f5b45c` |
 | `--praxis-tone-danger-bg` | `var(--praxis-color-red-10)` | `rgba(226,45,56,.18)` |
 | `--praxis-tone-danger-fg` | `var(--praxis-color-red-70)` | `#f28b91` |
 | `--px-card-rail` | `0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6)` | `0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.30),inset 0 .5px 0 rgba(255,255,255,.05)` |
@@ -498,7 +498,7 @@ Semantic color, not palette rungs. These are the tokens remapped per theme, so u
 |---|---|---|
 | `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
-| `--praxis-color-border-strong` | `var(--praxis-color-neutral-40)` | — |
+| `--praxis-color-border-strong` | `var(--praxis-color-neutral-50)` | — |
 | `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | `#222b39` |
 
 
@@ -522,7 +522,7 @@ Semantic color, not palette rungs. These are the tokens remapped per theme, so u
 | `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
 | `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
 | `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
-| `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
+| `--praxis-color-status-warning` | `var(--praxis-color-orange-70)` | `#ffa32e` |
 
 
 #### Tone pairs
@@ -539,7 +539,7 @@ The paired background and foreground used by status chips and badges, shown as t
 | `--praxis-tone-success-bg` | `var(--praxis-color-green-10)` | `rgba(9,139,83,.16)` |
 | `--praxis-tone-success-fg` | `var(--praxis-color-green-70)` | `#4cd08a` |
 | `--praxis-tone-warning-bg` | `var(--praxis-color-orange-10)` | `rgba(239,129,0,.16)` |
-| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-70)` | `#f5b45c` |
+| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-90)` | `#f5b45c` |
 | `--praxis-tone-danger-bg` | `var(--praxis-color-red-10)` | `rgba(226,45,56,.18)` |
 | `--praxis-tone-danger-fg` | `var(--praxis-color-red-70)` | `#f28b91` |
 
@@ -789,7 +789,7 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 |---|---|---|
 | `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
-| `--praxis-color-border-strong` | `var(--praxis-color-neutral-40)` | — |
+| `--praxis-color-border-strong` | `var(--praxis-color-neutral-50)` | — |
 | `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
 | `--praxis-color-interactive-default` | `var(--praxis-color-teal-60)` | `#29D2D7` |
 | `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | `#42D9DE` |
@@ -804,7 +804,7 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 | `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
 | `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
 | `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
-| `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
+| `--praxis-color-status-warning` | `var(--praxis-color-orange-70)` | `#ffa32e` |
 | `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | `#222b39` |
 | `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | `#222b39` |
 
@@ -821,7 +821,7 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 | `--praxis-tone-success-bg` | `var(--praxis-color-green-10)` | `rgba(9,139,83,.16)` |
 | `--praxis-tone-success-fg` | `var(--praxis-color-green-70)` | `#4cd08a` |
 | `--praxis-tone-warning-bg` | `var(--praxis-color-orange-10)` | `rgba(239,129,0,.16)` |
-| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-70)` | `#f5b45c` |
+| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-90)` | `#f5b45c` |
 | `--praxis-tone-danger-bg` | `var(--praxis-color-red-10)` | `rgba(226,45,56,.18)` |
 | `--praxis-tone-danger-fg` | `var(--praxis-color-red-70)` | `#f28b91` |
 
@@ -1345,7 +1345,7 @@ Class names that appear in Praxis selectors and so look supported, but have no b
 
 These class names appear in Praxis selectors, which makes them look supported. They have no base definition. The distinction matters because the failure is silent: your `.btn` picks up the Praxis primary fill and none of the box it needs, so it renders as colored text.
 
-Verified by hand against `src/` at 0.1.5. The generated tables further down are measured every build.
+Verified by hand against `src/` at 0.1.6. The generated tables further down are measured every build.
 
 ### Classes with no base
 
