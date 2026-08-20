@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.1.8 — 2026-08-20
+
+**Reverts the filter-panel control borders from 0.1.6 and 0.1.7.** A design
+decision, taken with the contrast cost understood and accepted.
+
+### Reverted
+
+- **`praxis-filters.css` and `praxis-toolbar-compact.css` return to their 0.1.5
+  state**, byte for byte. Nine control boundaries go back under the 1.4.11 3:1
+  floor — `neutral-20` at 1.57:1 for `.segmented`, `.filter-type-buttons`,
+  `.filter-select`/`.filter-date`, `.filter-search input`, `.filter-view-switch`;
+  `neutral-30` at 2.01:1 for `.qfilter__check`, `.select-menu__check`,
+  `.cf-group__add button`; and `border-default` at 1.26:1 for
+  `.tb-options__search input`.
+
+  **Why.** The app's search pill is drawn with a `rgba(16,36,58,.08)` shadow ring
+  rather than a border, so it was never in scope and never moved. Raising the
+  filter panel to 3:1 while the pill stayed put made the two read as different
+  systems sitting side by side, and the panel is the more visible of the pair.
+  Weighed against that, a conformant filter panel that looks broken next to the
+  app's primary control was judged the worse outcome.
+
+  The fill cannot rescue this: `--px-surface-2` measures **1.08:1** against
+  `--px-surface` in light and 1.12:1 in dark, so the border is the only thing
+  identifying these controls and 1.4.11 lands entirely on it. Reaching 3:1 by
+  fill alone needs roughly `#767b80`, which is not a light theme. There is no
+  version of this that is both conformant and visually unchanged — that is the
+  actual trade, and it was made deliberately.
+
+  **The real fix is a design change, not a token change.** Moving these controls
+  to a treatment that carries contrast on one edge — a filled field with a 3:1
+  underline — would conform without the four-sided weight, but it has to happen
+  to the search pill and the filter panel together or the mismatch simply moves.
+
+### Kept
+
+Everything outside the filter panel stands: `--praxis-color-border-strong` at
+`neutral-50` (3.84:1), `--praxis-color-status-warning` at `orange-70`, and
+`--praxis-tone-warning-fg` at `orange-90`. `border-strong` still serves
+`.sm-opt__box`, `.save-field__input` and `--px-check-stroke` in consuming apps,
+none of which were part of the objection.
+
 ## 0.1.7 — 2026-08-20
 
 **One line of CSS, for a reason worth writing down.** 0.1.6 raised the filter
