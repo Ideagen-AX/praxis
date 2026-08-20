@@ -52,7 +52,7 @@
 | Tokenization coverage | **65%** |
 | Tokens defined in more than one file | 75 |
 | Used but never defined (excluding runtime-set) | 3 — `--muted`, `--ph-pad-top`, `--praxis-filters-gutter` |
-| Defined but never referenced | 106 |
+| Defined but never referenced | 105 |
 | Stylesheets measured | 16 |
 | Consumer pages measured | none — src/ measured in isolation |
 <!-- /GENERATED:stats -->
@@ -329,7 +329,7 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 |---|---|---|
 | `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
-| `--praxis-color-border-strong` | `var(--praxis-color-neutral-40)` | — |
+| `--praxis-color-border-strong` | `var(--praxis-color-neutral-50)` | — |
 | `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
 | `--praxis-color-interactive-default` | `var(--praxis-color-teal-60)` | `#29D2D7` |
 | `--praxis-color-interactive-hover` | `var(--praxis-color-teal-70)` | `#42D9DE` |
@@ -349,7 +349,7 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
 | `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
 | `--praxis-color-status-success` | `var(--praxis-color-green-60)` | `#3ecf8e` |
-| `--praxis-color-status-warning` | `var(--praxis-color-orange-60)` | `#ffa32e` |
+| `--praxis-color-status-warning` | `var(--praxis-color-orange-70)` | `#ffa32e` |
 
 **Typography**
 
@@ -528,7 +528,7 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-tone-success-bg` | `var(--praxis-color-green-10)` | `rgba(9,139,83,.16)` |
 | `--praxis-tone-success-fg` | `var(--praxis-color-green-70)` | `#4cd08a` |
 | `--praxis-tone-warning-bg` | `var(--praxis-color-orange-10)` | `rgba(239,129,0,.16)` |
-| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-70)` | `#f5b45c` |
+| `--praxis-tone-warning-fg` | `var(--praxis-color-orange-90)` | `#f5b45c` |
 | `--praxis-tone-danger-bg` | `var(--praxis-color-red-10)` | `rgba(226,45,56,.18)` |
 | `--praxis-tone-danger-fg` | `var(--praxis-color-red-70)` | `#f28b91` |
 <!-- /GENERATED:foundation -->

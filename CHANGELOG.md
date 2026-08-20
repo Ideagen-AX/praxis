@@ -1,8 +1,52 @@
 # Changelog
 
-## Unreleased
+## 0.1.6 — 2026-08-20
 
-**Site only.** No CSS or JS changed, so there is nothing to publish.
+**`src/` changed.** Three colour tokens move and nine control borders darken, all of
+it WCAG 1.4.11 (non-text contrast). Light mode only — every dark value is unchanged.
+
+**What a consumer will notice.** Checkbox boxes, segmented controls, select/date
+triggers and search inputs get a visibly darker outline; warning icons and warning
+state-borders go one step deeper in the orange ramp; warning text on a warning chip
+darkens a lot. Nothing moves in dark.
+
+### Fixed
+
+- **`--praxis-color-border-strong` was 2.95:1 on white** — a rounding error short of
+  the 3:1 floor for a UI-component boundary. It is the control-boundary token
+  (checkbox boxes, input underlines, `--px-check-stroke`), so the floor applies.
+  Repointed from `neutral-40` to `neutral-50`: 3.84:1 on `surface-default`, 3.36:1 on
+  `surface-subtle`, 4.09:1 on the dark card, so it needs no dark remap of its own.
+
+  Repointed rather than editing the `neutral-40` rung, because
+  `--praxis-color-text-disabled` resolves to that same rung and must not move with it.
+  It is still `#8898a9`.
+
+- **Nine control boundaries reached past the token to a palette rung**, and every one
+  landed under 3:1 — `neutral-20` at 1.57:1 or `neutral-30` at 2.01:1. On an unchecked
+  `.qfilter__check` or `.select-menu__check` the border *is* the control, so a 2.01:1
+  box is the whole affordance failing. All nine now use `--praxis-color-border-strong`:
+  `.segmented`, `.qfilter__check`, `.select-menu__check`, `.filter-type-buttons`,
+  `.filter-select` / `.filter-date`, `.filter-search input`, `.filter-view-switch`,
+  `.cf-group__add button`, and `.tb-options__search input`.
+
+  `.filter-select:hover` moved to `neutral-60`, because its old `neutral-30` hover was
+  now *lighter* than the resting border and the state read backwards.
+
+- **`--praxis-color-status-warning` was 2.69:1 on white.** This token draws icons,
+  dots and 2px state borders, all of which owe 3:1, so `orange-60` failed at its own
+  job. Now `orange-70` — 3.64:1 on `surface-default`, 3.18:1 on `surface-subtle`, and
+  still legibly orange. Dark is untouched at `#ffa32e`.
+
+- **`--praxis-tone-warning-fg` was 3.30:1 on its own chip.** The `tone-*-fg` family is
+  the text tier and the other four sit near 5:1 on their backgrounds, but orange at the
+  `-70` rung is simply too light to get there. Now `orange-90`, 6.28:1 on
+  `--praxis-tone-warning-bg`. That matches the rule an earlier consumer-side audit
+  already landed on — use the `-90` step for text on a `-10` tint.
+
+  Note the division of labour: `--praxis-color-status-warning` for the graphical layer,
+  `--praxis-tone-warning-fg` for text. Using the status ink as a text colour on a chip
+  is what failed, and it still will.
 
 ### Added
 
