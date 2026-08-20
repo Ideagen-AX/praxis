@@ -1,6 +1,6 @@
 {
   "name": "@ideagen-ax/praxis",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Praxis \u2014 the design system for Ideagen EHSQ Enterprise. Tokens, chrome and record-form components as plain CSS and vanilla JS, with no build step and no framework.",
   "keywords": [
     "design-system",
