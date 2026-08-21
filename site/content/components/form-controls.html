@@ -3,8 +3,8 @@ title: Form controls
 slug: form-controls
 tier: ready
 order: 40
-sheet: praxis-admin.css, praxis-core.css
-classes: switch, track, thumb, onoff, segmented, px-skip, visually-hidden, icon, toggle-group, chip-area
+sheet: praxis-admin.css, praxis-core.css, praxis-controls.css
+classes: switch, track, thumb, onoff, segmented, filterfield, px-skip, visually-hidden, icon, toggle-group, chip-area
 summary: The checkbox, the toggle switch, the skip link and the scrollbar treatment — including the two markup forms of .switch, which now render identically after one of them turned out to be styled by nothing at all.
 keywords: checkbox switch toggle radio scrollbar skip link accessibility focus indeterminate segmented
 -->
@@ -207,3 +207,32 @@ classic scrollbars and shifts your layout by the scrollbar's width.</p>
 takes <code>--20</code>, <code>--18</code> and <code>--16</code>.
 <code>.visually-hidden</code> is the standard clip-rect pattern, for a label a screen reader
 needs and the layout does not.</p>
+
+<h2>Filter field</h2>
+
+<p><code>.filterfield</code> is type-to-filter beside a list: the report tree's Filter, the
+workspace editor's Search reports. It is a <code>&lt;label&gt;</code> wrapping an
+<code>&lt;input&gt;</code> and a glyph, and the glyph goes <strong>after</strong> the input in
+source order because it sits at the trailing edge.</p>
+
+<p>The trailing glyph is the whole distinction from the app bar's search box. A leading
+magnifier says "start here, type a query"; this field refines the list already under it, so
+the glyph is a label for what the field does rather than an invitation. <code>.cn-find</code>
+inside a menu is the leading-glyph form, and the app bar is the third — three fields, three
+jobs, and picking by which one looks nicest is how a screen ends up with two of them.</p>
+
+<p>Sized to <code>.iconbtn</code>: 34px, <code>--praxis-radius-sm</code>, the same tool
+shadow. Give the wrapper the width you want — <code>flex:1</code> in a panel header,
+<code>width:220px</code> in a card head — since the input fills it.</p>
+
+<template data-example="A card header: filter field, then the panel's icon buttons" data-height="150">
+  <div style="display:flex;align-items:center;gap:.5rem">
+    <label class="filterfield" style="flex:1">
+      <input type="text" placeholder="Filter reports" aria-label="Filter reports" />
+      <span class="material-symbols-rounded" aria-hidden="true">search</span>
+    </label>
+    <button class="iconbtn" type="button" aria-label="Expand all">
+      <span class="material-symbols-rounded" aria-hidden="true">unfold_more</span>
+    </button>
+  </div>
+</template>

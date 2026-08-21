@@ -61,6 +61,7 @@ COMPONENTS = [
     "praxis-module-selector.css",
     "praxis-profile-menu.css",
     "praxis-toolbar-compact.css",
+    "praxis-controls.css",
     "praxis-quick-rail.css",
     "praxis-rfield.css",
     "praxis-filters.css",
@@ -85,6 +86,7 @@ SCRIPTS = [
     "praxis-filters.js",
     "praxis-dotfield.js",
     "praxis-breadcrumb-back.js",
+    "praxis-toast.js",
     "praxis-admin-chrome.js",
 ]
 
