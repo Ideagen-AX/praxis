@@ -1,0 +1,105 @@
+<!--praxis
+title: Toolbar menu
+slug: toolbar-menu
+tier: settling
+order: 45
+sheet: praxis-controls.css
+classes: tb-menu, tb-dropdown
+summary: A toolbar button that opens a panel under itself — Group, Sort, row actions, a layout picker. Promoted from four incompatible copies in the prototype, one of which the compact toolbar was already reading.
+keywords: toolbar menu dropdown tb-menu tb-dropdown actions sort group picker overflow
+-->
+
+<p>A <code>.tbtn</code> that opens a panel under itself. Report Management's Group menu,
+Search's sort and column menus, the record pages' row actions, the workspace editor's layout
+picker — same object each time.</p>
+
+<p>Two classes. <code>.tb-menu</code> is the positioning context and holds the trigger;
+<code>.tb-dropdown</code> is the panel, and it is <code>hidden</code> until you open it.</p>
+
+<template data-example="A toolbar menu, open" data-height="320" data-scripts="lucide">
+  <div class="toolbar">
+    <div class="toolbar__inner">
+      <button class="tbtn" type="button">Save</button>
+      <div class="tb-menu">
+        <button class="tbtn" type="button" id="grp" aria-haspopup="menu" aria-expanded="true">
+          <span class="material-symbols-rounded" aria-hidden="true">layers</span> Group
+          <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="tb-dropdown" role="menu" aria-labelledby="grp">
+          <button class="tb-dropdown__item" type="button" role="menuitem">
+            <span class="material-symbols-rounded" aria-hidden="true">create_new_folder</span> New group…
+          </button>
+          <div class="tb-dropdown__sec">Add to group</div>
+          <button class="tb-dropdown__item" type="button" role="menuitemradio" aria-checked="true">
+            <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+            <span>Quality<span class="tb-dropdown__sub">6 reports</span></span>
+          </button>
+          <button class="tb-dropdown__item" type="button" role="menuitemradio" aria-checked="false">
+            <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+            <span>Safety<span class="tb-dropdown__sub">11 reports</span></span>
+          </button>
+          <div class="tb-dropdown__divider"></div>
+          <button class="tb-dropdown__item tb-dropdown__item--danger" type="button" role="menuitem">
+            <span class="material-symbols-rounded" aria-hidden="true">delete</span> Remove from group
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h2>The parts</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.tb-menu</code></td><td><code>position:relative; display:inline-flex</code>. Wraps the trigger so the panel anchors to it.</td></tr>
+    <tr><td><code>.tb-dropdown</code></td><td>The panel. Anchored 6px below the trigger, <code>min-width:220px</code>, <code>z-index:200</code>. <code>[hidden]</code> is its closed state.</td></tr>
+    <tr><td><code>.tb-dropdown--right</code></td><td>Right-aligned, for a trigger at the end of the band where a left-anchored panel would hang off the page.</td></tr>
+    <tr><td><code>.tb-dropdown__item</code></td><td>A row. <code>min-height:36px</code> rather than a fixed height, so an item carrying a second line grows instead of clipping it.</td></tr>
+    <tr><td><code>.tb-dropdown__sub</code></td><td>That second line — a count, a description, an owner.</td></tr>
+    <tr><td><code>.tb-dropdown__sec</code></td><td>A section label above a run of items.</td></tr>
+    <tr><td><code>.tb-dropdown__divider</code> / <code>__sep</code></td><td>A hairline. Two names for one rule; see below.</td></tr>
+    <tr><td><code>.tb-dropdown__empty</code></td><td>The "nothing here" line, for a menu whose contents are filtered or fetched.</td></tr>
+    <tr><td><code>.tb-dropdown__item--danger</code></td><td>Destructive action, in the danger ink.</td></tr>
+  </tbody>
+</table>
+
+<h2>Two names for the separator</h2>
+
+<p><code>.tb-dropdown__divider</code> and <code>.tb-dropdown__sep</code> are the same rule.
+The copies this was promoted from disagreed — four pages said <code>divider</code>, seven said
+<code>sep</code> — and an alias costs one selector where renaming costs an edit in seven
+files and a chance to miss one. Prefer <code>__divider</code> in new markup.</p>
+
+<div class="note note--trap">
+  <p><strong>The panel is styling only.</strong> Praxis does not open or close it: no script
+  here toggles <code>hidden</code>, moves focus into the panel, or closes it on outside click
+  or Escape. That is yours, and all four of those are load-bearing — a menu that
+  cannot be dismissed from the keyboard is a trap. Set
+  <code>aria-haspopup="menu"</code> and keep <code>aria-expanded</code> on the trigger in step
+  with the attribute.</p>
+</div>
+
+<h2>Why it is not in praxis-admin.css</h2>
+
+<p>That is where <code>.tbtn</code> lives, so it looks like the obvious home. But
+<code>praxis-admin.css</code> is the largest sheet in the system and it carries the
+application shell, a bare-element box-sizing reset and its own <code>.tbtn</code> — a page
+adding it to pick up a dropdown would be restyling its whole toolbar to get one panel. In the
+prototype only six of twenty pages load it, and eight of the twelve carrying a local
+<code>.tb-dropdown</code> are not among them. <code>praxis-controls.css</code> is four
+kilobytes and depends on nothing but the tokens.</p>
+
+<p><code>praxis-toolbar-compact.css</code> and <code>praxis-toolbar-compact.js</code> both
+already keyed off <code>.tb-menu</code>: the compact toolbar treats a menu as one overflow
+item and gives its trigger the full row width in the Tools popover. Until this landed, Praxis
+was reading a class it never defined — the panel worked only because every consuming page
+happened to declare its own. Four of them declared it differently.</p>
+
+<h2>Surface</h2>
+
+<p>The panel follows <code>.px-pop</code> exactly — a hairline and
+<code>--praxis-elevation-4</code> by default, borderless over <code>--px-overlay</code> under
+<code>body[data-variant="praxis"]</code>. A menu opened from the toolbar and one opened from
+the nav rail are then the same object, which they were not in three of the four copies.</p>

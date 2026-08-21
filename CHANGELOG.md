@@ -1,5 +1,76 @@
 # Changelog
 
+## 0.1.9 — 2026-08-21
+
+**Four things the prototype had four copies of.** A toolbar menu, a panel icon
+button, a filter field and a toast — each one duplicated across consumer pages,
+in versions that had drifted apart. Nothing here changes an existing Praxis
+component; it adds the four that were missing, which is why they kept being
+written locally.
+
+### Added
+
+- **`.tb-menu` / `.tb-dropdown` — the toolbar menu** (new sheet,
+  `praxis-controls.css`). A
+  `.tbtn` that opens a panel under itself: Group, sort and column menus, row
+  actions, a layout picker. Twelve pages in the prototype carried a copy in
+  three incompatible versions — 12px radius and no border in one, 36px items and
+  a hairline in another, `__divider` here and `__sep` there.
+
+  This one closes a real gap rather than merely deduplicating: both
+  `praxis-toolbar-compact.css` and `praxis-toolbar-compact.js` already keyed off
+  `.tb-menu`, so Praxis was reading a class it never defined. Surface follows
+  `.px-pop` exactly, so a menu opened from the toolbar and one opened from the
+  nav rail are the same object. Both separator names are kept as an alias —
+  cheaper than renaming a hairline in seven files.
+
+  Members: `__item`, `__item--danger`, `__sub`, `__sec`, `__divider` / `__sep`,
+  `__empty`, and `--right` for a trigger at the end of the band. Styling only:
+  opening, closing, focus and Escape are the consumer's.
+
+- **`.iconbtn` — the 34px panel icon button** (`praxis-controls.css`). Expand all,
+  pin, a filter toggle, a collapse chevron: the square that sits in a card
+  header rather than in the page toolbar band. Not `.tbtn--icon`, which is 40px
+  and belongs beside a labelled toolbar button — the two have never been the
+  same size on any screen carrying both. `.iconbtn--on` is the pressed state, in
+  the app's pink selection accent.
+
+- **`.filterfield` — type-to-filter beside a list** (`praxis-controls.css`).
+  Trailing glyph, because the field refines the list under it rather than
+  starting a search; the leading-glyph forms are the app bar and `.cn-find`.
+  Sized to `.iconbtn` so a header row of both lines up.
+
+- **`praxis-toast.js` — the transient confirmation.** `praxisToast('Saved')`,
+  with `tone` and `duration` options, stacking, and a `role="status"` live
+  region created at load rather than with the first message — creating a region
+  and its text in the same frame is the reliable way to have the announcement
+  dropped, which is what three of the four copies did. Styles itself, on the
+  `praxis-lucide.js` argument: a component with no markup until it fires cannot
+  be allowed to half-install.
+
+- **`praxis-controls.css`** is the new sheet the three CSS components live in.
+  `praxis-admin.css` is where `.tbtn` is and would have been the obvious home,
+  but it is the largest sheet in the system and carries the application shell,
+  a bare-element reset and its own `.tbtn` — eight of the twelve pages carrying
+  a local `.tb-dropdown` do not load it, and adding it to pick up a dropdown
+  would restyle their whole toolbar. Consumers of the `praxis.css` barrel get
+  it either way.
+
+### Changed
+
+- **`.iconbtn` and `.filterfield` are 8px, not the copies' 9px.**
+  `--praxis-radius-sm`. A one-pixel difference, and a design system should not
+  ship a value off its own scale to preserve it.
+
+- Consumers adopting `.tb-dropdown` in place of a local copy get **36px minimum
+  item height** and a focus ring. The four-page group that used 9px vertical
+  padding and no ring will see rows a few pixels taller.
+
+### Docs
+
+Two new pages — **Toolbar menu** and **Toast** — and `.iconbtn` / `.filterfield`
+join Buttons and Form controls. 31 pages, still at 100% class-family coverage.
+
 ## 0.1.8 — 2026-08-20
 
 **Reverts the filter-panel control borders from 0.1.6 and 0.1.7.** A design

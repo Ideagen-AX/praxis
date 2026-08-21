@@ -1,0 +1,111 @@
+/* ============================================================================
+   PRAXIS CONTROLS — the small shared controls that are not the toolbar band.
+
+   A toolbar menu, the 34px icon button and the filter field. All three were
+   promoted from the groom-lake prototype on 2026-08-21, where they had been
+   hand-copied into up to twelve pages each, in versions that had drifted apart.
+
+   WHY A SHEET OF THEIR OWN AND NOT praxis-admin.css
+
+   That is where .tbtn lives, so it looks like the obvious home — but only six
+   of the twenty prototype pages load praxis-admin.css, and it is the largest
+   sheet in the system. It also carries the application shell, a bare-element
+   box-sizing reset and its own .tbtn, so a record page adding it to pick up a
+   dropdown would be restyling its whole toolbar to get one panel. Every page
+   that needs these three can afford four kilobytes; none of them can afford
+   the admin shell.
+
+   Depends on praxis-tokens.css and praxis-core.css for --px-* and the
+   --praxis-* scales, and on nothing else.
+   ========================================================================= */
+
+/* ---- Toolbar menu -----------------------------------------------------
+   A .tbtn that opens a panel under itself: Group on Report Management, sort
+   and column menus on Search, row actions on the record pages, the layout
+   picker in the workspace editor.
+
+   Promoted from the prototype 2026-08-21, where twelve pages carried a copy in
+   three mutually incompatible versions — 12px radius and no border here, 36px
+   items and a hairline there, one calling the rule .tb-dropdown__divider and
+   another .tb-dropdown__sep. praxis-toolbar-compact.css and .js already keyed
+   off .tb-menu, so the system was reading a class it never defined; that is
+   the gap this closes. Both separator names are kept: the alias costs one
+   selector and saves editing seven files to rename a hairline.
+
+   Surface follows .px-pop exactly — hairline and elevation-4 by default,
+   borderless over --px-overlay under the Praxis variant — so a menu opened from
+   the toolbar and one opened from the nav rail are the same object. */
+.tb-menu{position:relative;display:inline-flex;}
+.tb-dropdown{position:absolute;top:calc(100% + 6px);left:0;z-index:200;min-width:220px;padding:6px;
+  background:var(--praxis-color-surface-default);border:1px solid var(--praxis-color-border-default);
+  border-radius:var(--praxis-radius-md);box-shadow:var(--praxis-elevation-4);}
+.tb-dropdown[hidden]{display:none;}
+body[data-variant="praxis"] .tb-dropdown{border:0;background:var(--px-surface);box-shadow:var(--px-overlay);}
+/* Right-aligned when the trigger is at the end of the band and a left-anchored
+   panel would hang off the page. */
+.tb-dropdown--right{left:auto;right:0;}
+/* min-height rather than a fixed height: an item may carry a second line
+   (a description, a count, an owner) and must grow rather than clip it. */
+.tb-dropdown__item{display:flex;align-items:center;gap:10px;width:100%;min-height:36px;padding:6px 10px;border:0;
+  background:transparent;border-radius:var(--praxis-radius-sm);cursor:pointer;text-align:left;
+  font-family:inherit;font-size:.875rem;font-weight:500;color:var(--praxis-color-text-primary);}
+.tb-dropdown__item:hover{background:var(--px-hover);}
+.tb-dropdown__item:focus-visible{outline:2px solid var(--praxis-color-border-focus);outline-offset:-2px;}
+.tb-dropdown__item .icon,.tb-dropdown__item svg{width:18px;height:18px;flex-shrink:0;color:var(--praxis-color-text-secondary);}
+.tb-dropdown__item .material-symbols-rounded{font-size:18px;flex-shrink:0;color:var(--praxis-color-text-secondary);}
+.tb-dropdown__item--danger{color:var(--praxis-color-status-danger);}
+.tb-dropdown__item--danger .icon,.tb-dropdown__item--danger svg{color:currentColor;}
+/* The checked option in a menuitemradio group takes the app's selection accent,
+   the same pink the nav rail and the report tree use. */
+.tb-dropdown__item[aria-checked="true"] .icon,.tb-dropdown__item[aria-checked="true"] svg{color:var(--praxis-color-pink-60);}
+.tb-dropdown__sub{display:block;font-size:.75rem;font-weight:400;color:var(--praxis-color-text-tertiary);}
+.tb-dropdown__sec{padding:8px 10px 4px;font-size:.6875rem;font-weight:700;color:var(--praxis-color-text-tertiary);}
+.tb-dropdown__divider,.tb-dropdown__sep{height:1px;margin:6px 8px;background:var(--praxis-color-border-default);}
+.tb-dropdown__empty{padding:8px 10px;font-size:.8125rem;color:var(--praxis-color-text-tertiary);}
+
+/* ---- Icon button ------------------------------------------------------
+   The 34px square that sits in a card header or a panel toolbar — expand all,
+   pin, filter toggles, collapse. Not .tbtn--icon: that is the 40px control for
+   the page toolbar band, and these two have never been the same size on any
+   screen that carries both.
+
+   Promoted from the prototype 2026-08-21 (.rm-iconbtn in three pages,
+   .we-iconbtn in a fourth). Radius moves from the copies' 9px to
+   --praxis-radius-sm, which is 8px: a design system should not ship a value
+   that is off its own scale to preserve one pixel. */
+.iconbtn{width:34px;height:34px;flex-shrink:0;display:grid;place-items:center;border:0;
+  border-radius:var(--praxis-radius-sm);background:var(--px-surface);color:var(--praxis-color-text-secondary);
+  box-shadow:var(--px-tool-shadow);cursor:pointer;
+  transition:box-shadow var(--praxis-motion-fast),background var(--praxis-motion-fast),color var(--praxis-motion-fast);}
+.iconbtn:hover{box-shadow:var(--px-tool-shadow-hover);color:var(--praxis-color-text-primary);}
+.iconbtn:focus-visible{outline:2px solid var(--praxis-color-border-focus);outline-offset:2px;}
+.iconbtn .icon,.iconbtn svg{width:18px;height:18px;}
+.iconbtn .material-symbols-rounded{font-size:18px;}
+/* On = the app's selection accent, so a toggled filter reads the same here as a
+   selected row does. */
+.iconbtn--on,.iconbtn--on:hover{background:var(--praxis-color-pink-60);color:var(--praxis-color-white);
+  box-shadow:0 0 0 .5px rgba(227,0,114,.25);}
+.iconbtn:disabled,.iconbtn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;box-shadow:none;}
+body[data-theme="dark"] .iconbtn{background:var(--px-surface-2);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06);}
+
+/* ---- Filter field -----------------------------------------------------
+   Type-to-filter beside a list: the report tree's Filter, the workspace
+   editor's Search reports. Trailing glyph, because the field is a refinement of
+   the list under it rather than a search box you begin at — the leading-glyph
+   treatment belongs to the app bar and to .cn-find inside a menu.
+
+   Sized to match .iconbtn so a header row of both lines up: same 34px, same
+   radius, same tool shadow. Promoted from the prototype 2026-08-21. */
+.filterfield{position:relative;display:inline-flex;align-items:center;}
+.filterfield input{width:100%;height:34px;padding:0 34px 0 12px;border:0;border-radius:var(--praxis-radius-sm);
+  background:var(--px-surface);box-shadow:var(--px-tool-shadow);color:var(--praxis-color-text-primary);
+  font:inherit;font-size:.875rem;outline:none;}
+.filterfield input::placeholder{color:var(--praxis-color-text-tertiary);}
+.filterfield input:focus{box-shadow:0 0 0 2px color-mix(in srgb, var(--praxis-color-interactive-default) 30%, transparent);}
+.filterfield .icon,.filterfield svg{position:absolute;right:12px;width:18px;height:18px;
+  color:var(--praxis-color-text-tertiary);pointer-events:none;}
+.filterfield .material-symbols-rounded{position:absolute;right:12px;font-size:18px;
+  color:var(--praxis-color-text-tertiary);pointer-events:none;}
+body[data-theme="dark"] .filterfield input{background:var(--px-surface-2);
+  box-shadow:0 0 0 .5px rgba(255,255,255,.08),inset 0 .5px 0 rgba(255,255,255,.06);}

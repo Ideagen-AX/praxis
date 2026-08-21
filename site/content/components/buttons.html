@@ -3,8 +3,8 @@ title: Buttons
 slug: buttons
 tier: ready
 order: 30
-sheet: praxis-admin.css, praxis-core.css
-classes: tbtn, admin-ghostbtn, btn, pill-btn, icon-btn, iconbtn-ghost, lg-btn, qa, sortbtn, filter-toggle
+sheet: praxis-admin.css, praxis-core.css, praxis-controls.css
+classes: tbtn, iconbtn, admin-ghostbtn, btn, pill-btn, icon-btn, iconbtn-ghost, lg-btn, qa, sortbtn, filter-toggle
 summary: One button is fully defined — .tbtn. Everything else named here is a variant or an interaction layer that assumes a base you write yourself.
 keywords: button buttons tbtn primary ghost icon cta press hover disabled
 -->
@@ -103,6 +103,44 @@ treatment — <code>--px-primary-soft</code> rather than the gradient — scoped
       <span class="toolbar__spacer"></span>
       <button class="tbtn tbtn--primary" type="button">Submit</button>
     </div>
+  </div>
+</template>
+
+<h2>The two icon buttons are different sizes on purpose</h2>
+
+<p><code>.iconbtn</code> is in <code>praxis-controls.css</code>, not the sheet the rest of
+this page documents — a page that wants it does not have to take the admin shell with it.</p>
+
+<p><code>.tbtn--icon</code> is the 40px square in the page toolbar band — same height as the
+labelled <code>.tbtn</code> beside it, because they share a row. <code>.iconbtn</code> is the
+34px square that goes in a <em>card header or a panel toolbar</em>: expand all, pin, a filter
+toggle, collapse a panel. Reach for the 40px one when it sits next to a labelled toolbar
+button, and the 34px one when it sits next to a <code>.filterfield</code>, which is also 34px
+and carries the same radius and shadow so a header row lines up.</p>
+
+<p><code>.iconbtn--on</code> is the pressed state for a toggle — the app's pink selection
+accent, the same one the nav rail's current page and a selected report row use. Set
+<code>aria-pressed</code> as well: the fill is the only visual difference, and it is not
+available to a screen reader.</p>
+
+<template data-example="Icon buttons: 34px panel controls, and the 40px toolbar square" data-height="150" data-scripts="lucide">
+  <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+    <button class="iconbtn" type="button" aria-label="Expand all">
+      <span class="material-symbols-rounded" aria-hidden="true">unfold_more</span>
+    </button>
+    <button class="iconbtn iconbtn--on" type="button" aria-label="Pinned only" aria-pressed="true">
+      <span class="material-symbols-rounded" aria-hidden="true">bookmark</span>
+    </button>
+    <button class="iconbtn" type="button" aria-label="Delete" disabled>
+      <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+    </button>
+    <label class="filterfield">
+      <input type="text" placeholder="Filter" aria-label="Filter" />
+      <span class="material-symbols-rounded" aria-hidden="true">search</span>
+    </label>
+    <button class="tbtn tbtn--icon" type="button" aria-label="Back">
+      <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+    </button>
   </div>
 </template>
 

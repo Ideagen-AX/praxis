@@ -7,7 +7,7 @@
      To change anything here, edit the matching file under site/content/ and
      re-run:  python3 build-site.py --agents-doc
 
-     Measured from src/ at Praxis 0.1.8. Where a statement is inferred from
+     Measured from src/ at Praxis 0.1.9. Where a statement is inferred from
      CSS structure rather than observed, it says so.
 -->
 
@@ -54,7 +54,7 @@ The frame above is a real document. Its head and body are exactly this:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My prototype</title>
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.8/dist/praxis.css">
+        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.9/dist/praxis.css">
 </head>
 
 <body data-variant="praxis" data-theme="light">
@@ -74,7 +74,7 @@ The frame above is a real document. Its head and body are exactly this:
   </div>
 
   <!-- Only if you use icons. Loads its own pinned Lucide from beside itself. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.8/dist/praxis-lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.9/dist/praxis-lucide.js"></script>
 </body>
 </html>
 ```
@@ -84,7 +84,7 @@ The frame above is a real document. Its head and body are exactly this:
 In a bundled app the requirements are identical — stylesheet, the two `<body>` attributes, the icon script if you want icons.
 
 >
-`npm install @ideagen-ax/praxis@0.1.8`
+`npm install @ideagen-ax/praxis@0.1.9`
 
 `import '@ideagen-ax/praxis'` — tokens, core and every component
 `import '@ideagen-ax/praxis/dist/praxis-lucide.js'` — optional, icons only
@@ -171,6 +171,7 @@ Rule counts and class families, read from `src/` at build time. "Families" count
 |---|---|---|
 | `praxis-admin.css` | 259 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
 | `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.msel`, `.iconbtn-ghost` |
+| `praxis-controls.css` | 32 | `.tb-dropdown`, `.iconbtn`, `.filterfield`, `.icon`, `.material-symbols-rounded` |
 | `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
 | `praxis-create-new.css` | 83 | `.cn-group`, `.cn-flyout`, `.cn-row`, `.material-symbols-rounded`, `.cn-tpl` |
 | `praxis-filters.css` | 403 | `.filter-row`, `.filter-drawer`, `.select-menu`, `.qfilter`, `.filter-chips` |
@@ -1345,7 +1346,7 @@ Class names that appear in Praxis selectors and so look supported, but have no b
 
 These class names appear in Praxis selectors, which makes them look supported. They have no base definition. The distinction matters because the failure is silent: your `.btn` picks up the Praxis primary fill and none of the box it needs, so it renders as colored text.
 
-Verified by hand against `src/` at 0.1.8. The generated tables further down are measured every build.
+Verified by hand against `src/` at 0.1.9. The generated tables further down are measured every build.
 
 ### Classes with no base
 
@@ -1962,7 +1963,7 @@ The pop is height-capped with its own scroll as of 0.1.4. Before that it extende
 One button is fully defined — .tbtn. Everything else named here is a variant or an interaction layer that assumes a base you write yourself.
 
 
-Tier: **ready** · Sheet: `praxis-admin.css, praxis-core.css`
+Tier: **ready** · Sheet: `praxis-admin.css, praxis-core.css, praxis-controls.css`
 This is the page most likely to save you an hour. Praxis names ten button classes and **defines exactly two of them completely**. The rest get a fill, a hover wash or a press transform on top of a base box that is yours. Use one without writing that base and you get colored text where you expected a button.
 
 ### What is actually defined
@@ -2022,6 +2023,35 @@ In dark mode, a primary button *inside a toolbar band* gets a different, softer 
 </div>
 ```
 
+### The two icon buttons are different sizes on purpose
+
+`.iconbtn` is in `praxis-controls.css`, not the sheet the rest of this page documents — a page that wants it does not have to take the admin shell with it.
+
+`.tbtn--icon` is the 40px square in the page toolbar band — same height as the labelled `.tbtn` beside it, because they share a row. `.iconbtn` is the 34px square that goes in a *card header or a panel toolbar*: expand all, pin, a filter toggle, collapse a panel. Reach for the 40px one when it sits next to a labelled toolbar button, and the 34px one when it sits next to a `.filterfield`, which is also 34px and carries the same radius and shadow so a header row lines up.
+
+`.iconbtn--on` is the pressed state for a toggle — the app's pink selection accent, the same one the nav rail's current page and a selected report row use. Set `aria-pressed` as well: the fill is the only visual difference, and it is not available to a screen reader.
+
+```html
+<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+  <button class="iconbtn" type="button" aria-label="Expand all">
+    <span class="material-symbols-rounded" aria-hidden="true">unfold_more</span>
+  </button>
+  <button class="iconbtn iconbtn--on" type="button" aria-label="Pinned only" aria-pressed="true">
+    <span class="material-symbols-rounded" aria-hidden="true">bookmark</span>
+  </button>
+  <button class="iconbtn" type="button" aria-label="Delete" disabled>
+    <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+  </button>
+  <label class="filterfield">
+    <input type="text" placeholder="Filter" aria-label="Filter" /></input>
+    <span class="material-symbols-rounded" aria-hidden="true">search</span>
+  </label>
+  <button class="tbtn tbtn--icon" type="button" aria-label="Back">
+    <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+  </button>
+</div>
+```
+
 ### Press feedback is global
 
 Praxis applies a press transform to a broad `:where()` list — every `button` and `[role="button"]`, plus `.btn`, `.tbtn`, `.qa`, `.pill-btn`, `.icon-btn`, `.praxis-navrail__btn`, `.card__link`, `.rep__pin` and `.segswitch > button`. Small controls scale to `.95`, larger pill buttons to `.97`, and it is suppressed on `:disabled` and `[aria-disabled="true"]`.
@@ -2059,7 +2089,7 @@ If you need a `.btn` scale — because you are porting markup that has one, or b
 The checkbox, the toggle switch, the skip link and the scrollbar treatment — including the two markup forms of .switch, which now render identically after one of them turned out to be styled by nothing at all.
 
 
-Tier: **ready** · Sheet: `praxis-admin.css, praxis-core.css`
+Tier: **ready** · Sheet: `praxis-admin.css, praxis-core.css, praxis-controls.css`
 Praxis restyles bare `<input type="checkbox">` and defines one toggle switch. Everything else on a form is [a field](#fields). The interesting part of this page is the last section, where two sheets disagree.
 
 ### Checkbox
@@ -2198,6 +2228,26 @@ Praxis sets `scrollbar-color` only, using `--px-scroll` and `--px-scroll-hover`.
 ### Icons and hidden text
 
 Two small utilities from `praxis-admin.css` you will want: `.icon` sizes an inline SVG to 22px square with `fill:currentColor`, and takes `--20`, `--18` and `--16`. `.visually-hidden` is the standard clip-rect pattern, for a label a screen reader needs and the layout does not.
+
+### Filter field
+
+`.filterfield` is type-to-filter beside a list: the report tree's Filter, the workspace editor's Search reports. It is a `<label>` wrapping an `<input>` and a glyph, and the glyph goes **after** the input in source order because it sits at the trailing edge.
+
+The trailing glyph is the whole distinction from the app bar's search box. A leading magnifier says "start here, type a query"; this field refines the list already under it, so the glyph is a label for what the field does rather than an invitation. `.cn-find` inside a menu is the leading-glyph form, and the app bar is the third — three fields, three jobs, and picking by which one looks nicest is how a screen ends up with two of them.
+
+Sized to `.iconbtn`: 34px, `--praxis-radius-sm`, the same tool shadow. Give the wrapper the width you want — `flex:1` in a panel header, `width:220px` in a card head — since the input fills it.
+
+```html
+<div style="display:flex;align-items:center;gap:.5rem">
+  <label class="filterfield" style="flex:1">
+    <input type="text" placeholder="Filter reports" aria-label="Filter reports" /></input>
+    <span class="material-symbols-rounded" aria-hidden="true">search</span>
+  </label>
+  <button class="iconbtn" type="button" aria-label="Expand all">
+    <span class="material-symbols-rounded" aria-hidden="true">unfold_more</span>
+  </button>
+</div>
+```
 
 ---
 
@@ -3099,6 +3149,80 @@ It collapses to `[back] [Tools ▾] [Filters] [Options] [▤]`, and it builds th
 
 ---
 
+## Toolbar menu
+
+A toolbar button that opens a panel under itself — Group, Sort, row actions, a layout picker. Promoted from four incompatible copies in the prototype, one of which the compact toolbar was already reading.
+
+
+Tier: **settling** · Sheet: `praxis-controls.css`
+A `.tbtn` that opens a panel under itself. Report Management's Group menu, Search's sort and column menus, the record pages' row actions, the workspace editor's layout picker — same object each time.
+
+Two classes. `.tb-menu` is the positioning context and holds the trigger; `.tb-dropdown` is the panel, and it is `hidden` until you open it.
+
+```html
+<div class="toolbar">
+  <div class="toolbar__inner">
+    <button class="tbtn" type="button">Save</button>
+    <div class="tb-menu">
+      <button class="tbtn" type="button" id="grp" aria-haspopup="menu" aria-expanded="true">
+        <span class="material-symbols-rounded" aria-hidden="true">layers</span> Group
+        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+      </button>
+      <div class="tb-dropdown" role="menu" aria-labelledby="grp">
+        <button class="tb-dropdown__item" type="button" role="menuitem">
+          <span class="material-symbols-rounded" aria-hidden="true">create_new_folder</span> New group…
+        </button>
+        <div class="tb-dropdown__sec">Add to group</div>
+        <button class="tb-dropdown__item" type="button" role="menuitemradio" aria-checked="true">
+          <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+          <span>Quality<span class="tb-dropdown__sub">6 reports</span></span>
+        </button>
+        <button class="tb-dropdown__item" type="button" role="menuitemradio" aria-checked="false">
+          <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+          <span>Safety<span class="tb-dropdown__sub">11 reports</span></span>
+        </button>
+        <div class="tb-dropdown__divider"></div>
+        <button class="tb-dropdown__item tb-dropdown__item--danger" type="button" role="menuitem">
+          <span class="material-symbols-rounded" aria-hidden="true">delete</span> Remove from group
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### The parts
+
+| Class | What it is |
+|---|---|
+| `.tb-menu` | `position:relative; display:inline-flex`. Wraps the trigger so the panel anchors to it. |
+| `.tb-dropdown` | The panel. Anchored 6px below the trigger, `min-width:220px`, `z-index:200`. `[hidden]` is its closed state. |
+| `.tb-dropdown--right` | Right-aligned, for a trigger at the end of the band where a left-anchored panel would hang off the page. |
+| `.tb-dropdown__item` | A row. `min-height:36px` rather than a fixed height, so an item carrying a second line grows instead of clipping it. |
+| `.tb-dropdown__sub` | That second line — a count, a description, an owner. |
+| `.tb-dropdown__sec` | A section label above a run of items. |
+| `.tb-dropdown__divider` / `__sep` | A hairline. Two names for one rule; see below. |
+| `.tb-dropdown__empty` | The "nothing here" line, for a menu whose contents are filtered or fetched. |
+| `.tb-dropdown__item--danger` | Destructive action, in the danger ink. |
+
+### Two names for the separator
+
+`.tb-dropdown__divider` and `.tb-dropdown__sep` are the same rule. The copies this was promoted from disagreed — four pages said `divider`, seven said `sep` — and an alias costs one selector where renaming costs an edit in seven files and a chance to miss one. Prefer `__divider` in new markup.
+
+**The panel is styling only.** Praxis does not open or close it: no script here toggles `hidden`, moves focus into the panel, or closes it on outside click or Escape. That is yours, and all four of those are load-bearing — a menu that cannot be dismissed from the keyboard is a trap. Set `aria-haspopup="menu"` and keep `aria-expanded` on the trigger in step with the attribute.
+
+### Why it is not in praxis-admin.css
+
+That is where `.tbtn` lives, so it looks like the obvious home. But `praxis-admin.css` is the largest sheet in the system and it carries the application shell, a bare-element box-sizing reset and its own `.tbtn` — a page adding it to pick up a dropdown would be restyling its whole toolbar to get one panel. In the prototype only six of twenty pages load it, and eight of the twelve carrying a local `.tb-dropdown` are not among them. `praxis-controls.css` is four kilobytes and depends on nothing but the tokens.
+
+`praxis-toolbar-compact.css` and `praxis-toolbar-compact.js` both already keyed off `.tb-menu`: the compact toolbar treats a menu as one overflow item and gives its trigger the full row width in the Tools popover. Until this landed, Praxis was reading a class it never defined — the panel worked only because every consuming page happened to declare its own. Four of them declared it differently.
+
+### Surface
+
+The panel follows `.px-pop` exactly — a hairline and `--praxis-elevation-4` by default, borderless over `--px-overlay` under `body[data-variant="praxis"]`. A menu opened from the toolbar and one opened from the nav rail are then the same object, which they were not in three of the four copies.
+
+---
+
 ## Module selector
 
 The search-scope picker in the app bar, and the chip that represents its result in the filter bar — because the modules a search is scoped to are a filter in every sense the user cares about.
@@ -3362,6 +3486,59 @@ The script finds the back button by looking for the toolbar's `aria-label="Back"
 | `.material-symbols-rounded` | 2 |
 | `.icon` | 1 |
 
+
+---
+
+## Toast
+
+The transient confirmation — one line at the bottom of the window that says an action landed, then leaves. One script, no markup, and it styles itself.
+
+
+Tier: **settling** · Script: `praxis-toast.js`
+"Link copied". "Workspace saved". "3 records exported". Load the script and call it:
+
+`<script src="praxis-toast.js"></script>`
+
+`praxisToast('Workspace saved');`
+`praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 });`
+
+```html
+<div style="display:flex;gap:.5rem;flex-wrap:wrap">
+  <button class="tbtn" type="button" onclick="praxisToast('Link copied')">Neutral</button>
+  <button class="tbtn" type="button" onclick="praxisToast('Workspace saved', { tone: 'success' })">Success</button>
+  <button class="tbtn" type="button" onclick="praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 })">Danger</button>
+  <button class="tbtn" type="button" onclick="praxisToast('First'); praxisToast('Second'); praxisToast('Third')">Three at once</button>
+</div>
+<script src="../praxis-toast.js"></script>
+```
+
+### The call
+
+| Argument | What it does |
+|---|---|
+| `message` | The text. Set as `textContent`, so it is not an HTML injection site. |
+| `opts.tone` | `'success'` or `'danger'`. Omit for the neutral slate. |
+| `opts.duration` | Milliseconds, default 1900. Give a failure longer — it carries more to read and matters more. |
+
+Returns `{ dismiss, element }`, so a long-running toast can be taken down early by whatever finishes.
+
+### It stacks
+
+Toasts append to one bottom-centred live region rather than replacing each other, so two actions in quick succession both get read. The region never takes pointer events: a confirmation that covers the control you just used is the one thing this pattern must not do.
+
+### Why the CSS is inside the script
+
+Same argument as `praxis-lucide.js`. A toast has no markup until it fires, so a consumer who loads the script and forgets a stylesheet gets an unstyled line of text at a moment they cannot rehearse — in production, on the success path, once. One tag cannot be half-installed. The style element is injected on load as well as on first call.
+
+### Accessibility
+
+The live region is created at load, *before* any message goes into it, with `role="status"` and `aria-live="polite"`. Creating a region and its text in the same frame is the reliable way to have the announcement dropped, which is what three of the four copies this replaces did. `status` rather than `alert`, because a confirmation should queue behind whatever is being read rather than interrupt it.
+
+**A toast is never the only report of what happened.** It is unreadable to anyone not looking at that corner, gone before a screen magnifier reaches it, and absent entirely to a keyboard user two tab stops away. Whatever it announces has to be visible somewhere permanent as well — a state chip, a count, a row that has changed. Use it to confirm, never to inform.
+
+### Where it came from
+
+Promoted from the groom-lake prototype on 2026-08-21, where four pages each carried a private `toast()` closure: the same shape, the same 1.9 seconds, four copies of a 20-line `cssText` string, and no two agreeing on whether the message reached a screen reader. A confirmation is a system-level behaviour, and an application should not be able to have four of them.
 
 ---
 

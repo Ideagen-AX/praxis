@@ -1,0 +1,78 @@
+<!--praxis
+title: Toast
+slug: toast
+tier: settling
+order: 75
+scripts: praxis-toast.js
+classes: praxis-toast
+summary: The transient confirmation — one line at the bottom of the window that says an action landed, then leaves. One script, no markup, and it styles itself.
+keywords: toast snackbar notification confirmation transient status feedback saved copied
+-->
+
+<p>"Link copied". "Workspace saved". "3 records exported". Load the script and call it:</p>
+
+<p><code>&lt;script src="praxis-toast.js"&gt;&lt;/script&gt;</code></p>
+
+<p><code>praxisToast('Workspace saved');</code><br />
+<code>praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 });</code></p>
+
+<template data-example="Fire a toast" data-height="220">
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+    <button class="tbtn" type="button" onclick="praxisToast('Link copied')">Neutral</button>
+    <button class="tbtn" type="button" onclick="praxisToast('Workspace saved', { tone: 'success' })">Success</button>
+    <button class="tbtn" type="button" onclick="praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 })">Danger</button>
+    <button class="tbtn" type="button" onclick="praxisToast('First'); praxisToast('Second'); praxisToast('Third')">Three at once</button>
+  </div>
+  <script src="../praxis-toast.js"></script>
+</template>
+
+<h2>The call</h2>
+
+<table>
+  <thead><tr><th>Argument</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>message</code></td><td>The text. Set as <code>textContent</code>, so it is not an HTML injection site.</td></tr>
+    <tr><td><code>opts.tone</code></td><td><code>'success'</code> or <code>'danger'</code>. Omit for the neutral slate.</td></tr>
+    <tr><td><code>opts.duration</code></td><td>Milliseconds, default 1900. Give a failure longer — it carries more to read and matters more.</td></tr>
+  </tbody>
+</table>
+
+<p>Returns <code>{ dismiss, element }</code>, so a long-running toast can be taken down early
+by whatever finishes.</p>
+
+<h2>It stacks</h2>
+
+<p>Toasts append to one bottom-centred live region rather than replacing each other, so two
+actions in quick succession both get read. The region never takes pointer events: a
+confirmation that covers the control you just used is the one thing this pattern must not do.</p>
+
+<h2>Why the CSS is inside the script</h2>
+
+<p>Same argument as <code>praxis-lucide.js</code>. A toast has no markup until it fires, so a
+consumer who loads the script and forgets a stylesheet gets an unstyled line of text at a
+moment they cannot rehearse — in production, on the success path, once. One tag cannot be
+half-installed. The style element is injected on load as well as on first call.</p>
+
+<h2>Accessibility</h2>
+
+<p>The live region is created at load, <em>before</em> any message goes into it, with
+<code>role="status"</code> and <code>aria-live="polite"</code>. Creating a region and its text
+in the same frame is the reliable way to have the announcement dropped, which is what three of
+the four copies this replaces did. <code>status</code> rather than <code>alert</code>, because
+a confirmation should queue behind whatever is being read rather than interrupt it.</p>
+
+<div class="note note--trap">
+  <p><strong>A toast is never the only report of what happened.</strong> It is unreadable to
+  anyone not looking at that corner, gone before a screen magnifier reaches it, and absent
+  entirely to a keyboard user two tab stops away. Whatever it announces has to be visible
+  somewhere permanent as well — a state chip, a count, a row that has changed. Use it to
+  confirm, never to inform.</p>
+</div>
+
+<h2>Where it came from</h2>
+
+<p>Promoted from the groom-lake prototype on 2026-08-21, where four pages each carried a
+private <code>toast()</code> closure: the same shape, the same 1.9 seconds, four copies of a
+20-line <code>cssText</code> string, and no two agreeing on whether the message reached a
+screen reader. A confirmation is a system-level behaviour, and an application should not be
+able to have four of them.</p>

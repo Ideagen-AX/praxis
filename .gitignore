@@ -7,3 +7,4 @@ node_modules/
 # the same reason dist/ is: src/ and site/content/ are the sources, and a second
 # committed copy is a second thing to keep in step.
 _site/
+__pycache__/
