@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.1.10 — 2026-08-25
+
+**The dialog, and the dark bar it arrives without.** Praxis had no modal at all,
+which is why five pages in the groom-lake prototype had each written one: Save As
+Report and Create New on the search page, Create New on contextual-awareness, the
+workspace Share and Delete dialogs, and the workspace editor's layout picker.
+
+### Added
+
+- **`.px-dialog` / `.px-dialog-scrim` — the centred modal** (new sheet,
+  `praxis-dialog.css`). A scrim, a card, and three bands inside it: a head with
+  the title and a close button, a body that is the only part that scrolls, and a
+  footer holding the actions.
+
+  Members: `__head`, `__title`, `__close`, `__body`, `__body--plain`, `__foot`,
+  `__note`, and `--sm` / `--lg` / `--xl` for 440, 760 and 1080 against a 560
+  default. Below 560px it docks to the bottom as a sheet rather than shrinking —
+  a centred card with side margins wastes the width it needs most at 380px, and
+  its footer ends up mid-screen.
+
+  **The head has no fill, and that is a change from all five copies.** Every one
+  put a `--praxis-color-neutral-100` band across the top with white text on it.
+  It was the loudest thing in the box while carrying no information — a dialog's
+  own edges and its scrim already say where it starts and that it is modal. It
+  also retires a contrast trap the prototype hit twice: `neutral-100` is not
+  remapped for the dark theme (only 05–20 are), so the band stayed the same navy
+  in both themes and any control that landed on it had to have its colour forced
+  white by hand. `.save-modal__close` in the prototype existed only to do that.
+
+  Styling only. Focus placement, `Tab` containment, Escape and the ARIA roles are
+  the consumer's, and the component's page says so — none of the four is
+  decidable from CSS. One note from the prototype worth repeating there: put the
+  opening focus on the dialog itself with `tabindex="-1"`, not on the first
+  control, or that control arrives looking hovered.
+
+  The differences it settles, measured across the five copies: 520px wide in one
+  and 560 in three, 16px body padding in one and 24 in the rest, `.icon-btn`
+  reused for the close button in two of them and its colour overridden in both.
+
 ## 0.1.9 — 2026-08-21
 
 **Four things the prototype had four copies of.** A toolbar menu, a panel icon

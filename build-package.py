@@ -62,6 +62,7 @@ COMPONENTS = [
     "praxis-profile-menu.css",
     "praxis-toolbar-compact.css",
     "praxis-controls.css",
+    "praxis-dialog.css",
     "praxis-quick-rail.css",
     "praxis-rfield.css",
     "praxis-filters.css",
