@@ -7,6 +7,7 @@ sheet: praxis-workspace.css
 classes: appswitch, persona-trigger, persona-picker, persona-popover, gl-theme-btn, gl-sun, gl-moon, appbar, ws-body, ws-toolbar
 summary: A second app-bar vocabulary, the app switcher, the persona picker and the theme button. Loaded last, so where it overlaps praxis-appbar.css it wins.
 keywords: workspace appbar appswitch persona theme toggle switcher hub avatar
+icon: dashboard
 -->
 
 <div class="note note--trap">
@@ -23,7 +24,20 @@ keywords: workspace appbar appswitch persona theme toggle switcher hub avatar
   which is what the agent guide documents; pick one per page and do not mix them.</p>
 </div>
 
-<h2>App switcher</h2>
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>App switcher</strong> — <code>.appswitch</code>, beside the wordmark.</li>
+  <li><strong>Persona picker</strong> — <code>.persona-picker</code>, relocated into the profile
+  menu as "Viewing as".</li>
+  <li><strong>Theme button</strong> — <code>.gl-theme-btn</code> with its sun/moon pair.</li>
+  <li><strong>Logo</strong> — two images, swapped by theme.</li>
+</ol>
+
+<p>Four small pieces of workspace-specific chrome. The app bar itself is on
+<a href="app-shell.html">The app shell</a>.
+
+<h3>App switcher</h3>
 
 <p><code>.appswitch</code> is the product switcher in the app bar's left corner — a trigger and
 a popover of products, with <code>--active</code> marking the current one.</p>
@@ -43,7 +57,9 @@ a popover of products, with <code>--active</code> marking the current one.</p>
   </div>
 </template>
 
-<h2>Persona picker</h2>
+<h2>Variants</h2>
+
+<h3>Persona picker</h3>
 
 <p>A prototype-only affordance for switching who you are looking at the screen as. It has two
 forms: standalone in the app bar (<code>.persona-trigger</code>), and folded into the profile
@@ -89,7 +105,7 @@ Praxis styles the container and leaves the rows to you.</p>
   or better specificity, not a plain class.</p>
 </div>
 
-<h2>Theme button</h2>
+<h3>Theme button</h3>
 
 <p><code>.gl-theme-btn</code> holds two glyphs, <code>.gl-sun</code> and
 <code>.gl-moon</code>, and the theme swaps which is visible. Both are always in the DOM — the
@@ -108,13 +124,123 @@ no state to keep.</p>
 <a href="../foundations/theming.html">the boot script reads</a> and the one
 <code>praxis-profile-menu.js</code> writes.</p>
 
-<h2>Logo, and the two-image pattern</h2>
+<h2>States</h2>
+
+<ul>
+  <li><strong>App switcher</strong> — <code>__pop</code> is <code>[hidden]</code> closed;
+  <code>__item--active</code> marks the current app.</li>
+  <li><strong>Persona</strong> — <code>aria-expanded</code> on the trigger, with a third state at
+  <code>[aria-expanded="true"]</code> that deepens the fill.</li>
+  <li><strong>Theme</strong> — driven entirely by <code>body[data-theme]</code>:
+  <code>.gl-moon</code> shows in light, <code>.gl-sun</code> in dark. No class toggling.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>Two things move:</p>
+
+<ul>
+  <li><code>.appswitch</code> is <code>display:none !important</code> below 640px under the Praxis
+  variant. It duplicates what the nav drawer and profile menu both offer, and at 390px it pushed
+  the app bar's right cluster past the viewport on the record variants.</li>
+  <li>Below 480px <code>.appswitch__trigger</code> is capped at 104px with an ellipsis, so brand
+  and switcher do not crowd out the search field.</li>
+  <li>The persona flyout, which normally opens to the left of the profile popover, becomes a fixed
+  panel inset by <code>--praxis-space-12</code> below 639px.</li>
+</ul>
+
+<h2>Interactive demo</h2>
+
+<h3>Logo, and the two-image pattern</h3>
 
 <p><code>.appbar__logo-img</code> with <code>--onlight</code> and <code>--ondark</code>: both
 images ship in the markup and the sheet hides one per theme. Praxis ships no logo files, so
 these are yours. The same reasoning as the theme button — swapping a <code>src</code> in
 script gives you a visible reload on every theme change.</p>
 
-<h2>Everything this sheet defines</h2>
+<h2>Code</h2>
+
+<p><code>praxis-workspace.css</code>, which is a <em>skin</em> rather than a base sheet —
+it layers workspace treatments over the shared chrome. Two consequences worth knowing:</p>
+
+<ul>
+  <li>It contains an unscoped <code>body[data-theme="dark"]</code> block that remaps surface
+  tokens. <code>praxis-core.css</code>'s Praxis-variant dark block has higher specificity and
+  wins, so the two do not fight — but the ordering is not accidental.</li>
+  <li><code>.gl-theme-btn</code> gets colour here and has no base geometry anywhere. Put the class
+  on an <code>.appbar__iconbtn</code>; that is what this reference site does.</li>
+</ul>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>App switcher</td><td><code>aria-haspopup</code>, <code>aria-expanded</code>, and <code>aria-current</code> alongside <code>__item--active</code></td></tr>
+    <tr><td>Persona trigger</td><td><code>aria-expanded</code>. Its accessible name must include who you are viewing as</td></tr>
+    <tr><td>Theme button</td><td>An <code>aria-label</code>, and <code>aria-pressed</code> if you treat it as a toggle. Both SVGs are <code>aria-hidden</code></td></tr>
+    <tr><td>Logo</td><td>Two <code>&lt;img&gt;</code> elements, one <code>alt</code> between them — the hidden one takes <code>alt=""</code> or the wordmark is announced twice</td></tr>
+    <tr><td>JS</td><td><code>praxis-profile-menu.js</code> for the menu. The switcher and persona flyout are yours</td></tr>
+  </tbody>
+</table>
+
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-workspace.css"></praxis-block>
+
+<h2>Token reference</h2>
+
+<praxis-block name="tokens" prefix="--praxis-menu"></praxis-block>
+
+<p>Beyond those, this sheet works almost entirely in <code>--px-*</code> materials and the glass
+family. The persona and switcher hovers are hard-coded <code>rgba(16,36,58,…)</code> and
+<code>rgba(255,255,255,…)</code> pairs rather than tokens — a small, real inconsistency in a sheet
+that predates the material layer.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Put <code>.gl-theme-btn</code> on an <code>.appbar__iconbtn</code> for its geometry.</li>
+  <li>Give the persona trigger a name that says who you are viewing as.</li>
+  <li>Keep one <code>alt</code> across the two logo images.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Load <code>praxis-workspace.css</code> on a non-workspace page for one rule — it is a skin
+  and it carries an unscoped dark block.</li>
+  <li>Rely on <code>.appswitch</code> below 640px. It is hidden.</li>
+  <li>Toggle theme classes by hand. The swap is attribute-driven.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The theme button needs a label; the two SVGs are decorative.</li>
+  <li>"Viewing as" is a consequential state — a user acting as someone else should be able to tell
+  from the trigger's accessible name, not only from a visual chip.</li>
+  <li>The double-logo pattern announces twice unless the hidden image has an empty
+  <code>alt</code>.</li>
+  <li>Both popovers need Escape and focus restoration; neither is supplied.</li>
+  <li>Persona and switcher hover states are fill-only, so they vanish in forced-colors — see
+  <a href="../foundations/forced-colors.html">Forced colors</a>.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.appswitch__trigger</code></td><td>Height / radius</td><td>32px / 8px</td></tr>
+    <tr><td><code>.appswitch__trigger</code></td><td>Max width ≤480px</td><td>104px, ellipsised</td></tr>
+    <tr><td><code>.appswitch__pop</code></td><td>Min width</td><td>200px</td></tr>
+    <tr><td>Persona flyout</td><td>Width</td><td>320–340px, fixed and inset below 639px</td></tr>
+    <tr><td>Logo</td><td>Height</td><td>26px, 22px below 480px</td></tr>
+    <tr><td>Avatar</td><td>Size</td><td>34px, 30px below 480px</td></tr>
+  </tbody>
+</table>

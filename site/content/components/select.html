@@ -1,0 +1,171 @@
+<!--praxis
+title: Select and combobox
+summary: Select controls exist only inside the filter system. .rfield has no select at all, so every record picklist is a bare native element. Planned.
+order: 130
+tier: planned
+icon: tune
+classes: px-select
+keywords: select combobox dropdown listbox picklist typeahead multi-select native planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Three select implementations, all filter-scoped.</strong> <code>.filter-select</code>, <code>.cf-select</code> and <code>.filter-type-select</code> live in <code>praxis-filters.css</code>. Tier 2 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Praxis has a real answer for one kind of picklist — <code>.pillset</code>/<code>.pill</code>
+in <a href="rfield.html">Fields</a>, described there as "picklists as real radios", which is
+correct for three or four options. Above that it stops working and there is nothing to fall
+back to.</p>
+
+<p>Record forms in this domain routinely pick from long, hierarchical, sometimes thousands-long
+lists: a site, an asset, a hazard category, a regulation clause. That is a combobox with
+typeahead, not a select.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Trigger</strong> — a field showing the current value.</li>
+  <li><strong>Panel</strong> — a <code>.px-pop</code> surface holding the list.</li>
+  <li><strong>Filter input</strong> — inside the panel for the combobox form. <code>.cn-find</code>
+  is the existing precedent for a leading-glyph search inside a menu.</li>
+  <li><strong>Option</strong> — with optional description and group heading.</li>
+  <li><strong>Selected tokens</strong> — for multi-select. <code>.chip-area</code> is reserved in
+  <code>praxis-rfield.css</code> for something like this.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th><th>APG pattern</th></tr></thead>
+  <tbody>
+    <tr><td>Native <code>&lt;select&gt;</code></td><td>Under ~15 fixed options. Genuinely the right answer more often than design systems admit — it is accessible, it works on touch, and it costs nothing</td><td>—</td></tr>
+    <tr><td>Listbox</td><td>Styled options, groups, descriptions, no typing</td><td><em>Listbox</em></td></tr>
+    <tr><td>Combobox</td><td>Typeahead over a long list</td><td><em>Combobox</em></td></tr>
+    <tr><td>Multi-select</td><td>Several values, shown as removable tokens</td><td><em>Combobox</em> with <code>aria-multiselectable</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Open decision, and it is the whole design:</strong> whether Praxis ships one component
+with modes or three. Three is more honest — a native select and a typeahead combobox share a
+look and nothing else — but it means three names for what a form author thinks of as one thing.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li>Closed / open / filled / empty / disabled / invalid.</li>
+  <li><strong>Loading</strong> — a remote option list. Depends on <a href="loading.html">loading states</a>.</li>
+  <li><strong>No matches</strong> — <a href="empty-state.html">empty state</a>, inline form.</li>
+  <li><strong>Too many to show</strong> — the state long lists actually hit. "Showing 50 of 1,284 — keep typing" is more useful than a truncated list with no explanation.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>Desktop: panel anchored to the trigger. Phone: defer to the native
+control for the plain forms; the combobox becomes a full-height sheet, because a typeahead panel
+over a phone keyboard has about 200px to work with.</p>
+
+<h2>Interactive demo</h2>
+
+<template data-example="Today: .filter-select inside filters, and .pillset for short picklists" data-height="230">
+  <div style="display:grid;gap:1rem">
+    <select class="filter-select" aria-label="Filter by status">
+      <option>Any status</option><option>Open</option><option>Closed</option>
+    </select>
+    <div class="rfield">
+      <span class="rfield__label">Severity</span>
+      <div class="rfield__control">
+        <div class="pillset">
+          <label class="pill"><input type="radio" name="sev" checked> Low</label>
+          <label class="pill"><input type="radio" name="sev"> Medium</label>
+          <label class="pill"><input type="radio" name="sev"> High</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p><code>praxis-controls.css</code> for the trigger and panel; a script for the
+combobox. The panel should follow <code>.px-pop</code> exactly, for the same reason
+<code>.tb-dropdown</code> does — a list opened from a field and one opened from a toolbar should
+be the same object.</p>
+
+<template data-source-only data-example="Proposed combobox — not implemented">
+<div class="px-select px-select--combo">
+  <input class="px-select__input" id="site" type="text" role="combobox"
+         aria-expanded="false" aria-controls="site-list" aria-autocomplete="list"
+         autocomplete="off">
+  <ul class="px-select__list px-pop" id="site-list" role="listbox" hidden>
+    <li class="px-select__group" role="presentation">Teesside</li>
+    <li class="px-select__opt" role="option" id="s-1" aria-selected="false">
+      Blast furnace 2<span class="px-select__sub">Asset TS-BF2</span>
+    </li>
+  </ul>
+</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td><code>role="combobox"</code></td><td>On the input, with <code>aria-expanded</code>, <code>aria-controls</code> and <code>aria-autocomplete</code></td></tr>
+    <tr><td><code>aria-activedescendant</code></td><td>Points at the highlighted option. Focus stays in the input — moving focus into the list breaks typeahead</td></tr>
+    <tr><td><code>role="listbox"</code> / <code>"option"</code></td><td>On the list and its items. Group headings are <code>role="presentation"</code> or a real <code>group</code></td></tr>
+    <tr><td><code>autocomplete="off"</code></td><td>Or the browser's own suggestions overlay the panel</td></tr>
+    <tr><td>Result count</td><td>Announced in a live region on filter, or a screen-reader user types into silence</td></tr>
+    <tr><td>JS</td><td>Required for combobox and multi-select; none for the native form</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table><thead><tr><th>Token</th><th>Use</th></tr></thead><tbody>
+  <tr><td><code>--px-field</code> / <code>--px-field-hover</code></td><td>Trigger fill</td></tr>
+  <tr><td><code>--px-overlay</code></td><td>Panel</td></tr>
+  <tr><td><code>--px-hover</code></td><td>Option hover — the faint 2.5% wash, correct for a large row target</td></tr>
+  <tr><td><code>--praxis-color-pink-60</code></td><td>Selected option, matching how selection is marked in <code>.tb-dropdown</code></td></tr>
+  <tr><td><code>--praxis-color-text-tertiary</code></td><td>Option sub-line</td></tr>
+</tbody></table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use a native <code>&lt;select&gt;</code> when it will do. It is the most accessible option
+  and needs no script.</li>
+  <li>Use <code>.pillset</code> for three or four options — it shows them all without a click.</li>
+  <li>Say how many results a filter left.</li>
+</ul>
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use a combobox for a yes/no. That is a <a href="radio.html">radio</a> or a switch.</li>
+  <li>Truncate a long list silently.</li>
+  <li>Move focus into the option list.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>APG <em>Combobox</em> is the specification; follow it rather than improvising.</li>
+  <li><code>aria-activedescendant</code>, not focus movement.</li>
+  <li>Result counts in a live region.</li>
+  <li>A native select is a legitimate accessible answer and should not be replaced for looks.</li>
+  <li>Fields carry no border in Praxis, so the fill is the whole affordance —
+  <code>--px-field</code> against <code>--px-surface</code> must clear 3:1 as a control boundary
+  under 1.4.11.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table><thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead><tbody>
+  <tr><td>Trigger</td><td>Height</td><td>Inherits <code>.rfield__control</code></td></tr>
+  <tr><td>Panel</td><td>Max height</td><td><code>min(60vh, 22rem)</code>, then scroll</td></tr>
+  <tr><td>Option</td><td>Min height</td><td>36px, matching <code>.tb-dropdown__item</code></td></tr>
+  <tr><td>Panel</td><td>Offset</td><td>6px, matching <code>.tb-dropdown</code></td></tr>
+</tbody></table>

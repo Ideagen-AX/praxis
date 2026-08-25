@@ -1,0 +1,71 @@
+<!--praxis
+title: Tree view
+summary: Org hierarchies, site and asset trees, document folders. .rref and .admin-menulist are adjacent to a tree and neither is one.
+order: 200
+tier: planned
+icon: account_tree
+classes: px-tree
+keywords: tree treeview hierarchy folder node expand asset site org treegrid planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Tier 3 placeholder.</strong> Real, not urgent, and nothing is defined in <code>src/</code>. This page reserves the name and records what is known; expect it to stay in this state for a while. See <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Two things in Praxis sit next to this and neither is a tree.
+<code>.rref</code> is a reference-field picker and <code>.admin-menulist</code> is a flat menu
+list. A real hierarchy — Teesside → Blast furnace 2 → Interlock guard — has no representation.</p>
+<p>The ARIA APG has both <em>Tree View</em> and <em>Treegrid</em>; the second is a tree whose rows
+carry columns, which is what an asset register actually is.</p>
+
+<h2>Anatomy</h2>
+
+<p>Not designed yet.</p>
+
+<h2>Variants</h2>
+
+<table><thead><tr><th>Variant</th><th>Use</th></tr></thead><tbody>
+  <tr><td>Tree</td><td>Navigation or selection over a hierarchy</td></tr>
+  <tr><td>Treegrid</td><td>Hierarchy with columns. The asset-register case, and much more work</td></tr>
+  <tr><td>Single vs multi-select</td><td>Multi-select with partial states is where this gets expensive</td></tr>
+</tbody></table>
+
+<h2>States</h2>
+
+<ul><li>Expanded / collapsed / selected / focused.</li><li><strong>Partially selected</strong> — some descendants chosen. Praxis already styles the indeterminate checkbox on the bare element, so the affordance exists.</li><li><strong>Loading children</strong> — lazy hierarchies are the norm at this size.</li></ul>
+
+<h2>Responsive behavior</h2>
+
+<p>Not decided yet.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>No sheet chosen yet.</p>
+
+<h2>Markup contract</h2>
+
+<p>APG <em>Tree View</em>: <code>role="tree"</code>, <code>treeitem</code>, <code>group</code>, with <code>aria-expanded</code>, <code>aria-selected</code> and <code>aria-level</code>. Roving <code>tabindex</code>, arrow keys to move and expand. Needs a script.</p>
+
+<h2>Token reference</h2>
+
+<p>No new tokens expected.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p>Not written yet.</p>
+
+<h2>Accessibility</h2>
+
+<p>The keyboard contract is the whole component and it is unusually detailed — follow APG rather than improvising. A tree without arrow-key navigation is a nested list with tree paint.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not decided yet.</p>

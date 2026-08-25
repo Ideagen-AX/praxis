@@ -1,0 +1,200 @@
+<!--praxis
+title: Loading states
+summary: Skeleton, spinner and inline loading. Praxis has none of the three — the only loading affordance in the system is Mazlan's typing dots. Planned.
+order: 80
+tier: planned
+icon: refresh
+classes: px-skeleton, px-spinner
+keywords: loading skeleton spinner shimmer placeholder pending progress busy aria-busy planned
+-->
+
+<div class="note note--planned">
+  <p><strong>The only loading affordance in Praxis is <code>.mazlan-typing</code></strong> — the
+  AI drawer's three dots, tied to that surface. No skeleton, no spinner, no inline loading.
+  Tier 1 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Every one of the six design systems surveyed for the roadmap ships at least two of these, and
+Praxis pages fetch data: a search result set, a record, a filter's option list, an attachment
+upload. Today each of those either appears instantly or appears blank, and blank is
+indistinguishable from broken.</p>
+
+<p>Three components, one page, because choosing between them is the actual design decision and
+splitting them across three pages hides it.</p>
+
+<h2>Anatomy</h2>
+
+<p><strong>Skeleton</strong></p>
+<ol>
+  <li><strong>Block</strong> — a muted shape matching the size of the content that will replace
+  it.</li>
+  <li><strong>Shimmer</strong> — optional animation. Open question below.</li>
+</ol>
+
+<p><strong>Spinner</strong></p>
+<ol>
+  <li><strong>Track and arc</strong> — a rotating partial ring. One size for inline use, one
+  for a region.</li>
+</ol>
+
+<p><strong>Inline loading</strong></p>
+<ol>
+  <li><strong>Spinner plus label</strong> — "Saving…", then a resolved state. Carbon's
+  <code>InlineLoading</code> is the model: it resolves to a tick rather than vanishing, so the
+  outcome is visible.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Use</th><th>Reach for</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>A region whose shape is known — a table, a card grid, a record form</td><td>Skeleton</td><td>It preserves layout, so nothing jumps when the data lands</td></tr>
+    <tr><td>A region whose shape is unknown</td><td>Spinner</td><td>A skeleton that guesses wrong is worse than no skeleton</td></tr>
+    <tr><td>A control the user just pressed</td><td>Inline loading</td><td>The feedback belongs on the thing they touched</td></tr>
+    <tr><td>Under 200ms</td><td>Nothing</td><td>A flash of skeleton reads as a glitch. This threshold should be a token, not folklore</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Open decision: shimmer or no shimmer.</strong> A moving gradient is the convention
+and it is also the thing most likely to be wrong here — Praxis honours
+<code>prefers-reduced-motion</code> in seven places, and a shimmering table under a user who
+asked for less motion is a straightforward failure. If shimmer is taken, the reduced-motion
+fallback is a static fill, not a slower shimmer.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Idle</strong> — not rendered.</li>
+  <li><strong>Pending</strong> — skeleton or spinner shown, container
+  <code>aria-busy="true"</code>.</li>
+  <li><strong>Resolved</strong> — for inline loading only, a brief success state before it
+  clears. This is what makes it worth having over a bare spinner.</li>
+  <li><strong>Failed</strong> — not this component. An <a href="empty-state.html">error empty
+  state</a> or a banner.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>None of its own. A skeleton takes the shape of whatever it stands in for, so it inherits that
+component's responsive behaviour — which is an argument for skeletons being composed from a
+primitive block rather than shipped per-component.</p>
+
+<h2>Interactive demo</h2>
+
+<p>The frame shows the one thing that exists: <code>.mazlan-typing</code>, and it only makes
+sense inside the AI drawer, which is the problem.</p>
+
+<template data-example="Today: .mazlan-typing, the system's only loading affordance" data-height="120" data-scripts="lucide">
+  <div class="mazlan-typing"><span></span><span></span><span></span></div>
+</template>
+
+<h2>Code</h2>
+
+<p><code>praxis-core.css</code>. All three are foundational and none of them belongs to a
+feature sheet — putting the skeleton in the admin sheet would repeat exactly the mistake
+<code>praxis-controls.css</code> was created to avoid.</p>
+
+<p>CSS only. A skeleton is markup the application swaps out; a Praxis script that owned loading
+state would be reaching past where the system stops.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<!-- Skeleton: composed from one primitive, sized by the caller -->
+<div class="admin-card" aria-busy="true">
+  <span class="px-skeleton" style="width:8rem;height:1rem"></span>
+  <span class="px-skeleton" style="width:100%;height:1rem"></span>
+  <span class="px-skeleton px-skeleton--text"></span>
+</div>
+
+<!-- Spinner -->
+<span class="px-spinner" role="status" aria-label="Loading"></span>
+
+<!-- Inline loading, on the control that was pressed -->
+<button class="btn btn--primary" type="button" disabled>
+  <span class="px-spinner px-spinner--sm" aria-hidden="true"></span>Saving…
+</button>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td><code>aria-busy="true"</code></td><td>On the container being replaced, not on each skeleton block</td></tr>
+    <tr><td>Skeleton blocks</td><td><code>aria-hidden</code>, or inside an <code>aria-busy</code> container. They are placeholder shapes and must not be read out as content</td></tr>
+    <tr><td><code>role="status"</code></td><td>On a standalone spinner, with an <code>aria-label</code></td></tr>
+    <tr><td>Sizing</td><td>By the caller, inline or through a utility. A skeleton primitive that hard-codes widths becomes a component per layout</td></tr>
+    <tr><td>Disabled control</td><td>A button in the inline-loading state is <code>disabled</code>, and its spinner is <code>aria-hidden</code> because the label already says "Saving…"</td></tr>
+    <tr><td>JS</td><td>None</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--px-chip</code></td><td>Skeleton fill. A step off the surface in both themes, which is exactly what a placeholder wants</td></tr>
+    <tr><td><code>--praxis-radius-sm</code></td><td>Skeleton block radius</td></tr>
+    <tr><td><code>--praxis-color-interactive-default</code></td><td>Spinner arc</td></tr>
+    <tr><td><code>--praxis-color-border-default</code></td><td>Spinner track</td></tr>
+    <tr><td><code>--praxis-motion-slowest</code></td><td>420ms — closest existing step for a spin cycle, though a spinner probably wants slower still</td></tr>
+  </tbody>
+</table>
+
+<p>Two values missing, and both are shared decisions rather than per-call ones: the delay before
+showing anything (the 200ms above), and the shimmer duration if shimmer is taken. Candidates:
+<code>--praxis-motion-loading-delay</code> and <code>--praxis-motion-shimmer</code>.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Match the skeleton to the real layout, so nothing moves when data arrives.</li>
+  <li>Put inline loading on the control the user pressed.</li>
+  <li>Wait ~200ms before showing anything.</li>
+  <li>Keep the resolved state visible for a moment. A save that silently stops looking busy has
+  not told anyone it worked.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Skeleton a region whose shape you cannot predict — use a spinner.</li>
+  <li>Replace a whole page with skeletons when only one card is loading.</li>
+  <li>Animate under <code>prefers-reduced-motion</code>.</li>
+  <li>Use a spinner for something that takes more than a few seconds. That needs progress, and
+  progress is a different component.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><code>aria-busy</code> on the container is what tells assistive technology the region is
+  in flux; without it a skeleton is a set of meaningless empty boxes in the accessibility tree.</li>
+  <li>A standalone spinner needs <code>role="status"</code> and a label, or it is invisible to a
+  screen reader — which is the same as no loading indicator at all.</li>
+  <li><code>prefers-reduced-motion</code>: shimmer becomes a static fill, spin becomes a static
+  or stepped indicator. Praxis already handles this correctly in seven places and there is no
+  excuse for the eighth being the exception.</li>
+  <li>Do not move focus when content replaces a skeleton. The user has not asked to go anywhere.</li>
+  <li><strong>Forced colors:</strong> a skeleton is a fill with no border and no text, so in
+  forced-colors it disappears entirely. Needs an outline in that mode.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td><code>.px-skeleton</code></td><td>Height</td><td>Caller-set. <code>--text</code> defaults to <code>1em</code> with a 0.35em bottom margin</td></tr>
+    <tr><td><code>.px-skeleton</code></td><td>Radius</td><td>8px, or full for an avatar placeholder</td></tr>
+    <tr><td><code>.px-spinner</code></td><td>Size</td><td>20px default, 14px for <code>--sm</code> inside a button</td></tr>
+    <tr><td><code>.px-spinner</code></td><td>Stroke</td><td>2px</td></tr>
+    <tr><td>Spin cycle</td><td>Duration</td><td>~700ms — no existing token goes that slow</td></tr>
+  </tbody>
+</table>
+

@@ -1,0 +1,63 @@
+<!--praxis
+title: Command palette
+summary: Power-user navigation in an application with twenty modules. Nothing exists.
+order: 280
+tier: planned
+icon: search
+classes: px-cmd
+keywords: command palette quick open fuzzy search actions navigation ctrl-k planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Tier 3 placeholder.</strong> Real, not urgent, and nothing is defined in <code>src/</code>. This page reserves the name and records what is known; expect it to stay in this state for a while. See <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>EHSQ Enterprise has many modules and a deep record tree. The app bar search is a record search; a command palette is a different thing — it navigates the application and invokes actions.</p>
+
+<h2>Anatomy</h2>
+
+<p>Not designed yet.</p>
+
+<h2>Variants</h2>
+
+<p>Navigate-only, or navigate plus actions. Actions raise a real question: an action invoked from a palette skips the screen that would normally confirm it, so destructive actions probably do not belong here at all.</p>
+
+<h2>States</h2>
+
+<p>Empty (show recents), typing, results, no matches, loading. Grouped results by kind — modules, records, actions — with the group heading always visible.</p>
+
+<h2>Responsive behavior</h2>
+
+<p>Not decided yet.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>No sheet chosen yet.</p>
+
+<h2>Markup contract</h2>
+
+<p>A combobox inside a dialog: APG <em>Combobox</em> for the list and <em>Dialog</em> for the container, so <code>aria-activedescendant</code>, focus trapping and Escape all apply. Focus must return to where it was on close.</p>
+
+<h2>Token reference</h2>
+
+<p><code>--px-overlay</code>, <code>--px-drawer</code>, <code>--px-hover</code>. Reuses <a href="select.html">select</a>'s option anatomy and <a href="kbd.html">kbd</a> for the shortcut column.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p>Not written yet.</p>
+
+<h2>Accessibility</h2>
+
+<p>Result count announced. The opening shortcut must be discoverable somewhere other than the palette itself, or only people who already know it will find it.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not decided yet.</p>

@@ -7,6 +7,7 @@ sheet: praxis-workspace.css, praxis-core.css
 classes: card, page, px-dot, px-dot-clear
 summary: The two layout surfaces every screen is made of, the dot texture behind them, and why the card radius is 12px and not the 20px the token says.
 keywords: card page surface texture dot grid elevation radius panel
+icon: view_module
 -->
 
 <p><code>.card</code> and <code>.page</code> are the two surfaces almost every screen is
@@ -14,7 +15,17 @@ assembled from, and they are defined in <strong><code>praxis-workspace.css</code
 not in core, not in a card sheet. That is one of the three "base in a surprising place"
 traps; the bundle makes it moot.</p>
 
-<h2>Card</h2>
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Page</strong> — <code>.page</code>, the material everything sits on: a fill plus the
+  dot texture.</li>
+  <li><strong>Card</strong> — <code>.card</code>, a raised surface on it.</li>
+</ol>
+
+<p>Two names, and only one of them is complete. See Variants.
+
+<h3>Card</h3>
 
 <template data-example="Cards at the three elevation tiers" data-height="230">
   <div style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))">
@@ -49,7 +60,7 @@ traps; the bundle makes it moot.</p>
 <strong>not</strong> give you padding — that varies by what is inside, and a card of table
 rows wants none. Every example above sets its own.</p>
 
-<h2>Page</h2>
+<h3>Page</h3>
 
 <p><code>.page</code> is the content wrapper inside the scroll container. Its job is the
 horizontal rhythm: it inherits <code>--ph-pad-x</code> from <code>.content</code> so the page
@@ -57,7 +68,41 @@ body lines up with the header and the toolbar above it. Below 640px it switches 
 <code>--px-gutter</code>, the single 16px phone inset, along with the app bar and header — so
 all three step in together rather than by different amounts.</p>
 
-<h2>The dot texture</h2>
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Name</th><th>State</th></tr></thead>
+  <tbody>
+    <tr><td><code>.card</code></td><td><strong>No base.</strong> <code>praxis-workspace.css</code> gives it a slate shadow and a 12px radius and nothing else — no fill, no padding. See <a href="card.html">Card base</a></td></tr>
+    <tr><td><code>.admin-card</code></td><td>Complete: fill, shadow, radius, 20px/22px padding, <code>__title</code>, <code>__meta</code>, and a <code>--flush</code> density</td></tr>
+    <tr><td><code>.admin-panel</code></td><td>The recessed form, on <code>--px-surface-2</code>. What a card contains rather than a card</td></tr>
+    <tr><td>Elevation tiers</td><td>Three exist as tokens — <code>--px-card-rail</code>, <code>--praxis-card</code>, <code>--px-card-raised</code> — and only the middle one is reachable through a class</td></tr>
+  </tbody>
+</table>
+
+<h2>States</h2>
+
+<p>A static card has none. An interactive one needs hover, focus-visible and press,
+and Praxis defines none of them for a card — this reference site had to write its own for its page
+grids.</p>
+
+<p>The interesting part is that the right hover depends on what the card sits <em>on</em>: on the
+page material a lift is correct, and on another card a lift is wrong and the fill should step to
+<code>--px-surface-2</code> instead. That is why <code>.admin-panel</code> exists.</p>
+
+<h2>Responsive behavior</h2>
+
+<p>Cards are sized by their grid — <code>.admin-grid--2/3/4/6</code> or
+<code>.admin-cols</code> — and those collapse at 1024px, 768px and 480px. Below 640px the inline
+padding follows <code>--px-gutter</code> through the container.</p>
+
+<p>The page texture adapts too: <code>--px-dot-clear</code> holds the dots clear of the top
+chrome, and the horizontal fade is measured from the nav rail's right edge rather than from x=0,
+so the visible ramp is symmetric about the content area.</p>
+
+<h2>Interactive demo</h2>
+
+<h3>The dot texture</h3>
 
 <p>The dot grid is not a class. It is painted on <code>body</code> by
 <code>praxis-core.css</code> as a repeating <code>radial-gradient</code> at
@@ -102,7 +147,7 @@ all three step in together rather than by different amounts.</p>
   </div>
 </template>
 
-<h2>The animated dot field</h2>
+<h3>The animated dot field</h3>
 
 <p>A different thing with a similar name. <code>praxis-dotfield.js</code> is a single-canvas
 animated dot grid for hero and login moments — one <code>&lt;canvas&gt;</code>, one draw loop,
@@ -151,3 +196,85 @@ down, or the loop keeps running.</p>
 <code>originY</code>, <code>glow</code>, <code>ring</code>, <code>edgeFade</code> and
 <code>loop</code>. It is a real animation running a real loop, so mind it on a page that is
 already busy.</p>
+
+<h2>Code</h2>
+
+<p><code>.card</code>'s shadow is in <code>praxis-workspace.css</code>;
+<code>.admin-card</code> is in <code>praxis-admin.css</code>; the page texture is on
+<code>body[data-variant="praxis"]</code> in <code>praxis-core.css</code>.</p>
+
+<p>That distribution is the practical problem: the complete card is in the largest sheet in the
+system, so a record page wanting a card either loads the admin shell or writes its own.
+<a href="card.html">Card base</a> proposes moving the canonical definition to core and keeping
+<code>.admin-card</code> as an alias.</p>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Card element</td><td>Any block. <code>&lt;a&gt;</code> for an interactive card, which is what forces the missing states above</td></tr>
+    <tr><td><code>__title</code></td><td>A real heading where the card is a section of the page. It is a <code>&lt;p&gt;</code> in every current example, which is right for a label and wrong for a section</td></tr>
+    <tr><td>Nesting</td><td>Step the surface, do not stack a second shadow</td></tr>
+    <tr><td><code>.page</code></td><td>The texture is on <code>body</code>, not on <code>.page</code>, under the Praxis variant. A page that sets its own background will cover it</td></tr>
+    <tr><td>JS</td><td>None for either. <code>praxis-dotfield.js</code> is a separate opt-in</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<praxis-block name="tokens" prefix="--px-dot|--px-card|--praxis-card"></praxis-block>
+
+<p><code>--praxis-radius-card</code> is 20px in the token file and 12px under the Praxis variant.
+The variant wins, so 12px is the card geometry — one of the nine documented overrides.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use <code>.admin-card</code>. It is the one that works.</li>
+  <li>Use <code>.admin-panel</code> for anything inside a card.</li>
+  <li>Let the grid size the card.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use bare <code>.card</code> expecting a surface.</li>
+  <li>Give every card on a page the same elevation. The three tiers exist because a page of
+  identically-shadowed cards reads as one flat plane, and <code>praxis-core.css</code> says so.</li>
+  <li>Put the card's padding on its contents.</li>
+  <li>Set a background on <code>.page</code> — you will cover the texture.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>A card is not a landmark. If it needs to be findable, its title is a heading.</li>
+  <li>An interactive card needs one target. A card wrapped in an anchor that also contains buttons
+  produces nested interactive elements, which is invalid and behaves unpredictably.</li>
+  <li>The dot texture is decorative and must never carry meaning.</li>
+  <li><code>praxis-dotfield.js</code> animates. It has to honour
+  <code>prefers-reduced-motion</code>, and any page using it should check that it does.</li>
+  <li><strong>Forced colors:</strong> a card is a fill plus a shadow and loses both, so a page of
+  cards becomes one undifferentiated block. See
+  <a href="../foundations/forced-colors.html">Forced colors</a>.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.admin-card</code></td><td>Padding</td><td>20px 22px</td></tr>
+    <tr><td><code>--flush</code></td><td>Padding</td><td>16px 18px</td></tr>
+    <tr><td>Card</td><td>Radius</td><td>12px</td></tr>
+    <tr><td><code>__title</code></td><td>Size / weight</td><td>16px / 700</td></tr>
+    <tr><td>Dot grid</td><td>Pitch</td><td>18px</td></tr>
+    <tr><td>Dot clearance</td><td><code>--px-dot-clear</code></td><td>192px — the app bar, page header and toolbar band combined</td></tr>
+    <tr><td><code>.admin-grid</code></td><td>Gap</td><td>18px 34px</td></tr>
+  </tbody>
+</table>

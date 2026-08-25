@@ -1,0 +1,81 @@
+<!--praxis
+title: Print
+summary: Zero @media print rules in src/. Regulated records are printed and PDF'd as evidence, which makes this a functional gap rather than a cosmetic one. Planned.
+order: 100
+icon: description
+keywords: print pdf paper evidence page-break media query planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Nothing is defined.</strong> A grep for <code>@media print</code> across every sheet
+  in <code>src/</code> returns zero. Foundation gap F1 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>In nuclear, pharma and aviation a record is routinely printed or exported to PDF and handed to
+an inspector. That artefact is the deliverable, not a convenience — and today Praxis contributes
+nothing to it, so what comes out of the printer is whatever the browser makes of an application
+shell designed for a 1440px viewport.</p>
+
+<h2>What actually happens today</h2>
+
+<p>Predictable, and all of it wrong:</p>
+
+<ul>
+  <li><strong>The shell prints.</strong> <code>.app</code> is <code>height:100vh</code> with
+  <code>overflow:hidden</code>, so the printed output is one screenful and the rest of the record
+  is simply absent. This is the serious one: a printed record that silently stops is worse than
+  no print support.</li>
+  <li><strong>Chrome consumes the page.</strong> The app bar, the nav rail or side nav, the page
+  header and the toolbar band are 192px of fixed chrome that nobody needs on paper.</li>
+  <li><strong>The dot grid prints.</strong> <code>body[data-variant="praxis"]</code> sets a
+  <code>radial-gradient</code> texture with <code>background-attachment:fixed</code>. Most
+  browsers drop backgrounds by default, which is luck rather than design.</li>
+  <li><strong>Dark theme prints dark</strong> if that is what the user was reading in.</li>
+  <li><strong>Collapsed sections stay collapsed</strong>, so a printed form omits whatever was
+  closed.</li>
+  <li><strong>Links lose their targets.</strong> A reference that reads "see the finding" on
+  paper points nowhere.</li>
+</ul>
+
+<h2>What it should do</h2>
+
+<table>
+  <thead><tr><th>Rule</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Force the light theme</td><td>Ink. Simply override the dark tokens inside the print block rather than asking the user to toggle first</td></tr>
+    <tr><td>Release the shell</td><td><code>.app{height:auto;overflow:visible}</code>, <code>.admin-body{overflow:visible}</code>. Without this nothing else matters</td></tr>
+    <tr><td>Hide the chrome</td><td>App bar, nav rail, side nav, toolbar band, skip link, theme toggle</td></tr>
+    <tr><td>Keep the page header</td><td>The breadcrumb and title are the record's identity and belong at the top of the printout</td></tr>
+    <tr><td>Drop shadows and textures</td><td>Praxis carries almost all of its structure in <code>box-shadow</code>, which prints as nothing or as grey mud. Cards need a hairline in print</td></tr>
+    <tr><td>Expand collapsed regions</td><td>A printed record must be complete</td></tr>
+    <tr><td>Avoid breaking rows and cards</td><td><code>break-inside: avoid</code> on <code>.admin-card</code>, table rows and <code>.rfield</code></td></tr>
+    <tr><td>Repeat table headers</td><td><code>thead{display:table-header-group}</code>. A five-page register with headers on page one is unreadable</td></tr>
+    <tr><td>Expose link targets</td><td><code>a[href^="http"]::after{content:" (" attr(href) ")"}</code>, scoped to prose so it does not fire on every nav item</td></tr>
+    <tr><td>Print the audit trail as a table</td><td>The rail and markers are screen affordances. See <a href="../components/audit-trail.html">audit trail</a></td></tr>
+  </tbody>
+</table>
+
+<h2>Open decisions</h2>
+
+<ul>
+  <li><strong>Where the rules live.</strong> One <code>praxis-print.css</code> that consumers opt
+  into, or a <code>@media print</code> block at the end of each component sheet. A separate sheet
+  is easier to reason about and easy to forget to link; blocks in each sheet cannot be forgotten
+  and scatter the logic. Leaning towards a separate sheet included in the barrel.</li>
+  <li><strong>Whether Praxis owns page margins and headers.</strong> <code>@page</code> can set
+  margins and running headers. That is arguably the application's decision, but if Praxis does not
+  take it nobody will.</li>
+  <li><strong>Whether a print view is a print stylesheet at all.</strong> For a formal export,
+  generating a document server-side gives control a stylesheet cannot. The honest scope for
+  Praxis is "printing a screen produces something usable", not "printing produces the
+  regulatory artefact".</li>
+</ul>
+
+<h2>Why this is not just CSS</h2>
+
+<p>Two of the items above are coupled to other gaps. Collapsed
+<a href="../components/accordion.html">sections</a> must expand, and that needs the disclosure
+component to expose its state in a way print can override. The
+<a href="../components/audit-trail.html">audit trail</a> needs a print form designed alongside its
+screen form. Neither can be retrofitted afterwards, which is the argument for doing this while
+those components are still on paper.</p>

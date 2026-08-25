@@ -1,0 +1,88 @@
+<!--praxis
+title: Forced colors and high contrast
+summary: Zero forced-colors support, in a system that carries nearly all of its structure in box-shadow. Shadows are dropped in that mode, so the shell loses its shape. Planned.
+order: 110
+icon: visibility
+keywords: forced-colors high contrast windows accessibility wcag procurement shadow border planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Nothing is defined.</strong> No <code>forced-colors</code> and no
+  <code>prefers-contrast</code> anywhere in <code>src/</code>. Foundation gap F2 on
+  <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Windows High Contrast — <code>forced-colors: active</code> — replaces the author's colours with
+a user-chosen system palette and <strong>discards <code>box-shadow</code> entirely</strong>. That
+is the problem, because Praxis's whole visual language is shadow.</p>
+
+<p>This mode is common in industrial, government and defence environments, which is most of the
+EHSQ customer base, and it turns up in procurement accessibility questionnaires. It is also the
+single cheapest large accessibility win available to this system, because the fix is additive:
+one media block per component that draws a border where a shadow used to be.</p>
+
+<h2>Why Praxis is unusually exposed</h2>
+
+<p>The material layer is built from shadows on purpose, and the comments in
+<code>praxis-core.css</code> say so: <code>--praxis-card</code>, <code>--px-tool-shadow</code>,
+<code>--px-overlay</code>, <code>--px-card-rail</code> and <code>--px-card-raised</code> are how a
+surface reads as raised, and <code>0 0 0 .5px</code> ring shadows are how most components draw
+their edge instead of using a border.</p>
+
+<p>In forced-colors, every one of those disappears at once. The result is not a degraded look, it
+is a loss of structure:</p>
+
+<table>
+  <thead><tr><th>Component</th><th>What it loses</th></tr></thead>
+  <tbody>
+    <tr><td><code>.tbtn</code>, <code>.iconbtn</code>, <code>.filterfield</code></td><td>All of it. These have <code>border:0</code> and a tool shadow, so they become unbounded text and glyphs</td></tr>
+    <tr><td><code>.admin-card</code>, <code>.card</code></td><td>Its edge. A page of cards becomes one undifferentiated block</td></tr>
+    <tr><td><code>.px-pop</code>, <code>.tb-dropdown</code>, <code>.appswitch__pop</code></td><td>Separation from the page beneath. Under the Praxis variant these explicitly set <code>border:0</code> and rely on <code>--px-overlay</code></td></tr>
+    <tr><td>Praxis fields</td><td>Everything. Fields carry no border by design — <code>--px-field</code> is documented as "the whole affordance" — and a fill difference is exactly what forced-colors removes</td></tr>
+    <tr><td>The app shell</td><td>The nav rail is transparent with one border; the app bar has none. Both blend into the page by design</td></tr>
+    <tr><td><a href="../components/loading.html">Skeletons</a></td><td>A fill with no border and no text vanishes completely</td></tr>
+    <tr><td>Status pills, stepper markers, tone chips</td><td>All fill-differentiated, so several states collapse into one</td></tr>
+  </tbody>
+</table>
+
+<h2>The shape of the fix</h2>
+
+<ul>
+  <li><strong>Draw borders where shadows were.</strong> Inside
+  <code>@media (forced-colors: active)</code>, give every shadow-bounded component
+  <code>border:1px solid</code>. The colour is irrelevant — the UA replaces it — so
+  <code>currentColor</code> or a system keyword is fine.</li>
+  <li><strong>Use the system colour keywords</strong> where a role must be conveyed:
+  <code>ButtonBorder</code>, <code>ButtonText</code>, <code>Canvas</code>, <code>CanvasText</code>,
+  <code>Highlight</code>, <code>HighlightText</code>, <code>LinkText</code>,
+  <code>GrayText</code>.</li>
+  <li><strong>Keep focus visible.</strong> <code>forced-color-adjust</code> and the UA's own focus
+  ring interact; the 29 <code>:focus-visible</code> rules in <code>src/</code> need checking, not
+  assuming.</li>
+  <li><strong>Add a non-colour differentiator to every state that is currently a fill.</strong>
+  Selected, complete, blocked and skipped cannot all be <code>Highlight</code>. This is the part
+  that is design work rather than a media block.</li>
+  <li><strong>Never use <code>forced-color-adjust: none</code></strong> except for something whose
+  colour is the content — the palette swatches on <a href="color.html">Color</a> are the one
+  legitimate case on this site.</li>
+</ul>
+
+<h2>Open decisions</h2>
+
+<ul>
+  <li><strong>Where the rules live.</strong> Same question as <a href="print.html">print</a>, and
+  the answer should be the same for both.</li>
+  <li><strong>Whether to also honour <code>prefers-contrast: more</code></strong>, which is a
+  separate signal with a different meaning — the user wants more contrast, not a replaced palette.
+  Cheaper to support and less urgent.</li>
+  <li><strong>How to test it.</strong> Windows High Contrast is the reference implementation and
+  neither macOS nor Linux reproduces it exactly, so this cannot be verified on the machine Praxis
+  is developed on. That is worth saying plainly: without a test path, any claim here would be
+  unverified.</li>
+</ul>
+
+<h2>What already works</h2>
+
+<p>Not everything needs doing. <code>prefers-reduced-motion</code> is honoured in seven places and
+<code>:focus-visible</code> is used in 29, so the two adjacent accessibility signals are already
+handled. This is a gap, not a pattern of neglect.</p>

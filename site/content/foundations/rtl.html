@@ -1,0 +1,77 @@
+<!--praxis
+title: Right-to-left — an audit
+summary: 82 physical left/right declarations against 12 logical ones. This page measures the cost of RTL support and commits to nothing.
+order: 120
+icon: arrow_forward
+keywords: rtl right-to-left bidi logical properties arabic hebrew internationalisation audit planned
+-->
+
+<div class="note note--planned">
+  <p><strong>This page is an audit, not a plan.</strong> Foundation gap F3 on
+  <code>ROADMAP.md</code>, and deliberately scoped to measuring the cost rather than committing to
+  the conversion. Nothing here should be read as a decision to support RTL.</p>
+</div>
+
+<p>Praxis has no RTL support and no <code>[dir="rtl"]</code> rule anywhere. Whether that matters
+is a product question about which markets EHSQ Enterprise sells into, not a design-system
+question. What a design system can usefully say is <em>what it would cost</em>, and that number
+grows every sprint, which is the reason to write it down now rather than when someone asks.</p>
+
+<h2>The measurement</h2>
+
+<table>
+  <thead><tr><th>Measure</th><th>Count</th><th>Note</th></tr></thead>
+  <tbody>
+    <tr><td>Physical <code>left:</code> / <code>right:</code> declarations</td><td><strong>82</strong></td><td>Positioning, mostly on popovers, scrims, drawers and pseudo-element rules</td></tr>
+    <tr><td>Logical <code>*-inline</code> properties</td><td>12</td><td><code>padding-inline</code> and <code>margin-inline</code>, added incidentally rather than as a policy</td></tr>
+    <tr><td><code>[dir="rtl"]</code> rules</td><td><strong>0</strong></td><td></td></tr>
+    <tr><td><code>text-align:left</code> / <code>right</code></td><td>present throughout</td><td><code>.admin-table__num</code> right-aligns numerals, which in RTL is a genuine design question, not a mechanical flip</td></tr>
+  </tbody>
+</table>
+
+<p>Counted from <code>src/</code> on 2026-08-25 with a grep for anchored declarations. The 82 is a
+floor, not a total: it excludes <code>transform:translateX</code>, directional
+<code>border-radius</code> shorthands, and background-position values, all of which also need
+attention.</p>
+
+<h2>Where the cost actually is</h2>
+
+<p>Not evenly spread. Four areas hold most of it:</p>
+
+<ul>
+  <li><strong>Popover and drawer positioning.</strong> <code>.tb-dropdown{left:0}</code> with a
+  <code>--right</code> modifier, <code>.px-navdrawer{left:0}</code> with
+  <code>translateX(-100%)</code>, <code>.appswitch__pop</code>, <code>.qrail-pop</code>,
+  <code>.persona-popover{right:calc(100% + 12px)}</code>. Each needs both a logical property and a
+  flipped transform.</li>
+  <li><strong>The shell.</strong> The nav rail and side nav are on the left by construction, and
+  the dot grid's left fade is keyed to <code>--navrail-w</code> in a
+  <code>linear-gradient(to right, …)</code>. That gradient does not flip with a logical property.</li>
+  <li><strong>Pseudo-element hairlines.</strong> <code>.pageheader::after</code> and
+  <code>.toolbar::after</code> use <code>left</code> and <code>right</code> together, which is
+  <code>inset-inline</code> — an easy mechanical fix, and there are many of them.</li>
+  <li><strong>Chevrons and directional glyphs.</strong> <code>chevron_right</code> in a breadcrumb
+  must become <code>chevron_left</code>. That is a markup and icon-map problem, not a CSS one, and
+  <code>praxis-lucide.js</code> would need to know about it.</li>
+</ul>
+
+<h2>What would need to be true</h2>
+
+<ol>
+  <li>A policy that new CSS uses logical properties, enforced by the build the way the
+  <code>--ehsq-*</code> token ban already is. Without this the 82 keeps growing and any conversion
+  is immediately stale.</li>
+  <li>A mechanical pass over the four areas above.</li>
+  <li>Design decisions that are not mechanical: numeral alignment in tables, whether the shell
+  mirrors or stays left-anchored, and what happens to the dot-grid gradient.</li>
+  <li>A test path. There is no RTL example on this site and no consumer using one, so a
+  conversion would be unverifiable today.</li>
+</ol>
+
+<h2>The recommendation</h2>
+
+<p>Adopt item 1 now and nothing else. A lint rule that fails on a new physical
+<code>left:</code>/<code>right:</code> costs almost nothing, stops the number growing, and leaves
+the decision about items 2 to 4 with the product. Doing the conversion speculatively would be a
+large change to every sheet in service of a market need nobody has stated — and the four
+non-mechanical decisions cannot be made without that need being real.</p>

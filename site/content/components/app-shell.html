@@ -8,6 +8,7 @@ scripts: praxis-lucide.js, praxis-navdrawer.js, praxis-profile-menu.js
 classes: app, main, content, appbar, praxis-navrail, pageheader, breadcrumb, toolbar, tbtn, page-body, profile-menu, verswitch, px-skip, mazlan-mark
 summary: Four bands, one composition. The app bar, nav rail, page header and toolbar that every Praxis page is built from — and the two rules your page still has to own.
 keywords: shell layout appbar navrail pageheader toolbar breadcrumb scroll responsive drawer avatar
+icon: dashboard
 -->
 
 <p>Every Praxis page is the same four bands. This is the one page on this site where the
@@ -174,7 +175,9 @@ behaviour lives, and none of it is a fixed breakpoint you can read off a stylesh
   </script>
 </template>
 
-<h2>The four bands</h2>
+<h2>Anatomy</h2>
+
+<h3>The four bands</h3>
 
 <table>
   <thead><tr><th>Band</th><th>Height</th><th>Token</th></tr></thead>
@@ -191,7 +194,92 @@ behaviour lives, and none of it is a fixed breakpoint you can read off a stylesh
 chrome. If you change a band height, change the token — not one page — or the dot grid will
 cut across your header.</p>
 
-<h2>The two rules your page must own</h2>
+<h2>Variants</h2>
+
+<p>One shell, three page families that wear it — the record page, the workspace and
+the admin section. What differs between them is the toolbar band's contents and
+<code>--ph-pad-x</code>: workspace 32px, record 24px, search 20px. The combined height does not
+differ, which is the promise the masthead exists to keep.</p>
+
+<p>See <a href="core-page-families.html">Page families</a> for the container names, and
+<a href="admin.html">The admin shell</a> for the variant that adds a labelled side nav between the
+rail and the content.</p>
+
+<h3>Profile menu</h3>
+
+<p>You supply the trigger, the <code>.profile-menu__pop</code> element and — optionally —
+a <code>.profile-menu__head</code> carrying your persona's name and role.
+<code>praxis-profile-menu.js</code> renders everything else inside the pop: navigation, the
+theme switch, sign out, the current-page marker, the version footer. It preserves your
+<code>.profile-menu__head</code>, because the persona is yours, not chrome.</p>
+
+<p>It writes <code>localStorage['gl-theme']</code> when the user toggles the theme. That is
+the key your boot script reads — use a different one and you must persist it yourself.</p>
+
+<p>You still wire open and close on the trigger yourself, as the example above does. The
+script deliberately does not touch the trigger or the pop element, so each page keeps its
+own binding.</p>
+
+<p><code>.verswitch</code> is the version switcher the script renders into the pop's footer.
+You do not build it; it is listed here because it is the one <code>.profile-menu</code> family
+member that is not part of your markup contract.</p>
+
+<div class="note">
+  <p>The pop is height-capped with its own scroll as of 0.1.4. Before that it extended past
+  the bottom of the window on short viewports and Sign out was unreachable.</p>
+</div>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Rail item active</strong> — <code>--active</code>, a filled pink square.</li>
+  <li><strong>Drawer open</strong> — <code>.is-open</code>, below 640px only.</li>
+  <li><strong>Theme</strong> — <code>body[data-theme]</code>, which the whole shell reads.</li>
+  <li><strong>Compact toolbar</strong> — <code>.tb-is-compact</code>, set by script when the band
+  runs out of width.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<h3>Responsive behaviour you get for free</h3>
+
+<table>
+  <thead><tr><th>Width</th><th>What happens</th></tr></thead>
+  <tbody>
+    <tr><td>≤1024px</td><td>Centred search pill narrows to <code>min(600px, 100vw - 420px)</code></td></tr>
+    <tr><td>≤1024px, or toolbar overflow</td><td><code>praxis-toolbar-compact.js</code> sets <code>body.tb-is-compact</code> and collapses the toolbar into a Tools menu — measured, not a fixed breakpoint</td></tr>
+    <tr><td>≤768px</td><td>Search pill goes in-flow; the Mazlan pill is hidden, still reachable from the rail and profile menu</td></tr>
+    <tr><td>≤640px</td><td>Nav rail hidden, <code>--navrail-w</code> zeroed, nav drawer takes over; <code>--px-gutter</code> becomes the single 16px inset for app bar, header and content</td></tr>
+    <tr><td>≤480px</td><td>Logo 22px, avatar 30px, tighter app-bar gap</td></tr>
+  </tbody>
+</table>
+
+<h3>Nav drawer — free, from the rail</h3>
+
+<p><code>praxis-navdrawer.js</code> reads the rail you already wrote and builds the
+narrow-width drawer from it. There is no second markup contract: label a rail button with
+<code>aria-label</code> and the drawer picks the label up. Mark the current item with
+<code>.praxis-navrail__btn--active</code> and the drawer marks it too.</p>
+
+<h2>Interactive demo</h2>
+
+<p>The example is at the top of this page, and it is the one frame on this
+site worth making tall and then resizing: the shell is where all the responsive behaviour lives,
+and none of it is a breakpoint you can read off a stylesheet.</p>
+
+<h2>Code</h2>
+
+<h3>What each sheet contributes</h3>
+
+<praxis-block name="sheet-classes" sheet="praxis-appbar.css"></praxis-block>
+
+<praxis-block name="sheet-classes" sheet="praxis-navrail.css"></praxis-block>
+
+<praxis-block name="sheet-classes" sheet="praxis-pageheader.css"></praxis-block>
+
+<h2>Markup contract</h2>
+
+<h3>The two rules your page must own</h3>
 
 <p><code>.app</code> is <code>height:100vh; overflow:hidden</code>, so the page does
 <strong>not</strong> scroll — the content column does. Praxis does not style
@@ -217,54 +305,82 @@ controls so they align with the cards below. Set its <code>max-width</code> to t
 number as your content column. For a full-width page, put the controls straight in
 <code>.toolbar</code> and drop the wrapper.</p>
 
-<h2>Responsive behaviour you get for free</h2>
+<h3>The rest of the contract</h3>
 
 <table>
-  <thead><tr><th>Width</th><th>What happens</th></tr></thead>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
   <tbody>
-    <tr><td>≤1024px</td><td>Centred search pill narrows to <code>min(600px, 100vw - 420px)</code></td></tr>
-    <tr><td>≤1024px, or toolbar overflow</td><td><code>praxis-toolbar-compact.js</code> sets <code>body.tb-is-compact</code> and collapses the toolbar into a Tools menu — measured, not a fixed breakpoint</td></tr>
-    <tr><td>≤768px</td><td>Search pill goes in-flow; the Mazlan pill is hidden, still reachable from the rail and profile menu</td></tr>
-    <tr><td>≤640px</td><td>Nav rail hidden, <code>--navrail-w</code> zeroed, nav drawer takes over; <code>--px-gutter</code> becomes the single 16px inset for app bar, header and content</td></tr>
-    <tr><td>≤480px</td><td>Logo 22px, avatar 30px, tighter app-bar gap</td></tr>
+    <tr><td><code>body</code></td><td><code>data-variant="praxis"</code> and <code>data-theme</code>. Without the first, none of the <code>--px-*</code> materials, the dot grid or the 8/12/16 geometry apply</td></tr>
+    <tr><td>Theme script</td><td>Inline, first thing inside <code>&lt;body&gt;</code>. In <code>&lt;head&gt;</code> it runs before <code>body</code> exists and does nothing</td></tr>
+    <tr><td>Rail items</td><td>Labelled. <a href="nav-drawer.html">The drawer</a> derives its text from those labels</td></tr>
+    <tr><td>Skip link</td><td><code>.px-skip</code> as the first focusable element, pointing at your content container. Every page opens with an app bar and a rail, so a keyboard user traverses about ten controls before reaching content</td></tr>
+    <tr><td><code>.page-body</code></td><td>Yours entirely — Praxis styles nothing on it. The two rules are above</td></tr>
   </tbody>
 </table>
 
-<h2>Nav drawer — free, from the rail</h2>
+<h2>Token reference</h2>
 
-<p><code>praxis-navdrawer.js</code> reads the rail you already wrote and builds the
-narrow-width drawer from it. There is no second markup contract: label a rail button with
-<code>aria-label</code> and the drawer picks the label up. Mark the current item with
-<code>.praxis-navrail__btn--active</code> and the drawer marks it too.</p>
+<praxis-block name="tokens" prefix="--praxis-appbar|--praxis-navrail|--ph-|--px-toolbar"></praxis-block>
 
-<h2>Profile menu</h2>
+<p>Those four families are the whole geometry of the shell. Change a band's height by changing its
+token, never by overriding one page — that drift is exactly what
+<code>praxis-pageheader.css</code> was written to prevent.</p>
 
-<p>You supply the trigger, the <code>.profile-menu__pop</code> element and — optionally —
-a <code>.profile-menu__head</code> carrying your persona's name and role.
-<code>praxis-profile-menu.js</code> renders everything else inside the pop: navigation, the
-theme switch, sign out, the current-page marker, the version footer. It preserves your
-<code>.profile-menu__head</code>, because the persona is yours, not chrome.</p>
+<h2>Figma adaptation</h2>
 
-<p>It writes <code>localStorage['gl-theme']</code> when the user toggles the theme. That is
-the key your boot script reads — use a different one and you must persist it yourself.</p>
+<p>Not mapped. Praxis has no Figma library.</p>
 
-<p>You still wire open and close on the trigger yourself, as the example above does. The
-script deliberately does not touch the trigger or the pop element, so each page keeps its
-own binding.</p>
+<h2>Usage guidelines</h2>
 
-<p><code>.verswitch</code> is the version switcher the script renders into the pop's footer.
-You do not build it; it is listed here because it is the one <code>.profile-menu</code> family
-member that is not part of your markup contract.</p>
+<p><strong>Do</strong></p>
+<ul>
+  <li>Set both <code>body</code> attributes, and set the theme before first paint.</li>
+  <li>Write the two <code>.page-body</code> rules. Nothing scrolls until you do.</li>
+  <li>Label every rail item.</li>
+  <li>Include <code>.px-skip</code>.</li>
+  <li>Change band heights through their tokens.</li>
+</ul>
 
-<div class="note">
-  <p>The pop is height-capped with its own scroll as of 0.1.4. Before that it extended past
-  the bottom of the window on short viewports and Sign out was unreachable.</p>
-</div>
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Put the theme script in <code>&lt;head&gt;</code>.</li>
+  <li>Override <code>--ph-h</code> or <code>--px-toolbar-h</code> on one page — page content will
+  start at a different y there than everywhere else.</li>
+  <li>Give <code>.page-body</code> a background. You will cover the dot grid.</li>
+  <li>Assume <code>.app</code>'s <code>height:100vh</code> is what you want for a document-shaped
+  page. It is an application shell and it does not scroll.</li>
+</ul>
 
-<h2>What each sheet contributes</h2>
+<h2>Accessibility</h2>
 
-<praxis-block name="sheet-classes" sheet="praxis-appbar.css"></praxis-block>
+<ul>
+  <li><strong>Bypass blocks (WCAG 2.4.1)</strong> is the reason <code>.px-skip</code> exists, and
+  it is a rule in <code>praxis-core.css</code> with no markup — you have to add the link.</li>
+  <li>Rail item labels are load-bearing twice: for assistive technology and for the drawer.</li>
+  <li>The app bar and the rail are the first ten-odd tab stops on every page. Anything that makes
+  them longer makes every page worse.</li>
+  <li>The masthead's landmarks matter: the page header is a <code>&lt;header&gt;</code>, the rail
+  and drawer are labelled <code>&lt;nav&gt;</code> elements, and the content container is where
+  <code>id="main"</code> belongs.</li>
+  <li><code>.app</code> is <code>overflow:hidden</code>, so the scroll container is
+  <code>.page-body</code>. Anchor links and scroll-into-view have to target that element, not the
+  window — a trap this reference site hit with its own table of contents.</li>
+  <li><strong>Forced colors:</strong> the app bar has no border and the rail is transparent with
+  one, both by design. In that mode the shell loses its structure — see
+  <a href="../foundations/forced-colors.html">Forced colors</a>.</li>
+</ul>
 
-<praxis-block name="sheet-classes" sheet="praxis-navrail.css"></praxis-block>
+<h2>Dimensions</h2>
 
-<praxis-block name="sheet-classes" sheet="praxis-pageheader.css"></praxis-block>
+<table>
+  <thead><tr><th>Band</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>App bar</td><td>Height</td><td><code>--praxis-appbar-h</code>, 64px</td></tr>
+    <tr><td>Nav rail</td><td>Width</td><td><code>--praxis-navrail-width</code>, 56px (240px expanded)</td></tr>
+    <tr><td>Page header</td><td>Min height</td><td><code>--ph-h</code>, 68px — a floor, so the breadcrumb may wrap and take it with it</td></tr>
+    <tr><td>Toolbar band</td><td>Min height</td><td><code>--px-toolbar-h</code>, 60px</td></tr>
+    <tr><td>Masthead</td><td>Combined</td><td>128px</td></tr>
+    <tr><td>Content start</td><td>y</td><td><strong>192px</strong>, and <code>--px-dot-clear</code> is set to exactly that so the dot grid stops short of the chrome</td></tr>
+    <tr><td>Phone gutter</td><td><code>--px-gutter</code></td><td>16px below 640px, shared by the bar, the header and the content</td></tr>
+  </tbody>
+</table>

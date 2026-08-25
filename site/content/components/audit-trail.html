@@ -1,0 +1,178 @@
+<!--praxis
+title: Audit trail
+summary: The most domain-critical gap in Praxis. Every regulated record needs an immutable, legible history and there is no way to draw one. Planned.
+order: 160
+tier: planned
+icon: history
+classes: px-trail
+keywords: audit trail timeline history activity feed event log immutable attribution 21 CFR Part 11 planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Nothing exists for this.</strong> Not a timeline, not an activity feed, not an event row. Tier 2 on <code>ROADMAP.md</code>, and a first-class Praxis component by decision 3 there.</p>
+</div>
+
+<p>In nuclear, pharma and aviation the history of a record is frequently more scrutinised than
+its current state. Who changed the severity, when, from what, to what, and why — that is the
+artefact an inspector asks for. It is not an activity feed in the social sense; it is evidence.</p>
+
+<p>That distinction drives every decision on this page. A social feed can be lossy, paginated
+by recency and summarised. An audit trail cannot: it must be complete, ordered, attributable,
+and printable. Praxis has no print stylesheet either
+(<code>ROADMAP.md</code> F1), so those two items are coupled.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Rail</strong> — the vertical line carrying the sequence.</li>
+  <li><strong>Marker</strong> — one per event, typed by what happened.</li>
+  <li><strong>Actor</strong> — an <a href="avatar.html">avatar</a> and a name. Never a name alone
+  and never an avatar alone.</li>
+  <li><strong>Action</strong> — the verb phrase. "Changed severity from Medium to High".</li>
+  <li><strong>Timestamp</strong> — absolute, with timezone. See Markup contract.</li>
+  <li><strong>Detail</strong> — optional expandable diff, comment or attachment reference.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table><thead><tr><th>Variant</th><th>Use</th></tr></thead><tbody>
+  <tr><td>Full trail</td><td>The History tab of a record. Every event, oldest or newest first — see Usage</td></tr>
+  <tr><td><code>--compact</code></td><td>The last three events in a side rail, with a link to the full trail</td></tr>
+  <tr><td><code>--grouped</code></td><td>Events collapsed by actor and time window: "Marcus Silva made 4 changes". Convenient, and it must remain expandable to the individual events or it is no longer a trail</td></tr>
+  <tr><td><code>--diff</code></td><td>Field-level before and after. The variant that makes it evidence rather than a log</td></tr>
+</tbody></table>
+
+<p><strong>Open decision:</strong> whether grouping is allowed at all. It improves readability
+and it introduces a summarised view of a legal record. The safe position is that grouping is
+presentation only, always expandable, and never the printed form.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Event types</strong> — created, edited, status change, assignment, comment,
+  attachment, approval, signature, system action. Each needs a distinct marker; nine fills alone
+  will not carry it.</li>
+  <li><strong>System versus person</strong> — must be unmistakable. An escalation fired by a
+  scheduled job is not a decision someone made.</li>
+  <li><strong>Superseded</strong> — a correction that replaces an earlier entry. The earlier
+  entry stays visible and marked, because deleting it is the one thing an audit trail may not do.</li>
+  <li><strong>Loading more</strong> — a long trail pages. Depends on <a href="loading.html">loading states</a>.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table><thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead><tbody>
+  <tr><td>Desktop</td><td>Rail left, timestamp in a fixed right column so the times align down the page</td></tr>
+  <tr><td>Tablet</td><td>Timestamp moves under the action</td></tr>
+  <tr><td>Phone</td><td>Rail narrows, diffs collapse by default</td></tr>
+  <tr><td>Print</td><td>Rail and markers drop; it becomes a table. This is the form an inspector receives and it should be designed, not left to the browser</td></tr>
+</tbody></table>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>New sheet — <code>praxis-trail.css</code>. It is a substantial component with
+several dependents and it does not belong inside the admin or record sheets.</p>
+
+<p>CSS only. The events are the application's data and a Praxis script that fetched or ordered
+them would be reaching well past where the system stops.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<ol class="px-trail" aria-label="Record history">
+  <li class="px-trail__event px-trail__event--status">
+    <span class="px-trail__marker" aria-hidden="true">
+      <span class="material-symbols-rounded">flag</span>
+    </span>
+    <div class="px-trail__body">
+      <p class="px-trail__action">
+        <span class="px-avatar px-avatar--sm" aria-hidden="true">MS</span>
+        <strong>Marcus Silva</strong> changed severity from
+        <del>Medium</del> to <ins>High</ins>
+      </p>
+      <p class="px-trail__reason">Second near-miss in the same bay this quarter.</p>
+    </div>
+    <time class="px-trail__time" datetime="2026-03-14T09:22:00Z">14 Mar 2026, 09:22 UTC</time>
+  </li>
+
+  <li class="px-trail__event px-trail__event--system">
+    <span class="px-trail__marker" aria-hidden="true">
+      <span class="material-symbols-rounded">bolt</span>
+    </span>
+    <div class="px-trail__body">
+      <p class="px-trail__action"><strong>Escalation rule</strong> notified the site manager</p>
+    </div>
+    <time class="px-trail__time" datetime="2026-03-14T09:25:00Z">14 Mar 2026, 09:25 UTC</time>
+  </li>
+</ol>
+</template>
+
+<h2>Markup contract</h2>
+
+<table><thead><tr><th>Item</th><th>Requirement</th></tr></thead><tbody>
+  <tr><td>Element</td><td><code>&lt;ol&gt;</code>. The order is the meaning</td></tr>
+  <tr><td><code>&lt;time datetime&gt;</code></td><td>Machine-readable, and the visible text carries the timezone. A trail showing browser-local times without saying so is actively misleading across sites in different countries — which is the normal case here</td></tr>
+  <tr><td>Relative times</td><td><strong>Not permitted.</strong> "2 hours ago" is unusable as evidence and changes every time the page is read. An absolute timestamp may carry a relative <em>hint</em>, never the reverse</td></tr>
+  <tr><td>Diffs</td><td><code>&lt;del&gt;</code> and <code>&lt;ins&gt;</code>, so the change is semantic rather than two colours</td></tr>
+  <tr><td>Markers</td><td><code>aria-hidden</code>. The event type must also be in the text, because a glyph is not a record</td></tr>
+  <tr><td>Actor</td><td>Name as text. The avatar is decorative</td></tr>
+  <tr><td>JS</td><td>None</td></tr>
+</tbody></table>
+
+<h2>Token reference</h2>
+
+<table><thead><tr><th>Token</th><th>Use</th></tr></thead><tbody>
+  <tr><td><code>--praxis-color-border-default</code></td><td>The rail</td></tr>
+  <tr><td><code>--px-surface-2</code></td><td>Marker well</td></tr>
+  <tr><td><code>--praxis-color-status-success</code> / <code>-warning</code> / <code>-danger</code> / <code>-info</code></td><td>Marker tints by event type</td></tr>
+  <tr><td><code>--praxis-tone-danger-fg</code> / <code>--praxis-tone-success-fg</code></td><td><code>&lt;del&gt;</code> and <code>&lt;ins&gt;</code> ink — the audited pairs, since these are small text</td></tr>
+  <tr><td><code>--praxis-color-text-tertiary</code></td><td>Timestamp</td></tr>
+  <tr><td><code>--praxis-color-neutral-30</code></td><td>System actor marker</td></tr>
+</tbody></table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use absolute timestamps with a timezone.</li>
+  <li>Name the actor in text, every time.</li>
+  <li>Show what changed from and to, not just that something changed.</li>
+  <li>Keep superseded entries visible and marked.</li>
+  <li>Default to newest first for reading, and offer oldest first — reconstructing a sequence is
+  easier forwards.</li>
+</ul>
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use relative times.</li>
+  <li>Summarise without an expandable path to the individual events.</li>
+  <li>Let a system action look like a human decision.</li>
+  <li>Omit an event because it seems uninteresting. Completeness is the property that makes this
+  worth having.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>An ordered list, so a screen-reader user hears the sequence and its length.</li>
+  <li>Event type in text, not only in a marker glyph — WCAG 1.4.1.</li>
+  <li><code>&lt;del&gt;</code>/<code>&lt;ins&gt;</code> rather than colour for diffs, for the same
+  reason.</li>
+  <li>Expandable details follow the <a href="accordion.html">disclosure</a> contract.</li>
+  <li>Long trails need a heading structure or landmark, or the History tab becomes one
+  unnavigable list of four hundred items.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table><thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead><tbody>
+  <tr><td>Rail</td><td>Width / inset</td><td>2px, 15px from the left edge so it centres a 32px marker</td></tr>
+  <tr><td>Marker</td><td>Size</td><td>32px</td></tr>
+  <tr><td>Event</td><td>Vertical gap</td><td><code>--praxis-space-20</code></td></tr>
+  <tr><td>Timestamp</td><td>Column width</td><td>11rem desktop, inline below tablet</td></tr>
+</tbody></table>

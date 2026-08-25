@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- GENERATED redirect stub. GitHub Pages serves static files only, so there is
      no server-side redirect available: this is the client-side equivalent, and it
      uses all three mechanisms because each covers a case the others do not.
@@ -17,16 +18,16 @@
 <meta http-equiv="refresh" content="0; url={{target}}">
 <link rel="canonical" href="{{target}}">
 <title>Moved to {{title}} · Praxis</title>
-<link rel="stylesheet" href="{{root}}praxis/praxis-tokens.css">
+<link rel="stylesheet" href="{{root}}praxis/praxis.css">
 <link rel="stylesheet" href="{{root}}assets/site.css">
 </head>
-<body>
-<main class="main" style="display:block;max-width:34rem;margin:0 auto;padding:4rem 1.5rem">
-  <h1 style="font-size:1.5rem;font-weight:600;margin:0 0 .5rem">This page moved</h1>
-  <p style="color:var(--doc-ink-2)"><code>{{from}}</code> is now
-     <a href="{{target}}">{{title}}</a>.</p>
-  <p style="color:var(--doc-ink-3);font-size:.875rem">Taking you there now. If nothing
-     happens, use the link above.</p>
+<body data-variant="praxis" data-theme="light">
+<main class="doc-stub">
+  <div class="admin-card">
+    <h1 class="admin-card__title">This page moved</h1>
+    <p><code>{{from}}</code> is now <a href="{{target}}">{{title}}</a>.</p>
+    <p class="admin-note">Taking you there now. If nothing happens, use the link above.</p>
+  </div>
 </main>
 <script>location.replace({{targetjson}});</script>
 </body>

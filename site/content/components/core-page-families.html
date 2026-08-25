@@ -7,13 +7,23 @@ sheet: praxis-core.css
 classes: home, view, record, demo, rm-body, ws-body, ws-toolbar, rp-toolbar, admin-toolbar, admin-body, pager, subtab, rep, upnext, capa-prio, segswitch, mz-input, nav-menu-drawer, filter-toggle, qa, lg-btn, icon-btn, sortbtn, adminnav, appswitch, cn-item, view-toggle
 summary: Fourteen class names praxis-core.css mentions and does not define. Some are page-family hooks doing one job; the rest are components whose parts are styled while the container never was.
 keywords: core page family gutter home view record pager subtab rep upnext leftovers undefined part
+icon: category
 -->
 
 <p>Grep <code>praxis-core.css</code> for a class name and you will find several that look like
 components and are not. They fall into two groups, and neither gives you anything to build
 with — which is exactly why they are worth a page rather than a footnote.</p>
 
-<h2>Page families — one job each</h2>
+<h2>Anatomy</h2>
+
+<p>This page has no anatomy, because it does not document a component. It is a
+catalogue of names <code>praxis-core.css</code> refers to and does not define — page families,
+toolbar band variants, container names that were never styled, and interaction-only names.</p>
+
+<p>The sections are kept in the skeleton's order so this page answers the same questions as every
+other, but several of them answer "not applicable, and here is why".</p>
+
+<h3>Page families — one job each</h3>
 
 <p><code>.home</code>, <code>.view</code>, <code>.record</code>, <code>.demo</code>,
 <code>.rm-body</code>, <code>.ws-body</code> and <code>.admin-body</code> appear in
@@ -44,7 +54,9 @@ called on that screen. They carry no layout, no surface and no type.</p>
   See <a href="app-shell.html">the app shell</a>.</p>
 </div>
 
-<h2>Toolbar band variants</h2>
+<h2>Variants</h2>
+
+<h3>Toolbar band variants</h3>
 
 <p><code>.rp-toolbar</code>, <code>.ws-toolbar</code> and <code>.admin-toolbar</code> are
 alternative names for the toolbar band on different page families. Core mentions them only in
@@ -56,7 +68,49 @@ full gradient to the softer <code>--px-primary-soft</code>. The band itself is
 <code>.rp-toolbar</code> you get the dark primary treatment and nothing else — you still need
 <code>.toolbar</code> for the band.</p>
 
-<h2>Part-only names — the container was never styled</h2>
+<h2>States</h2>
+
+<h3>Interaction-only names</h3>
+
+<p>A last group appears solely in the shared hover and press lists:
+<code>.qa</code>, <code>.lg-btn</code>, <code>.icon-btn</code>, <code>.sortbtn</code>,
+<code>.filter-toggle</code>, <code>.pill-btn</code>. They are covered on
+<a href="buttons.html">Buttons</a>, where the table says which of them has a base and which
+does not. The short answer is <code>.tbtn</code> and <code>.admin-ghostbtn</code> only.</p>
+
+<h2>Responsive behavior</h2>
+
+<p>The page families carry the phone gutter. Below 640px
+<code>--px-gutter</code> is 16px and <code>.home</code>, <code>.view</code>,
+<code>.record</code>, <code>.ws-body</code>, <code>.admin-body</code>, <code>.rm-body</code> and
+<code>.demo</code> all take it as inline padding.</p>
+
+<p>That is the one thing on this page that is genuinely defined rather than referenced, and it is
+the reason the family names matter: one rule sets the content inset for seven page types, so the
+app bar, the page header and the content all line up on one number.</p>
+
+<h2>Interactive demo</h2>
+
+<p>There is nothing to demonstrate — every name on this page is either a
+container Praxis does not style or a state it only tints. The frame below shows the one visible
+thing: <code>.subtab</code>, a name-only family, rendering as bare buttons.</p>
+
+<template data-example="A name-only family, rendering as nothing" data-height="120">
+  <div class="subtab">
+    <button class="subtab__btn" type="button">Open <span class="subtab__count">4</span></button>
+    <button class="subtab__btn" type="button">Closed <span class="subtab__count">17</span></button>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p><code>praxis-core.css</code>, which every page loads. Nothing here needs to be
+imported separately — the point of the page is that these names are already in scope and mostly
+do not do what their names suggest.</p>
+
+<h2>Markup contract</h2>
+
+<h3>Part-only names — the container was never styled</h3>
 
 <p>These seven have <strong>no rule keyed on the bare class at all</strong>. Core styles their
 <em>parts</em> and leaves the container to the page:</p>
@@ -83,15 +137,30 @@ full gradient to the softer <code>--px-primary-soft</code>. The band itself is
   looks half-wired.</p>
 </div>
 
-<h2>Interaction-only names</h2>
+<h2>Token reference</h2>
 
-<p>A last group appears solely in the shared hover and press lists:
-<code>.qa</code>, <code>.lg-btn</code>, <code>.icon-btn</code>, <code>.sortbtn</code>,
-<code>.filter-toggle</code>, <code>.pill-btn</code>. They are covered on
-<a href="buttons.html">Buttons</a>, where the table says which of them has a base and which
-does not. The short answer is <code>.tbtn</code> and <code>.admin-ghostbtn</code> only.</p>
+<praxis-block name="tokens" prefix="--px-gutter|--home-gutter|--sp-gutter"></praxis-block>
 
-<h2>Why this page is in the unstable tier</h2>
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use a family name on your page container so it picks up the phone gutter.</li>
+  <li>Check this page before assuming a class exists.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Expect a container from a part-only name.</li>
+  <li>Rely on an interaction-only name for anything at rest.</li>
+  <li>Invent a new page family. Seven is enough, and each one is a line in a shared media query.</li>
+</ul>
+
+<h3>Why this page is in the unstable tier</h3>
 
 <p>Because none of it is a decision anyone would make on purpose. These names are the residue
 of extracting a shared sheet from twenty pages: the interaction rules were general enough to
@@ -100,3 +169,23 @@ definition or stops being mentioned in <code>src/</code> — this page exists so
 state is visible instead of surprising, and it is measured by the
 <a href="../foundations/gaps.html#families-praxis-never-keys-a-rule-on">unkeyed families</a>
 table on every build.</p>
+
+<h2>Accessibility</h2>
+
+<p>Nothing here is a control, so there is little to assess. Two notes that do
+matter:</p>
+
+<ul>
+  <li>Six of these names have no base rule at all — <code>.pager</code>, <code>.capa-prio</code>,
+  <code>.subtab</code>, <code>.upnext</code>, <code>.rep</code>, <code>.qa</code> — which means
+  anything built on them is unstyled, and unstyled frequently means unfocusable and unlabelled
+  too. <code>.pager</code> is pagination and is tracked on
+  <a href="pagination.html">Pagination</a>.</li>
+  <li>The page-family containers are where a skip-link target belongs. <code>.px-skip</code>
+  points at page content, and that content is one of these.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<p>None defined. These are names, not boxes — which is the whole subject of the
+page.</p>

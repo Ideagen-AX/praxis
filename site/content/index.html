@@ -49,9 +49,12 @@ way a reference stays true to the thing it describes.</p>
 <p>Two sections account for nearly every "Praxis looks broken" report. Read them before
 writing markup.</p>
 
-<div class="cardgrid">
-  <a href="foundations/getting-started.html"><strong>Getting started</strong><span>The six non-negotiables, a complete working page, and how to diagnose a page that looks wrong</span></a>
-  <a href="foundations/mental-model.html"><strong>The one mental model</strong><span>Praxis styles component contents. Your page owns container positioning.</span></a>
+<!-- The same classes praxis-block name="pages" emits, so this hand-written pair
+     and the generated grids below it are one component. Without them these two
+     rendered as bare underlined links beside eleven cards. -->
+<div class="admin-grid admin-grid--2 cardgrid">
+  <a class="admin-card admin-card--flush" href="foundations/getting-started.html"><strong>Getting started</strong><span>The six non-negotiables, a complete working page, and how to diagnose a page that looks wrong</span></a>
+  <a class="admin-card admin-card--flush" href="foundations/mental-model.html"><strong>The one mental model</strong><span>Praxis styles component contents. Your page owns container positioning.</span></a>
 </div>
 
 <h2>Foundations</h2>

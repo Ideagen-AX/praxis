@@ -1,0 +1,148 @@
+<!--praxis
+title: Avatar
+summary: One avatar exists and it is welded to the app bar. Assignment, comments and sign-off all need it standalone. Planned.
+order: 150
+tier: planned
+icon: person
+classes: px-avatar
+keywords: avatar user initials photo group stack assignee presence planned
+-->
+
+<div class="note note--planned">
+  <p><strong><code>.appbar__avatar</code> is the only avatar in Praxis</strong> and its name binds it to the app bar. Tier 2 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>A small component with a lot of callers once the domain patterns land: an assignee on a
+CAPA row, the author of a <a href="comments.html">comment</a>, the signatory on an
+<a href="signature.html">attestation</a>, every actor in an <a href="audit-trail.html">audit
+trail</a>. Three of those four are also on this roadmap, so this is the shared dependency.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Frame</strong> — circle, fixed size, never distorted.</li>
+  <li><strong>Content</strong> — photo, initials, or a fallback glyph.</li>
+  <li><strong>Ring</strong> — a border separating it from whatever it sits on.
+  <code>.appbar__avatar</code> already does this and changes the ring per theme.</li>
+  <li><strong>Group</strong> — an overlapping stack with an overflow count.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table><thead><tr><th>Variant</th><th>Note</th></tr></thead><tbody>
+  <tr><td>Photo</td><td><code>background: center/cover</code>, as <code>.appbar__avatar</code> does</td></tr>
+  <tr><td>Initials</td><td>The common case. One or two letters, teal fill</td></tr>
+  <tr><td>System</td><td>An action taken by an integration or a scheduled job. An audit trail needs this and it must not look like a person</td></tr>
+  <tr><td>Group</td><td>Overlapping, with <code>+3</code></td></tr>
+  <tr><td>Sizes</td><td>Three: 20px inline, 28px in a row, 34px in chrome (the existing size)</td></tr>
+</tbody></table>
+
+<p><strong>Open decision:</strong> whether initials get a colour derived from the name. It
+helps distinguish people at a glance and it is a contrast liability — a hashed hue will
+eventually land on something that fails against white text. The safer answer is one fill.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Image failed</strong> — must fall back to initials, not to a broken image. This is
+  the state that actually occurs.</li>
+  <li><strong>Interactive</strong> — where the avatar opens a profile menu, it needs focus and
+  hover. <code>.appbar__avatar</code> is a trigger today and has neither.</li>
+  <li><strong>Deactivated user</strong> — a former employee still named in a record. Regulated
+  history does not delete people, so the avatar has to render them without implying they are
+  current.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>None. Fixed sizes. A group may show fewer before the overflow count at narrow widths.</p>
+
+<h2>Interactive demo</h2>
+
+<template data-example="Today: .appbar__avatar, and only inside an app bar" data-height="120">
+  <div class="appbar" style="height:auto;padding:.75rem 1rem">
+    <div class="appbar__right" style="margin:0">
+      <span class="appbar__avatar">ms</span>
+    </div>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p><code>praxis-core.css</code>. It is a primitive with several dependents and no
+sheet of its own is warranted.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<span class="px-avatar" aria-hidden="true">MS</span>
+<span class="px-avatar px-avatar--sm" style="background-image:url(…)" role="img"
+      aria-label="Marcus Silva"></span>
+<span class="px-avatar px-avatar--system" aria-hidden="true">
+  <span class="material-symbols-rounded">bolt</span>
+</span>
+
+<div class="px-avatar-group">
+  <span class="px-avatar px-avatar--sm">MS</span>
+  <span class="px-avatar px-avatar--sm">AB</span>
+  <span class="px-avatar px-avatar--count">+3</span>
+</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table><thead><tr><th>Item</th><th>Requirement</th></tr></thead><tbody>
+  <tr><td>Decorative use</td><td><code>aria-hidden="true"</code> when the name is already beside it — which is most of the time. An avatar next to "Marcus Silva" that also announces "Marcus Silva" is noise</td></tr>
+  <tr><td>Standalone use</td><td><code>role="img"</code> with <code>aria-label</code></td></tr>
+  <tr><td>Initials</td><td>Server- or app-derived. Not computed in CSS</td></tr>
+  <tr><td>Group</td><td>A list, with the overflow count as text — not a tooltip-only affordance</td></tr>
+  <tr><td>JS</td><td>None</td></tr>
+</tbody></table>
+
+<h2>Token reference</h2>
+
+<table><thead><tr><th>Token</th><th>Use</th></tr></thead><tbody>
+  <tr><td><code>--praxis-color-teal-60</code></td><td>Initials fill, as today</td></tr>
+  <tr><td><code>--praxis-color-text-inverse</code></td><td>Initials ink. White in both themes by design</td></tr>
+  <tr><td><code>--praxis-radius-full</code></td><td>Frame</td></tr>
+  <tr><td><code>--praxis-color-neutral-30</code></td><td>System / deactivated fill</td></tr>
+</tbody></table>
+<p>The ring is hard-coded per theme in <code>praxis-appbar.css</code>
+(<code>rgba(16,36,58,.12)</code> light, <code>rgba(255,255,255,.22)</code> dark). Promoting it to
+a token is part of this work.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Pair it with the name in a list. The avatar is recognition, the name is identification.</li>
+  <li>Hide it from assistive technology when the name is adjacent.</li>
+  <li>Give system actors a distinct treatment.</li>
+</ul>
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use an avatar alone to identify who did something in an audit trail.</li>
+  <li>Let a failed image render as a broken image.</li>
+  <li>Stack more than about five before the overflow count.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>Decorative by default; labelled only when standalone.</li>
+  <li>Initials are text and inherit the fill's contrast — white on teal-60 measures well, but a
+  hashed per-user hue would not be guaranteed to.</li>
+  <li>An interactive avatar needs a focus ring and an accessible name describing the action
+  ("Your account"), not the person.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table><thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead><tbody>
+  <tr><td>Frame</td><td>Sizes</td><td>20 / 28 / 34px</td></tr>
+  <tr><td>Initials</td><td>Size / weight</td><td>0.4× frame / 700</td></tr>
+  <tr><td>Ring</td><td>Width</td><td>2px, as today</td></tr>
+  <tr><td>Group</td><td>Overlap</td><td>−8px at 28px</td></tr>
+</tbody></table>

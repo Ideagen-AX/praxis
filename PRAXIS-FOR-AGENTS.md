@@ -169,7 +169,7 @@ Rule counts and class families, read from `src/` at build time. "Families" count
 
 | Sheet | Rules | Main class families |
 |---|---|---|
-| `praxis-admin.css` | 259 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
+| `praxis-admin.css` | 261 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
 | `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.msel`, `.iconbtn-ghost` |
 | `praxis-controls.css` | 32 | `.tb-dropdown`, `.iconbtn`, `.filterfield`, `.icon`, `.material-symbols-rounded` |
 | `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
@@ -1359,6 +1359,19 @@ Verified by hand against `src/` at 0.1.9. The generated tables further down are 
 | `.px-menu`, `.px-menu__head` | **Not defined**, but referenced by `praxis-navrail.css` for the dashboards flyout. Use `.px-pop` (defined in `praxis-admin.css`) instead. |
 | `.field` | Only the Praxis rule correcting `::before` alignment and raising rows to 64px. The base row is not here. |
 ](#the-app-shell)| `.page-body` | Yours entirely. The name appears in the shell markup but Praxis styles nothing on it — see [the app shell for the two rules you must write. |
+| `.card` | No base. `praxis-workspace.css` gives it the slate shadow and 12px radius and nothing else — no fill, no padding. Reach for `.admin-card`, which is complete. |
+| `.gl-theme-btn`, `.gl-sun`, `.gl-moon` | No base. The `[data-theme]` swap between the two glyphs works, and the button around them has no size, shape or hit area. Put the class on an `.appbar__iconbtn` for the geometry — that is what this site does. |
+
+### Four gaps this site had to fill
+
+The reference site is itself a Praxis page — the app bar, the labelled side nav, the page header, the toolbar band, the cards, the tables and the status pills are all the real components. Writing it that way is the most direct test of the system there is, and it found exactly four things it could not ask Praxis for.
+
+| What was needed | Closest Praxis has |
+|---|---|
+| **Long-form prose.** Headings, paragraph rhythm, prose lists, inline code, blockquotes. | Nothing. Praxis is an application design system and styles no document text at all. This is the largest thing the site writes for itself, and it is the right answer — an app has labels, not articles. |
+| **A callout box.** A framed aside carrying a status tone. | `.admin-note` is italic prose with no frame, and `.admin-banner` is a page-level bar. The status *tones* exist as `--praxis-tone-*`, so only the box is missing. |
+| **A secondary label above a value.** "Previous" over a page title. | `.admin-setting-row__label` is the right treatment bound to the wrong parent — it only works inside a settings row. |
+| **A brand lockup.** Mark, wordmark, version. | `.appbar__brand` positions it and expects a logo image. The teal→pink mark is the one piece of brand the palette does not express as a token. |
 
 ### Tokens read but never defined
 
@@ -1455,6 +1468,139 @@ So: **this site is the reference, that document is the rationale**, and this pag
 
 ---
 
+## Print
+
+Zero @media print rules in src/. Regulated records are printed and PDF'd as evidence, which makes this a functional gap rather than a cosmetic one. Planned.
+
+**Nothing is defined.** A grep for `@media print` across every sheet in `src/` returns zero. Foundation gap F1 on `ROADMAP.md`.
+
+In nuclear, pharma and aviation a record is routinely printed or exported to PDF and handed to an inspector. That artefact is the deliverable, not a convenience — and today Praxis contributes nothing to it, so what comes out of the printer is whatever the browser makes of an application shell designed for a 1440px viewport.
+
+### What actually happens today
+
+Predictable, and all of it wrong:
+
+- **The shell prints.** `.app` is `height:100vh` with `overflow:hidden`, so the printed output is one screenful and the rest of the record is simply absent. This is the serious one: a printed record that silently stops is worse than no print support.
+- **Chrome consumes the page.** The app bar, the nav rail or side nav, the page header and the toolbar band are 192px of fixed chrome that nobody needs on paper.
+- **The dot grid prints.** `body[data-variant="praxis"]` sets a `radial-gradient` texture with `background-attachment:fixed`. Most browsers drop backgrounds by default, which is luck rather than design.
+- **Dark theme prints dark** if that is what the user was reading in.
+- **Collapsed sections stay collapsed**, so a printed form omits whatever was closed.
+- **Links lose their targets.** A reference that reads "see the finding" on paper points nowhere.
+
+### What it should do
+
+| Rule | Why |
+|---|---|
+| Force the light theme | Ink. Simply override the dark tokens inside the print block rather than asking the user to toggle first |
+| Release the shell | `.app{height:auto;overflow:visible}`, `.admin-body{overflow:visible}`. Without this nothing else matters |
+| Hide the chrome | App bar, nav rail, side nav, toolbar band, skip link, theme toggle |
+| Keep the page header | The breadcrumb and title are the record's identity and belong at the top of the printout |
+| Drop shadows and textures | Praxis carries almost all of its structure in `box-shadow`, which prints as nothing or as grey mud. Cards need a hairline in print |
+| Expand collapsed regions | A printed record must be complete |
+| Avoid breaking rows and cards | `break-inside: avoid` on `.admin-card`, table rows and `.rfield` |
+| Repeat table headers | `thead{display:table-header-group}`. A five-page register with headers on page one is unreadable |
+| Expose link targets | `a[href^="http"]::after{content:" (" attr(href) ")"}`, scoped to prose so it does not fire on every nav item |
+](#audit-trail)| Print the audit trail as a table | The rail and markers are screen affordances. See [audit trail |
+
+### Open decisions
+
+- **Where the rules live.** One `praxis-print.css` that consumers opt into, or a `@media print` block at the end of each component sheet. A separate sheet is easier to reason about and easy to forget to link; blocks in each sheet cannot be forgotten and scatter the logic. Leaning towards a separate sheet included in the barrel.
+- **Whether Praxis owns page margins and headers.** `@page` can set margins and running headers. That is arguably the application's decision, but if Praxis does not take it nobody will.
+- **Whether a print view is a print stylesheet at all.** For a formal export, generating a document server-side gives control a stylesheet cannot. The honest scope for Praxis is "printing a screen produces something usable", not "printing produces the regulatory artefact".
+
+### Why this is not just CSS
+
+Two of the items above are coupled to other gaps. Collapsed [sections](#accordion) must expand, and that needs the disclosure component to expose its state in a way print can override. The [audit trail](#audit-trail) needs a print form designed alongside its screen form. Neither can be retrofitted afterwards, which is the argument for doing this while those components are still on paper.
+
+---
+
+## Forced colors and high contrast
+
+Zero forced-colors support, in a system that carries nearly all of its structure in box-shadow. Shadows are dropped in that mode, so the shell loses its shape. Planned.
+
+**Nothing is defined.** No `forced-colors` and no `prefers-contrast` anywhere in `src/`. Foundation gap F2 on `ROADMAP.md`.
+
+Windows High Contrast — `forced-colors: active` — replaces the author's colours with a user-chosen system palette and **discards `box-shadow` entirely**. That is the problem, because Praxis's whole visual language is shadow.
+
+This mode is common in industrial, government and defence environments, which is most of the EHSQ customer base, and it turns up in procurement accessibility questionnaires. It is also the single cheapest large accessibility win available to this system, because the fix is additive: one media block per component that draws a border where a shadow used to be.
+
+### Why Praxis is unusually exposed
+
+The material layer is built from shadows on purpose, and the comments in `praxis-core.css` say so: `--praxis-card`, `--px-tool-shadow`, `--px-overlay`, `--px-card-rail` and `--px-card-raised` are how a surface reads as raised, and `0 0 0 .5px` ring shadows are how most components draw their edge instead of using a border.
+
+In forced-colors, every one of those disappears at once. The result is not a degraded look, it is a loss of structure:
+
+| Component | What it loses |
+|---|---|
+| `.tbtn`, `.iconbtn`, `.filterfield` | All of it. These have `border:0` and a tool shadow, so they become unbounded text and glyphs |
+| `.admin-card`, `.card` | Its edge. A page of cards becomes one undifferentiated block |
+| `.px-pop`, `.tb-dropdown`, `.appswitch__pop` | Separation from the page beneath. Under the Praxis variant these explicitly set `border:0` and rely on `--px-overlay` |
+| Praxis fields | Everything. Fields carry no border by design — `--px-field` is documented as "the whole affordance" — and a fill difference is exactly what forced-colors removes |
+| The app shell | The nav rail is transparent with one border; the app bar has none. Both blend into the page by design |
+](#loading)| [Skeletons | A fill with no border and no text vanishes completely |
+| Status pills, stepper markers, tone chips | All fill-differentiated, so several states collapse into one |
+
+### The shape of the fix
+
+- **Draw borders where shadows were.** Inside `@media (forced-colors: active)`, give every shadow-bounded component `border:1px solid`. The colour is irrelevant — the UA replaces it — so `currentColor` or a system keyword is fine.
+- **Use the system colour keywords** where a role must be conveyed: `ButtonBorder`, `ButtonText`, `Canvas`, `CanvasText`, `Highlight`, `HighlightText`, `LinkText`, `GrayText`.
+- **Keep focus visible.** `forced-color-adjust` and the UA's own focus ring interact; the 29 `:focus-visible` rules in `src/` need checking, not assuming.
+- **Add a non-colour differentiator to every state that is currently a fill.** Selected, complete, blocked and skipped cannot all be `Highlight`. This is the part that is design work rather than a media block.
+- **Never use `forced-color-adjust: none`** except for something whose colour is the content — the palette swatches on [Color](#color) are the one legitimate case on this site.
+
+### Open decisions
+
+- **Where the rules live.** Same question as [print](#print), and the answer should be the same for both.
+- **Whether to also honour `prefers-contrast: more`**, which is a separate signal with a different meaning — the user wants more contrast, not a replaced palette. Cheaper to support and less urgent.
+- **How to test it.** Windows High Contrast is the reference implementation and neither macOS nor Linux reproduces it exactly, so this cannot be verified on the machine Praxis is developed on. That is worth saying plainly: without a test path, any claim here would be unverified.
+
+### What already works
+
+Not everything needs doing. `prefers-reduced-motion` is honoured in seven places and `:focus-visible` is used in 29, so the two adjacent accessibility signals are already handled. This is a gap, not a pattern of neglect.
+
+---
+
+## Right-to-left — an audit
+
+82 physical left/right declarations against 12 logical ones. This page measures the cost of RTL support and commits to nothing.
+
+**This page is an audit, not a plan.** Foundation gap F3 on `ROADMAP.md`, and deliberately scoped to measuring the cost rather than committing to the conversion. Nothing here should be read as a decision to support RTL.
+
+Praxis has no RTL support and no `[dir="rtl"]` rule anywhere. Whether that matters is a product question about which markets EHSQ Enterprise sells into, not a design-system question. What a design system can usefully say is *what it would cost*, and that number grows every sprint, which is the reason to write it down now rather than when someone asks.
+
+### The measurement
+
+| Measure | Count | Note |
+|---|---|---|
+| Physical `left:` / `right:` declarations | **82** | Positioning, mostly on popovers, scrims, drawers and pseudo-element rules |
+| Logical `*-inline` properties | 12 | `padding-inline` and `margin-inline`, added incidentally rather than as a policy |
+| `[dir="rtl"]` rules | **0** |  |
+| `text-align:left` / `right` | present throughout | `.admin-table__num` right-aligns numerals, which in RTL is a genuine design question, not a mechanical flip |
+
+Counted from `src/` on 2026-08-25 with a grep for anchored declarations. The 82 is a floor, not a total: it excludes `transform:translateX`, directional `border-radius` shorthands, and background-position values, all of which also need attention.
+
+### Where the cost actually is
+
+Not evenly spread. Four areas hold most of it:
+
+- **Popover and drawer positioning.** `.tb-dropdown{left:0}` with a `--right` modifier, `.px-navdrawer{left:0}` with `translateX(-100%)`, `.appswitch__pop`, `.qrail-pop`, `.persona-popover{right:calc(100% + 12px)}`. Each needs both a logical property and a flipped transform.
+- **The shell.** The nav rail and side nav are on the left by construction, and the dot grid's left fade is keyed to `--navrail-w` in a `linear-gradient(to right, …)`. That gradient does not flip with a logical property.
+- **Pseudo-element hairlines.** `.pageheader::after` and `.toolbar::after` use `left` and `right` together, which is `inset-inline` — an easy mechanical fix, and there are many of them.
+- **Chevrons and directional glyphs.** `chevron_right` in a breadcrumb must become `chevron_left`. That is a markup and icon-map problem, not a CSS one, and `praxis-lucide.js` would need to know about it.
+
+### What would need to be true
+
+1. A policy that new CSS uses logical properties, enforced by the build the way the `--ehsq-*` token ban already is. Without this the 82 keeps growing and any conversion is immediately stale.
+2. A mechanical pass over the four areas above.
+3. Design decisions that are not mechanical: numeral alignment in tables, whether the shell mirrors or stays left-anchored, and what happens to the dot-grid gradient.
+4. A test path. There is no RTL example on this site and no consumer using one, so a conversion would be unverifiable today.
+
+### The recommendation
+
+Adopt item 1 now and nothing else. A lint rule that fails on a new physical `left:`/`right:` costs almost nothing, stops the number growing, and leaves the decision about items 2 to 4 with the product. Doing the conversion speculatively would be a large change to every sheet in service of a market need nobody has stated — and the four non-mechanical decisions cannot be made without that need being real.
+
+---
+
 ## Fields
 
 The record form system — the most exercised component in Praxis and the one place every page that shows data agrees.
@@ -1463,7 +1609,16 @@ The record form system — the most exercised component in Praxis and the one pl
 Tier: **ready** · Sheet: `praxis-rfield.css`
 A field is either **interactive** — this workflow step owns it — or **static**, because it belongs to a passed step or is read-only. They are deliberately different shapes, because the same record body is editable in one step and frozen in the next, and the user has to tell at a glance which is which.
 
-### Interactive versus static
+### Anatomy
+
+1. **Row** — `.rfield`, a label and a control side by side.
+2. **Label** — `.rfield__label`, with `.req` for required.
+3. **Control** — `.rfield__control`. Fields carry no border, so the `--px-field` fill is the whole affordance.
+4. **Hint** — `.rfield__hint`, under the control.
+5. **Alert** — `.form-alert`, the inline validation message.
+6. **Group** — `.rfield__group`, several controls on one row.
+
+#### Interactive versus static
 
 |  | Interactive | Static |
 |---|---|---|
@@ -1514,7 +1669,9 @@ A field is either **interactive** — this workflow step owns it — or **static
 
 `[data-label-nocolon]` opts a static label out of the automatic colon. Use it for labels that are already questions — "Was high energy present?**:**" is not an improvement.
 
-### Groups
+### Variants
+
+#### Groups
 
 A `.rfield__group` puts fields side by side and stacks them automatically once locked, because a static row is already a two-column layout and nesting one inside another reads as noise.
 
@@ -1541,7 +1698,103 @@ A `.rfield__group` puts fields side by side and stacks them automatically once l
 </div>
 ```
 
-### Validation
+#### Picklists
+
+`.pill` wraps a real `<input type="radio">` **followed by a `<span>`** — the styling hangs off `input:checked + span`. Not `<button aria-checked>`: that carried no state and no keyboard model while looking selectable.
+
+```html
+<div class="rfield rfield--choice">
+  <span class="rfield__label">Severity</span>
+  <div class="pillset">
+    <label class="pill"><input type="radio" name="sev2" checked><span>Near miss</span></label>
+    <label class="pill"><input type="radio" name="sev2"><span>First aid</span></label>
+    <label class="pill"><input type="radio" name="sev2"><span>Medical treatment</span></label>
+    <label class="pill"><input type="radio" name="sev2"><span>Lost time</span></label>
+  </div>
+</div>
+```
+
+#### Reference field
+
+`.rref__input` plus `.rref__btn` plus a `.rref__menu[hidden]` of `.rref__opt` buttons. Options live in markup so each page configures its own list. Typing filters; only click or Enter commits; blur reverts uncommitted free text.
+
+Store the committed value in `data-committed` on the element, not in a closure, so a value restored from storage survives the next blur.
+
+```html
+<div class="rfield">
+  <label class="rfield__label" for="own">Owner</label>
+  <div class="rref" data-committed="Marcus Silva">
+    <input class="rref__input" id="own" type="text" value="Marcus Silva" autocomplete="off">
+    <button class="rref__btn" type="button" aria-label="Browse people">
+      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+    </button>
+    <div class="rref__menu">
+      <button class="rref__opt" type="button">Marcus Silva</button>
+      <button class="rref__opt" type="button">Aoife Byrne</button>
+      <button class="rref__opt" type="button">Priya Raman</button>
+      <button class="rref__opt" type="button">Tom Okafor</button>
+    </div>
+  </div>
+</div>
+```
+
+#### In-record table
+
+`.rtable__actions` plus a `<table>`. White fill, not the field grey — a table of rows is content, and the grey read as one large input. `.rtable--locked` keeps the rows and drops the controls.
+
+```html
+<div class="rtable">
+  <div class="rtable__actions">
+    <button class="rtable__action" type="button">
+      <span class="material-symbols-rounded" aria-hidden="true">add</span> Add witness
+    </button>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Role</th><th>Statement</th><th></th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Aoife Byrne</td><td>Supervisor</td><td>Taken 8 July</td>
+          <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
+            <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
+      <tr><td>Tom Okafor</td><td>Driver</td><td>Pending</td>
+          <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
+            <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
+    </tbody>
+    <!-- Own tbody, deliberately. See the striping gotcha below. -->
+    <tbody hidden>
+      <tr class="rtable__empty"><td colspan="4">No witnesses recorded.</td></tr>
+    </tbody>
+  </table>
+</div>
+```
+
+#### Sub-sections and the Mazlan hand-off
+
+```html
+<div class="subsec">
+  <p class="subsec__title">Immediate actions
+    <button class="mazbtn" type="button">
+      <span class="mazlan-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+      Ask Mazlan
+    </button>
+  </p>
+  <div class="rfield">
+    <label class="rfield__label" for="cont">Containment</label>
+    <input class="rfield__control" id="cont" type="text" value="Bay 4 cordoned, stack re-banded">
+  </div>
+  <div class="rfield rfield--locked">
+    <label class="rfield__label">Verified by</label>
+    <input class="rfield__control" value="Priya Raman" readonly>
+  </div>
+</div>
+```
+
+`.mazbtn` uses `.mazlan-mark`, so link `praxis-mazlan.css` too if you use it — the four child spans *are* the four dots.
+
+### States
+
+#### Validation
 
 `.rfield--invalid` is set by your save or submit check **only** — never on load. A field the user has not reached yet is not wrong.
 
@@ -1574,108 +1827,52 @@ A `.rfield__group` puts fields side by side and stacks them automatically once l
 </script>
 ```
 
-### Picklists
+#### The rest of the state set
 
-`.pill` wraps a real `<input type="radio">` **followed by a `<span>`** — the styling hangs off `input:checked + span`. Not `<button aria-checked>`: that carried no state and no keyboard model while looking selectable.
+- **Locked** — `.rfield--locked`, a read-only value with no control affordance.
+- **Required** — `.req` on the label.
+- **Collapsed** — `.is-collapsed` on a containing `.section`. A field inside a collapsed section is invisible *and* out of the tab order, which is why [the error summary](#error-summary) has to expand ancestors before focusing a target.
 
-```html
-<div class="rfield rfield--choice">
-  <span class="rfield__label">Severity</span>
-  <div class="pillset">
-    <label class="pill"><input type="radio" name="sev2" checked><span>Near miss</span></label>
-    <label class="pill"><input type="radio" name="sev2"><span>First aid</span></label>
-    <label class="pill"><input type="radio" name="sev2"><span>Medical treatment</span></label>
-    <label class="pill"><input type="radio" name="sev2"><span>Lost time</span></label>
-  </div>
-</div>
-```
+### Responsive behavior
 
-### Reference field
+`--praxis-record-rail-w` is 300px and narrows at breakpoints — that is the `.record__guide` / `.record__tree` rail beside the form, not the field. The field row itself reflows its label above its control at narrow widths.
 
-`.rref__input` plus `.rref__btn` plus a `.rref__menu[hidden]` of `.rref__opt` buttons. Options live in markup so each page configures its own list. Typing filters; only click or Enter commits; blur reverts uncommitted free text.
+Below 640px the record family takes `--px-gutter` as inline padding, along with the app bar and the page header, so all three edges line up on one number.
 
-Store the committed value in `data-committed` on the element, not in a closure, so a value restored from storage survives the next blur.
+### Interactive demo
 
-```html
-<div class="rfield">
-  <label class="rfield__label" for="own">Owner</label>
-  <div class="rref" data-committed="Marcus Silva">
-    <input class="rref__input" id="own" type="text" value="Marcus Silva" autocomplete="off">
-    <button class="rref__btn" type="button" aria-label="Browse people">
-      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-    </button>
-    <div class="rref__menu">
-      <button class="rref__opt" type="button">Marcus Silva</button>
-      <button class="rref__opt" type="button">Aoife Byrne</button>
-      <button class="rref__opt" type="button">Priya Raman</button>
-      <button class="rref__opt" type="button">Tom Okafor</button>
-    </div>
-  </div>
-</div>
-```
+Each variant carries its own frame in the sections above. Seven examples on one page is a lot, and they are distributed rather than grouped so each sits beside the rule it demonstrates.
 
-### In-record table
+### Code
 
-`.rtable__actions` plus a `<table>`. White fill, not the field grey — a table of rows is content, and the grey read as one large input. `.rtable--locked` keeps the rows and drops the controls.
+`praxis-rfield.css`. No script.
 
-```html
-<div class="rtable">
-  <div class="rtable__actions">
-    <button class="rtable__action" type="button">
-      <span class="material-symbols-rounded" aria-hidden="true">add</span> Add witness
-    </button>
-  </div>
-  <table>
-    <thead>
-      <tr><th>Name</th><th>Role</th><th>Statement</th><th></th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Aoife Byrne</td><td>Supervisor</td><td>Taken 8 July</td>
-          <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
-            <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
-      <tr><td>Tom Okafor</td><td>Driver</td><td>Pending</td>
-          <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
-            <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
-    </tbody>
-    <!-- Own tbody, deliberately. See the striping gotcha below. -->
-    <tbody hidden>
-      <tr class="rtable__empty"><td colspan="4">No witnesses recorded.</td></tr>
-    </tbody>
-  </table>
-</div>
-```
+It depends on `--px-field` and `--px-field-hover` from `praxis-core.css`, which is the shared form-field fill — the same one `.admin-field` uses. That is why the two look like one system despite living in different sheets.
 
-### Sub-sections and the Mazlan hand-off
+### Markup contract
 
-```html
-<div class="subsec">
-  <p class="subsec__title">Immediate actions
-    <button class="mazbtn" type="button">
-      <span class="mazlan-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-      Ask Mazlan
-    </button>
-  </p>
-  <div class="rfield">
-    <label class="rfield__label" for="cont">Containment</label>
-    <input class="rfield__control" id="cont" type="text" value="Bay 4 cordoned, stack re-banded">
-  </div>
-  <div class="rfield rfield--locked">
-    <label class="rfield__label">Verified by</label>
-    <input class="rfield__control" value="Priya Raman" readonly>
-  </div>
-</div>
-```
-
-`.mazbtn` uses `.mazlan-mark`, so link `praxis-mazlan.css` too if you use it — the four child spans *are* the four dots.
-
-### Four gotchas, each learned the hard way
+#### Four gotchas, each learned the hard way
 
 - **Zebra striping counts hidden rows.** `nth-of-type` counts every `<tr>`, including a hidden empty-state row, which made the first *real* row strike as even. Put the empty state in its own `<tbody>` so data rows count from one.
 - **`background-color`, never the `background` shorthand,** on a select. Selects layer a chevron image on top and the shorthand wipes it.
 - **Placeholders are content** and answer to WCAG 1.4.3 like any other text. `--praxis-color-text-disabled` measured 2.73:1 light and 2.77:1 dark on the field fill — a clear failure. Placeholders take `--praxis-color-text-secondary` (4.94:1 / 5.48:1); the weight drop to 500 is what separates a placeholder from a real value.
 - **`.admin-field` read-outs get the static treatment automatically,** selected with `:has(> .admin-field__value)` so generated pages needed no markup change. Emit `.admin-field > .admin-field__value` and you get it for free.
 
-### Everything this sheet defines
+#### The contract itself
+
+| Item | Requirement |
+|---|---|
+| Label | A real `<label for>`, or the row is a styled div with no association |
+| Hint | Wired with `aria-describedby`. Visual proximity is not association |
+| Alert | Also `aria-describedby`, and the input gets `aria-invalid="true"` |
+| Required | `.req` is decoration. The input needs `required` or `aria-required` |
+| Picklist | `.pillset`/`.pill` wrap real radios — the selection, keyboard navigation and screen-reader semantics come from the input, not the pill |
+| Locked | `readonly` or `disabled`, chosen deliberately: `disabled` leaves the tab order, `readonly` does not |
+| JS | None |
+
+### Token reference
+
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -1698,6 +1895,46 @@ Store the committed value in `data-committed` on the element, not in a closure, 
 | `.chip-area` | 1 |
 | `.is-collapsed` | 1 |
 
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Read the four gotchas in Markup contract before building a form. Each one was learned by getting it wrong.
+- Use `.pillset` for three or four options — it shows them all without a click.
+- Wire hints and alerts with `aria-describedby`.
+- Say what a validation message wants, not that something is wrong: "Enter the immediate cause".
+
+**Don't**
+
+- Rely on `.req` alone to make a field required.
+- Use `.pillset` for a long list. There is no select in this sheet — see [Select and combobox](#select).
+- Put a date field here and expect a picker. There is none; see [Date picker](#date-picker).
+- Assume a border. Fields have none, and the fill is doing all the work.
+
+### Accessibility
+
+- **Label association is the whole thing.** A `.rfield__label` that is not a `<label for>` looks identical and is useless to a screen reader.
+- Hints and alerts need `aria-describedby`; `aria-invalid` on the input is what conveys the error state.
+- **Fields carry no border**, so `--px-field` against `--px-surface` is the control boundary and has to clear 3:1 under WCAG 1.4.11. This is the reason `--praxis-color-border-strong` was repointed after measuring 2.95:1.
+- A form with more than a handful of fields needs an [error summary](#error-summary), which Praxis does not have — and a field inside a collapsed section is unreachable without one.
+- `.pillset` wraps real radios, so arrow-key navigation and group semantics come free. Do not replace them with buttons.
+- `readonly` versus `disabled` is an accessibility decision: a disabled field cannot be read by a keyboard user tabbing through the form.
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| `.rfield` | Row min height | 64px where the field rules raise it |
+| `.rtable` | Margin / border | 4px 16px 0 / 1px `--praxis-color-neutral-20` |
+| `.rtable` cells | Padding | 8px 12px head, 10px 12px body |
+| `.rtable__action` | Height | 32px |
+| Record rail | Width | `--praxis-record-rail-w`, 300px |
+| `.pill` | Inset | 10px inside the radio label |
 
 ---
 
@@ -1869,7 +2106,9 @@ Every Praxis page is the same four bands. This is the one page on this site wher
 </script>
 ```
 
-### The four bands
+### Anatomy
+
+#### The four bands
 
 | Band | Height | Token |
 |---|---|---|
@@ -1880,36 +2119,13 @@ Every Praxis page is the same four bands. This is the one page on this site wher
 
 Page content therefore starts at **192px**, and `--px-dot-clear` is set to exactly that so the dot grid stops short of the chrome. If you change a band height, change the token — not one page — or the dot grid will cut across your header.
 
-### The two rules your page must own
+### Variants
 
-`.app` is `height:100vh; overflow:hidden`, so the page does **not** scroll — the content column does. Praxis does not style `.page-body`; that name is yours. Add:
+One shell, three page families that wear it — the record page, the workspace and the admin section. What differs between them is the toolbar band's contents and `--ph-pad-x`: workspace 32px, record 24px, search 20px. The combined height does not differ, which is the promise the masthead exists to keep.
 
->
-`.page-body{ flex:1; min-height:0; overflow:auto; padding: var(--px-toolbar-gutter) var(--ph-pad-x) var(--praxis-space-32); }`
+See [Page families](#page-families-and-part-only-names) for the container names, and [The admin shell](#the-admin-shell) for the variant that adds a labelled side nav between the rail and the content.
 
-`--px-toolbar-gutter` (16px) is the canonical gap between the toolbar band and the first card of content. It exists because that gap was set per section and drifted — 8px on one page, 6px on another. Use the token.
-
-The body dot grid is `background-attachment:fixed`, so an inner scroll container is correct: the texture reads as page material and stays put while content moves.
-
-#### `.toolbar__inner` — when to use it
-
-Only when your content is a centred max-width column. The band stays full-bleed so its closing hairline lines up with the page header's; `.toolbar__inner` centres the controls so they align with the cards below. Set its `max-width` to the same number as your content column. For a full-width page, put the controls straight in `.toolbar` and drop the wrapper.
-
-### Responsive behaviour you get for free
-
-| Width | What happens |
-|---|---|
-| ≤1024px | Centred search pill narrows to `min(600px, 100vw - 420px)` |
-| ≤1024px, or toolbar overflow | `praxis-toolbar-compact.js` sets `body.tb-is-compact` and collapses the toolbar into a Tools menu — measured, not a fixed breakpoint |
-| ≤768px | Search pill goes in-flow; the Mazlan pill is hidden, still reachable from the rail and profile menu |
-| ≤640px | Nav rail hidden, `--navrail-w` zeroed, nav drawer takes over; `--px-gutter` becomes the single 16px inset for app bar, header and content |
-| ≤480px | Logo 22px, avatar 30px, tighter app-bar gap |
-
-### Nav drawer — free, from the rail
-
-`praxis-navdrawer.js` reads the rail you already wrote and builds the narrow-width drawer from it. There is no second markup contract: label a rail button with `aria-label` and the drawer picks the label up. Mark the current item with `.praxis-navrail__btn--active` and the drawer marks it too.
-
-### Profile menu
+#### Profile menu
 
 You supply the trigger, the `.profile-menu__pop` element and — optionally — a `.profile-menu__head` carrying your persona's name and role. `praxis-profile-menu.js` renders everything else inside the pop: navigation, the theme switch, sign out, the current-page marker, the version footer. It preserves your `.profile-menu__head`, because the persona is yours, not chrome.
 
@@ -1921,7 +2137,36 @@ You still wire open and close on the trigger yourself, as the example above does
 
 The pop is height-capped with its own scroll as of 0.1.4. Before that it extended past the bottom of the window on short viewports and Sign out was unreachable.
 
-### What each sheet contributes
+### States
+
+- **Rail item active** — `--active`, a filled pink square.
+- **Drawer open** — `.is-open`, below 640px only.
+- **Theme** — `body[data-theme]`, which the whole shell reads.
+- **Compact toolbar** — `.tb-is-compact`, set by script when the band runs out of width.
+
+### Responsive behavior
+
+#### Responsive behaviour you get for free
+
+| Width | What happens |
+|---|---|
+| ≤1024px | Centred search pill narrows to `min(600px, 100vw - 420px)` |
+| ≤1024px, or toolbar overflow | `praxis-toolbar-compact.js` sets `body.tb-is-compact` and collapses the toolbar into a Tools menu — measured, not a fixed breakpoint |
+| ≤768px | Search pill goes in-flow; the Mazlan pill is hidden, still reachable from the rail and profile menu |
+| ≤640px | Nav rail hidden, `--navrail-w` zeroed, nav drawer takes over; `--px-gutter` becomes the single 16px inset for app bar, header and content |
+| ≤480px | Logo 22px, avatar 30px, tighter app-bar gap |
+
+#### Nav drawer — free, from the rail
+
+`praxis-navdrawer.js` reads the rail you already wrote and builds the narrow-width drawer from it. There is no second markup contract: label a rail button with `aria-label` and the drawer picks the label up. Mark the current item with `.praxis-navrail__btn--active` and the drawer marks it too.
+
+### Interactive demo
+
+The example is at the top of this page, and it is the one frame on this site worth making tall and then resizing: the shell is where all the responsive behaviour lives, and none of it is a breakpoint you can read off a stylesheet.
+
+### Code
+
+#### What each sheet contributes
 
 
 | Family | Mentions |
@@ -1956,6 +2201,89 @@ The pop is height-capped with its own scroll as of 0.1.4. Before that it extende
 | `.icon` | 1 |
 
 
+### Markup contract
+
+#### The two rules your page must own
+
+`.app` is `height:100vh; overflow:hidden`, so the page does **not** scroll — the content column does. Praxis does not style `.page-body`; that name is yours. Add:
+
+>
+`.page-body{ flex:1; min-height:0; overflow:auto; padding: var(--px-toolbar-gutter) var(--ph-pad-x) var(--praxis-space-32); }`
+
+`--px-toolbar-gutter` (16px) is the canonical gap between the toolbar band and the first card of content. It exists because that gap was set per section and drifted — 8px on one page, 6px on another. Use the token.
+
+The body dot grid is `background-attachment:fixed`, so an inner scroll container is correct: the texture reads as page material and stays put while content moves.
+
+#### `.toolbar__inner` — when to use it
+
+Only when your content is a centred max-width column. The band stays full-bleed so its closing hairline lines up with the page header's; `.toolbar__inner` centres the controls so they align with the cards below. Set its `max-width` to the same number as your content column. For a full-width page, put the controls straight in `.toolbar` and drop the wrapper.
+
+#### The rest of the contract
+
+| Item | Requirement |
+|---|---|
+| `body` | `data-variant="praxis"` and `data-theme`. Without the first, none of the `--px-*` materials, the dot grid or the 8/12/16 geometry apply |
+| Theme script | Inline, first thing inside `<body>`. In `<head>` it runs before `body` exists and does nothing |
+](#nav-drawer-and-rail-flyouts)| Rail items | Labelled. [The drawer derives its text from those labels |
+| Skip link | `.px-skip` as the first focusable element, pointing at your content container. Every page opens with an app bar and a rail, so a keyboard user traverses about ten controls before reaching content |
+| `.page-body` | Yours entirely — Praxis styles nothing on it. The two rules are above |
+
+### Token reference
+
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--praxis-navrail-width` | `56px` | — |
+| `--praxis-navrail-width-expanded` | `240px` | — |
+| `--praxis-appbar-h` | `64px` | — |
+| `--px-toolbar-gutter` | `16px` | — |
+| `--ph-pad-x` | `var(--px-gutter)` | — |
+
+
+Those four families are the whole geometry of the shell. Change a band's height by changing its token, never by overriding one page — that drift is exactly what `praxis-pageheader.css` was written to prevent.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Set both `body` attributes, and set the theme before first paint.
+- Write the two `.page-body` rules. Nothing scrolls until you do.
+- Label every rail item.
+- Include `.px-skip`.
+- Change band heights through their tokens.
+
+**Don't**
+
+- Put the theme script in `<head>`.
+- Override `--ph-h` or `--px-toolbar-h` on one page — page content will start at a different y there than everywhere else.
+- Give `.page-body` a background. You will cover the dot grid.
+- Assume `.app`'s `height:100vh` is what you want for a document-shaped page. It is an application shell and it does not scroll.
+
+### Accessibility
+
+- **Bypass blocks (WCAG 2.4.1)** is the reason `.px-skip` exists, and it is a rule in `praxis-core.css` with no markup — you have to add the link.
+- Rail item labels are load-bearing twice: for assistive technology and for the drawer.
+- The app bar and the rail are the first ten-odd tab stops on every page. Anything that makes them longer makes every page worse.
+- The masthead's landmarks matter: the page header is a `<header>`, the rail and drawer are labelled `<nav>` elements, and the content container is where `id="main"` belongs.
+- `.app` is `overflow:hidden`, so the scroll container is `.page-body`. Anchor links and scroll-into-view have to target that element, not the window — a trap this reference site hit with its own table of contents.
+- **Forced colors:** the app bar has no border and the rail is transparent with one, both by design. In that mode the shell loses its structure — see [Forced colors](#forced-colors-and-high-contrast).
+
+### Dimensions
+
+| Band | Property | Value |
+|---|---|---|
+| App bar | Height | `--praxis-appbar-h`, 64px |
+| Nav rail | Width | `--praxis-navrail-width`, 56px (240px expanded) |
+| Page header | Min height | `--ph-h`, 68px — a floor, so the breadcrumb may wrap and take it with it |
+| Toolbar band | Min height | `--px-toolbar-h`, 60px |
+| Masthead | Combined | 128px |
+| Content start | y | **192px**, and `--px-dot-clear` is set to exactly that so the dot grid stops short of the chrome |
+| Phone gutter | `--px-gutter` | 16px below 640px, shared by the bar, the header and the content |
+
 ---
 
 ## Buttons
@@ -1966,7 +2294,15 @@ One button is fully defined — .tbtn. Everything else named here is a variant o
 Tier: **ready** · Sheet: `praxis-admin.css, praxis-core.css, praxis-controls.css`
 This is the page most likely to save you an hour. Praxis names ten button classes and **defines exactly two of them completely**. The rest get a fill, a hover wash or a press transform on top of a base box that is yours. Use one without writing that base and you get colored text where you expected a button.
 
-### What is actually defined
+### Anatomy
+
+1. **Box** — height, inline padding, radius, shadow.
+2. **Label** — 14px/600 in every complete Praxis button.
+3. **Glyph** — optional, leading, 20px with a 7px gap in `.tbtn`.
+
+Only two of the ten classes named on this page own all three.
+
+#### What is actually defined
 
 | Class | Praxis gives you | Where |
 |---|---|---|
@@ -1978,7 +2314,9 @@ This is the page most likely to save you an hour. Praxis names ten button classe
 
 **Reach for `.tbtn` unless you have a reason not to.** It is the only button in Praxis you can use without writing CSS, and its variants cover the primary action, the icon-only button and the quiet one. `.btn` exists in Praxis selectors because the originating application had a `.btn` scale; `praxis-filters.css` says outright that its variants sit "on top of the host's `.btn` set".
 
-### The toolbar button
+### Variants
+
+#### The toolbar button
 
 ```html
 <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
@@ -2005,7 +2343,7 @@ Before that, Praxis suppressed hover and the press transform on disabled control
 
 **The other eight button classes still have nothing.** If you built your own base, style its disabled state yourself.
 
-### The primary action
+#### The primary action
 
 One definition for the whole application: `--px-primary-grad` fill, `--px-primary-fg` ink, `--px-primary-shadow`. It is applied to `.btn--primary`, `.tbtn--primary`, `.tbtn--run` and `.pill-btn` together, so all four look identical by construction rather than by four people agreeing.
 
@@ -2023,7 +2361,7 @@ In dark mode, a primary button *inside a toolbar band* gets a different, softer 
 </div>
 ```
 
-### The two icon buttons are different sizes on purpose
+#### The two icon buttons are different sizes on purpose
 
 `.iconbtn` is in `praxis-controls.css`, not the sheet the rest of this page documents — a page that wants it does not have to take the admin shell with it.
 
@@ -2052,13 +2390,46 @@ In dark mode, a primary button *inside a toolbar band* gets a different, softer 
 </div>
 ```
 
-### Press feedback is global
+### States
+
+#### Press feedback is global
 
 Praxis applies a press transform to a broad `:where()` list — every `button` and `[role="button"]`, plus `.btn`, `.tbtn`, `.qa`, `.pill-btn`, `.icon-btn`, `.praxis-navrail__btn`, `.card__link`, `.rep__pin` and `.segswitch > button`. Small controls scale to `.95`, larger pill buttons to `.97`, and it is suppressed on `:disabled` and `[aria-disabled="true"]`.
 
 Two consequences worth knowing. Your own custom button gets the press feel for free if it is a real `<button>`. And because the selector is `:where()`, it carries zero specificity, so overriding it takes only a plain class selector.
 
-### Writing the base Praxis does not give you
+#### The rest of the state set
+
+- **Hover** — `--px-tool-shadow-hover` on `.tbtn`, a wash on `.tbtn--ghost` and `.admin-ghostbtn`.
+- **Focus-visible** — 2px `--praxis-color-border-focus` on `.iconbtn`. `.tbtn` has no focus rule of its own and falls back to the UA outline.
+- **Disabled** — `.tbtn:disabled` and `[aria-disabled="true"]` are both handled; `.iconbtn` uses `opacity:.45` and drops its shadow.
+- **On** — `.iconbtn--on` takes the pink selection accent, so a toggled filter reads the same as a selected row.
+- **Loading** — does not exist anywhere. See [Loading states](#loading).
+
+### Responsive behavior
+
+Buttons have no breakpoints of their own. Two things reach them from outside:
+
+- Below 640px the shared `--px-gutter` sets the inline inset of the band they sit in, so a row of toolbar buttons lines up with the app bar and the content.
+- [The compact toolbar](#compact-toolbar) moves overflow buttons into a popover and gives each the full row width.
+
+`--praxis-control-h` (32px) exists in the token file as the "compact action control height" and almost nothing uses it — which is the strongest hint that the missing [`.btn`](#btn) was always meant to be the smaller sibling.
+
+### Interactive demo
+
+The examples are distributed through Variants above, one per class family, so each sits beside the prose describing it. The one worth looking at first is in [Button base](#btn): it shows `.btn` rendering as coloured text next to a working `.tbtn`.
+
+### Code
+
+Buttons come from three sheets and which one you load decides what you get:
+
+| Sheet | Gives you |
+|---|---|
+| `praxis-admin.css` | `.tbtn` and all its variants, `.admin-ghostbtn`. Also the whole application shell |
+| `praxis-controls.css` | `.iconbtn`. Four kilobytes, depends on nothing but tokens |
+| `praxis-core.css` | The primary fill, the press pass, the hover pass. Every page loads this |
+
+#### Writing the base Praxis does not give you
 
 If you need a `.btn` scale — because you are porting markup that has one, or because you want a link-shaped button — this is the minimum that makes the Praxis variants land correctly on top of it.
 
@@ -2082,6 +2453,76 @@ If you need a `.btn` scale — because you are porting markup that has one, or b
 </div>
 ```
 
+### Markup contract
+
+| Item | Requirement |
+|---|---|
+| Element | A real `<button>`. The press-feedback pass keys on `button, [role="button"]`, so a styled `<div>` gets the paint and none of the keyboard behaviour |
+| `type` | Always explicit. An unset `type` inside a form is `submit`, which is the most common cause of a Cancel button submitting |
+](#tooltip)| Icon-only | `aria-label`, always. And a [tooltip, once that exists |
+| Glyph | `.material-symbols-rounded` span, converted by `praxis-lucide.js`, sized by the button rule rather than the span |
+| Disabled | The attribute, or `aria-disabled="true"` where the control must stay focusable to explain why it is unavailable |
+| JS | None. All CSS |
+
+### Token reference
+
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--px-primary-fg` | `#fff` | `#08313a` |
+| `--px-primary-grad` | `linear-gradient(180deg,#197b83,#156f77)` | `linear-gradient(180deg,#29d2d7,#1fb4b9)` |
+| `--px-primary-shadow` | `0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28)` | `0 0 0 .5px rgba(41,210,215,.30),0 1px 2px rgba(0,0,0,.45),0 8px 18px -8px rgba(41,210,215,.45),inset 0 1px 0 rgba(255,255,255,.22)` |
+| `--px-tool` | `#ffffff` | `rgba(255,255,255,.06)` |
+| `--px-tool-shadow` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35)` |
+| `--px-tool-shadow-hover` | `0 0 0 .5px rgba(16,36,58,.09),0 2px 8px -2px rgba(16,36,58,.16)` | `0 0 0 .5px rgba(255,255,255,.12),0 4px 12px -2px rgba(0,0,0,.5)` |
+| `--px-toolbar-gutter` | `16px` | — |
+
+
+Plus `--praxis-control-h` for the compact height and `--praxis-color-border-focus` for the focus ring.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Reach for `.tbtn` unless you have a reason not to — it is the only button you can use without writing CSS.
+- Use `.iconbtn` (34px) in a card or panel header and `.tbtn--icon` (40px) in a toolbar band. The two sizes are deliberate.
+- Keep one primary action per view.
+- Label with a verb naming the outcome.
+
+**Don't**
+
+- Reach for `.btn`, `.qa`, `.lg-btn`, `.iconbtn-ghost` or `.sortbtn` expecting a button. All five are fill-or-hover-only over a base you must write.
+- Use `.icon-btn` outside `.filter-drawer` — it is 36px square there and nothing anywhere else.
+- Remove the focus indicator.
+
+### Accessibility
+
+- Real `<button>` elements, so Enter and Space work and the control is in the tab order without help.
+- Every icon-only button needs an accessible name.
+- **The primary fill was a real contrast failure.** White on `--px-primary-grad` measured 3.86:1 at the top of the gradient and exactly 4.50:1 at the bottom, so the label failed across the upper half of every primary button in the app. Both stops moved; it is now 5.00:1 to 5.88:1. Any new fill variant has to be measured across the whole gradient, not at one stop.
+- In dark, `--praxis-color-interactive-default` brightens to a light cyan, so white text on it as a fill measures 1.86:1. `--px-primary-fg` is the dark ink that exists for exactly this, at 12.4:1.
+- `aria-disabled` rather than `disabled` where the user needs to be able to focus the control and find out why it is unavailable.
+- **Forced colors:** `.tbtn` and `.iconbtn` both set `border:0` and draw their edge with a shadow, which that mode discards — they become unbounded text. See [Forced colors](#forced-colors-and-high-contrast).
+
+### Dimensions
+
+| Class | Height | Inline padding | Radius |
+|---|---|---|---|
+| `.tbtn` | 40px | 14px | 10px |
+| `.tbtn--primary` | 40px | 18px | 10px |
+| `.tbtn--icon` | 40px | 40px square | 10px |
+| `.admin-ghostbtn` | 34px | — | — |
+| `.iconbtn` | 34px | 34px square | 8px |
+| `.icon-btn` | 36px | 36px square | — |
+
+The 10px radius on `.tbtn` is off the Praxis 8/12/16 scale. Noted rather than defended — `.iconbtn` deliberately moved to 8px when it was promoted, on the grounds that a design system should not ship a value off its own scale to preserve one pixel.
+
+Label is 14px/600 and glyphs are 20px in `.tbtn`, 18px in `.iconbtn`, throughout.
+
 ---
 
 ## Form controls
@@ -2092,7 +2533,20 @@ The checkbox, the toggle switch, the skip link and the scrollbar treatment — i
 Tier: **ready** · Sheet: `praxis-admin.css, praxis-core.css, praxis-controls.css`
 Praxis restyles bare `<input type="checkbox">` and defines one toggle switch. Everything else on a form is [a field](#fields). The interesting part of this page is the last section, where two sheets disagree.
 
-### Checkbox
+### Anatomy
+
+This page covers six small controls rather than one component, so its anatomy is a list of what each is made of:
+
+- **Checkbox** — the bare element, restyled. No wrapper, no parts.
+- **Switch** — a wrapper, a hidden input, and two decorative spans (`__track`, `__thumb`). The order of those spans matters.
+- **Segmented** — a container and its options.
+- **Skip link** — `.px-skip`, one element.
+- **Filter field** — an input and a trailing glyph.
+- **Hidden text** — `.visually-hidden`, and the icon conventions.
+
+### Variants
+
+#### Checkbox
 
 Styled on the bare element, so you get it without a class. 16px, 4px radius, 1.5px border, and it fills with `--praxis-color-text-primary` rather than the brand teal — a checked checkbox in a list of forty is a data point, not a call to action.
 
@@ -2122,7 +2576,7 @@ The indeterminate state draws a bar rather than a tick, and it has **no HTML att
 
 Focus is a 2px outline in the interactive teal at 60% mix, offset 2px. Do not remove it; the fill alone does not indicate focus, only state.
 
-### Toggle switch
+#### Toggle switch
 
 A wrapper, a hidden input, and two decorative spans. The input carries the state and the label association; `.track` and `.thumb` are painted from it with sibling selectors, so **the order matters**: the rules are `input:checked + .track` and `input:checked ~ .thumb`.
 
@@ -2149,7 +2603,7 @@ A wrapper, a hidden input, and two decorative spans. The input carries the state
 
 **The switch is deliberately excluded from the checkbox styling.** `praxis-core.css` keys its checkbox rules on `input[type="checkbox"]:not(.switch):not(.switch *)`. That second clause is what spares the switch's hidden input. It also means **putting `class="switch"` on the input itself opts that input out of all checkbox styling** — see below.
 
-### Two markup forms, both supported
+#### Two markup forms, both supported
 
 Praxis shipped two contradictory ideas of what `.switch` means, and until 2026-08-18 only one of them was styled. Both work now, from one set of values, and they render identically — verified as 34×20 with `neutral-30` unchecked and `teal-60` checked in all four permutations.
 
@@ -2191,7 +2645,7 @@ The sibling form was kept working rather than removed because `praxis-filters.cs
 
 **What this looked like before the fix,** because it is a useful shape to recognise: the sibling form rendered as a *bare browser checkbox* between two labels. No sheet defined `.switch__track` or `.switch__thumb`, and `class="switch"` on the input also opted it out of the Praxis checkbox rules — so nothing styled it at all, and there was no error. A control that renders as an unstyled native widget is usually this: a class that excludes it from one treatment without providing another.
 
-### Segmented control
+#### Segmented control
 
 `.segmented` is defined in `praxis-filters.css` and is not scoped to the drawer, so it is usable anywhere. A 1px neutral border, 12px radius, and `.segmented__opt` children at 36px; `.segmented--lg` raises them to 40px. The selected option is `.segmented__opt--active` — a BEM modifier, not the `.is-selected` convention the filter rows use elsewhere.
 
@@ -2209,27 +2663,7 @@ The sibling form was kept working rather than removed because `praxis-filters.cs
 </div>
 ```
 
-### Skip link
-
-`.px-skip` is fully defined: fixed at top left, 36px tall, 10px radius, and it overrides the global press transform to `none` because a skip link that shrinks under the pointer reads as broken. Put it first in `<body>` and point it at your scroll container.
-
-```html
-<a class="px-skip" href="#c" id="skip">Skip to content</a>
-<p class="rfield__hint" style="margin-top:3rem">Focused on load so there is something to
-   see. In a real page it sits off the visible flow until the first Tab press.</p>
-<div id="c"></div>
-<script>document.getElementById('skip').focus();</script>
-```
-
-### Scrollbars
-
-Praxis sets `scrollbar-color` only, using `--px-scroll` and `--px-scroll-hover`. That is deliberate and worth not "improving": it is the one scrollbar property that does not change the gutter, so Chrome and Firefox keep their overlay scrollbars and nothing reflows when the thumb appears. Declaring `::-webkit-scrollbar` or `scrollbar-width` switches those elements to classic scrollbars and shifts your layout by the scrollbar's width.
-
-### Icons and hidden text
-
-Two small utilities from `praxis-admin.css` you will want: `.icon` sizes an inline SVG to 22px square with `fill:currentColor`, and takes `--20`, `--18` and `--16`. `.visually-hidden` is the standard clip-rect pattern, for a label a screen reader needs and the layout does not.
-
-### Filter field
+#### Filter field
 
 `.filterfield` is type-to-filter beside a list: the report tree's Filter, the workspace editor's Search reports. It is a `<label>` wrapping an `<input>` and a glyph, and the glyph goes **after** the input in source order because it sits at the trailing edge.
 
@@ -2249,6 +2683,121 @@ Sized to `.iconbtn`: 34px, `--praxis-radius-sm`, the same tool shadow. Give the 
 </div>
 ```
 
+#### Skip link
+
+`.px-skip` is fully defined: fixed at top left, 36px tall, 10px radius, and it overrides the global press transform to `none` because a skip link that shrinks under the pointer reads as broken. Put it first in `<body>` and point it at your scroll container.
+
+```html
+<a class="px-skip" href="#c" id="skip">Skip to content</a>
+<p class="rfield__hint" style="margin-top:3rem">Focused on load so there is something to
+   see. In a real page it sits off the visible flow until the first Tab press.</p>
+<div id="c"></div>
+<script>document.getElementById('skip').focus();</script>
+```
+
+### States
+
+Each control's states are described in its section above. Two things are worth pulling out because they are system-wide rather than per-control:
+
+- **Focus is never removed.** The checkbox rule uses a 2px outline in the interactive teal at 60% mix, offset 2px. As that section says: the fill alone does not indicate focus, only state.
+- **Indeterminate has no HTML attribute.** It is a DOM property, so a three-state header checkbox has to set `el.indeterminate = true` from script. Praxis styles it either way.
+
+### Responsive behavior
+
+None of these six has a breakpoint. The one size note that matters: a 16px checkbox and a 34×20 switch are both below the 44px WCAG 2.5.8 target minimum, which is acceptable at desktop under the spacing exception and worth checking wherever they appear in a dense touch row.
+
+`.filterfield` is sized to match `.iconbtn` — same 34px, same radius, same tool shadow — so a header row of both lines up.
+
+### Interactive demo
+
+Each control has its own frame in the sections above, beside the prose that describes it. That is deliberate for this page: six controls in one gallery would make it harder to tell which rule belongs to which.
+
+### Code
+
+Three sheets, and which one you need depends on the control:
+
+| Control | Sheet |
+|---|---|
+| Checkbox, scrollbars, `.px-skip` | `praxis-core.css` — every page has it |
+| Switch (both forms), `.visually-hidden` | `praxis-admin.css` |
+| `.filterfield` | `praxis-controls.css` |
+| `.segmented`, `.onoff` | `praxis-filters.css` |
+
+The switch being in the admin sheet is the awkward one: a record page wanting a toggle either loads the application shell or writes its own. That is the same problem `praxis-controls.css` was created to solve and the switch has not moved yet.
+
+#### Scrollbars
+
+Praxis sets `scrollbar-color` only, using `--px-scroll` and `--px-scroll-hover`. That is deliberate and worth not "improving": it is the one scrollbar property that does not change the gutter, so Chrome and Firefox keep their overlay scrollbars and nothing reflows when the thumb appears. Declaring `::-webkit-scrollbar` or `scrollbar-width` switches those elements to classic scrollbars and shifts your layout by the scrollbar's width.
+
+### Markup contract
+
+| Control | Requirement |
+|---|---|
+| Checkbox | Nothing — style comes from the bare element. Do not add `class="switch"` to a checkbox input unless you mean the switch: that class opts the input out of every checkbox rule, which is exactly what the selector `input[type="checkbox"]:not(.switch):not(.switch *)` is for |
+| Switch, wrapper form | `.switch` on the wrapper, input inside, then `__track` and `__thumb`. **Canonical.** |
+| Switch, sibling form | `.switch` on the input, track as its next sibling. Supported because `praxis-filters.js` emits it and `.onoff:has(.switch:checked)` depends on it |
+| Switch part names | `__track` / `__thumb` are canonical. Bare `.track` / `.thumb` still work and are two of the most collision-prone names it is possible to put in a shared sheet — do not use them in new markup |
+| Segmented | Real roles. A choice control built from bare buttons says nothing about which option is active |
+| `.px-skip` | First focusable element in the document, `href` pointing at your content container |
+| `.filterfield` | A labelled input. The glyph is `aria-hidden` and `pointer-events:none` |
+| JS | None for any of them, except setting `indeterminate` |
+
+#### Icons and hidden text
+
+Two small utilities from `praxis-admin.css` you will want: `.icon` sizes an inline SVG to 22px square with `fill:currentColor`, and takes `--20`, `--18` and `--16`. `.visually-hidden` is the standard clip-rect pattern, for a label a screen reader needs and the layout does not.
+
+### Token reference
+
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--px-field` | `#EEF1F4` | `#262F3F` |
+| `--px-field-hover` | `#E6EAEF` | `#2C3646` |
+
+
+`--praxis-color-border-strong` is the one worth knowing about here. It is the control-boundary token — checkbox boxes, input underlines, `--px-check-stroke` — so it has to clear 3:1 against the surface it sits on under WCAG 1.4.11. It was repointed from neutral-40 to neutral-50 after measuring 2.95:1 on white, a rounding error short. The rung itself was not edited, because `--praxis-color-text-disabled` resolves to neutral-40 and must not move with it.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Use the bare `<input type="checkbox">`. You get the Praxis treatment with no class at all.
+- Use the wrapper form for new switches, with `__track` and `__thumb`.
+- Use a switch for a commitment and a checkbox for a selection — the switch is the one control that uses the brand teal, and that is why.
+- Put `.px-skip` on every page.
+
+**Don't**
+
+- Put `class="switch"` on a checkbox you want styled as a checkbox.
+- Use bare `.track` or `.thumb`.
+- Remove the focus outline.
+- Reach for a radio and expect it to be styled — it is not. See [Radio](#radio).
+
+### Accessibility
+
+- **Focus indicators are load-bearing and easy to lose.** The checkbox's fill indicates *state*, not focus, so removing the outline leaves a keyboard user with no way to know where they are.
+- Every control needs a real label. `.visually-hidden` is there for the cases where the label should not be seen.
+- Indeterminate is a DOM property. A tri-state header checkbox also needs `aria-checked="mixed"` if it is a custom control rather than a native input.
+- The segmented control must carry roles matching what it is — tabs or a radio group.
+- `.px-skip` exists for WCAG 2.4.1, and it is a rule with no markup: you have to add the link.
+- The scrollbar treatment fades scrollbars until hover or focus-within. `:focus-within` is in that selector deliberately, so keyboard users — who never trigger `:hover` — still get a position indicator.
+- 16px checkboxes and 34×20 switches are below the 44px target minimum; check them in dense touch contexts.
+
+### Dimensions
+
+| Control | Property | Value |
+|---|---|---|
+| Checkbox | Size / radius / border | 16px / 4px / 1.5px |
+| Checkbox | Focus outline | 2px, offset 2px, teal at 60% mix |
+| Switch | Track / thumb / travel | 34×20 / 16px / 14px |
+| `.filterfield` | Height / radius / glyph | 34px / 8px / 18px at right:12px |
+| `.px-skip` | Height / padding | 36px / 0 16px, at top:8px left:8px, z-index 1000 |
+| `.admin-check` | Size | 16px, `accent-color` teal-60 |
+
 ---
 
 ## Nav drawer and rail flyouts
@@ -2261,7 +2810,15 @@ Below 640px the 56px icon rail costs a sixth of the viewport and its items are u
 
 The important part: it **derives the drawer from the live rail** rather than duplicating the markup. There is no second contract. Change a rail button and the drawer follows; there is nothing to keep in step.
 
-### What you supply
+### Anatomy
+
+1. **Toggle** — `.px-navtoggle`, a hamburger in the app bar's left corner. `display:none` above 640px.
+2. **Scrim** — `.px-navdrawer__scrim`.
+3. **Drawer** — `.px-navdrawer`, with a head, a brand and a close.
+4. **Items** — `.px-navdrawer__item`, the rail's destinations with labels.
+
+None of it is markup you write. See Markup contract.
+#### What you supply
 
 Nothing beyond [the rail you already wrote](#the-app-shell). The script reads each `.praxis-navrail__btn` and `.praxis-navrail__link`, takes its label from `aria-label`, and carries two modifiers across:
 
@@ -2273,7 +2830,79 @@ Nothing beyond [the rail you already wrote](#the-app-shell). The script reads ea
 
 So the one thing you must do is **label every rail button**. An unlabelled rail button is merely terse at desktop width; in the drawer it is a blank row.
 
-### Live, at phone width
+### Variants
+
+One drawer. Two flyouts share this page because they are the rail's other popovers:
+
+#### The rail's own flyout
+
+`.ws-pop` is the popover the rail opens for workspace and dashboard switching. It is defined here, not in the workspace sheet, and its rows are `.ws-item`:
+
+| Part | What it is |
+|---|---|
+| `.ws-item__icon` | Leading glyph. Takes `.icon` inside. |
+| `.ws-item__text` | Wrapper for the two lines |
+| `.ws-item__name` / `__sub` | Primary and secondary line |
+| `.ws-item__badge` | Trailing count or state |
+| `.ws-item--current` | The one you are on |
+| `.ws-item--new` | The create affordance; gets the brand tint |
+| `.ws-item--home` | Given its own dark treatment so it does not read as current |
+
+**`.ws-pop` styles a `.px-menu__head` that does not exist.** The sheet has a rule for it, so a head element is clearly intended, but no Praxis sheet defines `.px-menu` or `.px-menu__head`. Use `.px-pop` from `praxis-admin.css` if you need the popover shell, and write the head yourself. See [what Praxis does not define](#what-praxis-does-not-define).
+
+```html
+<div class="ws-pop" style="position:relative">
+  <div class="ws-item ws-item--current">
+    <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">crisis_alert</span></span>
+    <span class="ws-item__text">
+      <span class="ws-item__name">Incident management</span>
+      <span class="ws-item__sub">Teesside works</span>
+    </span>
+    <span class="ws-item__badge">12</span>
+  </div>
+  <div class="ws-item ws-item--home">
+    <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">home</span></span>
+    <span class="ws-item__text">
+      <span class="ws-item__name">Home hub</span>
+      <span class="ws-item__sub">All modules</span>
+    </span>
+  </div>
+  <div class="ws-item">
+    <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">fact_check</span></span>
+    <span class="ws-item__text">
+      <span class="ws-item__name">Audit programme</span>
+      <span class="ws-item__sub">Rotherham plant</span>
+    </span>
+    <span class="ws-item__badge">3</span>
+  </div>
+  <div class="ws-item ws-item--new">
+    <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">add</span></span>
+    <span class="ws-item__text"><span class="ws-item__name">New workspace</span></span>
+  </div>
+</div>
+```
+
+### States
+
+- **Closed** — `[hidden]` plus a `translateX(-100%)`.
+- **Open** — `.is-open` on both drawer and scrim, so the panel slides and the scrim fades together.
+- **Current destination** — carried over from the rail, either from `--active`/`aria-current` or, where the rail does not mark it, by matching the link target against the current filename.
+- **Create** — leads the list as a filled action, so the drawer is self-sufficient on pages with no in-page Create button.
+
+### Responsive behavior
+
+| Viewport | Behaviour |
+|---|---|
+| > 640px | The 56px icon rail. `.px-navtoggle` is `display:none` |
+| ≤ 640px | The rail is `display:none !important`, `--navrail-w` is zeroed so every page's content offset collapses regardless of how it was expressed, and the toggle appears |
+
+Zeroing the token is the part worth noticing: pages offset content by the rail width in at least three different ways — `margin-left`, `padding-left`, a grid column — and one token covers all of them.
+
+The drawer's surface is a fixed slate in both themes rather than `--px-surface`, because it is chrome over the page rather than a page surface, and a constant panel colour reads the same wherever it is opened from.
+
+### Interactive demo
+
+#### Live, at phone width
 
 The frame below is narrower than 640px, so the rail is hidden and the drawer has taken over. Press the hamburger. Widen the frame past 640px and the rail returns.
 
@@ -2333,59 +2962,33 @@ The frame below is narrower than 640px, so the rail is hidden and the drawer has
 </div>
 ```
 
-### What the drawer defines
+### Code
+
+`praxis-navrail.css` for both, plus `praxis-navdrawer.js`. One script tag and nothing else:
+
+```html
+<script src="praxis-navdrawer.js"></script>
+```
+
+It *derives* the drawer from the live rail rather than duplicating the markup, so a rail change propagates automatically and there is nothing to keep in sync across twenty pages. It no-ops on a page with no rail — which is why this reference site, which has no rail, builds its own drawer instead.
+
+### Markup contract
+
+| Item | Requirement |
+|---|---|
+| Labels | **The contract.** Each rail item needs an `aria-label`, a `title`, or an `img alt` — that is where the drawer's text comes from. An unlabelled rail button is silently dropped from the drawer |
+| Rail | A `.praxis-navrail` and an `.appbar` must both exist or the script returns immediately |
+| Current | `--active`, `aria-current="page"`, or a matching `href` |
+| Glyphs | Cloned from the rail as they are at that moment, so a Material ligature already converted by `praxis-lucide.js` comes across as the SVG |
+| JS API | Self-wiring. No init call, and it refuses to build twice |
+
+#### What the drawer defines
 
 Fully specified in `praxis-navrail.css`, so you do not style any of it: `.px-navdrawer` with `.is-open` and `[hidden]` states, a `__scrim`, a `__head` carrying `__brand` and `__close`, and a `__list` of `__item`s each with an `__icon` and `__label`. `__group` separates runs of items. The icon slot accepts an `<svg>`, an `<img>` or a `.material-symbols-rounded` ligature.
 
-### The rail's own flyout
+### Token reference
 
-`.ws-pop` is the popover the rail opens for workspace and dashboard switching. It is defined here, not in the workspace sheet, and its rows are `.ws-item`:
-
-| Part | What it is |
-|---|---|
-| `.ws-item__icon` | Leading glyph. Takes `.icon` inside. |
-| `.ws-item__text` | Wrapper for the two lines |
-| `.ws-item__name` / `__sub` | Primary and secondary line |
-| `.ws-item__badge` | Trailing count or state |
-| `.ws-item--current` | The one you are on |
-| `.ws-item--new` | The create affordance; gets the brand tint |
-| `.ws-item--home` | Given its own dark treatment so it does not read as current |
-
-**`.ws-pop` styles a `.px-menu__head` that does not exist.** The sheet has a rule for it, so a head element is clearly intended, but no Praxis sheet defines `.px-menu` or `.px-menu__head`. Use `.px-pop` from `praxis-admin.css` if you need the popover shell, and write the head yourself. See [what Praxis does not define](#what-praxis-does-not-define).
-
-```html
-<div class="ws-pop" style="position:relative">
-  <div class="ws-item ws-item--current">
-    <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">crisis_alert</span></span>
-    <span class="ws-item__text">
-      <span class="ws-item__name">Incident management</span>
-      <span class="ws-item__sub">Teesside works</span>
-    </span>
-    <span class="ws-item__badge">12</span>
-  </div>
-  <div class="ws-item ws-item--home">
-    <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">home</span></span>
-    <span class="ws-item__text">
-      <span class="ws-item__name">Home hub</span>
-      <span class="ws-item__sub">All modules</span>
-    </span>
-  </div>
-  <div class="ws-item">
-    <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">fact_check</span></span>
-    <span class="ws-item__text">
-      <span class="ws-item__name">Audit programme</span>
-      <span class="ws-item__sub">Rotherham plant</span>
-    </span>
-    <span class="ws-item__badge">3</span>
-  </div>
-  <div class="ws-item ws-item--new">
-    <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">add</span></span>
-    <span class="ws-item__text"><span class="ws-item__name">New workspace</span></span>
-  </div>
-</div>
-```
-
-### Everything this sheet defines
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -2401,6 +3004,45 @@ Fully specified in `praxis-navrail.css`, so you do not style any of it: `.px-nav
 | `.icon` | 1 |
 
 
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Label every rail item. It is the whole contract.
+- Let the script derive the drawer — do not hand-write one.
+- Mark the current destination on the rail so the drawer inherits it.
+
+**Don't**
+
+- Duplicate the rail's markup into a drawer.
+- Rely on the drawer where there is no rail — it will not exist.
+- Hide a destination from the rail and expect it in the drawer.
+
+### Accessibility
+
+- The labels are an accessibility requirement and a functional one at the same time, which is the useful thing about this design: an unlabelled rail button is invisible to a screen reader *and* missing from the drawer.
+- The toggle carries `aria-expanded`.
+- The drawer traps focus while open, Escape closes, and focus returns to the toggle.
+- The scrim is not focusable.
+- Motion honours `prefers-reduced-motion` — both the drawer transform and the scrim fade are disabled in that mode.
+- At ≤640px the rail is genuinely hidden, so its destinations exist only in the drawer. That is why "the drawer is self-sufficient" matters rather than being a nicety.
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| Rail | Width | `--praxis-navrail-width`, 56px |
+| Drawer | Width | 280px, `max-width:85vw` |
+| Drawer | Surface | `rgb(36,48,60)` in both themes |
+| Drawer head | Height | `--praxis-appbar-h`, 64px |
+| Item | Min height | 48px |
+| Toggle / close | Size | 40px |
+| Transition | Drawer / scrim | 220ms / 200ms |
+
 ---
 
 ## Card, page and texture
@@ -2411,7 +3053,13 @@ The two layout surfaces every screen is made of, the dot texture behind them, an
 Tier: **ready** · Sheet: `praxis-workspace.css, praxis-core.css`
 `.card` and `.page` are the two surfaces almost every screen is assembled from, and they are defined in **`praxis-workspace.css`** — not in core, not in a card sheet. That is one of the three "base in a surprising place" traps; the bundle makes it moot.
 
-### Card
+### Anatomy
+
+1. **Page** — `.page`, the material everything sits on: a fill plus the dot texture.
+2. **Card** — `.card`, a raised surface on it.
+
+Two names, and only one of them is complete. See Variants.
+#### Card
 
 ```html
 <div style="display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))">
@@ -2437,11 +3085,34 @@ Tier: **ready** · Sheet: `praxis-workspace.css, praxis-core.css`
 
 `.card` gives you the surface, the radius and the shadow. It does **not** give you padding — that varies by what is inside, and a card of table rows wants none. Every example above sets its own.
 
-### Page
+#### Page
 
 `.page` is the content wrapper inside the scroll container. Its job is the horizontal rhythm: it inherits `--ph-pad-x` from `.content` so the page body lines up with the header and the toolbar above it. Below 640px it switches to `--px-gutter`, the single 16px phone inset, along with the app bar and header — so all three step in together rather than by different amounts.
 
-### The dot texture
+### Variants
+
+| Name | State |
+|---|---|
+](#card)| `.card` | **No base.** `praxis-workspace.css` gives it a slate shadow and a 12px radius and nothing else — no fill, no padding. See [Card base |
+| `.admin-card` | Complete: fill, shadow, radius, 20px/22px padding, `__title`, `__meta`, and a `--flush` density |
+| `.admin-panel` | The recessed form, on `--px-surface-2`. What a card contains rather than a card |
+| Elevation tiers | Three exist as tokens — `--px-card-rail`, `--praxis-card`, `--px-card-raised` — and only the middle one is reachable through a class |
+
+### States
+
+A static card has none. An interactive one needs hover, focus-visible and press, and Praxis defines none of them for a card — this reference site had to write its own for its page grids.
+
+The interesting part is that the right hover depends on what the card sits *on*: on the page material a lift is correct, and on another card a lift is wrong and the fill should step to `--px-surface-2` instead. That is why `.admin-panel` exists.
+
+### Responsive behavior
+
+Cards are sized by their grid — `.admin-grid--2/3/4/6` or `.admin-cols` — and those collapse at 1024px, 768px and 480px. Below 640px the inline padding follows `--px-gutter` through the container.
+
+The page texture adapts too: `--px-dot-clear` holds the dots clear of the top chrome, and the horizontal fade is measured from the nav rail's right edge rather than from x=0, so the visible ramp is symmetric about the content area.
+
+### Interactive demo
+
+#### The dot texture
 
 The dot grid is not a class. It is painted on `body` by `praxis-core.css` as a repeating `radial-gradient` at `18px`, using `--px-dot`, with `background-attachment:fixed`.
 
@@ -2475,7 +3146,7 @@ Two consequences that matter:
 </div>
 ```
 
-### The animated dot field
+#### The animated dot field
 
 A different thing with a similar name. `praxis-dotfield.js` is a single-canvas animated dot grid for hero and login moments — one `<canvas>`, one draw loop, every dot drawn with `arc()` each frame so it stays smooth past 4,000 dots. It is not the page texture and does not replace it.
 
@@ -2503,6 +3174,75 @@ The rest of the surface: `setParam(key, value)` for a live mode parameter, `setG
 Modes are the keys of `PraxisDotField.MODES`: `wave`, `sweep`, `rippleLoop`, `sonar`, `radar`, `diagonal`, `breathe`, `flow`, `rain`, `constellation`, `organic`, `vortex`, `logo` and `magnet`. Each entry is `{label, controls:[…]}`, and `field.setMode(key)` resets the parameters to that mode's defaults.
 
 Global options include `spacing`, `dotRadius`, `restAlpha`, `teal`, `magenta`, `originX`, `originY`, `glow`, `ring`, `edgeFade` and `loop`. It is a real animation running a real loop, so mind it on a page that is already busy.
+
+### Code
+
+`.card`'s shadow is in `praxis-workspace.css`; `.admin-card` is in `praxis-admin.css`; the page texture is on `body[data-variant="praxis"]` in `praxis-core.css`.
+
+That distribution is the practical problem: the complete card is in the largest sheet in the system, so a record page wanting a card either loads the admin shell or writes its own. [Card base](#card) proposes moving the canonical definition to core and keeping `.admin-card` as an alias.
+
+### Markup contract
+
+| Item | Requirement |
+|---|---|
+| Card element | Any block. `<a>` for an interactive card, which is what forces the missing states above |
+| `__title` | A real heading where the card is a section of the page. It is a `<p>` in every current example, which is right for a label and wrong for a section |
+| Nesting | Step the surface, do not stack a second shadow |
+| `.page` | The texture is on `body`, not on `.page`, under the Praxis variant. A page that sets its own background will cover it |
+| JS | None for either. `praxis-dotfield.js` is a separate opt-in |
+
+### Token reference
+
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--px-card-rail` | `0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6)` | `0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.30),inset 0 .5px 0 rgba(255,255,255,.05)` |
+| `--px-card-raised` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85)` | `0 0 0 .5px rgba(255,255,255,.11),0 1px 2px rgba(0,0,0,.45),0 4px 10px -3px rgba(0,0,0,.40),0 32px 60px -24px rgba(0,0,0,.75),inset 0 .5px 0 rgba(255,255,255,.10)` |
+| `--px-dot` | `rgba(16,36,58,.11)` | `rgba(255,255,255,.09)` |
+| `--px-dot-clear` | `192px` | — |
+| `--praxis-card` | `0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07)` |
+
+
+`--praxis-radius-card` is 20px in the token file and 12px under the Praxis variant. The variant wins, so 12px is the card geometry — one of the nine documented overrides.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Use `.admin-card`. It is the one that works.
+- Use `.admin-panel` for anything inside a card.
+- Let the grid size the card.
+
+**Don't**
+
+- Use bare `.card` expecting a surface.
+- Give every card on a page the same elevation. The three tiers exist because a page of identically-shadowed cards reads as one flat plane, and `praxis-core.css` says so.
+- Put the card's padding on its contents.
+- Set a background on `.page` — you will cover the texture.
+
+### Accessibility
+
+- A card is not a landmark. If it needs to be findable, its title is a heading.
+- An interactive card needs one target. A card wrapped in an anchor that also contains buttons produces nested interactive elements, which is invalid and behaves unpredictably.
+- The dot texture is decorative and must never carry meaning.
+- `praxis-dotfield.js` animates. It has to honour `prefers-reduced-motion`, and any page using it should check that it does.
+- **Forced colors:** a card is a fill plus a shadow and loses both, so a page of cards becomes one undifferentiated block. See [Forced colors](#forced-colors-and-high-contrast).
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| `.admin-card` | Padding | 20px 22px |
+| `--flush` | Padding | 16px 18px |
+| Card | Radius | 12px |
+| `__title` | Size / weight | 16px / 700 |
+| Dot grid | Pitch | 18px |
+| Dot clearance | `--px-dot-clear` | 192px — the app bar, page header and toolbar band combined |
+| `.admin-grid` | Gap | 18px 34px |
 
 ---
 
@@ -2577,42 +3317,16 @@ A centred filter modal, a quick-filter strip and an active-filter chip bar, wher
 </script>
 ```
 
-### Initialising
+### Anatomy
 
-Everything application-specific enters through `init`. It returns `null` if `[data-filter-drawer]` is absent, so a page with no modal is fine.
+1. **Toolbar row** — `.filter-toolbar-row` with `.filter-toggle` and `.filter-chips`.
+2. **Chips** — `.chip`, one per active filter, with a clear-all.
+3. **Drawer** — `.filter-drawer` over `.drawer-scrim`.
+4. **Rows** — `.filter-row`, one per field, with a type-specific control.
+5. **Custom builder** — `.custom-builder`, the expression tree.
+6. **Summary** — `.custom-summary`, the expression in words.
 
-| Option | What it is |
-|---|---|
-| `records` | The unfiltered set |
-| `fieldMap` | Filter name to accessor: `{ 'Status': r => r.status }` |
-| `today` | "Now" for the relative date operators. Pass a fixed date to make a demo reproducible. |
-| `parseDate` | Optional, for non-ISO date strings |
-| `onChange` | Receives the filtered records. You render them. |
-| `people`, `sites`, `tasks`, `statuses`, `priorities`, `actionTypes`, `tree` | Value vocabularies. **Replace these.** Left at the defaults, the menus offer ported CAPA values your data has never heard of and every selection returns nothing. |
-| `options` | Override outright, by field name |
-| `defaultFavorites`, `defaultQuick` | Which filters start pinned |
-| `scopeChip` | Omit entirely if you have no fixed scope |
-
-The returned object also exposes `setRecords`, `apply`, `state`, `clearAll`, `open`, `close` and `FILTERS` — the real field catalog, so you can build a field map against it rather than guessing names.
-
-### Markup contract
-
-Four hooks, all data attributes. The engine renders filter rows into `[data-filter-list]`.
-
->
-`[data-action="open-filter-drawer"]` · `[data-chips]` · `[data-quick-filters]` · `[data-drawer-scrim]` · `[data-filter-drawer] > [data-filter-list]`
-
-It sets `data-filter-mode="modal"` on `<html>` itself if you have not — the centred-modal rules are gated on that attribute.
-
-### Three things to know before you commit to filters
-
-1. **The drawer's full chrome is not shipped as markup.** The engine renders filter rows into `[data-filter-list]`, but the surrounding head, footer and resize handles came from the originating prototype's own page. The skeleton above is the minimum the engine needs; you will be assembling the rest yourself from `praxis-filters.css`.
-2. **This sheet is a port** from the Responsive Search project, now owned here. Do not re-extract over it — that would reintroduce the parallel `--s`/`--r`/`--t` token vocabulary and silently revert the field treatment.
-3. **Its dark mode does not follow a host theme override.** It themes itself by flipping palette primitives inside its own scope, 21 declarations, instead of using the semantic tokens. Everything else in Praxis follows a host override; this does not. Known rough edge — toggle this page to dark and open the modal to see it.
-
-It also adds `.btn--neutral` and `.btn--clear`, scoped to `.filter-drawer` so they cannot leak into your own button scale — and it expects **your** `.btn` base underneath them. Praxis does not define one; see [what Praxis does not define](#what-praxis-does-not-define).
-
-### The two views onto one tree
+#### The two views onto one tree
 
 Standard and Custom are not two filter systems. They are two editors for one expression tree, and `.filter-view-switch` moves between them — `__opt` with `.is-active`, which is this sheet's convention rather than the `--active` BEM modifier the create-new and segmented controls use.
 
@@ -2662,7 +3376,76 @@ Conditions and groups are reorderable, and the states are all classes on the mov
 
 **Four state conventions in one sheet.** `.is-active` on the view switch and type select, `[aria-pressed="true"]` on the type buttons, `[data-open]` on the scrim, and `.is-selected` versus `.cf-group-selected` for the same idea at two levels. This is the clearest symptom of the sheet being a port: each convention was right in its original file. Read the selector before assuming which one applies.
 
-### Everything this sheet defines
+### Variants
+
+| Variant | Use |
+|---|---|
+| Standard | A row per field. The common case |
+| Custom | `.custom-builder` — nested groups, AND/OR joins, drag to reorder. The same tree the summary renders |
+](#quick-filter-rail)| Quick filters | `.quick-filters` / `.qfilter`, shared with [the quick-filter rail |
+](#btn)| Footer buttons | `.btn--neutral` and `.btn--clear`, defined *only* inside `.filter-drawer`. They sit on top of a host `.btn` set that Praxis does not provide — see [Button base |
+
+### States
+
+- **Drawer open** — `.is-open`, with the scrim.
+- **Filter active** — a chip appears; `.filter-toggle` shows a count.
+- **Expression states** — `.is-expanded`, `.cf-group-selected`, `.cf-dragging`, `.cf-drop-before` / `--after`, `.cf-enter` / `.cf-exit`.
+- **Incomplete** — `.cfx-incomplete`, an expression that is not yet valid. Worth knowing this exists: an incomplete filter should not be applied silently.
+- **Empty** — `.cf-empty`, one of the three ad-hoc empty states the roadmap consolidates.
+- **On/off** — `.onoff` wrapping a `.switch`. Note this is the sibling markup form; see [Form controls](#form-controls).
+
+### Responsive behavior
+
+The drawer is full-height at every width and the toolbar row wraps. The part that adapts is the band around it — a `.filter-toggle` is a toolbar control and moves into the overflow popover when the band goes compact.
+
+This is a *port* of the Responsive Search project rather than a Praxis-native sheet, so several of its internals use their own scale rather than the shared tokens.
+
+### Interactive demo
+
+#### Initialising
+
+Everything application-specific enters through `init`. It returns `null` if `[data-filter-drawer]` is absent, so a page with no modal is fine.
+
+| Option | What it is |
+|---|---|
+| `records` | The unfiltered set |
+| `fieldMap` | Filter name to accessor: `{ 'Status': r => r.status }` |
+| `today` | "Now" for the relative date operators. Pass a fixed date to make a demo reproducible. |
+| `parseDate` | Optional, for non-ISO date strings |
+| `onChange` | Receives the filtered records. You render them. |
+| `people`, `sites`, `tasks`, `statuses`, `priorities`, `actionTypes`, `tree` | Value vocabularies. **Replace these.** Left at the defaults, the menus offer ported CAPA values your data has never heard of and every selection returns nothing. |
+| `options` | Override outright, by field name |
+| `defaultFavorites`, `defaultQuick` | Which filters start pinned |
+| `scopeChip` | Omit entirely if you have no fixed scope |
+
+The returned object also exposes `setRecords`, `apply`, `state`, `clearAll`, `open`, `close` and `FILTERS` — the real field catalog, so you can build a field map against it rather than guessing names.
+
+### Code
+
+`praxis-filters.css` and `praxis-filters.js` — at 83KB and 122KB the largest pair in the system, and the only component here with a real JavaScript API rather than self-wiring alone.
+
+#### Three things to know before you commit to filters
+
+1. **The drawer's full chrome is not shipped as markup.** The engine renders filter rows into `[data-filter-list]`, but the surrounding head, footer and resize handles came from the originating prototype's own page. The skeleton above is the minimum the engine needs; you will be assembling the rest yourself from `praxis-filters.css`.
+2. **This sheet is a port** from the Responsive Search project, now owned here. Do not re-extract over it — that would reintroduce the parallel `--s`/`--r`/`--t` token vocabulary and silently revert the field treatment.
+3. **Its dark mode does not follow a host theme override.** It themes itself by flipping palette primitives inside its own scope, 21 declarations, instead of using the semantic tokens. Everything else in Praxis follows a host override; this does not. Known rough edge — toggle this page to dark and open the modal to see it.
+
+It also adds `.btn--neutral` and `.btn--clear`, scoped to `.filter-drawer` so they cannot leak into your own button scale — and it expects **your** `.btn` base underneath them. Praxis does not define one; see [what Praxis does not define](#what-praxis-does-not-define).
+
+### Markup contract
+
+#### Markup contract
+
+Four hooks, all data attributes. The engine renders filter rows into `[data-filter-list]`.
+
+>
+`[data-action="open-filter-drawer"]` · `[data-chips]` · `[data-quick-filters]` · `[data-drawer-scrim]` · `[data-filter-drawer] > [data-filter-list]`
+
+It sets `data-filter-mode="modal"` on `<html>` itself if you have not — the centred-modal rules are gated on that attribute.
+
+### Token reference
+
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -2732,6 +3515,42 @@ Conditions and groups are reorderable, and the states are all classes on the mov
 | `.cf-exit` | 1 |
 
 
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Read the three caveats in Code before committing to this component. It is the largest thing in Praxis and the least Praxis-native.
+- Show active filters as chips, and give the toggle a count.
+- Announce the result count when a filter is applied.
+
+**Don't**
+
+- Use `.btn--neutral` or `.btn--clear` outside `.filter-drawer`. They are scoped there and depend on a base that does not exist.
+- Use `.icon-btn` outside the drawer either — it is 36px there and nothing elsewhere.
+- Apply an incomplete expression. `.cfx-incomplete` exists so you can tell.
+- Reach for the custom builder when a row per field would do.
+
+### Accessibility
+
+- The drawer needs a focus trap, Escape and focus restoration. Verify what the script supplies rather than assuming — this sheet is a port and its accessibility was not audited as part of Praxis.
+- Applying a filter changes the result set: that is a content change and the new count belongs in a live region.
+- The custom builder's drag-to-reorder needs a keyboard equivalent, or the expression tree is mouse-only.
+- `.onoff` uses the sibling `.switch` form, which until 2026-08-18 rendered as a bare browser checkbox because no sheet defined its track or thumb. Both forms are now defined from one set of values.
+- Chips are removable filters, so each needs a labelled remove control naming which filter it clears.
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| `.chip` | Min height / padding | 40px / 4px 16px |
+| `.chip__close` | Size | 24px |
+| `.icon-btn` | Size | 36px, drawer-only |
+| `.switch` | Track / thumb / travel | 34×20 / 16px / 14px |
+
 ---
 
 ## Create New menu
@@ -2744,23 +3563,17 @@ Tier: **settling** · Sheet: `praxis-create-new.css` · Script: `praxis-create-n
 
 The point of shipping the catalog without the renderer is that the workspace and the record page both build a Create New menu, and the two must not drift on *what* can be created. They are free to differ on how it looks.
 
-### Getting at the data, and the trap
+### Anatomy
 
-Both arrays are on `window`, and both bare identifiers still work. Measured in a browser:
+1. **Overlay and scrim** — `.cn-overlay`, `.cn-scrim`.
+2. **Flyout or modal** — `.cn-flyout` from the rail, `.cn-modal` as a centred dialog.
+3. **Head** — `.cn-head` with `.cn-close` and `.cn-controls`.
+4. **Find** — `.cn-find`, a leading-glyph search inside the menu.
+5. **Segmented** — `.cn-seg`, the Shortcuts / All / Templates switch.
+6. **Body** — `.cn-body` and `.cn-content`, holding `.cn-group`, `.cn-grid` and `.cn-item`.
+7. **Footer** — `.cn-footer`, with `.cn-manage-note`.
 
-| Access | Result |
-|---|---|
-| `window.CREATE_CATALOG` | 6 groups |
-| `window.CN_TEMPLATES` | 5 templates |
-| `CREATE_CATALOG` from another classic `<script>` | Still works |
-
-**This was broken until 2026-08-18, and the failure mode is worth recognising.** Both were declared with top-level `const` and never assigned anywhere. In a classic script that creates a global *lexical* binding — readable as a bare identifier from another classic script, but **not a property of `window`**, so a guard like `if (window.CREATE_CATALOG)` always failed.
-
-Worse, `package.json` declares `"type": "module"` and no shipped script has an `export`. Imported through a bundler, both `const`s became module-scoped and invisible to everything else, with no error — so `import '@ideagen-ax/praxis/dist/praxis-create-new.js'`, the documented npm path, was a silent no-op.
-
-Only three shipped scripts assign to `window` at all: `PraxisFilters`, `PraxisDotField` and the Mazlan globals. The rest survive a module import because they self-wire as a side effect; a pure-data file had nothing to fall back on.
-
-### The catalog shape
+#### The catalog shape
 
 Six groups, each with a brand `tone` that drives the group header colour, and a Material Symbols ligature for its icon.
 
@@ -2784,7 +3597,56 @@ CN_TEMPLATES = [
 
 The tone values are `pink`, `teal`, `blue`, `orange`, `purple` and `green`, matching the `.cn-group--*` modifiers exactly, so a group renders correctly by passing its tone straight through.
 
-### Rendering it
+### Variants
+
+| Variant | Use |
+|---|---|
+| `.cn-flyout` | Opened from the nav rail's Create button |
+| `.cn-modal` | Centred, for a full catalogue |
+| Shortcuts / All / Templates | The three views, switched by `.cn-seg`. Templates uses `.cn-tpl` and `.cn-tpl-list` rather than the item grid |
+
+#### Templates
+
+```html
+<div class="cn-flyout" style="position:relative;inset:auto">
+  <div class="cn-head"><p class="cn-head__title">Start from a template</p></div>
+  <div class="cn-body"><div class="cn-tpl-list" id="tpls"></div></div>
+  <div class="cn-footer">
+    <p class="cn-manage-note">Templates are managed per solution.</p>
+  </div>
+</div>
+<script>
+  document.getElementById('tpls').innerHTML = CN_TEMPLATES.map(function (t) {
+    return '<button class="cn-tpl" type="button">'
+      + '<span class="cn-tpl__icon"><span class="material-symbols-rounded">' + t.icon + '</span></span>'
+      + '<span class="cn-tpl__body">'
+      + '<div class="cn-tpl__name">' + t.label + '</div>'
+      + '<div class="cn-tpl__meta">' + t.type + ' · ' + t.sub + '</div>'
+      + '</span></button>';
+  }).join('');
+</script>
+```
+
+**`.cn-tpl__name` and `.cn-tpl__meta` must be block-level, and nothing in the sheet enforces it.** The name sets `white-space:nowrap` with `text-overflow:ellipsis` and the meta sets `margin-top` — both meaningless on an inline element. Their parent `.cn-tpl__body` is `flex:1; min-width:0`, not a flex column, so `<span>`s run together on one line with no truncation.
+
+The equivalent `.ws-item__text` in `praxis-navrail.css` *is* `display:flex; flex-direction:column`, so spans stack there. Two near-identical two-line rows, two different contracts. Use `<div>`s in `.cn-tpl__body` and you are safe in both.
+
+### States
+
+- **Closed / open** — `[hidden]` on the overlay.
+- **Collapsed group** — `.is-collapsed`.
+- **Filtered** — driven by `.cn-find`.
+- **Empty** — no matches. This sheet has no empty-state class of its own, which is part of why [Empty state](#empty-state) is on the roadmap.
+
+### Responsive behavior
+
+The flyout is anchored to the rail, and below 640px the rail itself is hidden — so on a phone the Create action arrives through [the nav drawer](#nav-drawer-and-rail-flyouts), which leads its list with Create as a filled action specifically so the catalogue stays reachable.
+
+That is the responsive story: the component does not adapt so much as hand over.
+
+### Interactive demo
+
+#### Rendering it
 
 The example below reads the real shipped catalog and builds the flyout from it with the real classes. This is roughly the minimum render, and it is the part you own.
 
@@ -2824,33 +3686,38 @@ The example below reads the real shipped catalog and builds the flyout from it w
 </script>
 ```
 
-### Templates
+### Code
 
-```html
-<div class="cn-flyout" style="position:relative;inset:auto">
-  <div class="cn-head"><p class="cn-head__title">Start from a template</p></div>
-  <div class="cn-body"><div class="cn-tpl-list" id="tpls"></div></div>
-  <div class="cn-footer">
-    <p class="cn-manage-note">Templates are managed per solution.</p>
-  </div>
-</div>
-<script>
-  document.getElementById('tpls').innerHTML = CN_TEMPLATES.map(function (t) {
-    return '<button class="cn-tpl" type="button">'
-      + '<span class="cn-tpl__icon"><span class="material-symbols-rounded">' + t.icon + '</span></span>'
-      + '<span class="cn-tpl__body">'
-      + '<div class="cn-tpl__name">' + t.label + '</div>'
-      + '<div class="cn-tpl__meta">' + t.type + ' · ' + t.sub + '</div>'
-      + '</span></button>';
-  }).join('');
-</script>
-```
+`praxis-create-new.css` and `praxis-create-new.js`. The script auto-initialises.
 
-**`.cn-tpl__name` and `.cn-tpl__meta` must be block-level, and nothing in the sheet enforces it.** The name sets `white-space:nowrap` with `text-overflow:ellipsis` and the meta sets `margin-top` — both meaningless on an inline element. Their parent `.cn-tpl__body` is `flex:1; min-width:0`, not a flex column, so `<span>`s run together on one line with no truncation.
+#### Getting at the data, and the trap
 
-The equivalent `.ws-item__text` in `praxis-navrail.css` *is* `display:flex; flex-direction:column`, so spans stack there. Two near-identical two-line rows, two different contracts. Use `<div>`s in `.cn-tpl__body` and you are safe in both.
+Both arrays are on `window`, and both bare identifiers still work. Measured in a browser:
 
-### The rest of the vocabulary
+| Access | Result |
+|---|---|
+| `window.CREATE_CATALOG` | 6 groups |
+| `window.CN_TEMPLATES` | 5 templates |
+| `CREATE_CATALOG` from another classic `<script>` | Still works |
+
+**This was broken until 2026-08-18, and the failure mode is worth recognising.** Both were declared with top-level `const` and never assigned anywhere. In a classic script that creates a global *lexical* binding — readable as a bare identifier from another classic script, but **not a property of `window`**, so a guard like `if (window.CREATE_CATALOG)` always failed.
+
+Worse, `package.json` declares `"type": "module"` and no shipped script has an `export`. Imported through a bundler, both `const`s became module-scoped and invisible to everything else, with no error — so `import '@ideagen-ax/praxis/dist/praxis-create-new.js'`, the documented npm path, was a silent no-op.
+
+Only three shipped scripts assign to `window` at all: `PraxisFilters`, `PraxisDotField` and the Mazlan globals. The rest survive a module import because they self-wire as a side effect; a pure-data file had nothing to fall back on.
+
+### Markup contract
+
+| Item | Requirement |
+|---|---|
+| Overlay | `[hidden]` closed. `role="dialog"` with `aria-modal` for the modal form |
+| Find | A real labelled input. Its result count should be announced |
+| Segmented | `.cn-seg` is a choice control and needs the roles to match — either tabs or a radio group, not unlabelled buttons |
+](#module-selector)| Items | `.cn-item` is shared with [the module selector, so keep the icon and label structure identical |
+| Close | Labelled. Escape should also close |
+| JS | Self-wiring |
+
+#### The rest of the vocabulary
 
 | Class | What it is |
 |---|---|
@@ -2863,7 +3730,9 @@ The equivalent `.ws-item__text` in `praxis-navrail.css` *is* `display:flex; flex
 
 `.material-symbols-rounded` — the icon base every Praxis page uses — is defined in **this** sheet, not in core. One of the three surprising-location bases. Another reason to load the bundle.
 
-### Everything this sheet defines
+### Token reference
+
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -2892,6 +3761,41 @@ The equivalent `.ws-item__text` in `praxis-navrail.css` *is* `display:flex; flex
 | `.cn-section-label` | 1 |
 
 
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Keep `.cn-item` markup identical to the module selector's — they are one vocabulary on purpose.
+- Announce how many results a filter left.
+- Provide the Create action somewhere else at phone width.
+
+**Don't**
+
+- Use this as a generic modal. `.cn-modal` is the Create New catalogue; a confirmation needs [a dialog](#dialog), which does not exist yet.
+- Style `.cn-item` locally. Two catalogues depend on it.
+
+### Accessibility
+
+- The modal form needs `aria-modal`, a focus trap, Escape, and focus restoration. None of it is supplied by the script.
+- `.cn-seg` must carry real roles. A three-way switch built from bare buttons tells a screen-reader user nothing about which view is active.
+- The find field's result count belongs in a live region.
+- Collapsed groups should leave the tab order.
+- Item glyphs are decorative; the label is the accessible name.
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| `.cn-item` marker | Size | 32px |
+| Item glyph | Size | 20px |
+| `.cn-group` head | Height | 32px |
+
+Matched deliberately with `praxis-module-selector.css`, so the two catalogues line up.
+
 ---
 
 ## Quick-filter rail
@@ -2906,7 +3810,15 @@ The design decision worth copying: it **moves** the existing `.qfilter` card int
 
 **Every rule in this sheet is scoped to `body.tb-is-compact`.** Nothing in it applies at full width, and the class is set by `praxis-toolbar-compact.js`, not by this script. So the rail is inert unless the [compact toolbar](#compact-toolbar) is also loaded — the two are a pair, and it watches the body class rather than a media query precisely so both switch at exactly the same moment.
 
-### The quick-filter card
+### Anatomy
+
+1. **Rail** — `.qrail`, the container.
+2. **Pill** — `.qrail__pill`, one quick filter.
+3. **Caret** — `.qrail__caret`, opening the pill's options.
+4. **Popover** — `.qrail-pop`.
+5. **Filter rows** — `.qfilter`, shared with [Filters](#filters).
+
+#### The quick-filter card
 
 `.qfilter` comes from `praxis-filters.css`, not this sheet, and it is what both forms display. Each card needs `data-filter-name` — the script and the filter engine both look the card up by it.
 
@@ -2951,7 +3863,9 @@ The design decision worth copying: it **moves** the existing `.qfilter` card int
 
 `.qfilter__row--selected` is what the script counts to render the pill's badge — `.qrail__count` is `querySelectorAll('.qfilter__row--selected').length`. So the count is derived from the same DOM the user is clicking, never from a parallel state object that could disagree.
 
-### The compact form
+### Variants
+
+#### The compact form
 
 ```html
 <div class="qrail">
@@ -3009,7 +3923,21 @@ The design decision worth copying: it **moves** the existing `.qfilter` card int
 </script>
 ```
 
-### The vocabulary
+### States
+
+- **Open** — `.is-open` on the rail or a popover.
+- **Compact** — `.tb-is-compact`, set by `praxis-toolbar-compact.js`. The rail and the compact toolbar share this class, which is how they stay in step.
+- **Active filter** — a pill carrying a value.
+
+### Responsive behavior
+
+Driven by `.tb-is-compact` rather than a media query, for the same reason as [the compact toolbar](#compact-toolbar): the rail reacts to the width it actually has, not the width of the window.
+
+Motion comes from three shared tokens — `--praxis-rail-duration` (480ms), `--praxis-rail-ease` and `--praxis-rail-travel` (−56px) — which seven prototype pages had defined identically before they were promoted.
+
+### Interactive demo
+
+#### The vocabulary
 
 | Class | What it is |
 |---|---|
@@ -3021,7 +3949,23 @@ The design decision worth copying: it **moves** the existing `.qfilter` card int
 | `.qrail__caret` | Trailing chevron |
 | `.qrail-pop` | The popover, with `.is-open` and `[hidden]`. `__head`, `__title`, `__close`, `__body`. |
 
-### Everything this sheet defines
+### Code
+
+`praxis-quick-rail.css` and `praxis-quick-rail.js`. The script auto-initialises on `DOMContentLoaded`.
+
+The rail's *width* is deliberately not a token: it was genuinely different on every prototype page (100%, 260px, 300px), so it stays a per-page decision. The motion is shared; the geometry is not.
+
+### Markup contract
+
+| Item | Requirement |
+|---|---|
+| Pill | A real button, labelled with the filter name and its current value |
+| Caret | `aria-expanded`, and it must not be a second tab stop if the whole pill opens the popover |
+| Popover | `[hidden]` closed, labelled by its pill |
+| Rail width | Yours. Set it per page |
+| JS | Self-wiring |
+
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -3033,6 +3977,48 @@ The design decision worth copying: it **moves** the existing `.qfilter` card int
 | `.is-open` | 1 |
 | `.material-symbols-rounded` | 1 |
 
+
+### Token reference
+
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--praxis-rail-duration` | `480ms` | — |
+| `--praxis-rail-ease` | `cubic-bezier(.34,.01,.1,1)` | — |
+| `--praxis-rail-travel` | `-56px` | — |
+
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Put the value in the pill's label, so the rail reads as the current filter state.
+- Set the rail width for your page.
+- Keep the quick filters to the few that are used constantly — everything else belongs in [the filter drawer](#filters).
+
+**Don't**
+
+- Set `.tb-is-compact` by hand.
+- Duplicate the drawer here. The rail is a shortcut, not a second filter UI.
+
+### Accessibility
+
+- A pill's accessible name should carry the filter and its value: "Status: Open", not "Status".
+- Applying a filter changes the result set, which is a content change and needs announcing — usually by the result count rather than by the rail.
+- Popovers close on Escape and return focus to their pill.
+- The caret should not be a separate tab stop when the pill already opens the popover.
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| Rail | Width | Per page — deliberately not tokenised |
+| Rail | Travel | `--praxis-rail-travel`, −56px |
+| Rail | Duration | `--praxis-rail-duration`, 480ms |
 
 ---
 
@@ -3050,7 +4036,51 @@ The consequence for you: **you cannot predict the collapse point from CSS**. Res
 
 It collapses to `[back] [Tools ▾] [Filters] [Options] [▤]`, and it builds the Options popover **only if the page actually has sort or display controls** — an empty Options button would be worse than none.
 
-### Live
+### Anatomy
+
+1. **Band** — the `.toolbar` row the compact behaviour applies to.
+2. **Kept controls** — what stays visible when space runs out.
+3. **Tools trigger** — the button that opens the overflow.
+4. **Options popover** — `.tb-options`, holding everything that moved, each control at full row width.
+5. **Scrim** — `.tb-options-scrim`.
+
+#### The vocabulary
+
+| Class | What it is |
+|---|---|
+](#quick-filter-rail)| `body.tb-is-compact` | The switch. Set by this script, read by this sheet **and by [the quick-filter rail**, which watches the body class rather than a media query so both change at the same instant. |
+| `.tb-compact` | The collapsed cluster. `__menu`, `__btn`, `__caret`, `__pop`. |
+| `.tb-options` | The Options sheet, with `.is-open` and `[hidden]`. Paired with `.tb-options-scrim`. |
+| `.tb-options__head`, `__title`, `__close`, `__search`, `__body`, `__panel`, `__sechead`, `__label`, `__empty` | Its internals. `__sr` is a screen-reader-only live region. |
+| `.tb-display__btn`, `.tb-display__pop` | The density and column switch. `[aria-expanded="true"]` is the open state. |
+| `.tb-viewlabel` | The current view's name, shown when the switcher itself does not fit |
+| `.colmenu`, `.sortmenu`, `.sortbtn` | Column and sort menus. Praxis styles these **only inside** `.tb-options__body` and `.tb-display__pop` — see the trap. |
+| `.exp-head` | Expandable section head inside the options panel |
+
+**`.colmenu`, `.sortmenu`, `.sortbtn`, `.tb-display` and `.panel` have no base rule in Praxis.** The only rules that mention them are *inside* the compact popovers, and several are `display:none !important` — this sheet's job for those classes is to *suppress* your full-width controls once they have been folded into the Options sheet, not to define them. If you use one outside a popover you get nothing. The [unkeyed families](#families-praxis-never-keys-a-rule-on) table measures this every build.
+
+### Variants
+
+Two, and the switch between them is automatic rather than authored: the full band, and the compact band marked by `.tb-is-compact`.
+
+`.tb-display` is the third thing in this family and it has no base — it is one of the part-only names catalogued on [Page families](#page-families-and-part-only-names).
+
+### States
+
+- **Full** — every control in the band.
+- **Compact** — `.tb-is-compact` on the band. The script sets it; do not set it by hand.
+- **Options open** — `.is-open`, with the scrim shown.
+- **A menu inside the overflow** — a `.tb-menu` moved into the popover takes the full row width, so [the toolbar menu](#toolbar-menu) stays usable there.
+
+### Responsive behavior
+
+This component *is* the responsive behaviour of the toolbar band, which is why it has no breakpoint table of its own: the switch is driven by measured available width rather than a viewport size, so a band inside a narrow column goes compact on a wide screen.
+
+That is the important property. A media query cannot see that a toolbar is in a 600px panel on a 1920px monitor; this can.
+
+### Interactive demo
+
+#### Live
 
 ```html
 <div class="app">
@@ -3106,22 +4136,26 @@ It collapses to `[back] [Tools ▾] [Filters] [Options] [▤]`, and it builds th
 </div>
 ```
 
-### The vocabulary
+### Code
 
-| Class | What it is |
+`praxis-toolbar-compact.css` and `praxis-toolbar-compact.js`. The script auto-initialises on `DOMContentLoaded` and mutates the document, which is why every example on this site runs in its own iframe.
+
+```html
+<link rel="stylesheet" href="praxis-toolbar-compact.css">
+<script src="praxis-toolbar-compact.js"></script>
+```
+
+### Markup contract
+
+| Item | Requirement |
 |---|---|
-](#quick-filter-rail)| `body.tb-is-compact` | The switch. Set by this script, read by this sheet **and by [the quick-filter rail**, which watches the body class rather than a media query so both change at the same instant. |
-| `.tb-compact` | The collapsed cluster. `__menu`, `__btn`, `__caret`, `__pop`. |
-| `.tb-options` | The Options sheet, with `.is-open` and `[hidden]`. Paired with `.tb-options-scrim`. |
-| `.tb-options__head`, `__title`, `__close`, `__search`, `__body`, `__panel`, `__sechead`, `__label`, `__empty` | Its internals. `__sr` is a screen-reader-only live region. |
-| `.tb-display__btn`, `.tb-display__pop` | The density and column switch. `[aria-expanded="true"]` is the open state. |
-| `.tb-viewlabel` | The current view's name, shown when the switcher itself does not fit |
-| `.colmenu`, `.sortmenu`, `.sortbtn` | Column and sort menus. Praxis styles these **only inside** `.tb-options__body` and `.tb-display__pop` — see the trap. |
-| `.exp-head` | Expandable section head inside the options panel |
+| Band | A `.toolbar` with its controls as direct children of `.toolbar__inner` |
+| Labels | Every control needs a real label — the script uses it for the popover row, so an unlabelled icon button becomes an unlabelled row |
+| `.tb-is-compact` | Set by the script. Read it, do not write it |
+| Trigger | `aria-expanded` maintained by the script |
+| JS API | Self-wiring, no init call. It no-ops on a page with no toolbar |
 
-**`.colmenu`, `.sortmenu`, `.sortbtn`, `.tb-display` and `.panel` have no base rule in Praxis.** The only rules that mention them are *inside* the compact popovers, and several are `display:none !important` — this sheet's job for those classes is to *suppress* your full-width controls once they have been folded into the Options sheet, not to define them. If you use one outside a popover you get nothing. The [unkeyed families](#families-praxis-never-keys-a-rule-on) table measures this every build.
-
-### Everything this sheet defines
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -3147,6 +4181,50 @@ It collapses to `[back] [Tools ▾] [Filters] [Options] [▤]`, and it builds th
 | `.exp-head` | 1 |
 
 
+### Token reference
+
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--px-toolbar-gutter` | `16px` | — |
+
+
+The band's height and padding come from `praxis-pageheader.css`, so the compact form does not change the masthead's combined 128px — which is the promise that keeps page content starting at the same y on every page.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Label every control in the band.
+- Put the primary action first, so it is the last thing to move into the overflow.
+- Let the script decide when to go compact.
+
+**Don't**
+
+- Set `.tb-is-compact` yourself.
+- Rely on a media query to hide toolbar controls — this measures the container, which is the thing that actually matters.
+- Put a control in the band that must always be visible without also providing it elsewhere.
+
+### Accessibility
+
+- Control labels are load-bearing twice over: for assistive technology, and because the script reuses them as popover row labels.
+- The trigger carries `aria-expanded`.
+- Moving a focused control into the popover would lose focus — worth verifying in any page that changes its toolbar contents dynamically.
+- The scrim is not focusable and clicking it closes the popover; Escape should too.
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| Band | Min height | `--px-toolbar-h`, 60px |
+| Band | Padding | `--px-toolbar-pad-y` 10px, `--ph-pad-x` per page |
+| Popover row | Width | Full width of the popover |
+| Masthead | Combined height | 128px, unchanged by the compact form |
+
 ---
 
 ## Toolbar menu
@@ -3158,6 +4236,46 @@ Tier: **settling** · Sheet: `praxis-controls.css`
 A `.tbtn` that opens a panel under itself. Report Management's Group menu, Search's sort and column menus, the record pages' row actions, the workspace editor's layout picker — same object each time.
 
 Two classes. `.tb-menu` is the positioning context and holds the trigger; `.tb-dropdown` is the panel, and it is `hidden` until you open it.
+
+### Anatomy
+
+| Class | What it is |
+|---|---|
+| `.tb-menu` | `position:relative; display:inline-flex`. Wraps the trigger so the panel anchors to it. |
+| `.tb-dropdown` | The panel. Anchored 6px below the trigger, `min-width:220px`, `z-index:200`. `[hidden]` is its closed state. |
+| `.tb-dropdown--right` | Right-aligned, for a trigger at the end of the band where a left-anchored panel would hang off the page. |
+| `.tb-dropdown__item` | A row. `min-height:36px` rather than a fixed height, so an item carrying a second line grows instead of clipping it. |
+| `.tb-dropdown__sub` | That second line — a count, a description, an owner. |
+| `.tb-dropdown__sec` | A section label above a run of items. |
+| `.tb-dropdown__divider` / `__sep` | A hairline. Two names for one rule; see below. |
+| `.tb-dropdown__empty` | The "nothing here" line, for a menu whose contents are filtered or fetched. |
+| `.tb-dropdown__item--danger` | Destructive action, in the danger ink. |
+
+### Variants
+
+| Variant | Use |
+|---|---|
+| Default | Left-anchored under the trigger |
+| `--right` | Right-aligned, for a trigger at the end of the band where a left-anchored panel would hang off the page |
+| `__item--danger` | A destructive row, in the danger ink |
+| `menuitemradio` rows | A choice group. The checked item takes the app's pink selection accent, matching how selection is marked in the nav rail and the report tree |
+
+### States
+
+- **Closed** — `[hidden]` on the panel.
+- **Open** — attribute removed. There is no `.is-open` here; the attribute is the state.
+- **Item hover** — `--px-hover`.
+- **Item focus-visible** — a 2px inset focus ring.
+- **Checked** — `aria-checked="true"` tints the item's glyph pink.
+- **Empty** — `__empty`, for a menu whose contents are filtered or fetched.
+
+### Responsive behavior
+
+The panel does not reposition itself — there is no script, so nothing measures the viewport. `--right` is the manual answer.
+
+What does adapt is the band around it: `praxis-toolbar-compact.css` treats a `.tb-menu` as one overflow item and gives its trigger the full row width inside the Tools popover. See [Compact toolbar](#compact-toolbar).
+
+### Interactive demo
 
 ```html
 <div class="toolbar">
@@ -3191,35 +4309,102 @@ Two classes. `.tb-menu` is the positioning context and holds the trigger; `.tb-d
 </div>
 ```
 
-### The parts
+### Code
 
-| Class | What it is |
-|---|---|
-| `.tb-menu` | `position:relative; display:inline-flex`. Wraps the trigger so the panel anchors to it. |
-| `.tb-dropdown` | The panel. Anchored 6px below the trigger, `min-width:220px`, `z-index:200`. `[hidden]` is its closed state. |
-| `.tb-dropdown--right` | Right-aligned, for a trigger at the end of the band where a left-anchored panel would hang off the page. |
-| `.tb-dropdown__item` | A row. `min-height:36px` rather than a fixed height, so an item carrying a second line grows instead of clipping it. |
-| `.tb-dropdown__sub` | That second line — a count, a description, an owner. |
-| `.tb-dropdown__sec` | A section label above a run of items. |
-| `.tb-dropdown__divider` / `__sep` | A hairline. Two names for one rule; see below. |
-| `.tb-dropdown__empty` | The "nothing here" line, for a menu whose contents are filtered or fetched. |
-| `.tb-dropdown__item--danger` | Destructive action, in the danger ink. |
+`praxis-controls.css`. No script.
 
-### Two names for the separator
+```html
+<div class="tb-menu">
+  <button class="tbtn" type="button" id="grp" aria-haspopup="menu" aria-expanded="false">
+    Group <span class="material-symbols-rounded">expand_more</span>
+  </button>
+  <div class="tb-dropdown" role="menu" aria-labelledby="grp" hidden>
+    <button class="tb-dropdown__item" type="button" role="menuitem">New group…</button>
+  </div>
+</div>
+```
 
-`.tb-dropdown__divider` and `.tb-dropdown__sep` are the same rule. The copies this was promoted from disagreed — four pages said `divider`, seven said `sep` — and an alias costs one selector where renaming costs an edit in seven files and a chance to miss one. Prefer `__divider` in new markup.
-
-**The panel is styling only.** Praxis does not open or close it: no script here toggles `hidden`, moves focus into the panel, or closes it on outside click or Escape. That is yours, and all four of those are load-bearing — a menu that cannot be dismissed from the keyboard is a trap. Set `aria-haspopup="menu"` and keep `aria-expanded` on the trigger in step with the attribute.
-
-### Why it is not in praxis-admin.css
+#### Why it is not in praxis-admin.css
 
 That is where `.tbtn` lives, so it looks like the obvious home. But `praxis-admin.css` is the largest sheet in the system and it carries the application shell, a bare-element box-sizing reset and its own `.tbtn` — a page adding it to pick up a dropdown would be restyling its whole toolbar to get one panel. In the prototype only six of twenty pages load it, and eight of the twelve carrying a local `.tb-dropdown` are not among them. `praxis-controls.css` is four kilobytes and depends on nothing but the tokens.
 
 `praxis-toolbar-compact.css` and `praxis-toolbar-compact.js` both already keyed off `.tb-menu`: the compact toolbar treats a menu as one overflow item and gives its trigger the full row width in the Tools popover. Until this landed, Praxis was reading a class it never defined — the panel worked only because every consuming page happened to declare its own. Four of them declared it differently.
 
-### Surface
+### Markup contract
+
+**The panel is styling only.** Praxis does not open or close it: no script here toggles `hidden`, moves focus into the panel, or closes it on outside click or Escape. That is yours, and all four of those are load-bearing — a menu that cannot be dismissed from the keyboard is a trap. Set `aria-haspopup="menu"` and keep `aria-expanded` on the trigger in step with the attribute.
+
+| Item | Requirement |
+|---|---|
+| Trigger | `aria-haspopup="menu"` and `aria-expanded`, kept in step with the panel's `hidden` attribute |
+| Panel | `role="menu"` and `aria-labelledby` pointing at the trigger |
+| Items | `role="menuitem"`, or `menuitemradio`/`menuitemcheckbox` with `aria-checked` |
+| Section labels | `__sec` is not a menu item and should not be focusable |
+| Closed state | The `hidden` attribute, not a class |
+| JS | **None supplied.** Open, close, focus movement, outside click and Escape are all yours |
+
+#### Two names for the separator
+
+`.tb-dropdown__divider` and `.tb-dropdown__sep` are the same rule. The copies this was promoted from disagreed — four pages said `divider`, seven said `sep` — and an alias costs one selector where renaming costs an edit in seven files and a chance to miss one. Prefer `__divider` in new markup.
+
+**The panel is styling only.** Praxis does not open or close it: no script here toggles `hidden`, moves focus into the panel, or closes it on outside click or Escape. That is yours, and all four of those are load-bearing — a menu that cannot be dismissed from the keyboard is a trap. Set `aria-haspopup="menu"` and keep `aria-expanded` on the trigger in step with the attribute.
+
+### Token reference
+
+
+| Family | Mentions |
+|---|---|
+| `.tb-dropdown` | 20 |
+| `.iconbtn` | 11 |
+| `.filterfield` | 8 |
+| `.icon` | 5 |
+| `.material-symbols-rounded` | 3 |
+| `.tb-menu` | 1 |
+
+
+#### Surface
 
 The panel follows `.px-pop` exactly — a hairline and `--praxis-elevation-4` by default, borderless over `--px-overlay` under `body[data-variant="praxis"]`. A menu opened from the toolbar and one opened from the nav rail are then the same object, which they were not in three of the four copies.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Use `--right` for a trigger near the end of the band.
+- Put a count or an owner in `__sub` rather than crowding the item label.
+- Prefer `__divider` over `__sep` in new markup.
+- Wire Escape and outside-click. Praxis does not.
+
+**Don't**
+
+- Ship it without keyboard dismissal — a menu that cannot be closed from the keyboard is a trap.
+- Use it as a [select](#select). A menu invokes actions; a select edits a value, and the ARIA roles differ.
+- Nest a second panel inside an item.
+
+### Accessibility
+
+The panel is styling only, so every accessibility obligation here is the consumer's — which is worth stating plainly rather than implying Praxis has handled it.
+
+- `aria-expanded` on the trigger, in step with `hidden`.
+- Focus moves into the panel on open and returns to the trigger on close.
+- Escape closes. Outside click closes.
+- Arrow keys move between items for a true `role="menu"`; if you are not going to implement that, do not claim the role.
+- `__item--danger` uses the danger ink on the item's own text, so the destructive meaning is not carried by colour alone only if the label says so — write "Remove from group", not "Remove".
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| `.tb-dropdown` | Min width / padding / offset | 220px / 6px / 6px below the trigger |
+| `.tb-dropdown` | Radius / z-index | `--praxis-radius-md` (12px) / 200 |
+| `__item` | Min height / padding | 36px / 6px 10px |
+| `__item` | Size / weight / gap | 14px / 500 / 10px |
+| Item glyph | Size | 18px |
+| `__divider` | Height / margin | 1px / 6px 8px |
 
 ---
 
@@ -3233,7 +4418,16 @@ The app bar's search is scoped to one or more modules. `.msel` is the picker; `p
 
 The reasoning, from the script's own header: the modules a search is scoped to are a filter in every sense the user cares about, so they belong alongside the rest. **No modules selected means the search covers everything** — that is the default, not a filter, so no chip appears.
 
-### The picker
+### Anatomy
+
+1. **Trigger** — `.msel`, the app-bar chip showing the current module.
+2. **Panel** — the picker.
+3. **Group** — `.cn-group`, a labelled run of modules.
+4. **Item** — `.cn-item`, one module.
+
+The grid and item vocabulary is shared with [the Create New menu](#create-new-menu) — deliberately, since both are catalogues of the same modules.
+
+#### The picker
 
 It reuses the Create New grid vocabulary — `.cn-grid`, `.cn-group`, `.cn-item` — rather than inventing a parallel one, so a module tile and a record-type tile are the same object. Selection is `.is-sel`, and the menu's own parts are `.msel__*`.
 
@@ -3287,7 +4481,9 @@ It reuses the Create New grid vocabulary — `.cn-grid`, `.cn-group`, `.cn-item`
 </div>
 ```
 
-### The vocabulary
+### Variants
+
+#### The vocabulary
 
 | Class | What it is |
 |---|---|
@@ -3299,11 +4495,97 @@ It reuses the Create New grid vocabulary — `.cn-grid`, `.cn-group`, `.cn-item`
 | `.msel__filter` | Type-to-narrow field |
 | `.msel__groups`, `.msel__empty` | The group list and its no-results state |
 
-### The chip, and why it is awkward
+### States
+
+- **Closed / open** — `.is-open`.
+- **Selected** — `.is-sel` on the current module.
+- **Collapsed group** — `.is-collapsed`.
+
+Three state classes, all following the `is-` convention documented on [Naming and state conventions](#naming-and-state-conventions).
+
+### Responsive behavior
+
+The trigger is hidden below 768px on every page except Search: `body:not([data-page="search"]) .msel{display:none}` in `praxis-appbar.css`. The reasoning is in that sheet — the chip's true home is the Search page, and on other pages it was taking width the search input needed.
+
+So on a phone, outside Search, this component is not present at all and its destinations have to be reachable another way.
+
+### Interactive demo
+
+#### The picker
+
+It reuses the Create New grid vocabulary — `.cn-grid`, `.cn-group`, `.cn-item` — rather than inventing a parallel one, so a module tile and a record-type tile are the same object. Selection is `.is-sel`, and the menu's own parts are `.msel__*`.
+
+```html
+<div class="msel is-open" style="position:relative;max-width:26rem">
+  <div class="msel__input">
+    All modules
+    <span class="msel__caret"><span class="material-symbols-rounded">expand_more</span></span>
+  </div>
+  <div class="msel__menu" style="position:relative;inset:auto;margin-top:.5rem">
+    <div class="msel__titlebar">
+      <span class="msel__title">Scope the search</span>
+      <button class="msel__clear" type="button">Clear</button>
+    </div>
+    <input class="msel__filter" type="search" placeholder="Filter modules" aria-label="Filter modules">
+    <div class="msel__groups">
+      <div class="cn-group cn-group--pink">
+        <div class="cn-group__head">
+          <span class="cn-group__icon"><span class="material-symbols-rounded">emergency_home</span></span>
+          <span class="cn-group__title">Incidents & Events</span>
+        </div>
+        <div class="cn-grid">
+          <button class="cn-item is-sel" type="button">
+            <span class="cn-item__icon"><span class="material-symbols-rounded">crisis_alert</span></span>
+            <span class="cn-item__label">Incidents</span>
+          </button>
+          <button class="cn-item" type="button">
+            <span class="cn-item__icon"><span class="material-symbols-rounded">warning</span></span>
+            <span class="cn-item__label">Near-misses</span>
+          </button>
+        </div>
+      </div>
+      <div class="cn-group cn-group--teal">
+        <div class="cn-group__head">
+          <span class="cn-group__icon"><span class="material-symbols-rounded">frame_inspect</span></span>
+          <span class="cn-group__title">Audit & Findings</span>
+        </div>
+        <div class="cn-grid">
+          <button class="cn-item is-sel" type="button">
+            <span class="cn-item__icon"><span class="material-symbols-rounded">fact_check</span></span>
+            <span class="cn-item__label">Audits</span>
+          </button>
+          <button class="cn-item" type="button">
+            <span class="cn-item__icon"><span class="material-symbols-rounded">flag</span></span>
+            <span class="cn-item__label">Findings</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+### Code
+
+`praxis-module-selector.css` for the panel, `praxis-appbar.css` for the trigger's place in the bar, and `praxis-module-chip.js` for the behaviour. The script auto-initialises and mutates the document.
+
+### Markup contract
+
+| Item | Requirement |
+|---|---|
+| Trigger | `aria-haspopup` and `aria-expanded` |
+| Panel | Labelled by the trigger |
+| Selected | `.is-sel` plus `aria-current` — the class is paint |
+| Groups | A real heading or an `aria-label` on the group, not a styled div alone |
+| JS | `praxis-module-chip.js`, self-wiring |
+
+#### The chip, and why it is awkward
 
 **`praxis-filters.js` owns `[data-chips]` and rewrites it wholesale on every `renderChips()` call**, which would wipe anything the module chip injected. So `praxis-module-chip.js` cannot simply append — it has to re-inject after each rebuild. If you render your own chips into that container, expect the same fight, and read the script before adding a third writer.
 
-### Everything this sheet defines
+### Token reference
+
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -3318,6 +4600,40 @@ It reuses the Create New grid vocabulary — `.cn-grid`, `.cn-group`, `.cn-item`
 | `.material-symbols-rounded` | 1 |
 
 
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Mark the current module with both `.is-sel` and `aria-current`.
+- Provide another route to the modules on phone, where the chip is hidden.
+
+**Don't**
+
+- Use it as a general-purpose dropdown. It is a module catalogue and shares its item vocabulary with Create New for that reason.
+- Assume it is present. Outside the Search page it disappears below 768px.
+
+### Accessibility
+
+- The trigger needs an accessible name that includes the current module, so a screen-reader user knows where they are without opening it.
+- `aria-current` on the selected item.
+- Group labels must reach the accessibility tree.
+- Escape closes and focus returns to the trigger.
+- A collapsed group's contents should leave the tab order.
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| `.cn-item` marker | Size | 32px |
+| Item glyph | Size | 20px |
+| Group head | Height | 32px |
+
+Those three are matched deliberately across this sheet and `praxis-create-new.css`, so the two catalogues line up.
+
 ---
 
 ## Workspace chrome
@@ -3330,7 +4646,15 @@ Tier: **settling** · Sheet: `praxis-workspace.css`
 
 Both work. They are not interchangeable, and **this sheet loads later in the bundle**, so wherever the two key on the same selector, this one wins. [The app shell](#the-app-shell) uses the `praxis-appbar.css` vocabulary, which is what the agent guide documents; pick one per page and do not mix them.
 
-### App switcher
+### Anatomy
+
+1. **App switcher** — `.appswitch`, beside the wordmark.
+2. **Persona picker** — `.persona-picker`, relocated into the profile menu as "Viewing as".
+3. **Theme button** — `.gl-theme-btn` with its sun/moon pair.
+4. **Logo** — two images, swapped by theme.
+
+Four small pieces of workspace-specific chrome. The app bar itself is on [The app shell](#the-app-shell).
+#### App switcher
 
 `.appswitch` is the product switcher in the app bar's left corner — a trigger and a popover of products, with `--active` marking the current one.
 
@@ -3349,7 +4673,9 @@ Both work. They are not interchangeable, and **this sheet loads later in the bun
 </div>
 ```
 
-### Persona picker
+### Variants
+
+#### Persona picker
 
 A prototype-only affordance for switching who you are looking at the screen as. It has two forms: standalone in the app bar (`.persona-trigger`), and folded into the profile menu (`.persona-picker--in-menu`), which restyles the trigger to sit as a menu row rather than a bar control.
 
@@ -3384,7 +4710,7 @@ The in-menu form expects the full set — `__icon`, `__text` wrapping `__label` 
 
 `.persona-trigger` rules are keyed on `body .persona-trigger` — a descendant of `body` purely for specificity, because this sheet loads before a page's own `<style>` and needed to outrank it. Overriding it takes the same or better specificity, not a plain class.
 
-### Theme button
+#### Theme button
 
 `.gl-theme-btn` holds two glyphs, `.gl-sun` and `.gl-moon`, and the theme swaps which is visible. Both are always in the DOM — the sheet hides one per theme rather than the script replacing the icon, so there is no flash and no state to keep.
 
@@ -3397,11 +4723,44 @@ The in-menu form expects the full set — `__icon`, `__text` wrapping `__label` 
 
 It does not persist anything by itself. The key to write is `localStorage['gl-theme']` — the one [the boot script reads](#theming) and the one `praxis-profile-menu.js` writes.
 
-### Logo, and the two-image pattern
+### States
+
+- **App switcher** — `__pop` is `[hidden]` closed; `__item--active` marks the current app.
+- **Persona** — `aria-expanded` on the trigger, with a third state at `[aria-expanded="true"]` that deepens the fill.
+- **Theme** — driven entirely by `body[data-theme]`: `.gl-moon` shows in light, `.gl-sun` in dark. No class toggling.
+
+### Responsive behavior
+
+Two things move:
+
+- `.appswitch` is `display:none !important` below 640px under the Praxis variant. It duplicates what the nav drawer and profile menu both offer, and at 390px it pushed the app bar's right cluster past the viewport on the record variants.
+- Below 480px `.appswitch__trigger` is capped at 104px with an ellipsis, so brand and switcher do not crowd out the search field.
+- The persona flyout, which normally opens to the left of the profile popover, becomes a fixed panel inset by `--praxis-space-12` below 639px.
+
+### Interactive demo
+
+#### Logo, and the two-image pattern
 
 `.appbar__logo-img` with `--onlight` and `--ondark`: both images ship in the markup and the sheet hides one per theme. Praxis ships no logo files, so these are yours. The same reasoning as the theme button — swapping a `src` in script gives you a visible reload on every theme change.
 
-### Everything this sheet defines
+### Code
+
+`praxis-workspace.css`, which is a *skin* rather than a base sheet — it layers workspace treatments over the shared chrome. Two consequences worth knowing:
+
+- It contains an unscoped `body[data-theme="dark"]` block that remaps surface tokens. `praxis-core.css`'s Praxis-variant dark block has higher specificity and wins, so the two do not fight — but the ordering is not accidental.
+- `.gl-theme-btn` gets colour here and has no base geometry anywhere. Put the class on an `.appbar__iconbtn`; that is what this reference site does.
+
+### Markup contract
+
+| Item | Requirement |
+|---|---|
+| App switcher | `aria-haspopup`, `aria-expanded`, and `aria-current` alongside `__item--active` |
+| Persona trigger | `aria-expanded`. Its accessible name must include who you are viewing as |
+| Theme button | An `aria-label`, and `aria-pressed` if you treat it as a toggle. Both SVGs are `aria-hidden` |
+| Logo | Two `<img>` elements, one `alt` between them — the hidden one takes `alt=""` or the wordmark is announced twice |
+| JS | `praxis-profile-menu.js` for the menu. The switcher and persona flyout are yours |
+
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -3422,6 +4781,54 @@ It does not persist anything by itself. The key to write is `localStorage['gl-th
 | `.btn` | 1 |
 
 
+### Token reference
+
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--praxis-menu-duration` | `520ms` | — |
+| `--praxis-menu-ease` | `cubic-bezier(.4,0,.2,1)` | — |
+
+
+Beyond those, this sheet works almost entirely in `--px-*` materials and the glass family. The persona and switcher hovers are hard-coded `rgba(16,36,58,…)` and `rgba(255,255,255,…)` pairs rather than tokens — a small, real inconsistency in a sheet that predates the material layer.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Put `.gl-theme-btn` on an `.appbar__iconbtn` for its geometry.
+- Give the persona trigger a name that says who you are viewing as.
+- Keep one `alt` across the two logo images.
+
+**Don't**
+
+- Load `praxis-workspace.css` on a non-workspace page for one rule — it is a skin and it carries an unscoped dark block.
+- Rely on `.appswitch` below 640px. It is hidden.
+- Toggle theme classes by hand. The swap is attribute-driven.
+
+### Accessibility
+
+- The theme button needs a label; the two SVGs are decorative.
+- "Viewing as" is a consequential state — a user acting as someone else should be able to tell from the trigger's accessible name, not only from a visual chip.
+- The double-logo pattern announces twice unless the hidden image has an empty `alt`.
+- Both popovers need Escape and focus restoration; neither is supplied.
+- Persona and switcher hover states are fill-only, so they vanish in forced-colors — see [Forced colors](#forced-colors-and-high-contrast).
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| `.appswitch__trigger` | Height / radius | 32px / 8px |
+| `.appswitch__trigger` | Max width ≤480px | 104px, ellipsised |
+| `.appswitch__pop` | Min width | 200px |
+| Persona flyout | Width | 320–340px, fixed and inset below 639px |
+| Logo | Height | 26px, 22px below 480px |
+| Avatar | Size | 34px, 30px below 480px |
+
 ---
 
 ## Breadcrumb back button
@@ -3432,15 +4839,39 @@ The toolbar's back button, driven by the breadcrumb trail rather than history. T
 Tier: **settling** · Sheet: `praxis-pageheader.css` · Script: `praxis-breadcrumb-back.js`
 Every page's toolbar carries a back button, and it used to do nothing. It should step one level up the breadcrumb trail, ending at the workspace. `praxis-breadcrumb-back.js` is self-wiring: include it, and the button in your toolbar starts working.
 
-### Why it is not one line
+Two things are documented here, because they are inseparable — the breadcrumb component itself, which `praxis-pageheader.css` fully defines, and the script that reads it.
 
-The obvious implementation is `location.href = lastCrumb.href`. It does not work here, and the reason is worth knowing because it is a property of real markup rather than a design choice:
+### Anatomy
 
-The breadcrumb *structure* is consistent — a `<nav class="breadcrumb">` with `<a>` ancestors, `.breadcrumb__sep` separators and a final `.breadcrumb__current`. The **hrefs are not**. Six of the twenty pages point their ancestor links at `"#"`. Following those takes you nowhere and adds a history entry, so the script has to resolve a real destination rather than trusting the attribute.
+1. **Trail** — `.breadcrumb`, a `<nav>` with a label.
+2. **Home** — `.breadcrumb__home`, a glyph link at the head.
+3. **Ancestors** — plain `<a>` elements.
+4. **Separator** — `.breadcrumb__sep`, decorative.
+5. **Current** — `.breadcrumb__current`, the page you are on, not a link.
+6. **Back button** — a `.tbtn--icon` in the toolbar band below. Not part of the breadcrumb, and driven by it.
 
-The practical instruction: **give your breadcrumb ancestors real hrefs.** The script copes with `"#"`, but it copes by guessing, and a correct href is always better than a good guess.
+### Variants
 
-### The markup it reads
+One trail. The back button has no variants either — it is a single icon button whose behaviour comes from the script.
+
+What Praxis does *not* have is an overflow form for a deep trail; the breadcrumb wraps instead, which is deliberate but has consequences. See [Breadcrumb overflow](#breadcrumb-overflow).
+
+### States
+
+- **Ancestor link** — secondary ink, primary on hover.
+- **Current** — primary ink, not interactive.
+- **Wrapped** — at narrow widths the trail wraps and takes the header's height with it. `--ph-h` is a floor, not a fixed height.
+- **Back unavailable** — at the top of a trail there is nowhere to go. The script resolves to the workspace rather than disabling the button.
+
+### Responsive behavior
+
+| Viewport | Behaviour |
+|---|---|
+| Desktop | One line, full trail |
+| Narrow | Wraps. `praxis-pageheader.css` says so explicitly — "the breadcrumb is allowed to wrap at narrow widths and take the header with it" |
+| ≤640px | Inline padding follows `--px-gutter`, so the trail lines up with the app bar and the content |
+
+### Interactive demo
 
 ```html
 <div class="pageheader">
@@ -3473,19 +4904,80 @@ The practical instruction: **give your breadcrumb ancestors real hrefs.** The sc
 
 The script finds the back button by looking for the toolbar's `aria-label="Back"` control, so **label it**. An icon-only button with no label is both inaccessible and invisible to this script — the same requirement, for two reasons.
 
-### What the breadcrumb itself defines
+### Code
 
-`praxis-pageheader.css` is a small sheet and fully covers the breadcrumb: `.breadcrumb`, `.breadcrumb__home`, `.breadcrumb__sep` and `.breadcrumb__current`. The separators are decorative and take `aria-hidden`; the trail is a `<nav>` with a label so it is announced as navigation rather than a run of links.
+The breadcrumb is CSS in `praxis-pageheader.css`. The back button is one script tag and nothing else:
 
+```html
+<script src="praxis-breadcrumb-back.js"></script>
+```
 
-| Family | Mentions |
+#### Why it is not one line
+
+The obvious implementation is `location.href = lastCrumb.href`. It does not work here, and the reason is worth knowing because it is a property of real markup rather than a design choice:
+
+The breadcrumb *structure* is consistent — a `<nav class="breadcrumb">` with `<a>` ancestors, `.breadcrumb__sep` separators and a final `.breadcrumb__current`. The **hrefs are not**. Six of the twenty pages point their ancestor links at `"#"`. Following those takes you nowhere and adds a history entry, so the script has to resolve a real destination rather than trusting the attribute.
+
+The practical instruction: **give your breadcrumb ancestors real hrefs.** The script copes with `"#"`, but it copes by guessing, and a correct href is always better than a good guess.
+
+### Markup contract
+
+| Item | Requirement |
 |---|---|
-| `.pageheader` | 9 |
-| `.breadcrumb` | 7 |
-| `.toolbar` | 4 |
-| `.material-symbols-rounded` | 2 |
-| `.icon` | 1 |
+| `<nav class="breadcrumb">` | With an `aria-label`, so it is announced as navigation rather than a run of links |
+| Ancestor hrefs | **Real URLs.** The script copes with `"#"` by guessing, and a correct href is always better than a good guess |
+| `.breadcrumb__sep` | `aria-hidden="true"`. Decorative |
+| `.breadcrumb__current` | Not a link. Add `aria-current="page"` |
+| Back button | `aria-label="Back"` — this is how the script finds it |
+| JS API | Self-wiring on `DOMContentLoaded`. No init call, and it no-ops on a page with no breadcrumb |
 
+### Token reference
+
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--ph-pad-x` | `var(--px-gutter)` | — |
+
+
+Beyond those, the breadcrumb uses `--praxis-color-text-secondary` for ancestors, `--praxis-color-text-primary` for the current page and `--praxis-color-text-disabled` for the home glyph and separators.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+The practical instruction: **give your breadcrumb ancestors real hrefs.** The script copes with `"#"`, but it copes by guessing.
+
+**Do**
+
+- Label the nav and label the back button.
+- Keep the trail structural — it reflects where the record sits, not where the user has been.
+- Let it wrap rather than truncating it silently.
+
+**Don't**
+
+- Point an ancestor at `"#"`.
+- Make the current page a link.
+- Use the back button as browser history. It steps the trail, which is not the same thing — and that difference is the reason the script exists.
+
+### Accessibility
+
+- The trail is a labelled `<nav>` landmark.
+- Separators are `aria-hidden`, so a screen reader hears the path rather than "chevron right" four times.
+- The current page carries `aria-current="page"` and is not focusable.
+- The back button must have an accessible name. This is also a functional requirement, since the script keys on it.
+- A deep wrapped trail is verbose to hear. That is the cost of not having an overflow form, and it is tracked on [Breadcrumb overflow](#breadcrumb-overflow).
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| `.breadcrumb` | Size / weight | 13px / 600 |
+| `.breadcrumb` | Gap / bottom margin | 6px / 6px |
+| Separator glyph | Size | 18px |
+| `.pageheader` | Min height | `--ph-h`, 68px — a floor |
+| Back button | Size | 40px, `.tbtn--icon` |
 
 ---
 
@@ -3495,12 +4987,36 @@ The transient confirmation — one line at the bottom of the window that says an
 
 
 Tier: **settling** · Script: `praxis-toast.js`
-"Link copied". "Workspace saved". "3 records exported". Load the script and call it:
+"Link copied". "Workspace saved". "3 records exported". A toast is the shortest-lived thing in the system: one line, one moment, then gone. Praxis ships it as a script with no markup at all, which is unusual for this system and deliberate — see Code.
 
-`<script src="praxis-toast.js"></script>`
+### Anatomy
 
-`praxisToast('Workspace saved');`
-`praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 });`
+1. **Live region** — one bottom-centred container, created at load and reused. Never takes pointer events.
+2. **Toast** — a single line of text on a slate surface. There is no title, no icon and no close button, and that is the design: anything more belongs somewhere permanent.
+
+Neither part is markup you write. The script owns both.
+
+### Variants
+
+Three tones, set through `opts.tone`:
+
+| Tone | Use |
+|---|---|
+| Neutral (default) | "Link copied". The overwhelming majority |
+| `'success'` | "Workspace saved" |
+| `'danger'` | "Could not save — try again". Give it a longer duration; it carries more to read and matters more |
+
+### States
+
+- **Entering / visible / leaving** — all handled by the script.
+- **Stacked** — toasts append rather than replace, so two actions in quick succession both get read.
+- **Dismissed early** — the return value carries a `dismiss` function, so a long-running toast can be taken down by whatever finishes.
+
+### Responsive behavior
+
+Bottom-centred at every width. The one thing that matters here is that the region never covers the control that triggered it, which is why it takes no pointer events at any size.
+
+### Interactive demo
 
 ```html
 <div style="display:flex;gap:.5rem;flex-wrap:wrap">
@@ -3512,23 +5028,68 @@ Tier: **settling** · Script: `praxis-toast.js`
 <script src="../praxis-toast.js"></script>
 ```
 
-### The call
+### Code
 
-| Argument | What it does |
-|---|---|
-| `message` | The text. Set as `textContent`, so it is not an HTML injection site. |
-| `opts.tone` | `'success'` or `'danger'`. Omit for the neutral slate. |
-| `opts.duration` | Milliseconds, default 1900. Give a failure longer — it carries more to read and matters more. |
+One tag, no stylesheet:
 
-Returns `{ dismiss, element }`, so a long-running toast can be taken down early by whatever finishes.
+```html
+<script src="praxis-toast.js"></script>
 
-### It stacks
+<script>
+  praxisToast('Workspace saved');
+  praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 });
 
-Toasts append to one bottom-centred live region rather than replacing each other, so two actions in quick succession both get read. The region never takes pointer events: a confirmation that covers the control you just used is the one thing this pattern must not do.
+  var t = praxisToast('Exporting…', { duration: 30000 });
+  // …when the export finishes:
+  t.dismiss();
+</script>
+```
 
-### Why the CSS is inside the script
+#### Why the CSS is inside the script
 
 Same argument as `praxis-lucide.js`. A toast has no markup until it fires, so a consumer who loads the script and forgets a stylesheet gets an unstyled line of text at a moment they cannot rehearse — in production, on the success path, once. One tag cannot be half-installed. The style element is injected on load as well as on first call.
+
+#### Where it came from
+
+Promoted from the groom-lake prototype on 2026-08-21, where four pages each carried a private `toast()` closure: the same shape, the same 1.9 seconds, four copies of a 20-line `cssText` string, and no two agreeing on whether the message reached a screen reader. A confirmation is a system-level behaviour, and an application should not be able to have four of them.
+
+### Markup contract
+
+There is none — and that is the contract. You write no markup and no classes. The interface is the function.
+
+| Item | Behaviour |
+|---|---|
+| `praxisToast(message)` | The text. Set as `textContent`, so it is not an HTML injection site |
+| `opts.tone` | `'success'` or `'danger'`. Omit for the neutral slate |
+| `opts.duration` | Milliseconds, default 1900 |
+| Returns | `{ dismiss, element }` |
+| Region | `role="status"`, `aria-live="polite"`, created at load. See Accessibility for why the timing matters |
+| Self-wiring | Yes. No init call, and the style is injected on load |
+
+### Token reference
+
+None reachable. The script carries its own values in an internal `cssText` string rather than reading `--praxis-*` tokens, which is the trade-off that makes it work without a stylesheet.
+
+**That means the toast does not follow the theme.** It cannot, because it does not consume the token layer. If a toast ever needs to match a themed surface, the fix is to read the tokens with a fallback to the current literals — not to ask consumers to load a stylesheet, which is the problem this design exists to avoid.
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Use it to confirm something the user just did.
+- Give failures a longer duration than successes.
+- Keep it to one short line.
+
+**Don't**
+
+- Use it as the only report of what happened — see the trap below.
+- Put a button or a link in it. It is not interactive and it will be gone before anyone reaches it. An undoable action needs a permanent affordance.
+- Use it for something the user must read. That is a [dialog](#dialog) or an inline message.
+- Fire one on page load. Nothing has happened yet.
 
 ### Accessibility
 
@@ -3536,9 +5097,15 @@ The live region is created at load, *before* any message goes into it, with `rol
 
 **A toast is never the only report of what happened.** It is unreadable to anyone not looking at that corner, gone before a screen magnifier reaches it, and absent entirely to a keyboard user two tab stops away. Whatever it announces has to be visible somewhere permanent as well — a state chip, a count, a row that has changed. Use it to confirm, never to inform.
 
-### Where it came from
+### Dimensions
 
-Promoted from the groom-lake prototype on 2026-08-21, where four pages each carried a private `toast()` closure: the same shape, the same 1.9 seconds, four copies of a 20-line `cssText` string, and no two agreeing on whether the message reached a screen reader. A confirmation is a system-level behaviour, and an application should not be able to have four of them.
+All set inside the script and not overridable from a stylesheet:
+
+| Element | Property | Value |
+|---|---|---|
+| Region | Position | Bottom-centred, fixed, `pointer-events:none` |
+| Toast | Duration | 1900ms default |
+| Toast | Stacking | Appended, oldest at the top of the stack |
 
 ---
 
@@ -3554,7 +5121,16 @@ Tier: **unstable** · Sheet: `praxis-mazlan.css` · Script: `praxis-mazlan.js`
 
 `praxis-mazlan.css` is the largest sheet in Praxis and covers the conversational drawer, the menu, reasoning timeline, message bubbles, follow-ups and content panel. All of that CSS is here and ready. What is missing is the markup it styles.
 
-### What you can use today
+### Anatomy
+
+1. **Mark** — `.mazlan-mark`, the four-dot brand glyph. The one part that is safe to use on its own.
+2. **Drawer** — `.mazlan-drawer`, the conversation surface.
+3. **Thread** — `.mazlan-thread` holding `.mazlan-msg`.
+4. **Input** — `.mz-input`, with tool and scope buttons.
+5. **Suggestions and follow-ups** — `.mazlan-suggestions`, `.mazlan-followups`.
+6. **Sources and reasoning** — `.mazlan-sources`, `.mazlan-reasoning`.
+
+#### What you can use today
 
 #### The four-dot signature
 
@@ -3616,13 +5192,11 @@ The teal to magenta gradient, `#29D2D7 → #E30072`, is reserved for agentic mom
 
 `.mazbtn` is the quiet section-level hand-off, and it lives in `praxis-rfield.css` rather than here. See [fields](#sub-sections-and-the-mazlan-hand-off).
 
-### Configuration, for when you have the markup
+### Variants
 
-`window.MAZLAN_CONFIG` takes `{ greeting, suggestions: [{icon, cat, text, reply, action}], scope }` and is read lazily on each open, so you can refresh it on the trigger click. This only matters once you have the drawer markup.
+One drawer, and a chat-only mode via `.mazlan-chat-only`.
 
-The drawer is a prototype surface with canned replies, not an integration with a model. It references no host globals directly; it uses `window.announce` when present and optionally `window.openAgentic` and `window.closeDetailPanel`.
-
-### The drawer inventory
+#### The drawer inventory
 
 Everything below is **fully styled and has no shipped markup**. There is nothing to demonstrate — an example would be me inventing the markup, which is exactly what this page is telling you not to do. It is inventoried so that when the markup is extracted, whoever does it knows what the sheet already expects, and so a reader who greps for one of these names finds out why it does nothing.
 
@@ -3665,7 +5239,45 @@ The most developed part of the sheet, and the part most worth having when the ma
 
 **What to do if you need this.** Do not reconstruct the DOM from the class list above — the script requires specific *ids*, not classes, and getting 30 of them right by inference is not a good use of an afternoon. Raise it, and the markup gets extracted into the package once, correctly. Meanwhile [the mark](#the-four-dot-signature), the gradient and [`.mazbtn`](#sub-sections-and-the-mazlan-hand-off) are all usable today and cover most of what a prototype needs to signal an agentic moment.
 
-### Everything this sheet defines
+### States
+
+- **Open** — `.is-open` on the drawer, with `.mazlan-scrim`.
+- **Typing** — `.mazlan-typing`, the three dots. Currently the only loading affordance anywhere in Praxis; see [Loading states](#loading).
+- **Spinning** — `.is-spinning`, on a tool button while it works.
+- **Reasoning shown** — `.mazlan-reasoning` expanded.
+
+### Responsive behavior
+
+The drawer's motion depends on three tokens that used to be defined on one page only — `--praxis-motion-drawer`, `--praxis-ease-spring` and `--praxis-ease-spring-soft`. Before they were promoted, those declarations were invalid at computed-value time everywhere else, so the drawer had no transition at all on nineteen of twenty pages.
+
+Beyond that, the drawer's own breakpoints are not documented here because the markup is not shipped — which is the subject of the trap in Markup contract.
+
+### Interactive demo
+
+#### Configuration, for when you have the markup
+
+`window.MAZLAN_CONFIG` takes `{ greeting, suggestions: [{icon, cat, text, reply, action}], scope }` and is read lazily on each open, so you can refresh it on the trigger click. This only matters once you have the drawer markup.
+
+The drawer is a prototype surface with canned replies, not an integration with a model. It references no host globals directly; it uses `window.announce` when present and optionally `window.openAgentic` and `window.closeDetailPanel`.
+
+### Code
+
+`praxis-mazlan.css` and `praxis-mazlan.js`. The script auto-initialises and mutates the document globally.
+
+```html
+<link rel="stylesheet" href="praxis-mazlan.css">
+<script src="praxis-mazlan.js"></script>
+```
+
+### Markup contract
+
+**Praxis ships this sheet's CSS without its markup.** Fifteen of its class families are an inventory with no working example, because the drawer's DOM lives in the prototype rather than in Praxis. So the classes below are documented as an inventory, not as a contract you can build against — if you need the drawer, you need the markup too, and this package does not have it.
+
+The one exception is `.mazlan-mark`, which is self-contained and safe to use. That is why it appears in the app bar examples on [The app shell](#the-app-shell) and nothing else here does.
+
+### Token reference
+
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -3697,6 +5309,33 @@ The most developed part of the sheet, and the part most worth having when the ma
 | `.mazlan-plus-wrap` | 1 |
 
 
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Use `.mazlan-mark` on its own. It is complete.
+- Treat the rest as an inventory of what exists, for reading rather than building.
+
+**Don't**
+
+- Try to reconstruct the drawer from these class names. Fifteen families with no example is not a specification.
+- Use this for human comments on a record — that is a different component, and it is planned. See [Comment thread](#comments).
+- Use `.mazlan-typing` as a general loading indicator. It is tied to this surface.
+
+### Accessibility
+
+Not assessable from here, and that is the honest answer: the markup that would carry the roles, the live regions and the focus management is not in this package.
+
+What can be said is what a conversation surface needs, so it is not forgotten when the markup does arrive: a live region for streamed responses that does not re-announce the whole thread, focus management on open and close, an escape route, and a non-visual equivalent for the typing indicator. `.mazlan-typing` is currently three animated dots and nothing else, which communicates nothing to a screen reader.
+
+### Dimensions
+
+Not documented, for the same reason as Markup contract — the drawer's geometry is expressed against markup that is not shipped. `.mazlan-mark` is the exception and it is sized by its container.
+
 ---
 
 ## The admin shell
@@ -3709,7 +5348,9 @@ Tier: **unstable** · Sheet: `praxis-admin.css` · Script: `praxis-admin-chrome.
 
 Everything from `.adminnav` onward *is* admin-specific, and it is the largest single component surface in Praxis. It sits in the **unstable** tier because it is page-scoped: the ten admin pages emit an identical shell and this sheet was extracted from them, so it is shaped by those screens rather than by a general case.
 
-### The shell primitives
+### Anatomy
+
+#### The shell primitives
 
 | Class | What it is |
 |---|---|
@@ -3717,13 +5358,15 @@ Everything from `.adminnav` onward *is* admin-specific, and it is the largest si
 | `.main` | `flex:1; display:flex; min-height:0`. The rail and content sit side by side inside it. The `min-height:0` is what lets the inner column actually scroll. |
 | `.content` | The column. Declares `--ph-pad-x:24px`, which the page header, toolbar band and your body all inherit — change it here, once, to reset the page rhythm. |
 
-### The admin nav
+#### The admin nav
 
 A third navigation level, beside the rail: `.adminnav` at `--adminnav-w`, with a head, a type-to-filter field, a scrolling group list and items. It is the largest family in the sheet at 24 rules.
 
 **`praxis-core.css` hides it outright:** `body[data-variant="praxis"] .adminnav { display:none !important }`. So under the Praxis variant — which is every Praxis page — the admin nav does not render at all. The styling is here for the pages that predate the variant. If you want a third nav level under Praxis you are overriding an `!important`, which is a signal to build it as your own component rather than reviving this one.
 
-### Layout and cards
+### Variants
+
+#### Layout and cards
 
 ```html
 <div class="admin-cols">
@@ -3748,18 +5391,18 @@ A third navigation level, beside the rail: `.adminnav` at `--adminnav-w`, with a
 
     <div class="admin-card" style="margin-top:1rem">
       <p class="admin-subhead">Status</p>
-      <div class="admin-grid">
+      <div class="admin-drill__stats">
         <div class="admin-stat">
-          <span class="admin-stat__n">1,284</span>
-          <span class="admin-stat__k">Active users</span>
+          <button class="admin-stat__btn" type="button">Active users</button>
+          <span class="admin-stat__metric"><b>1,284</b> across 6 sites</span>
         </div>
         <div class="admin-stat">
-          <span class="admin-stat__n">37</span>
-          <span class="admin-stat__k">Pending invites</span>
+          <button class="admin-stat__btn" type="button">Pending invites</button>
+          <span class="admin-stat__metric"><b>37</b> awaiting reply</span>
         </div>
         <div class="admin-stat">
-          <span class="admin-stat__n">4</span>
-          <span class="admin-stat__k">Failed jobs</span>
+          <button class="admin-stat__btn" type="button">Failed jobs</button>
+          <span class="admin-stat__metric"><b>4</b> in the last hour</span>
         </div>
       </div>
     </div>
@@ -3781,57 +5424,7 @@ A third navigation level, beside the rail: `.adminnav` at `--adminnav-w`, with a
 
 `.admin-field` is the read-out row, and it is worth knowing that `praxis-rfield.css` gives it [the static-field treatment automatically](#four-gotchas-each-learned-the-hard-way), selected with `:has(> .admin-field__value)` — so generated admin pages needed no markup change to pick up the record-form look.
 
-### Tables
-
-Three wrappers, and they are not interchangeable: `.admin-table-wrap` is the outer container, `.admin-table-scroll` adds the horizontal scroll for wide column sets, and `.admin-tabletools` is the control strip above.
-
-```html
-<div class="admin-card">
-  <div class="admin-tabs">
-    <button class="admin-tab admin-tab--active" type="button">All users</button>
-    <button class="admin-tab" type="button">Pending</button>
-    <button class="admin-tab" type="button">Disabled</button>
-  </div>
-  <div class="admin-tabletools">
-    <button class="admin-ghostbtn" type="button">
-      <span class="material-symbols-rounded" aria-hidden="true">add</span> Invite user
-    </button>
-  </div>
-  <div class="admin-table-wrap">
-    <div class="admin-table-scroll">
-      <table class="admin-table">
-        <thead>
-          <tr><th>Name</th><th>Role</th><th>Site</th><th>Status</th><th></th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Marcus Silva</td><td>EHS coordinator</td><td>Teesside works</td>
-            <td><span class="admin-pill admin-pill--success">Active</span></td>
-            <td><button class="admin-rowx" type="button" aria-label="Remove">
-              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
-          </tr>
-          <tr>
-            <td>Aoife Byrne</td><td>Supervisor</td><td>Teesside works</td>
-            <td><span class="admin-pill admin-pill--warning">Invited</span></td>
-            <td><button class="admin-rowx" type="button" aria-label="Remove">
-              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
-          </tr>
-          <tr>
-            <td>Tom Okafor</td><td>Driver</td><td>Rotherham plant</td>
-            <td><span class="admin-pill">Disabled</span></td>
-            <td><button class="admin-rowx" type="button" aria-label="Remove">
-              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-```
-
-Zebra striping is `tbody tr:nth-child(even)`, and the same warning applies as for [in-record tables](#fields): **a hidden empty-state row still counts**. Put it in its own `<tbody>`.
-
-### Settings rows and drill-downs
+#### Settings rows and drill-downs
 
 ```html
 <div class="admin-settings-grid">
@@ -3864,19 +5457,108 @@ Zebra striping is `tbody tr:nth-child(even)`, and the same warning applies as fo
 </div>
 ```
 
-### Search suggestions
+### States
+
+- **Tab active** — `.admin-tab--active`, teal ink and a 2px border. No focus rule; see Accessibility.
+- **Nav item active** — `.adminnav__item--active`, a teal tint plus a 3px left bar, remapped to cyan in dark.
+- **Row selected** — `.admin-table__row--selected`, using the amber `--admin-row-selected`.
+- **Row hover** — `--px-hover`.
+- **Pill states** — `--ok`, `--off`, `--lock`, `--info`, `--warning`.
+- **Empty table** — `.admin-table__empty`.
+
+### Responsive behavior
+
+| Viewport | Behaviour |
+|---|---|
+| ≤1024px | `.admin-cols` variants collapse to one column; `--4` and `--6` grids to two |
+| ≤768px | `--adminnav-w` drops to 224px; `--2` and `--3` grids and the settings grid collapse |
+](#nav-drawer-and-rail-flyouts)| ≤640px | The side nav collapses to a 60px icon rail — and under the Praxis variant `praxis-core.css` hides it outright, because 60px of unlabelled icons is unusable and it offsets the header and content so they cannot line up with the full-width app bar. Its destinations fold into [the nav drawer |
+| ≤480px | `--4`, `--6` and the drill stats go to one column; the app switcher hides |
+
+### Interactive demo
+
+#### Tables
+
+Three wrappers, and they are not interchangeable: `.admin-table-wrap` is the outer container, `.admin-table-scroll` adds the horizontal scroll for wide column sets, and `.admin-tabletools` is the control strip above.
+
+```html
+<div class="admin-card">
+  <div class="admin-tabs">
+    <button class="admin-tab admin-tab--active" type="button">All users</button>
+    <button class="admin-tab" type="button">Pending</button>
+    <button class="admin-tab" type="button">Disabled</button>
+  </div>
+  <div class="admin-tabletools">
+    <button class="admin-ghostbtn" type="button">
+      <span class="material-symbols-rounded" aria-hidden="true">add</span> Invite user
+    </button>
+  </div>
+  <div class="admin-table-wrap">
+    <div class="admin-table-scroll">
+      <table class="admin-table">
+        <thead>
+          <tr><th>Name</th><th>Role</th><th>Site</th><th>Status</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Marcus Silva</td><td>EHS coordinator</td><td>Teesside works</td>
+            <td><span class="admin-pill admin-pill--ok">Active</span></td>
+            <td><button class="admin-rowx" type="button" aria-label="Remove">
+              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+          </tr>
+          <tr>
+            <td>Aoife Byrne</td><td>Supervisor</td><td>Teesside works</td>
+            <td><span class="admin-pill admin-pill--warning">Invited</span></td>
+            <td><button class="admin-rowx" type="button" aria-label="Remove">
+              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+          </tr>
+          <tr>
+            <td>Tom Okafor</td><td>Driver</td><td>Rotherham plant</td>
+            <td><span class="admin-pill admin-pill--off">Disabled</span></td>
+            <td><button class="admin-rowx" type="button" aria-label="Remove">
+              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+```
+
+Zebra striping is `tbody tr:nth-child(even)`, and the same warning applies as for [in-record tables](#fields): **a hidden empty-state row still counts**. Put it in its own `<tbody>`.
+
+#### Search suggestions
 
 `.ss-pop`, `.ss-sec` and `.ss-row` are the app-bar search suggestion popover, wired by `praxis-admin-chrome.js`. `.ss-row mark` is styled for match highlighting — transparent background, interactive-teal ink, weight 700 — so wrap the matched substring in `<mark>` rather than a span.
 
 `.ss-sec` has no base rule; only `.ss-sec__head` is defined. So the section wrapper is yours, and it appears in the [unkeyed families](#families-praxis-never-keys-a-rule-on) table for that reason.
 
-### Chrome wiring
+### Code
+
+`praxis-admin.css` — 520 lines and the largest sheet in the system — plus `praxis-admin-chrome.js`.
+
+**This sheet is not a component library.** It carries the application shell, a bare-element `box-sizing` reset, `html,body{height:100%}`, an `a` rule and its own `.tbtn`. Loading it to get one card restyles your whole page. That is exactly why `praxis-controls.css` exists, and why [Card base](#card) and [Table base](#table) propose moving the canonical definitions to core.
+
+#### Chrome wiring
 
 `praxis-admin-chrome.js` wires the shared chrome for all ten admin pages at once, because they emit an identical shell with the same `ad-` element IDs: the Create New flyout, the search module selector, the Dashboards popout, search suggestions and the Mazlan drawer.
 
 **It is ID-driven, so it only works on markup that uses those exact IDs**, and it **depends on `praxis-create-new.js` being loaded first** for the catalog data. It also deliberately does *not* wire the app switcher, profile menu, theme button or side-nav filter — those stay in each page's own inline script. So loading this file does not give you a working admin header on its own.
 
-### Everything this sheet defines
+### Markup contract
+
+| Item | Requirement |
+|---|---|
+| Shell | `.app` > `.appbar` + `.main` > rail + `.adminnav` + `.content`. `.content` sets `--ph-pad-x:24px`, which the header, the band and `.admin-body` all inherit |
+| `.adminnav` | A labelled `<nav>`. Active item gets `aria-current="page"` alongside the class |
+](#tabs)| `.admin-tabs` | Real tab roles, or do not claim them. See [Tabs |
+| `.admin-table` | A real table with `scope` on header cells. `__num` for numeric columns |
+| `.admin-card__title` | A `<p>` in every current example. Use a heading where the card is a section of the page |
+| JS | `praxis-admin-chrome.js`, self-wiring, mutates the document |
+
+### Token reference
+
+#### Everything this sheet defines
 
 
 | Family | Mentions |
@@ -3890,12 +5572,12 @@ Zebra striping is `tbody tr:nth-child(even)`, and the same warning applies as fo
 | `.material-symbols-rounded` | 12 |
 | `.admin-grid` | 11 |
 | `.appswitch` | 10 |
+| `.admin-pill` | 9 |
 | `.icon` | 8 |
 | `.admin-banner` | 8 |
 | `.mazlan-mark` | 8 |
 | `.admin-ghostbtn` | 7 |
 | `.admin-cols` | 7 |
-| `.admin-pill` | 7 |
 | `.admin-drill` | 7 |
 | `.admin-stat` | 7 |
 | `.admin-card` | 5 |
@@ -3942,6 +5624,46 @@ Zebra striping is `tbody tr:nth-child(even)`, and the same warning applies as fo
 | `.ss-sec` | 1 |
 
 
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Use `.admin-card`, `.admin-table` and `.admin-pill` — all three are complete, and they are what this reference site is built from.
+- Use `.admin-panel` for anything nested inside a card.
+- Give the side nav a label and mark the current page.
+
+**Don't**
+
+- Load this sheet for one rule. Read the trap in Code first.
+- Rely on the side nav below 640px — it is hidden under the Praxis variant.
+- Combine zebra striping with a selected-row fill and expect both to read. The stripe is `tbody tr:nth-child(even)` and the selection is an amber wash; on alternating rows they interact.
+
+### Accessibility
+
+- **`.admin-tab` has no `:focus-visible` rule.** A keyboard user gets the UA outline over a 2px bottom border, which is where it is least visible. This is a live defect, not a planned improvement — tracked on [Tabs](#tabs).
+- The tabs also carry no tab roles in the current examples, so they are a row of buttons with tab paint.
+- `.adminnav` needs a label and `aria-current`; the 3px active bar is a `::before` and conveys nothing to assistive technology.
+- Tables need `scope` on header cells and a name on the table.
+- `.admin-pill--ok` and `--lock` were repointed to the audited tone pairs after measuring 3.81:1 and 3.88:1 against a 4.5 requirement at 12px/700. Any new pill variant has to be measured, not eyeballed.
+- Row actions like `.admin-rowx` are icon-only and need labels naming the row they act on.
+
+### Dimensions
+
+| Element | Property | Value |
+|---|---|---|
+| Shell | `--appbar-h` / `--navrail-w` / `--adminnav-w` | 64px / 56px / 260px (224px ≤768px, 60px ≤640px) |
+| `.admin-card` | Padding / radius | 20px 22px / 12px |
+| `.admin-panel` | Padding | 18px 20px |
+| `.admin-table` | Cell padding | 12px 14px body, sticky head |
+| `.admin-table-scroll` | Max height | 440px, 560px for `--tall` |
+| `.admin-pill` | Height / padding | 22px / 0 9px, 12px/700 |
+| `.adminnav__item` | Min height | 40px |
+| `.admin-grid` | Gap | 18px 34px |
+
 ---
 
 ## Page families and part-only names
@@ -3952,7 +5674,13 @@ Fourteen class names praxis-core.css mentions and does not define. Some are page
 Tier: **unstable** · Sheet: `praxis-core.css`
 Grep `praxis-core.css` for a class name and you will find several that look like components and are not. They fall into two groups, and neither gives you anything to build with — which is exactly why they are worth a page rather than a footnote.
 
-### Page families — one job each
+### Anatomy
+
+This page has no anatomy, because it does not document a component. It is a catalogue of names `praxis-core.css` refers to and does not define — page families, toolbar band variants, container names that were never styled, and interaction-only names.
+
+The sections are kept in the skeleton's order so this page answers the same questions as every other, but several of them answer "not applicable, and here is why".
+
+#### Page families — one job each
 
 `.home`, `.view`, `.record`, `.demo`, `.rm-body`, `.ws-body` and `.admin-body` appear in **exactly one rule** between them:
 
@@ -3973,13 +5701,44 @@ That is the whole contribution. They are **markers for which page family you are
 
 **What to do with this:** if you are writing a new page, put one of these on your content wrapper — or better, use [`.page`](#card-page-and-texture), which is a real definition — and you inherit the phone inset in step with the app bar and the header. If you were hoping `.record` gave you a record layout, it does not. See [the app shell](#the-app-shell).
 
-### Toolbar band variants
+### Variants
+
+#### Toolbar band variants
 
 `.rp-toolbar`, `.ws-toolbar` and `.admin-toolbar` are alternative names for the toolbar band on different page families. Core mentions them only in one place: the dark-mode treatment that swaps a primary button inside a toolbar band from the full gradient to the softer `--px-primary-soft`. The band itself is `.toolbar`, defined in [the shell](#the-app-shell).
 
 So they are aliases for the purposes of that one rule. If you name your band `.rp-toolbar` you get the dark primary treatment and nothing else — you still need `.toolbar` for the band.
 
-### Part-only names — the container was never styled
+### States
+
+#### Interaction-only names
+
+A last group appears solely in the shared hover and press lists: `.qa`, `.lg-btn`, `.icon-btn`, `.sortbtn`, `.filter-toggle`, `.pill-btn`. They are covered on [Buttons](#buttons), where the table says which of them has a base and which does not. The short answer is `.tbtn` and `.admin-ghostbtn` only.
+
+### Responsive behavior
+
+The page families carry the phone gutter. Below 640px `--px-gutter` is 16px and `.home`, `.view`, `.record`, `.ws-body`, `.admin-body`, `.rm-body` and `.demo` all take it as inline padding.
+
+That is the one thing on this page that is genuinely defined rather than referenced, and it is the reason the family names matter: one rule sets the content inset for seven page types, so the app bar, the page header and the content all line up on one number.
+
+### Interactive demo
+
+There is nothing to demonstrate — every name on this page is either a container Praxis does not style or a state it only tints. The frame below shows the one visible thing: `.subtab`, a name-only family, rendering as bare buttons.
+
+```html
+<div class="subtab">
+  <button class="subtab__btn" type="button">Open <span class="subtab__count">4</span></button>
+  <button class="subtab__btn" type="button">Closed <span class="subtab__count">17</span></button>
+</div>
+```
+
+### Code
+
+`praxis-core.css`, which every page loads. Nothing here needs to be imported separately — the point of the page is that these names are already in scope and mostly do not do what their names suggest.
+
+### Markup contract
+
+#### Part-only names — the container was never styled
 
 These seven have **no rule keyed on the bare class at all**. Core styles their *parts* and leaves the container to the page:
 
@@ -3996,10 +5755,44 @@ These seven have **no rule keyed on the bare class at all**. Core styles their *
 
 **Two of these have a complete alternative and you should prefer it.** `.nav-menu-drawer` → `.px-navdrawer`. `.segswitch` → `.segmented`. Reaching for the part-only name gets you a press animation on an unstyled box, which is a worse starting point than nothing because it looks half-wired.
 
-### Interaction-only names
+### Token reference
 
-A last group appears solely in the shared hover and press lists: `.qa`, `.lg-btn`, `.icon-btn`, `.sortbtn`, `.filter-toggle`, `.pill-btn`. They are covered on [Buttons](#buttons), where the table says which of them has a base and which does not. The short answer is `.tbtn` and `.admin-ghostbtn` only.
 
-### Why this page is in the unstable tier
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--px-gutter` | `16px` | — |
+| `--home-gutter` | `var(--px-gutter)` | — |
+| `--sp-gutter` | `var(--px-gutter)` | — |
+
+
+### Figma adaptation
+
+Not mapped. Praxis has no Figma library.
+
+### Usage guidelines
+
+**Do**
+
+- Use a family name on your page container so it picks up the phone gutter.
+- Check this page before assuming a class exists.
+
+**Don't**
+
+- Expect a container from a part-only name.
+- Rely on an interaction-only name for anything at rest.
+- Invent a new page family. Seven is enough, and each one is a line in a shared media query.
+
+#### Why this page is in the unstable tier
 
 Because none of it is a decision anyone would make on purpose. These names are the residue of extracting a shared sheet from twenty pages: the interaction rules were general enough to promote, the containers were not. The right end state is that each either gets a real definition or stops being mentioned in `src/` — this page exists so the current state is visible instead of surprising, and it is measured by the [unkeyed families](#families-praxis-never-keys-a-rule-on) table on every build.
+
+### Accessibility
+
+Nothing here is a control, so there is little to assess. Two notes that do matter:
+
+- Six of these names have no base rule at all — `.pager`, `.capa-prio`, `.subtab`, `.upnext`, `.rep`, `.qa` — which means anything built on them is unstyled, and unstyled frequently means unfocusable and unlabelled too. `.pager` is pagination and is tracked on [Pagination](#pagination).
+- The page-family containers are where a skip-link target belongs. `.px-skip` points at page content, and that content is one of these.
+
+### Dimensions
+
+None defined. These are names, not boxes — which is the whole subject of the page.

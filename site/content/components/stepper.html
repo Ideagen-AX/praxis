@@ -1,0 +1,167 @@
+<!--praxis
+title: Stepper and progress tracker
+summary: .capa-prio is a name with no base. CAPA stages, permit states and MOC approvals are all staged work, and the staging is the primary affordance. Planned.
+order: 90
+tier: planned
+icon: approval
+classes: capa-prio
+keywords: stepper progress tracker stage step workflow approval capa permit moc planned
+-->
+
+<div class="note note--planned">
+  <p><strong><code>.capa-prio</code> has no base rule.</strong> The only reference to it in <code>src/</code> is a WCAG contrast fix for its active step in the dark theme — a correction applied to a component that was never defined. Tier 2 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Every regulated record in EHSQ Enterprise moves through named stages, and the stage is
+usually the first thing a user needs to know: a CAPA is at <em>containment</em>, a permit is
+<em>issued but not activated</em>, an MOC is <em>awaiting technical review</em>. Praxis has one
+class for this — <code>.capa-prio__step--active</code> — and it exists only as a colour fix in
+the dark theme, applied over nothing.</p>
+
+<p>This is the component that makes a record page legible before you read any of it.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Track</strong> — the line connecting the steps.</li>
+  <li><strong>Step</strong> — a marker and a label. The label is not optional; a numbered
+  circle with no name tells a user nothing about a permit.</li>
+  <li><strong>Marker</strong> — complete, current or pending.</li>
+  <li><strong>Meta</strong> — optional per step: who, when. This is what turns a stepper into a
+  record of what happened rather than a picture of a process.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--horizontal</code></td><td>Under the page header, 3–5 stages. The default</td></tr>
+    <tr><td><code>--vertical</code></td><td>In a side rail, or where steps carry meta lines. Scales past five</td></tr>
+    <tr><td><code>--compact</code></td><td>Marker only, in a table cell or a card header</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Open decision:</strong> whether a step can be navigated to. A wizard's steps are
+links; a workflow's history is not. Making it configurable risks a stage badge that looks
+clickable and is not, so the safer answer is two components — and the safer default is
+<em>not</em> a link.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Complete</strong> — filled marker, success ink.</li>
+  <li><strong>Current</strong> — the one place <code>.capa-prio__step--active</code> already has
+  a treatment: dark ink on the bright cyan fill via <code>--px-primary-fg</code>, added because
+  white on that fill measured 1.86:1.</li>
+  <li><strong>Pending</strong> — outline marker, secondary ink.</li>
+  <li><strong>Blocked</strong> — the state general steppers omit and this domain needs. A CAPA
+  can be stalled waiting on evidence, and that is not "pending".</li>
+  <li><strong>Skipped</strong> — permitted by some workflows. Must be visually distinct from
+  complete or the record lies.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Desktop</td><td>Horizontal, labels beside markers</td></tr>
+    <tr><td>Tablet</td><td>Labels wrap under markers</td></tr>
+    <tr><td>Phone</td><td>Collapses to "Step 3 of 5 — Technical review" plus the current marker. A five-stage horizontal track at 390px gives each label about 60px, which is not a label</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo. <code>.capa-prio</code> renders as unstyled markup.</p>
+
+<h2>Code</h2>
+
+<p><code>praxis-core.css</code>, beside the dark-theme rule that already references it.
+CSS only — stage state is the application's.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<ol class="capa-prio" aria-label="CAPA progress">
+  <li class="capa-prio__step capa-prio__step--complete">
+    <span class="capa-prio__label">Raised</span>
+    <span class="capa-prio__meta">M. Silva · 14 Mar</span>
+  </li>
+  <li class="capa-prio__step capa-prio__step--active" aria-current="step">
+    <span class="capa-prio__label">Containment</span>
+    <span class="capa-prio__meta">Due 22 Mar</span>
+  </li>
+  <li class="capa-prio__step"><span class="capa-prio__label">Root cause</span></li>
+  <li class="capa-prio__step"><span class="capa-prio__label">Verification</span></li>
+</ol>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Element</td><td><code>&lt;ol&gt;</code>. The steps are ordered and that order is meaningful; a <code>&lt;div&gt;</code> stack throws it away</td></tr>
+    <tr><td><code>aria-current="step"</code></td><td>On the current step. This is what conveys position; the class is paint</td></tr>
+    <tr><td><code>aria-label</code></td><td>On the list, naming what is progressing</td></tr>
+    <tr><td>Track</td><td>Drawn with <code>::before</code>/<code>::after</code>, not extra elements — a screen reader should hear four steps, not four steps and three connectors</td></tr>
+    <tr><td>State</td><td>Class per step. No state may be conveyed by colour alone; complete and skipped need different markers, not just different fills</td></tr>
+    <tr><td>JS</td><td>None</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-color-status-success</code></td><td>Complete marker</td></tr>
+    <tr><td><code>--praxis-color-interactive-default</code></td><td>Current marker</td></tr>
+    <tr><td><code>--px-primary-fg</code></td><td>Ink on the current marker. Required in dark — see States</td></tr>
+    <tr><td><code>--praxis-color-border-strong</code></td><td>Pending outline. The 1.4.11-audited rung, so a 2px marker boundary clears 3:1</td></tr>
+    <tr><td><code>--praxis-color-status-warning</code></td><td>Blocked</td></tr>
+    <tr><td><code>--praxis-space-8</code> / <code>-16</code></td><td>Spacing</td></tr>
+  </tbody>
+</table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Name every stage. "Step 3" is not a stage.</li>
+  <li>Show who and when on completed steps — that is the part an auditor reads.</li>
+  <li>Give blocked its own treatment.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use it as navigation unless the steps really are navigable.</li>
+  <li>Show more than about five stages horizontally — go vertical.</li>
+  <li>Use it for a percentage. That is a progress bar, and a different thing.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><code>aria-current="step"</code> carries position; the fill does not.</li>
+  <li>Complete, skipped and blocked must differ in shape or glyph as well as colour — WCAG 1.4.1.</li>
+  <li>Connector lines are decorative and must not reach the accessibility tree.</li>
+  <li><strong>Forced colors:</strong> every state here is a fill difference, so all five collapse
+  to one. Needs glyphs or borders in that mode.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Marker</td><td>Size</td><td>24px, 16px for <code>--compact</code></td></tr>
+    <tr><td>Track</td><td>Thickness</td><td>2px</td></tr>
+    <tr><td>Label</td><td>Size / weight</td><td>13px / 600</td></tr>
+    <tr><td>Meta</td><td>Size</td><td>12px, <code>--praxis-color-text-secondary</code></td></tr>
+  </tbody>
+</table>

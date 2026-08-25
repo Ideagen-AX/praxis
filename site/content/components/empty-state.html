@@ -1,0 +1,175 @@
+<!--praxis
+title: Empty state
+summary: Three ad-hoc empty states already exist in three sheets, none of them shared. The classic drift-before-promotion signal. Planned.
+order: 60
+tier: planned
+icon: inbox
+classes: px-empty
+keywords: empty state blank slate zero no results first run placeholder planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Three copies, no component.</strong> <code>.cf-empty</code>
+  (<code>praxis-filters.css</code>), <code>.admin-table__empty</code>
+  (<code>praxis-admin.css</code>) and <code>.tb-dropdown__empty</code>
+  (<code>praxis-controls.css</code>) each solve this locally. Tier 1 on
+  <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Three independent definitions of the same idea in three sheets is exactly the signal that
+preceded the four controls promoted in 0.1.9 — a toolbar menu, an icon button, a filter field
+and a toast, each hand-copied into up to twelve pages in versions that had drifted apart. This
+is the same shape of problem caught earlier.</p>
+
+<p>It also matters more here than in most products. An empty list in an EHS application is
+usually good news — no open findings, no overdue actions — and an empty state that reads as a
+failure ("No data") tells the user the wrong thing about their own site.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Glyph</strong> — optional, muted, large. Not an illustration; Praxis ships no
+  illustrations and should not start.</li>
+  <li><strong>Headline</strong> — states the situation in the user's terms.</li>
+  <li><strong>Body</strong> — one sentence, why it is empty or what to do.</li>
+  <li><strong>Action</strong> — optional, one button.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Situation</th><th>Tone</th></tr></thead>
+  <tbody>
+    <tr><td><code>--first-run</code></td><td>Nothing has been created yet</td><td>Inviting, with an action. "No permits yet — create the first one"</td></tr>
+    <tr><td><code>--clear</code></td><td>There is genuinely nothing, and that is the desired state</td><td>Positive, no action. "No overdue actions". This is the variant general design systems do not have and this domain needs</td></tr>
+    <tr><td><code>--no-results</code></td><td>A filter or search excluded everything</td><td>Neutral, with a clear-filters action. What <code>.cf-empty</code> does today</td></tr>
+    <tr><td><code>--error</code></td><td>The data could not be loaded</td><td>Not an empty state. Belongs to <a href="dialog.html">alert</a> or an inline banner — worth naming here so it does not get folded in</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Open decision:</strong> two sizes or one. An empty state inside a
+<code>.tb-dropdown</code> is a single line of text; one filling a table body has room for a
+glyph and an action. <code>--inline</code> and the default is probably the answer, rather than
+one component stretched across both.</p>
+
+<h2>States</h2>
+
+<p>None. An empty state is a state.</p>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Layout</th></tr></thead>
+  <tbody>
+    <tr><td>Desktop</td><td>Centred in its container, max-width around 24rem so the body does not run wide</td></tr>
+    <tr><td>Phone</td><td>Glyph shrinks or drops; action becomes full-width</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<p>The frame shows the one that exists in a form you can see —
+<code>.admin-table__empty</code>, a centred row inside a real table.</p>
+
+<template data-example="Today: .admin-table__empty, one of the three" data-height="200">
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead><tr><th>Permit</th><th>Site</th><th>Expires</th></tr></thead>
+      <tbody>
+        <tr class="admin-table__empty"><td colspan="3">No permits match these filters.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p><code>praxis-core.css</code>, since all three current homes load core and none of them loads
+each other. The three existing names stay as aliases per the roadmap's decision 2.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<div class="px-empty px-empty--clear">
+  <span class="px-empty__glyph material-symbols-rounded" aria-hidden="true">task_alt</span>
+  <p class="px-empty__head">No overdue actions</p>
+  <p class="px-empty__body">Every CAPA on this site is inside its due date.</p>
+</div>
+
+<div class="px-empty px-empty--no-results">
+  <p class="px-empty__head">No permits match these filters</p>
+  <button class="btn" type="button">Clear filters</button>
+</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Element</td><td>Any block. Inside a table it is a <code>&lt;tr&gt;</code> with a spanning cell — the existing <code>.admin-table__empty</code> shape</td></tr>
+    <tr><td><code>__glyph</code></td><td><code>aria-hidden</code>. Decorative, always</td></tr>
+    <tr><td><code>__head</code></td><td>The accessible content. Not a heading unless the empty state replaces a whole page</td></tr>
+    <tr><td>Live region</td><td>When a filter change empties a list, the change must be announced. Undecided whether the component carries <code>aria-live</code> itself or the container does — carrying it itself risks announcing on first render, which is wrong</td></tr>
+    <tr><td>JS</td><td>None</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-color-text-secondary</code></td><td>Headline</td></tr>
+    <tr><td><code>--praxis-color-text-tertiary</code></td><td>Body</td></tr>
+    <tr><td><code>--praxis-color-text-disabled</code></td><td>Glyph</td></tr>
+    <tr><td><code>--praxis-space-32</code> / <code>-48</code></td><td>Vertical padding</td></tr>
+    <tr><td><code>--praxis-color-status-success</code></td><td>The <code>--clear</code> glyph, if the positive variant is taken</td></tr>
+  </tbody>
+</table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Say what is true in the user's terms. "No overdue actions", not "No data".</li>
+  <li>Give an action only where there is one worth taking.</li>
+  <li>Distinguish "nothing yet" from "nothing matching" — they need different words and
+  different actions.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use an error tone for a legitimately empty list.</li>
+  <li>Add an illustration. Praxis ships no illustration set and one page's cartoon becomes
+  everyone's maintenance.</li>
+  <li>Leave the container blank. A table body with nothing in it reads as a loading failure.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The headline is text, not an image or a glyph.</li>
+  <li>The glyph is <code>aria-hidden</code>.</li>
+  <li>An empty state arriving after a filter change is a content change and needs announcing;
+  arriving on first paint does not.</li>
+  <li>Contrast: <code>--praxis-color-text-tertiary</code> is <code>#616f7e</code> and must be
+  checked against whatever surface the empty state lands on. Inside a
+  <code>--px-surface-2</code> panel it is tighter than on white.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Container</td><td>Padding</td><td>48px 24px, or 8px 10px for <code>--inline</code></td></tr>
+    <tr><td>Container</td><td>Max width</td><td>24rem, centred</td></tr>
+    <tr><td>Glyph</td><td>Size</td><td>32px</td></tr>
+    <tr><td><code>__head</code></td><td>Size / weight</td><td>14px / 600</td></tr>
+    <tr><td><code>__body</code></td><td>Size</td><td>13px</td></tr>
+  </tbody>
+</table>
+

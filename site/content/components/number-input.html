@@ -1,0 +1,63 @@
+<!--praxis
+title: Number input
+summary: A quantity field with a stepper. Nothing exists; the bare native control is unstyled and its spinners are inconsistent across browsers.
+order: 240
+tier: planned
+icon: add
+classes: px-number
+keywords: number input stepper spinner quantity numeric increment decimal unit planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Tier 3 placeholder.</strong> Real, not urgent, and nothing is defined in <code>src/</code>. This page reserves the name and records what is known; expect it to stay in this state for a while. See <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Quantities, durations, counts, tolerances. In this domain most numeric fields also carry a unit, and the unit belongs in the control rather than in the label.</p>
+
+<h2>Anatomy</h2>
+
+<p>Not designed yet.</p>
+
+<h2>Variants</h2>
+
+<p>Plain; with stepper buttons; with a unit suffix ("mm", "ppm", "hours"). The suffix is the variant worth having and the one general systems most often omit.</p>
+
+<h2>States</h2>
+
+<p>Empty, filled, invalid, out of range, disabled. Out-of-range should say the bound — "must be 0 to 100" — not "invalid".</p>
+
+<h2>Responsive behavior</h2>
+
+<p>Not decided yet.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>No sheet chosen yet.</p>
+
+<h2>Markup contract</h2>
+
+<p><code>type="number"</code> with <code>inputmode="decimal"</code>, plus explicit <code>min</code>, <code>max</code> and <code>step</code>. Hide the native spinners and provide real buttons, or keep the native ones — but not both. Buttons need labels, and the unit suffix must be associated with the input, not floated beside it.</p>
+
+<h2>Token reference</h2>
+
+<p>No new tokens expected.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p>Not written yet.</p>
+
+<h2>Accessibility</h2>
+
+<p>The unit must reach assistive technology, via the label or <code>aria-describedby</code>. Never rely on scroll-wheel increment. <code>type="number"</code> silently discards non-numeric input in some browsers, which is worth knowing before choosing it over a text input with validation.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not decided yet.</p>

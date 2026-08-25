@@ -1,0 +1,63 @@
+<!--praxis
+title: Separator
+summary: No tokenised rule component. Every divider in Praxis is a local border declaration.
+order: 310
+tier: planned
+icon: remove
+classes: px-sep
+keywords: separator divider rule hr horizontal vertical spacer planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Tier 3 placeholder.</strong> Real, not urgent, and nothing is defined in <code>src/</code>. This page reserves the name and records what is known; expect it to stay in this state for a while. See <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Trivial, and worth having because it is currently written inline everywhere: <code>.tb-dropdown__divider</code>, the <code>.pageheader::after</code> hairline, <code>.admin-setting-row</code> borders, the <code>.toolbar::after</code> rule. Four different declarations of one line.</p>
+
+<h2>Anatomy</h2>
+
+<p>Not designed yet.</p>
+
+<h2>Variants</h2>
+
+<p>Horizontal, vertical, and with a label ("or"). The vertical form is the one repeatedly hand-written in toolbars.</p>
+
+<h2>States</h2>
+
+<p>None.</p>
+
+<h2>Responsive behavior</h2>
+
+<p>Not decided yet.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>No sheet chosen yet.</p>
+
+<h2>Markup contract</h2>
+
+<p><code>&lt;hr&gt;</code> where it separates content, a <code>&lt;span aria-hidden&gt;</code> where it is purely visual, and <code>role="separator"</code> in a menu. The distinction matters: a decorative line announced as a separator is noise.</p>
+
+<h2>Token reference</h2>
+
+<p><code>--praxis-color-border-default</code>. Note <code>--praxis-color-border-subtle</code> resolves to <code>#222B39</code> in dark, which is the <code>--px-surface-2</code> fill — so a subtle separator is invisible on a panel, a trap already hit twice on this site.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p>Not written yet.</p>
+
+<h2>Accessibility</h2>
+
+<p>Decorative separators are hidden. Only a real content division gets <code>role="separator"</code>.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not decided yet.</p>

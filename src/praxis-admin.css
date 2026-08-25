@@ -310,14 +310,34 @@ body[data-theme="dark"] .admin-tab--active{color:#5CE0E5;border-bottom-color:#29
 .admin-rowx:hover{background:var(--px-hover);color:var(--praxis-color-red-60);}
 .admin-rowx .material-symbols-rounded{font-size:18px;}
 .admin-check{width:16px;height:16px;accent-color:var(--praxis-color-teal-60);cursor:pointer;}
-/* status pills (Users grid, etc.) */
+/* status pills (Users grid, etc.)
+
+   WCAG 1.4.3 — the label is 12px/700, which is not large text (large starts at
+   18.66px bold), so it needs 4.5:1. Two of the three variants were built from
+   palette rungs rather than the audited --praxis-tone-* pairs and measured
+   short: --ok was green-60 on green-10 at 3.81:1 and --lock was red-60 on
+   red-10 at 3.88:1. Both now take the tone pair, which is one rung darker on
+   the ink and the same tint behind it — 4.99:1 and 5.08:1. --off was already
+   4.89:1 and is left where it is rather than moved for symmetry.
+
+   --info and --warning were added 2026-08-25: the reference site needed an
+   amber and a blue pill and both were missing, so its own pages were reaching
+   for .admin-pill--warning and getting the bare shape with no colour. */
 .admin-pill{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;font-size:.75rem;font-weight:700;white-space:nowrap;}
-.admin-pill--ok{background:var(--praxis-color-green-10);color:var(--praxis-color-green-60);}
+.admin-pill--ok{background:var(--praxis-tone-success-bg);color:var(--praxis-tone-success-fg);}
 .admin-pill--off{background:var(--praxis-color-neutral-10);color:var(--praxis-color-text-secondary);}
-.admin-pill--lock{background:var(--praxis-color-red-10);color:var(--praxis-color-red-60);}
+.admin-pill--lock{background:var(--praxis-tone-danger-bg);color:var(--praxis-tone-danger-fg);}
+.admin-pill--info{background:var(--praxis-tone-info-bg);color:var(--praxis-tone-info-fg);}
+.admin-pill--warning{background:var(--praxis-tone-warning-bg);color:var(--praxis-tone-warning-fg);}
 body[data-theme="dark"] .admin-pill--ok{background:rgba(9,139,83,.16);color:#4cd08a;}
 body[data-theme="dark"] .admin-pill--off{background:rgba(255,255,255,.08);color:var(--praxis-color-text-secondary);}
 body[data-theme="dark"] .admin-pill--lock{background:rgba(226,45,56,.18);color:#f28b91;}
+/* The two overrides above now restate what the tone tokens already resolve to
+   in dark, and they are kept rather than deleted: praxis-core.css remaps the
+   tone pairs under body[data-variant="praxis"][data-theme="dark"], so on a dark
+   page that is NOT the Praxis variant the pill would keep its light tint. Same
+   reason --info and --warning get none: nothing outside the Praxis variant uses
+   them yet. */
 /* card header with a right-aligned count/meta */
 .admin-card__meta{margin-left:auto;font-size:.8125rem;font-weight:600;color:var(--praxis-color-text-secondary);}
 .admin-table-scroll--tall{max-height:560px;}

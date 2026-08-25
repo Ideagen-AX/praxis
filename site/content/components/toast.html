@@ -3,18 +3,57 @@ title: Toast
 slug: toast
 tier: settling
 order: 75
+icon: notifications
 scripts: praxis-toast.js
 classes: praxis-toast
 summary: The transient confirmation — one line at the bottom of the window that says an action landed, then leaves. One script, no markup, and it styles itself.
 keywords: toast snackbar notification confirmation transient status feedback saved copied
 -->
 
-<p>"Link copied". "Workspace saved". "3 records exported". Load the script and call it:</p>
+<p>"Link copied". "Workspace saved". "3 records exported". A toast is the shortest-lived thing
+in the system: one line, one moment, then gone. Praxis ships it as a script with no markup at
+all, which is unusual for this system and deliberate — see Code.</p>
 
-<p><code>&lt;script src="praxis-toast.js"&gt;&lt;/script&gt;</code></p>
+<h2>Anatomy</h2>
 
-<p><code>praxisToast('Workspace saved');</code><br />
-<code>praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 });</code></p>
+<ol>
+  <li><strong>Live region</strong> — one bottom-centred container, created at load and reused.
+  Never takes pointer events.</li>
+  <li><strong>Toast</strong> — a single line of text on a slate surface. There is no title, no
+  icon and no close button, and that is the design: anything more belongs somewhere permanent.</li>
+</ol>
+
+<p>Neither part is markup you write. The script owns both.</p>
+
+<h2>Variants</h2>
+
+<p>Three tones, set through <code>opts.tone</code>:</p>
+
+<table>
+  <thead><tr><th>Tone</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Neutral (default)</td><td>"Link copied". The overwhelming majority</td></tr>
+    <tr><td><code>'success'</code></td><td>"Workspace saved"</td></tr>
+    <tr><td><code>'danger'</code></td><td>"Could not save — try again". Give it a longer duration; it carries more to read and matters more</td></tr>
+  </tbody>
+</table>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Entering / visible / leaving</strong> — all handled by the script.</li>
+  <li><strong>Stacked</strong> — toasts append rather than replace, so two actions in quick
+  succession both get read.</li>
+  <li><strong>Dismissed early</strong> — the return value carries a <code>dismiss</code>
+  function, so a long-running toast can be taken down by whatever finishes.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>Bottom-centred at every width. The one thing that matters here is that the region never
+covers the control that triggered it, which is why it takes no pointer events at any size.</p>
+
+<h2>Interactive demo</h2>
 
 <template data-example="Fire a toast" data-height="220">
   <div style="display:flex;gap:.5rem;flex-wrap:wrap">
@@ -26,32 +65,90 @@ keywords: toast snackbar notification confirmation transient status feedback sav
   <script src="../praxis-toast.js"></script>
 </template>
 
-<h2>The call</h2>
+<h2>Code</h2>
 
-<table>
-  <thead><tr><th>Argument</th><th>What it does</th></tr></thead>
-  <tbody>
-    <tr><td><code>message</code></td><td>The text. Set as <code>textContent</code>, so it is not an HTML injection site.</td></tr>
-    <tr><td><code>opts.tone</code></td><td><code>'success'</code> or <code>'danger'</code>. Omit for the neutral slate.</td></tr>
-    <tr><td><code>opts.duration</code></td><td>Milliseconds, default 1900. Give a failure longer — it carries more to read and matters more.</td></tr>
-  </tbody>
-</table>
+<p>One tag, no stylesheet:</p>
 
-<p>Returns <code>{ dismiss, element }</code>, so a long-running toast can be taken down early
-by whatever finishes.</p>
+<template data-source-only data-example="Loading and calling it">
+<script src="praxis-toast.js"></script>
 
-<h2>It stacks</h2>
+<script>
+  praxisToast('Workspace saved');
+  praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 });
 
-<p>Toasts append to one bottom-centred live region rather than replacing each other, so two
-actions in quick succession both get read. The region never takes pointer events: a
-confirmation that covers the control you just used is the one thing this pattern must not do.</p>
+  var t = praxisToast('Exporting…', { duration: 30000 });
+  // …when the export finishes:
+  t.dismiss();
+</script>
+</template>
 
-<h2>Why the CSS is inside the script</h2>
+<h3>Why the CSS is inside the script</h3>
 
 <p>Same argument as <code>praxis-lucide.js</code>. A toast has no markup until it fires, so a
 consumer who loads the script and forgets a stylesheet gets an unstyled line of text at a
 moment they cannot rehearse — in production, on the success path, once. One tag cannot be
 half-installed. The style element is injected on load as well as on first call.</p>
+
+<h3>Where it came from</h3>
+
+<p>Promoted from the groom-lake prototype on 2026-08-21, where four pages each carried a
+private <code>toast()</code> closure: the same shape, the same 1.9 seconds, four copies of a
+20-line <code>cssText</code> string, and no two agreeing on whether the message reached a
+screen reader. A confirmation is a system-level behaviour, and an application should not be
+able to have four of them.</p>
+
+<h2>Markup contract</h2>
+
+<p>There is none — and that is the contract. You write no markup and no classes. The interface
+is the function.</p>
+
+<table>
+  <thead><tr><th>Item</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><code>praxisToast(message)</code></td><td>The text. Set as <code>textContent</code>, so it is not an HTML injection site</td></tr>
+    <tr><td><code>opts.tone</code></td><td><code>'success'</code> or <code>'danger'</code>. Omit for the neutral slate</td></tr>
+    <tr><td><code>opts.duration</code></td><td>Milliseconds, default 1900</td></tr>
+    <tr><td>Returns</td><td><code>{ dismiss, element }</code></td></tr>
+    <tr><td>Region</td><td><code>role="status"</code>, <code>aria-live="polite"</code>, created at load. See Accessibility for why the timing matters</td></tr>
+    <tr><td>Self-wiring</td><td>Yes. No init call, and the style is injected on load</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<p>None reachable. The script carries its own values in an internal <code>cssText</code> string
+rather than reading <code>--praxis-*</code> tokens, which is the trade-off that makes it
+work without a stylesheet.</p>
+
+<div class="note note--trap">
+  <p><strong>That means the toast does not follow the theme.</strong> It cannot, because it does
+  not consume the token layer. If a toast ever needs to match a themed surface, the fix is to
+  read the tokens with a fallback to the current literals — not to ask consumers to load a
+  stylesheet, which is the problem this design exists to avoid.</p>
+</div>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use it to confirm something the user just did.</li>
+  <li>Give failures a longer duration than successes.</li>
+  <li>Keep it to one short line.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use it as the only report of what happened — see the trap below.</li>
+  <li>Put a button or a link in it. It is not interactive and it will be gone before anyone
+  reaches it. An undoable action needs a permanent affordance.</li>
+  <li>Use it for something the user must read. That is a
+  <a href="dialog.html">dialog</a> or an inline message.</li>
+  <li>Fire one on page load. Nothing has happened yet.</li>
+</ul>
 
 <h2>Accessibility</h2>
 
@@ -69,10 +166,15 @@ a confirmation should queue behind whatever is being read rather than interrupt 
   confirm, never to inform.</p>
 </div>
 
-<h2>Where it came from</h2>
+<h2>Dimensions</h2>
 
-<p>Promoted from the groom-lake prototype on 2026-08-21, where four pages each carried a
-private <code>toast()</code> closure: the same shape, the same 1.9 seconds, four copies of a
-20-line <code>cssText</code> string, and no two agreeing on whether the message reached a
-screen reader. A confirmation is a system-level behaviour, and an application should not be
-able to have four of them.</p>
+<p>All set inside the script and not overridable from a stylesheet:</p>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Region</td><td>Position</td><td>Bottom-centred, fixed, <code>pointer-events:none</code></td></tr>
+    <tr><td>Toast</td><td>Duration</td><td>1900ms default</td></tr>
+    <tr><td>Toast</td><td>Stacking</td><td>Appended, oldest at the top of the stack</td></tr>
+  </tbody>
+</table>

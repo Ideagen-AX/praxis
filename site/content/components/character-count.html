@@ -1,0 +1,63 @@
+<!--praxis
+title: Character count
+summary: Regulated free-text fields are often capped and the cap has to be visible before submit, not after.
+order: 250
+tier: planned
+icon: notes
+classes: px-count
+keywords: character count limit maxlength textarea remaining live region planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Tier 3 placeholder.</strong> Real, not urgent, and nothing is defined in <code>src/</code>. This page reserves the name and records what is known; expect it to stay in this state for a while. See <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Taken from GOV.UK, where it is a named component. A description field capped at 2,000 characters that only reveals the cap on rejection wastes the user's work — and in an incident report that work is a narrative someone typed once.</p>
+
+<h2>Anatomy</h2>
+
+<p>Not designed yet.</p>
+
+<h2>Variants</h2>
+
+<p>Count up to a limit, or count down remaining. Remaining is more useful. A word-count form exists in GOV.UK and is rarely what a regulated field wants.</p>
+
+<h2>States</h2>
+
+<p>Under limit (quiet), approaching (a threshold — GOV.UK uses the last 25%), over (danger, and the field is invalid). Whether input is truncated at the cap or allowed to exceed it is the open decision; allowing it and marking it invalid is kinder.</p>
+
+<h2>Responsive behavior</h2>
+
+<p>Not decided yet.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>No sheet chosen yet.</p>
+
+<h2>Markup contract</h2>
+
+<p>The message is associated with the textarea via <code>aria-describedby</code> and lives in a polite live region that is <strong>debounced</strong> — announcing on every keystroke makes the field unusable with a screen reader. GOV.UK debounces to roughly one second. <code>maxlength</code> alone is not enough because it gives no feedback.</p>
+
+<h2>Token reference</h2>
+
+<p>No new tokens expected.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p>Not written yet.</p>
+
+<h2>Accessibility</h2>
+
+<p>Debounced <code>aria-live="polite"</code>. State the limit up front, not only when it is neared. Colour is not the signal — the text carries it.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not decided yet.</p>

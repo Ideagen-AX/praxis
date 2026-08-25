@@ -8,6 +8,7 @@ scripts: praxis-filters.js
 classes: filter-drawer, filter-row, filter-chips, select-menu, qfilter, chip, btn--neutral, btn--clear, filter-controls, filter-toolbar-row, filter-search, filter-search-input, filter-select, filter-date, filter-date-range, filter-cond, filter-expr, filter-menu, filter-more, filter-type-btn, filter-type-buttons, filter-type-select, filter-view-switch, filter-toggle, frow-chip, drawer-scrim, quick-filters, custom-builder, custom-summary, cf-group, cf-cond, cf-join, cf-drag, cf-select, cf-value, cf-input, cf-pick, cf-remove, cf-empty, cf-enter, cf-exit, cf-dragging, cf-drop-before, cf-drop-after, cf-group-selected, cf-example-btn, cf-date-range, cfx-bool, cfx-val, cfx-paren, cfx-opword, cfx-incomplete, segmented, onoff, icon-btn
 summary: The largest component in Praxis — 403 rules and a filter engine where Standard and Custom are two views onto one expression tree.
 keywords: filter filters drawer modal chip quick expression custom standard PraxisFilters
+icon: instant_mix
 -->
 
 <p>A centred filter modal, a quick-filter strip and an active-filter chip bar, where
@@ -80,70 +81,20 @@ results list in exactly that way.</p>
   </script>
 </template>
 
-<h2>Initialising</h2>
-
-<p>Everything application-specific enters through <code>init</code>. It returns
-<code>null</code> if <code>[data-filter-drawer]</code> is absent, so a page with no modal is
-fine.</p>
-
-<table>
-  <thead><tr><th>Option</th><th>What it is</th></tr></thead>
-  <tbody>
-    <tr><td><code>records</code></td><td>The unfiltered set</td></tr>
-    <tr><td><code>fieldMap</code></td><td>Filter name to accessor: <code>{ 'Status': r => r.status }</code></td></tr>
-    <tr><td><code>today</code></td><td>"Now" for the relative date operators. Pass a fixed date to make a demo reproducible.</td></tr>
-    <tr><td><code>parseDate</code></td><td>Optional, for non-ISO date strings</td></tr>
-    <tr><td><code>onChange</code></td><td>Receives the filtered records. You render them.</td></tr>
-    <tr><td><code>people</code>, <code>sites</code>, <code>tasks</code>, <code>statuses</code>, <code>priorities</code>, <code>actionTypes</code>, <code>tree</code></td><td>Value vocabularies. <strong>Replace these.</strong> Left at the defaults, the menus offer ported CAPA values your data has never heard of and every selection returns nothing.</td></tr>
-    <tr><td><code>options</code></td><td>Override outright, by field name</td></tr>
-    <tr><td><code>defaultFavorites</code>, <code>defaultQuick</code></td><td>Which filters start pinned</td></tr>
-    <tr><td><code>scopeChip</code></td><td>Omit entirely if you have no fixed scope</td></tr>
-  </tbody>
-</table>
-
-<p>The returned object also exposes <code>setRecords</code>, <code>apply</code>,
-<code>state</code>, <code>clearAll</code>, <code>open</code>, <code>close</code> and
-<code>FILTERS</code> — the real field catalog, so you can build a field map against it
-rather than guessing names.</p>
-
-<h2>Markup contract</h2>
-
-<p>Four hooks, all data attributes. The engine renders filter rows into
-<code>[data-filter-list]</code>.</p>
-
-<blockquote>
-  <p><code>[data-action="open-filter-drawer"]</code> · <code>[data-chips]</code> ·
-  <code>[data-quick-filters]</code> · <code>[data-drawer-scrim]</code> ·
-  <code>[data-filter-drawer] &gt; [data-filter-list]</code></p>
-</blockquote>
-
-<p>It sets <code>data-filter-mode="modal"</code> on <code>&lt;html&gt;</code> itself if you
-have not — the centred-modal rules are gated on that attribute.</p>
-
-<h2>Three things to know before you commit to filters</h2>
+<h2>Anatomy</h2>
 
 <ol>
-  <li><strong>The drawer's full chrome is not shipped as markup.</strong> The engine renders
-      filter rows into <code>[data-filter-list]</code>, but the surrounding head, footer and
-      resize handles came from the originating prototype's own page. The skeleton above is
-      the minimum the engine needs; you will be assembling the rest yourself from
-      <code>praxis-filters.css</code>.</li>
-  <li><strong>This sheet is a port</strong> from the Responsive Search project, now owned
-      here. Do not re-extract over it — that would reintroduce the parallel
-      <code>--s</code>/<code>--r</code>/<code>--t</code> token vocabulary and silently revert
-      the field treatment.</li>
-  <li><strong>Its dark mode does not follow a host theme override.</strong> It themes itself
-      by flipping palette primitives inside its own scope, 21 declarations, instead of using
-      the semantic tokens. Everything else in Praxis follows a host override; this does not.
-      Known rough edge — toggle this page to dark and open the modal to see it.</li>
+  <li><strong>Toolbar row</strong> — <code>.filter-toolbar-row</code> with
+  <code>.filter-toggle</code> and <code>.filter-chips</code>.</li>
+  <li><strong>Chips</strong> — <code>.chip</code>, one per active filter, with a clear-all.</li>
+  <li><strong>Drawer</strong> — <code>.filter-drawer</code> over <code>.drawer-scrim</code>.</li>
+  <li><strong>Rows</strong> — <code>.filter-row</code>, one per field, with a type-specific
+  control.</li>
+  <li><strong>Custom builder</strong> — <code>.custom-builder</code>, the expression tree.</li>
+  <li><strong>Summary</strong> — <code>.custom-summary</code>, the expression in words.</li>
 </ol>
 
-<p>It also adds <code>.btn--neutral</code> and <code>.btn--clear</code>, scoped to
-<code>.filter-drawer</code> so they cannot leak into your own button scale — and it expects
-<strong>your</strong> <code>.btn</code> base underneath them. Praxis does not define one;
-see <a href="../foundations/gaps.html">what Praxis does not define</a>.</p>
-
-<h2>The two views onto one tree</h2>
+<h3>The two views onto one tree</h3>
 
 <p>Standard and Custom are not two filter systems. They are two editors for one expression
 tree, and <code>.filter-view-switch</code> moves between them —
@@ -224,6 +175,171 @@ than refusing to render.</p>
   before assuming which one applies.</p>
 </div>
 
-<h2>Everything this sheet defines</h2>
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Standard</td><td>A row per field. The common case</td></tr>
+    <tr><td>Custom</td><td><code>.custom-builder</code> — nested groups, AND/OR joins, drag to reorder. The same tree the summary renders</td></tr>
+    <tr><td>Quick filters</td><td><code>.quick-filters</code> / <code>.qfilter</code>, shared with <a href="quick-rail.html">the quick-filter rail</a></td></tr>
+    <tr><td>Footer buttons</td><td><code>.btn--neutral</code> and <code>.btn--clear</code>, defined <em>only</em> inside <code>.filter-drawer</code>. They sit on top of a host <code>.btn</code> set that Praxis does not provide — see <a href="btn.html">Button base</a></td></tr>
+  </tbody>
+</table>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Drawer open</strong> — <code>.is-open</code>, with the scrim.</li>
+  <li><strong>Filter active</strong> — a chip appears; <code>.filter-toggle</code> shows a count.</li>
+  <li><strong>Expression states</strong> — <code>.is-expanded</code>,
+  <code>.cf-group-selected</code>, <code>.cf-dragging</code>, <code>.cf-drop-before</code> /
+  <code>--after</code>, <code>.cf-enter</code> / <code>.cf-exit</code>.</li>
+  <li><strong>Incomplete</strong> — <code>.cfx-incomplete</code>, an expression that is not yet
+  valid. Worth knowing this exists: an incomplete filter should not be applied silently.</li>
+  <li><strong>Empty</strong> — <code>.cf-empty</code>, one of the three ad-hoc empty states the
+  roadmap consolidates.</li>
+  <li><strong>On/off</strong> — <code>.onoff</code> wrapping a <code>.switch</code>. Note this is
+  the sibling markup form; see <a href="form-controls.html">Form controls</a>.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>The drawer is full-height at every width and the toolbar row wraps.
+The part that adapts is the band around it — a <code>.filter-toggle</code> is a toolbar control and
+moves into the overflow popover when the band goes compact.</p>
+
+<p>This is a <em>port</em> of the Responsive Search project rather than a Praxis-native sheet, so
+several of its internals use their own scale rather than the shared tokens.</p>
+
+<h2>Interactive demo</h2>
+
+<h3>Initialising</h3>
+
+<p>Everything application-specific enters through <code>init</code>. It returns
+<code>null</code> if <code>[data-filter-drawer]</code> is absent, so a page with no modal is
+fine.</p>
+
+<table>
+  <thead><tr><th>Option</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>records</code></td><td>The unfiltered set</td></tr>
+    <tr><td><code>fieldMap</code></td><td>Filter name to accessor: <code>{ 'Status': r => r.status }</code></td></tr>
+    <tr><td><code>today</code></td><td>"Now" for the relative date operators. Pass a fixed date to make a demo reproducible.</td></tr>
+    <tr><td><code>parseDate</code></td><td>Optional, for non-ISO date strings</td></tr>
+    <tr><td><code>onChange</code></td><td>Receives the filtered records. You render them.</td></tr>
+    <tr><td><code>people</code>, <code>sites</code>, <code>tasks</code>, <code>statuses</code>, <code>priorities</code>, <code>actionTypes</code>, <code>tree</code></td><td>Value vocabularies. <strong>Replace these.</strong> Left at the defaults, the menus offer ported CAPA values your data has never heard of and every selection returns nothing.</td></tr>
+    <tr><td><code>options</code></td><td>Override outright, by field name</td></tr>
+    <tr><td><code>defaultFavorites</code>, <code>defaultQuick</code></td><td>Which filters start pinned</td></tr>
+    <tr><td><code>scopeChip</code></td><td>Omit entirely if you have no fixed scope</td></tr>
+  </tbody>
+</table>
+
+<p>The returned object also exposes <code>setRecords</code>, <code>apply</code>,
+<code>state</code>, <code>clearAll</code>, <code>open</code>, <code>close</code> and
+<code>FILTERS</code> — the real field catalog, so you can build a field map against it
+rather than guessing names.</p>
+
+<h2>Code</h2>
+
+<p><code>praxis-filters.css</code> and <code>praxis-filters.js</code> — at 83KB and
+122KB the largest pair in the system, and the only component here with a real JavaScript API
+rather than self-wiring alone.</p>
+
+<h3>Three things to know before you commit to filters</h3>
+
+<ol>
+  <li><strong>The drawer's full chrome is not shipped as markup.</strong> The engine renders
+      filter rows into <code>[data-filter-list]</code>, but the surrounding head, footer and
+      resize handles came from the originating prototype's own page. The skeleton above is
+      the minimum the engine needs; you will be assembling the rest yourself from
+      <code>praxis-filters.css</code>.</li>
+  <li><strong>This sheet is a port</strong> from the Responsive Search project, now owned
+      here. Do not re-extract over it — that would reintroduce the parallel
+      <code>--s</code>/<code>--r</code>/<code>--t</code> token vocabulary and silently revert
+      the field treatment.</li>
+  <li><strong>Its dark mode does not follow a host theme override.</strong> It themes itself
+      by flipping palette primitives inside its own scope, 21 declarations, instead of using
+      the semantic tokens. Everything else in Praxis follows a host override; this does not.
+      Known rough edge — toggle this page to dark and open the modal to see it.</li>
+</ol>
+
+<p>It also adds <code>.btn--neutral</code> and <code>.btn--clear</code>, scoped to
+<code>.filter-drawer</code> so they cannot leak into your own button scale — and it expects
+<strong>your</strong> <code>.btn</code> base underneath them. Praxis does not define one;
+see <a href="../foundations/gaps.html">what Praxis does not define</a>.</p>
+
+<h2>Markup contract</h2>
+
+<h3>Markup contract</h3>
+
+<p>Four hooks, all data attributes. The engine renders filter rows into
+<code>[data-filter-list]</code>.</p>
+
+<blockquote>
+  <p><code>[data-action="open-filter-drawer"]</code> · <code>[data-chips]</code> ·
+  <code>[data-quick-filters]</code> · <code>[data-drawer-scrim]</code> ·
+  <code>[data-filter-drawer] &gt; [data-filter-list]</code></p>
+</blockquote>
+
+<p>It sets <code>data-filter-mode="modal"</code> on <code>&lt;html&gt;</code> itself if you
+have not — the centred-modal rules are gated on that attribute.</p>
+
+<h2>Token reference</h2>
+
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-filters.css"></praxis-block>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Read the three caveats in Code before committing to this component. It is the largest thing
+  in Praxis and the least Praxis-native.</li>
+  <li>Show active filters as chips, and give the toggle a count.</li>
+  <li>Announce the result count when a filter is applied.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use <code>.btn--neutral</code> or <code>.btn--clear</code> outside
+  <code>.filter-drawer</code>. They are scoped there and depend on a base that does not exist.</li>
+  <li>Use <code>.icon-btn</code> outside the drawer either — it is 36px there and nothing
+  elsewhere.</li>
+  <li>Apply an incomplete expression. <code>.cfx-incomplete</code> exists so you can tell.</li>
+  <li>Reach for the custom builder when a row per field would do.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The drawer needs a focus trap, Escape and focus restoration. Verify what the script supplies
+  rather than assuming — this sheet is a port and its accessibility was not audited as part of
+  Praxis.</li>
+  <li>Applying a filter changes the result set: that is a content change and the new count belongs
+  in a live region.</li>
+  <li>The custom builder's drag-to-reorder needs a keyboard equivalent, or the expression tree is
+  mouse-only.</li>
+  <li><code>.onoff</code> uses the sibling <code>.switch</code> form, which until 2026-08-18
+  rendered as a bare browser checkbox because no sheet defined its track or thumb. Both forms are
+  now defined from one set of values.</li>
+  <li>Chips are removable filters, so each needs a labelled remove control naming which filter it
+  clears.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.chip</code></td><td>Min height / padding</td><td>40px / 4px 16px</td></tr>
+    <tr><td><code>.chip__close</code></td><td>Size</td><td>24px</td></tr>
+    <tr><td><code>.icon-btn</code></td><td>Size</td><td>36px, drawer-only</td></tr>
+    <tr><td><code>.switch</code></td><td>Track / thumb / travel</td><td>34×20 / 16px / 14px</td></tr>
+  </tbody>
+</table>

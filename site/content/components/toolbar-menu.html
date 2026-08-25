@@ -16,6 +16,59 @@ picker — same object each time.</p>
 <p>Two classes. <code>.tb-menu</code> is the positioning context and holds the trigger;
 <code>.tb-dropdown</code> is the panel, and it is <code>hidden</code> until you open it.</p>
 
+<h2>Anatomy</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.tb-menu</code></td><td><code>position:relative; display:inline-flex</code>. Wraps the trigger so the panel anchors to it.</td></tr>
+    <tr><td><code>.tb-dropdown</code></td><td>The panel. Anchored 6px below the trigger, <code>min-width:220px</code>, <code>z-index:200</code>. <code>[hidden]</code> is its closed state.</td></tr>
+    <tr><td><code>.tb-dropdown--right</code></td><td>Right-aligned, for a trigger at the end of the band where a left-anchored panel would hang off the page.</td></tr>
+    <tr><td><code>.tb-dropdown__item</code></td><td>A row. <code>min-height:36px</code> rather than a fixed height, so an item carrying a second line grows instead of clipping it.</td></tr>
+    <tr><td><code>.tb-dropdown__sub</code></td><td>That second line — a count, a description, an owner.</td></tr>
+    <tr><td><code>.tb-dropdown__sec</code></td><td>A section label above a run of items.</td></tr>
+    <tr><td><code>.tb-dropdown__divider</code> / <code>__sep</code></td><td>A hairline. Two names for one rule; see below.</td></tr>
+    <tr><td><code>.tb-dropdown__empty</code></td><td>The "nothing here" line, for a menu whose contents are filtered or fetched.</td></tr>
+    <tr><td><code>.tb-dropdown__item--danger</code></td><td>Destructive action, in the danger ink.</td></tr>
+  </tbody>
+</table>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Default</td><td>Left-anchored under the trigger</td></tr>
+    <tr><td><code>--right</code></td><td>Right-aligned, for a trigger at the end of the band where a left-anchored panel would hang off the page</td></tr>
+    <tr><td><code>__item--danger</code></td><td>A destructive row, in the danger ink</td></tr>
+    <tr><td><code>menuitemradio</code> rows</td><td>A choice group. The checked item takes the app's pink selection accent, matching how selection is marked in the nav rail and the report tree</td></tr>
+  </tbody>
+</table>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Closed</strong> — <code>[hidden]</code> on the panel.</li>
+  <li><strong>Open</strong> — attribute removed. There is no <code>.is-open</code> here; the
+  attribute is the state.</li>
+  <li><strong>Item hover</strong> — <code>--px-hover</code>.</li>
+  <li><strong>Item focus-visible</strong> — a 2px inset focus ring.</li>
+  <li><strong>Checked</strong> — <code>aria-checked="true"</code> tints the item's glyph pink.</li>
+  <li><strong>Empty</strong> — <code>__empty</code>, for a menu whose contents are filtered or
+  fetched.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>The panel does not reposition itself — there is no script, so nothing
+measures the viewport. <code>--right</code> is the manual answer.</p>
+
+<p>What does adapt is the band around it: <code>praxis-toolbar-compact.css</code> treats a
+<code>.tb-menu</code> as one overflow item and gives its trigger the full row width inside the
+Tools popover. See <a href="compact-toolbar.html">Compact toolbar</a>.</p>
+
+<h2>Interactive demo</h2>
+
 <template data-example="A toolbar menu, open" data-height="320" data-scripts="lucide">
   <div class="toolbar">
     <div class="toolbar__inner">
@@ -48,40 +101,22 @@ picker — same object each time.</p>
   </div>
 </template>
 
-<h2>The parts</h2>
+<h2>Code</h2>
 
-<table>
-  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
-  <tbody>
-    <tr><td><code>.tb-menu</code></td><td><code>position:relative; display:inline-flex</code>. Wraps the trigger so the panel anchors to it.</td></tr>
-    <tr><td><code>.tb-dropdown</code></td><td>The panel. Anchored 6px below the trigger, <code>min-width:220px</code>, <code>z-index:200</code>. <code>[hidden]</code> is its closed state.</td></tr>
-    <tr><td><code>.tb-dropdown--right</code></td><td>Right-aligned, for a trigger at the end of the band where a left-anchored panel would hang off the page.</td></tr>
-    <tr><td><code>.tb-dropdown__item</code></td><td>A row. <code>min-height:36px</code> rather than a fixed height, so an item carrying a second line grows instead of clipping it.</td></tr>
-    <tr><td><code>.tb-dropdown__sub</code></td><td>That second line — a count, a description, an owner.</td></tr>
-    <tr><td><code>.tb-dropdown__sec</code></td><td>A section label above a run of items.</td></tr>
-    <tr><td><code>.tb-dropdown__divider</code> / <code>__sep</code></td><td>A hairline. Two names for one rule; see below.</td></tr>
-    <tr><td><code>.tb-dropdown__empty</code></td><td>The "nothing here" line, for a menu whose contents are filtered or fetched.</td></tr>
-    <tr><td><code>.tb-dropdown__item--danger</code></td><td>Destructive action, in the danger ink.</td></tr>
-  </tbody>
-</table>
+<p><code>praxis-controls.css</code>. No script.</p>
 
-<h2>Two names for the separator</h2>
-
-<p><code>.tb-dropdown__divider</code> and <code>.tb-dropdown__sep</code> are the same rule.
-The copies this was promoted from disagreed — four pages said <code>divider</code>, seven said
-<code>sep</code> — and an alias costs one selector where renaming costs an edit in seven
-files and a chance to miss one. Prefer <code>__divider</code> in new markup.</p>
-
-<div class="note note--trap">
-  <p><strong>The panel is styling only.</strong> Praxis does not open or close it: no script
-  here toggles <code>hidden</code>, moves focus into the panel, or closes it on outside click
-  or Escape. That is yours, and all four of those are load-bearing — a menu that
-  cannot be dismissed from the keyboard is a trap. Set
-  <code>aria-haspopup="menu"</code> and keep <code>aria-expanded</code> on the trigger in step
-  with the attribute.</p>
+<template data-source-only data-example="The minimum">
+<div class="tb-menu">
+  <button class="tbtn" type="button" id="grp" aria-haspopup="menu" aria-expanded="false">
+    Group <span class="material-symbols-rounded">expand_more</span>
+  </button>
+  <div class="tb-dropdown" role="menu" aria-labelledby="grp" hidden>
+    <button class="tb-dropdown__item" type="button" role="menuitem">New group…</button>
+  </div>
 </div>
+</template>
 
-<h2>Why it is not in praxis-admin.css</h2>
+<h3>Why it is not in praxis-admin.css</h3>
 
 <p>That is where <code>.tbtn</code> lives, so it looks like the obvious home. But
 <code>praxis-admin.css</code> is the largest sheet in the system and it carries the
@@ -97,9 +132,105 @@ item and gives its trigger the full row width in the Tools popover. Until this l
 was reading a class it never defined — the panel worked only because every consuming page
 happened to declare its own. Four of them declared it differently.</p>
 
-<h2>Surface</h2>
+<h2>Markup contract</h2>
+
+<div class="note note--trap">
+  <p><strong>The panel is styling only.</strong> Praxis does not open or close it: no script
+  here toggles <code>hidden</code>, moves focus into the panel, or closes it on outside click
+  or Escape. That is yours, and all four of those are load-bearing — a menu that
+  cannot be dismissed from the keyboard is a trap. Set
+  <code>aria-haspopup="menu"</code> and keep <code>aria-expanded</code> on the trigger in step
+  with the attribute.</p>
+</div>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Trigger</td><td><code>aria-haspopup="menu"</code> and <code>aria-expanded</code>, kept in step with the panel's <code>hidden</code> attribute</td></tr>
+    <tr><td>Panel</td><td><code>role="menu"</code> and <code>aria-labelledby</code> pointing at the trigger</td></tr>
+    <tr><td>Items</td><td><code>role="menuitem"</code>, or <code>menuitemradio</code>/<code>menuitemcheckbox</code> with <code>aria-checked</code></td></tr>
+    <tr><td>Section labels</td><td><code>__sec</code> is not a menu item and should not be focusable</td></tr>
+    <tr><td>Closed state</td><td>The <code>hidden</code> attribute, not a class</td></tr>
+    <tr><td>JS</td><td><strong>None supplied.</strong> Open, close, focus movement, outside click and Escape are all yours</td></tr>
+  </tbody>
+</table>
+
+<h3>Two names for the separator</h3>
+
+<p><code>.tb-dropdown__divider</code> and <code>.tb-dropdown__sep</code> are the same rule.
+The copies this was promoted from disagreed — four pages said <code>divider</code>, seven said
+<code>sep</code> — and an alias costs one selector where renaming costs an edit in seven
+files and a chance to miss one. Prefer <code>__divider</code> in new markup.</p>
+
+<div class="note note--trap">
+  <p><strong>The panel is styling only.</strong> Praxis does not open or close it: no script
+  here toggles <code>hidden</code>, moves focus into the panel, or closes it on outside click
+  or Escape. That is yours, and all four of those are load-bearing — a menu that
+  cannot be dismissed from the keyboard is a trap. Set
+  <code>aria-haspopup="menu"</code> and keep <code>aria-expanded</code> on the trigger in step
+  with the attribute.</p>
+</div>
+
+<h2>Token reference</h2>
+
+<praxis-block name="sheet-classes" sheet="praxis-controls.css"></praxis-block>
+
+<h3>Surface</h3>
 
 <p>The panel follows <code>.px-pop</code> exactly — a hairline and
 <code>--praxis-elevation-4</code> by default, borderless over <code>--px-overlay</code> under
 <code>body[data-variant="praxis"]</code>. A menu opened from the toolbar and one opened from
 the nav rail are then the same object, which they were not in three of the four copies.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use <code>--right</code> for a trigger near the end of the band.</li>
+  <li>Put a count or an owner in <code>__sub</code> rather than crowding the item label.</li>
+  <li>Prefer <code>__divider</code> over <code>__sep</code> in new markup.</li>
+  <li>Wire Escape and outside-click. Praxis does not.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Ship it without keyboard dismissal — a menu that cannot be closed from the keyboard is a
+  trap.</li>
+  <li>Use it as a <a href="select.html">select</a>. A menu invokes actions; a select edits a
+  value, and the ARIA roles differ.</li>
+  <li>Nest a second panel inside an item.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<p>The panel is styling only, so every accessibility obligation here is the
+consumer's — which is worth stating plainly rather than implying Praxis has handled it.</p>
+
+<ul>
+  <li><code>aria-expanded</code> on the trigger, in step with <code>hidden</code>.</li>
+  <li>Focus moves into the panel on open and returns to the trigger on close.</li>
+  <li>Escape closes. Outside click closes.</li>
+  <li>Arrow keys move between items for a true <code>role="menu"</code>; if you are not going to
+  implement that, do not claim the role.</li>
+  <li><code>__item--danger</code> uses the danger ink on the item's own text, so the destructive
+  meaning is not carried by colour alone only if the label says so — write "Remove from group",
+  not "Remove".</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.tb-dropdown</code></td><td>Min width / padding / offset</td><td>220px / 6px / 6px below the trigger</td></tr>
+    <tr><td><code>.tb-dropdown</code></td><td>Radius / z-index</td><td><code>--praxis-radius-md</code> (12px) / 200</td></tr>
+    <tr><td><code>__item</code></td><td>Min height / padding</td><td>36px / 6px 10px</td></tr>
+    <tr><td><code>__item</code></td><td>Size / weight / gap</td><td>14px / 500 / 10px</td></tr>
+    <tr><td>Item glyph</td><td>Size</td><td>18px</td></tr>
+    <tr><td><code>__divider</code></td><td>Height / margin</td><td>1px / 6px 8px</td></tr>
+  </tbody>
+</table>

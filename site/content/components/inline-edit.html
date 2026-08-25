@@ -1,0 +1,63 @@
+<!--praxis
+title: Inline edit
+summary: Edit a value where it is displayed. Both Atlassian and Carbon ship it; it is the biggest single win inside a grid.
+order: 260
+tier: planned
+icon: edit
+classes: px-inline-edit
+keywords: inline edit in place editable click to edit save cancel optimistic planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Tier 3 placeholder.</strong> Real, not urgent, and nothing is defined in <code>src/</code>. This page reserves the name and records what is known; expect it to stay in this state for a while. See <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Changing one field on forty rows should not mean forty round trips through a record page. Praxis has <code>.rfield--locked</code> for a read-only field and no path from read-only to editable in place.</p>
+
+<h2>Anatomy</h2>
+
+<p>Not designed yet.</p>
+
+<h2>Variants</h2>
+
+<p>Text, select, and date. In a table cell versus in a record field — the two need different affordances, because a table cell cannot afford a visible edit button per row.</p>
+
+<h2>States</h2>
+
+<p>Read / hover (the affordance appears) / editing / saving / saved / failed. Failed must keep the entered value and say what happened; an inline edit that silently reverts is worse than no inline edit.</p>
+
+<h2>Responsive behavior</h2>
+
+<p>Not decided yet.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>No sheet chosen yet.</p>
+
+<h2>Markup contract</h2>
+
+<p>A real button in read mode, so the control is reachable and announced as editable. On activation, focus moves into the input; Escape cancels and restores; Enter commits. The change must be announced. Whether saving is optimistic is an application decision the component must not assume — in a regulated record it usually should not be.</p>
+
+<h2>Token reference</h2>
+
+<p>No new tokens expected.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p>Not written yet.</p>
+
+<h2>Accessibility</h2>
+
+<p>Hover-only affordance is not discoverable by keyboard, so read mode must be focusable and named ("Edit severity"). Announce the outcome. Do not trap focus in the field after commit.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not decided yet.</p>

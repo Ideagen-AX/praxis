@@ -1,0 +1,159 @@
+<!--praxis
+title: Comment thread
+summary: Praxis has an AI conversation surface and nothing for human annotation on a record. Planned.
+order: 170
+tier: planned
+icon: forum
+classes: px-comment
+keywords: comment thread annotation discussion mention reply internal external note planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Mazlan is not this.</strong> <code>praxis-mazlan.css</code> is an AI conversation drawer; a comment thread is human annotation attached to a record, and none of it is defined. Tier 2 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Investigations are collaborative and the collaboration is part of the record. A supervisor
+questions a root cause, a safety lead attaches context, a contractor is asked to confirm a
+detail. That discussion has to live on the record and, in a regulated system, it is usually
+disclosable — which makes the internal-versus-external distinction below a compliance feature
+rather than a convenience.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Composer</strong> — a textarea, an attach button, a submit.</li>
+  <li><strong>Comment</strong> — <a href="avatar.html">avatar</a>, author, timestamp, body.</li>
+  <li><strong>Visibility marker</strong> — internal or visible to the contractor. See Variants.</li>
+  <li><strong>Reply</strong> — one level of nesting, no more.</li>
+  <li><strong>Edited marker</strong> — with the original preserved. This is a regulated record.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table><thead><tr><th>Variant</th><th>Use</th></tr></thead><tbody>
+  <tr><td>Thread</td><td>Flat, chronological. The default</td></tr>
+  <tr><td><code>--internal</code></td><td>Visible only inside the organisation. Needs an unmistakable treatment — a tinted surface and a label, not a small icon</td></tr>
+  <tr><td><code>--resolved</code></td><td>A question that has been answered and can collapse</td></tr>
+  <tr><td><code>--pinned</code></td><td>Held at the top. Useful, and it breaks chronology, so it must be visibly separated</td></tr>
+</tbody></table>
+
+<p><strong>The decision that matters:</strong> internal comments must be impossible to post by
+accident. Getting that wrong discloses an internal opinion to a contractor or, worse, withholds
+something that should have been shared. A quiet toggle is not enough; the composer should change
+appearance while internal mode is active.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li>Empty thread — <a href="empty-state.html">empty state</a>, inviting tone.</li>
+  <li>Composing / submitting / failed. A failed comment must keep its text.</li>
+  <li><strong>Edited</strong> — marked, with the original reachable.</li>
+  <li><strong>Deleted</strong> — the tombstone stays. "Comment removed by M. Silva, 14 Mar" is the
+  correct rendering; removing the row is not.</li>
+  <li><strong>Unread</strong> — since the reader last opened the record.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>Desktop: composer at the top or bottom consistently, thread beneath. Phone: composer collapses to a single line that expands on focus, so the thread is not pushed off screen.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo. The nearest existing surface is the Mazlan thread, which is a different component with a different purpose — see <a href="mazlan.html">Mazlan</a>.</p>
+
+<h2>Code</h2>
+
+<p><code>praxis-trail.css</code> alongside <a href="audit-trail.html">the audit
+trail</a>, or its own sheet. They share the actor-plus-timestamp-plus-body shape and a comment is
+itself an audit-trail event, so building them together avoids two answers to one layout.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<section class="px-comment-thread" aria-label="Comments">
+  <article class="px-comment px-comment--internal">
+    <span class="px-avatar px-avatar--sm" aria-hidden="true">AB</span>
+    <div class="px-comment__body">
+      <p class="px-comment__meta">
+        <strong>Aoife Byrne</strong>
+        <span class="admin-pill admin-pill--warning">Internal only</span>
+        <time datetime="2026-03-14T11:02:00Z">14 Mar 2026, 11:02 UTC</time>
+      </p>
+      <p>Root cause looks like the same guard interlock as INC-2024-0388.</p>
+    </div>
+  </article>
+
+  <form class="px-comment-composer">
+    <label class="visually-hidden" for="c-new">Add a comment</label>
+    <textarea id="c-new" rows="2" placeholder="Add a comment"></textarea>
+    <div class="px-comment-composer__actions">
+      <label class="onoff"><input class="switch" type="checkbox">
+        <span class="switch__track"><span class="switch__thumb"></span></span>
+        <span class="onoff__label">Internal only</span>
+      </label>
+      <button class="btn btn--primary" type="submit">Comment</button>
+    </div>
+  </form>
+</section>
+</template>
+
+<h2>Markup contract</h2>
+
+<table><thead><tr><th>Item</th><th>Requirement</th></tr></thead><tbody>
+  <tr><td>Element</td><td><code>&lt;article&gt;</code> per comment inside a labelled <code>&lt;section&gt;</code></td></tr>
+  <tr><td><code>&lt;time datetime&gt;</code></td><td>Absolute with timezone, same rule as the audit trail</td></tr>
+  <tr><td>Visibility</td><td>Stated in text, not by colour alone. An internal comment mis-read as public is a disclosure incident</td></tr>
+  <tr><td>New comment</td><td>Announced in a live region when it arrives from someone else</td></tr>
+  <tr><td>Mentions</td><td>If supported, a real link with an accessible name — not a styled span</td></tr>
+  <tr><td>Composer</td><td>A real <code>&lt;form&gt;</code>. Enter-to-submit is wrong here: comments are multi-line and this is a record</td></tr>
+  <tr><td>JS</td><td>None from Praxis</td></tr>
+</tbody></table>
+
+<h2>Token reference</h2>
+
+<table><thead><tr><th>Token</th><th>Use</th></tr></thead><tbody>
+  <tr><td><code>--px-surface-2</code></td><td>Comment body</td></tr>
+  <tr><td><code>--praxis-tone-warning-bg</code> / <code>-fg</code></td><td>Internal marker. Amber rather than red: it is a restriction, not an error</td></tr>
+  <tr><td><code>--px-field</code></td><td>Composer fill</td></tr>
+  <tr><td><code>--praxis-color-text-tertiary</code></td><td>Timestamp</td></tr>
+  <tr><td><code>--praxis-radius-md</code></td><td>Comment surface</td></tr>
+</tbody></table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Make internal mode visible in the composer while it is active.</li>
+  <li>Keep edited and deleted comments accounted for.</li>
+  <li>Use absolute timestamps.</li>
+</ul>
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Nest replies more than one level.</li>
+  <li>Submit on Enter.</li>
+  <li>Remove a deleted comment from the thread — leave the tombstone.</li>
+  <li>Use this for AI conversation. That is <a href="mazlan.html">Mazlan</a>.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>Each comment an <code>&lt;article&gt;</code>, so a screen reader can move between them.</li>
+  <li>Visibility in text.</li>
+  <li>Incoming comments announced politely, not assertively — a thread that interrupts on every
+  arrival is unusable.</li>
+  <li>The composer's textarea has a real label, even when the visible label is only a
+  placeholder.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table><thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead><tbody>
+  <tr><td>Avatar</td><td>Size</td><td>28px</td></tr>
+  <tr><td>Comment</td><td>Padding</td><td>12px 14px</td></tr>
+  <tr><td>Thread</td><td>Gap</td><td><code>--praxis-space-16</code></td></tr>
+  <tr><td>Reply</td><td>Indent</td><td>36px, one level only</td></tr>
+  <tr><td>Composer</td><td>Min height</td><td>2 rows, growing</td></tr>
+</tbody></table>

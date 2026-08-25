@@ -1,5 +1,76 @@
 # Changelog
 
+## Unreleased
+
+**The reference site is now built in Praxis.** It used to consume the tokens and
+draw its own chrome from a parallel `--doc-*` layer with hand-written dark
+values; it now loads `dist/praxis.css` and wears the real shell — `.app`,
+`.appbar`, `.adminnav`, `.content`, `.pageheader`, `.toolbar`, `.admin-body`,
+`.admin-card`, `.admin-table`, `.admin-pill`, `.tbtn`, `.px-skip`,
+`.px-navtoggle`, and Material Symbols ligatures through `praxis-lucide.js`. Only
+prose typography, the table of contents, the example frame and the colour
+instruments are still the site's own. No `src/` behaviour changed for that; the
+one fix below is what building it that way turned up.
+
+The document sits on its own sheet — `.doc` is an `.admin-card` on the raised
+tier — so anything on it steps to `--px-surface-2` rather than trying to lift
+off white with a shadow. That is the step Praxis already uses for
+`.admin-panel` inside an `.admin-card`, and the token moves away from the sheet
+in whichever direction is visible in each theme.
+
+### Added — site only
+
+- **One twelve-section skeleton on every component page, enforced by the build.**
+  Anatomy, Variants, States, Responsive behavior, Interactive demo, Code, Markup
+  contract, Token reference, Figma adaptation, Usage guidelines, Accessibility,
+  Dimensions — from the previous EHSQ-E design system docs, with *API* replaced by
+  *Markup contract* since Praxis has no props or events to document, and *Helix
+  alignment* dropped. All 18 pre-existing component pages were restructured to it
+  with their prose preserved and demoted to `<h3>`, and the five sections none of
+  them had were written from `src/`.
+
+  That pass recorded five live defects it found, listed in `ROADMAP.md` — the one
+  worth repeating here is that **`.admin-tab` ships with no `:focus-visible`
+  rule**, so a keyboard user gets the UA outline over a 2px bottom border.
+
+- **All 35 roadmap items now have a page** — 32 component stubs under a
+  *Components — planned* nav section, and three foundation pages for print,
+  forced-colors and an RTL cost audit.
+
+- **A `planned` component tier, and the first eight stub pages.** `ROADMAP.md`
+  inventories Praxis against six design systems and lists 35 patterns it does not
+  define; the eight Tier 1 entries now have pages. They sit in their own
+  **Components — planned** nav section and follow the thirteen-section convention
+  the previous EHSQ-E design system docs used, with *API* replaced by *Markup
+  contract* because Praxis ships no framework bindings.
+
+  These are **excluded from `PRAXIS-FOR-AGENTS.md`**, which ships and is contracted
+  to state what Praxis defines rather than what it intends.
+
+### Fixed
+
+- **`.admin-pill--ok` and `.admin-pill--lock` failed WCAG 1.4.3.** The pill label
+  is 12px at weight 700, which is not large text (large starts at 18.66px bold),
+  so it needs 4.5:1. Both variants were built from palette rungs rather than the
+  audited `--praxis-tone-*` pairs: `--ok` was green-60 on green-10 at **3.81:1**
+  and `--lock` was red-60 on red-10 at **3.88:1**. Both now take the tone pair,
+  one rung darker on the ink over the same tint — **4.99:1** and **5.08:1**.
+  `--off` was already 4.89:1 and is left where it is rather than moved for
+  symmetry.
+
+  The dark overrides are kept rather than deleted even though they now restate
+  what the tone tokens resolve to: `praxis-core.css` remaps the tone pairs under
+  `body[data-variant="praxis"][data-theme="dark"]`, so on a dark page that is
+  *not* the Praxis variant the pill would otherwise keep its light tint.
+
+### Added
+
+- **`.admin-pill--info` and `.admin-pill--warning`.** The pill had green, neutral
+  and red and no blue or amber. The reference site's own admin example was
+  already reaching for `.admin-pill--warning` and getting the bare shape with no
+  colour, which is how this surfaced. Both take the audited tone pairs, so they
+  need no dark override.
+
 ## 0.1.9 — 2026-08-21
 
 **Four things the prototype had four copies of.** A toolbar menu, a panel icon

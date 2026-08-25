@@ -1,0 +1,198 @@
+<!--praxis
+title: Error summary
+summary: Praxis marks required fields and shows one inline alert. Nothing aggregates a form's errors to the top and links to each one. Planned.
+order: 70
+tier: planned
+icon: error
+classes: form-summary
+keywords: error summary validation required form alert inline message focus link accessibility planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Nothing aggregates form errors.</strong> <code>.form-alert</code> exists in
+  <code>praxis-rfield.css</code> as a single inline message and <code>.req</code> marks a
+  required field. There is no summary. Tier 1 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>This is the one item on the Tier 1 list taken directly from
+<a href="https://design-system.service.gov.uk/components/error-summary/">GOV.UK</a>, where it
+is the centrepiece of their accessibility work rather than a nicety. The reasoning is simple:
+on a long form, a user who submits and gets inline errors twelve fields down has no way to know
+how many there are, where they are, or whether they have fixed them all.</p>
+
+<p>Praxis's record forms are long by nature — an incident report or an audit checklist runs to
+several <code>.section</code> blocks of <code>.rfield</code> rows, and sections can be
+collapsed, which means an error can be inside something that is closed. That last part makes
+this more than a convenience: without a summary, a validation error can be genuinely
+invisible.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Container</strong> — a danger-toned box at the top of the form.</li>
+  <li><strong>Heading</strong> — "There is a problem" is GOV.UK's wording and it is hard to
+  improve on: it is plain, it is not blaming, and it is the same every time.</li>
+  <li><strong>List</strong> — one link per error, in the order the fields appear in the DOM,
+  not in the order validation ran.</li>
+  <li><strong>Link</strong> — text is the error message; the target is the field.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<p>One. A form either has errors or it does not.</p>
+
+<p><strong>Open decision:</strong> whether it also covers the section-level case. A record page
+can have errors spread across four collapsed sections, and a flat list of twelve links loses
+that structure. Grouping by section — "Immediate actions (3)" — is more useful and more work,
+and it needs the summary to know about <code>.section</code>, which couples two components.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Absent</strong> — not rendered at all. Not hidden: an empty summary in the DOM is
+  something a screen reader can land on.</li>
+  <li><strong>Present</strong> — rendered and focused. Focus, not just scroll — see
+  Accessibility.</li>
+  <li><strong>Updated</strong> — a second submit with fewer errors replaces the list and
+  re-focuses. The re-focus is what tells a user their fix worked.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>All</td><td>Full width of the form column, above the first field, inside the scroll container</td></tr>
+    <tr><td>Phone</td><td>Unchanged. This is the viewport where it matters most, because less of the form is visible at once</td></tr>
+  </tbody>
+</table>
+
+<p>One real constraint: Praxis's shell puts the form inside <code>.admin-body</code> or
+<code>.page-body</code>, which is the scroll container, not the window. A summary that scrolls
+its target into view has to scroll <em>that</em> element. This is the same trap the reference
+site's table of contents hit.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo. The frame shows what exists — a required field and the single inline
+<code>.form-alert</code>.</p>
+
+<template data-example="Today: .req marks required, .form-alert carries one message" data-height="230">
+  <div class="rfield">
+    <label class="rfield__label" for="es-1">Immediate cause <span class="req">*</span></label>
+    <div class="rfield__control">
+      <input id="es-1" type="text" value="">
+      <p class="form-alert">Enter the immediate cause.</p>
+    </div>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p><code>praxis-rfield.css</code>, beside <code>.form-alert</code> — that sheet already owns the
+record form's validation vocabulary.</p>
+
+<p>It needs a script, and this is the one place a Praxis script should own behaviour rather
+than paint: moving focus, and scrolling the right container, are both easy to get wrong and
+both invisible when wrong.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<div class="form-summary" role="alert" tabindex="-1">
+  <h2 class="form-summary__head">There is a problem</h2>
+  <ul class="form-summary__list">
+    <li><a href="#immediate-cause">Enter the immediate cause</a></li>
+    <li><a href="#date-occurred">The date occurred cannot be in the future</a></li>
+    <li><a href="#severity">Select a severity</a></li>
+  </ul>
+</div>
+
+<!-- Each target field carries the matching inline message -->
+<div class="rfield rfield--invalid">
+  <label class="rfield__label" for="immediate-cause">Immediate cause <span class="req">*</span></label>
+  <div class="rfield__control">
+    <input id="immediate-cause" type="text" aria-invalid="true" aria-describedby="immediate-cause-err">
+    <p class="form-alert" id="immediate-cause-err">Enter the immediate cause.</p>
+  </div>
+</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td><code>role="alert"</code></td><td>On the container, so it is announced when it appears. Only correct because it is rendered on submit rather than present at load</td></tr>
+    <tr><td><code>tabindex="-1"</code></td><td>So it can receive programmatic focus</td></tr>
+    <tr><td>Link <code>href</code></td><td>A fragment pointing at the field's <code>id</code> — the input, not its wrapper. Landing on the wrapper puts focus somewhere a keyboard user then has to leave</td></tr>
+    <tr><td>Link text</td><td>The error message itself. Not "Immediate cause" and not "Fix this"</td></tr>
+    <tr><td><code>aria-invalid="true"</code></td><td>On each failing input</td></tr>
+    <tr><td><code>aria-describedby</code></td><td>From the input to its inline message</td></tr>
+    <tr><td>Collapsed sections</td><td>The script must expand a collapsed <code>.section</code> before focusing a field inside it. Without this the link moves focus to something <code>display:none</code> and the browser does nothing at all</td></tr>
+    <tr><td>JS API</td><td>Undecided. Probably a render function taking a list of <code>{id, message}</code>, since validation itself is the application's job</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-tone-danger-bg</code> / <code>-fg</code></td><td>Container fill and heading. The audited pair — 5.08:1 — not the raw red rungs</td></tr>
+    <tr><td><code>--praxis-color-status-danger</code></td><td>The left rule</td></tr>
+    <tr><td><code>--praxis-radius-sm</code></td><td>8px</td></tr>
+    <tr><td><code>--praxis-space-16</code></td><td>Padding</td></tr>
+  </tbody>
+</table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Render it on submit, not on blur. A summary that appears while a user is still typing is
+  noise.</li>
+  <li>List errors in DOM order.</li>
+  <li>Write the message as an instruction: "Enter the immediate cause", not "This field is
+  required".</li>
+  <li>Keep the inline message too. The summary is navigation; the inline message is context.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Leave an empty summary in the DOM.</li>
+  <li>Use it for warnings or for anything the user can ignore.</li>
+  <li>Count errors in the heading. "There is a problem" is stable; "There are 3 problems"
+  changes on every submit and gives a screen-reader user a number they did not ask for before
+  the list they did.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Focus the summary on render.</strong> Scrolling to it is not enough — a screen
+  reader user is wherever their cursor was, which is the submit button at the bottom.</li>
+  <li><strong>Expand collapsed ancestors before focusing a target.</strong> The single most
+  likely bug in this component.</li>
+  <li><code>aria-invalid</code> and <code>aria-describedby</code> on every failing field, or the
+  summary is the only place the error exists.</li>
+  <li>Scroll the right container — <code>.admin-body</code>, not the window.</li>
+  <li>Colour is not the only indicator: the inline message is text and the field gets
+  <code>aria-invalid</code>, so a red border is reinforcement rather than the signal.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Container</td><td>Padding</td><td>16px</td></tr>
+    <tr><td>Container</td><td>Left rule</td><td>3px, matching the reference site's own callouts</td></tr>
+    <tr><td>Container</td><td>Bottom margin</td><td><code>--praxis-space-24</code></td></tr>
+    <tr><td><code>__head</code></td><td>Size / weight</td><td>16px / 700</td></tr>
+    <tr><td><code>__list</code></td><td>Item spacing</td><td><code>--praxis-space-4</code></td></tr>
+  </tbody>
+</table>
+

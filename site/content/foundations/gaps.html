@@ -2,7 +2,7 @@
 title: What Praxis does not define
 summary: Class names that appear in Praxis selectors and so look supported, but have no base definition. If you use one, you write it.
 order: 90
-classes: btn, section, chevron-btn, callout, toggle, viewswitch, chip, px-menu, field, page-body, summary, panel, fields, admin-preview, colmenu, ss-sec, mazlan-source, tb-display, persona-picker
+classes: btn, section, chevron-btn, callout, toggle, viewswitch, chip, px-menu, field, page-body, summary, panel, fields, admin-preview, colmenu, ss-sec, mazlan-source, tb-display, persona-picker, gl-theme-btn, gl-sun, gl-moon, card
 keywords: missing undefined gap btn section chip callout toggle field px-menu unkeyed
 -->
 
@@ -26,6 +26,25 @@ are measured every build.</p>
     <tr><td><code>.px-menu</code>, <code>.px-menu__head</code></td><td><strong>Not defined</strong>, but referenced by <code>praxis-navrail.css</code> for the dashboards flyout. Use <code>.px-pop</code> (defined in <code>praxis-admin.css</code>) instead.</td></tr>
     <tr><td><code>.field</code></td><td>Only the Praxis rule correcting <code>::before</code> alignment and raising rows to 64px. The base row is not here.</td></tr>
     <tr><td><code>.page-body</code></td><td>Yours entirely. The name appears in the shell markup but Praxis styles nothing on it — see <a href="../components/app-shell.html">the app shell</a> for the two rules you must write.</td></tr>
+    <tr><td><code>.card</code></td><td>No base. <code>praxis-workspace.css</code> gives it the slate shadow and 12px radius and nothing else — no fill, no padding. Reach for <code>.admin-card</code>, which is complete.</td></tr>
+    <tr><td><code>.gl-theme-btn</code>, <code>.gl-sun</code>, <code>.gl-moon</code></td><td>No base. The <code>[data-theme]</code> swap between the two glyphs works, and the button around them has no size, shape or hit area. Put the class on an <code>.appbar__iconbtn</code> for the geometry — that is what this site does.</td></tr>
+  </tbody>
+</table>
+
+<h2>Four gaps this site had to fill</h2>
+
+<p>The reference site is itself a Praxis page — the app bar, the labelled side nav, the
+page header, the toolbar band, the cards, the tables and the status pills are all the real
+components. Writing it that way is the most direct test of the system there is, and it
+found exactly four things it could not ask Praxis for.</p>
+
+<table>
+  <thead><tr><th>What was needed</th><th>Closest Praxis has</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Long-form prose.</strong> Headings, paragraph rhythm, prose lists, inline code, blockquotes.</td><td>Nothing. Praxis is an application design system and styles no document text at all. This is the largest thing the site writes for itself, and it is the right answer — an app has labels, not articles.</td></tr>
+    <tr><td><strong>A callout box.</strong> A framed aside carrying a status tone.</td><td><code>.admin-note</code> is italic prose with no frame, and <code>.admin-banner</code> is a page-level bar. The status <em>tones</em> exist as <code>--praxis-tone-*</code>, so only the box is missing.</td></tr>
+    <tr><td><strong>A secondary label above a value.</strong> "Previous" over a page title.</td><td><code>.admin-setting-row__label</code> is the right treatment bound to the wrong parent — it only works inside a settings row.</td></tr>
+    <tr><td><strong>A brand lockup.</strong> Mark, wordmark, version.</td><td><code>.appbar__brand</code> positions it and expects a logo image. The teal→pink mark is the one piece of brand the palette does not express as a token.</td></tr>
   </tbody>
 </table>
 

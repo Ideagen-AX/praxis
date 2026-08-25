@@ -47,12 +47,12 @@
 | Measure | Value |
 |---|---|
 | Distinct custom properties defined | **224** |
-| `var()` usages | **1,550** |
+| `var()` usages | **1,554** |
 | Raw colour literals remaining | 825 (370 hex / 455 rgb·rgba) |
 | Tokenization coverage | **65%** |
 | Tokens defined in more than one file | 75 |
 | Used but never defined (excluding runtime-set) | 3 — `--muted`, `--ph-pad-top`, `--praxis-filters-gutter` |
-| Defined but never referenced | 104 |
+| Defined but never referenced | 96 |
 | Stylesheets measured | 17 |
 | Consumer pages measured | none — src/ measured in isolation |
 <!-- /GENERATED:stats -->
@@ -738,7 +738,7 @@ Measured by CSS class-block frequency across all sources. Grouped by area.
 <!-- GENERATED:components -->
 | Sheet | Rules | Main class families |
 |---|---|---||
-| `praxis-admin.css` | 259 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
+| `praxis-admin.css` | 261 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
 | `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.msel`, `.iconbtn-ghost` |
 | `praxis-controls.css` | 32 | `.tb-dropdown`, `.iconbtn`, `.filterfield`, `.icon`, `.material-symbols-rounded` |
 | `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |

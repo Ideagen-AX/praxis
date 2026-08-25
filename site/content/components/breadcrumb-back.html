@@ -10,31 +10,58 @@ summary: The toolbar's back button, driven by the breadcrumb trail rather than h
 keywords: breadcrumb back button navigation history trail ancestor
 -->
 
-<p>Every page's toolbar carries a back button, and it used to do nothing. It should step one
-level up the breadcrumb trail, ending at the workspace.
+<p>Every page's toolbar carries a back button, and it used to do nothing. It should
+step one level up the breadcrumb trail, ending at the workspace.
 <code>praxis-breadcrumb-back.js</code> is self-wiring: include it, and the button in your
 toolbar starts working.</p>
 
-<h2>Why it is not one line</h2>
+<p>Two things are documented here, because they are inseparable — the breadcrumb component
+itself, which <code>praxis-pageheader.css</code> fully defines, and the script that reads it.</p>
 
-<p>The obvious implementation is <code>location.href = lastCrumb.href</code>. It does not work
-here, and the reason is worth knowing because it is a property of real markup rather than a
-design choice:</p>
+<h2>Anatomy</h2>
 
-<p>The breadcrumb <em>structure</em> is consistent — a <code>&lt;nav class="breadcrumb"&gt;</code>
-with <code>&lt;a&gt;</code> ancestors, <code>.breadcrumb__sep</code> separators and a final
-<code>.breadcrumb__current</code>. The <strong>hrefs are not</strong>. Six of the twenty pages
-point their ancestor links at <code>"#"</code>. Following those takes you nowhere and adds a
-history entry, so the script has to resolve a real destination rather than trusting the
-attribute.</p>
+<ol>
+  <li><strong>Trail</strong> — <code>.breadcrumb</code>, a <code>&lt;nav&gt;</code> with a label.</li>
+  <li><strong>Home</strong> — <code>.breadcrumb__home</code>, a glyph link at the head.</li>
+  <li><strong>Ancestors</strong> — plain <code>&lt;a&gt;</code> elements.</li>
+  <li><strong>Separator</strong> — <code>.breadcrumb__sep</code>, decorative.</li>
+  <li><strong>Current</strong> — <code>.breadcrumb__current</code>, the page you are on, not a link.</li>
+  <li><strong>Back button</strong> — a <code>.tbtn--icon</code> in the toolbar band below. Not part
+  of the breadcrumb, and driven by it.</li>
+</ol>
 
-<div class="note">
-  <p>The practical instruction: <strong>give your breadcrumb ancestors real hrefs.</strong> The
-  script copes with <code>"#"</code>, but it copes by guessing, and a correct href is always
-  better than a good guess.</p>
-</div>
+<h2>Variants</h2>
 
-<h2>The markup it reads</h2>
+<p>One trail. The back button has no variants either — it is a single icon button
+whose behaviour comes from the script.</p>
+
+<p>What Praxis does <em>not</em> have is an overflow form for a deep trail; the breadcrumb wraps
+instead, which is deliberate but has consequences. See
+<a href="breadcrumb-overflow.html">Breadcrumb overflow</a>.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Ancestor link</strong> — secondary ink, primary on hover.</li>
+  <li><strong>Current</strong> — primary ink, not interactive.</li>
+  <li><strong>Wrapped</strong> — at narrow widths the trail wraps and takes the header's height
+  with it. <code>--ph-h</code> is a floor, not a fixed height.</li>
+  <li><strong>Back unavailable</strong> — at the top of a trail there is nowhere to go. The script
+  resolves to the workspace rather than disabling the button.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Desktop</td><td>One line, full trail</td></tr>
+    <tr><td>Narrow</td><td>Wraps. <code>praxis-pageheader.css</code> says so explicitly — "the breadcrumb is allowed to wrap at narrow widths and take the header with it"</td></tr>
+    <tr><td>≤640px</td><td>Inline padding follows <code>--px-gutter</code>, so the trail lines up with the app bar and the content</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
 
 <template data-example="A breadcrumb and the back button it drives" data-height="230" data-scripts="lucide,breadcrumb-back">
   <div class="pageheader">
@@ -69,12 +96,104 @@ attribute.</p>
 control, so <strong>label it</strong>. An icon-only button with no label is both inaccessible
 and invisible to this script — the same requirement, for two reasons.</p>
 
-<h2>What the breadcrumb itself defines</h2>
+<h2>Code</h2>
 
-<p><code>praxis-pageheader.css</code> is a small sheet and fully covers the breadcrumb:
-<code>.breadcrumb</code>, <code>.breadcrumb__home</code>, <code>.breadcrumb__sep</code> and
-<code>.breadcrumb__current</code>. The separators are decorative and take
-<code>aria-hidden</code>; the trail is a <code>&lt;nav&gt;</code> with a label so it is
-announced as navigation rather than a run of links.</p>
+<p>The breadcrumb is CSS in <code>praxis-pageheader.css</code>. The back button is one
+script tag and nothing else:</p>
 
-<praxis-block name="sheet-classes" sheet="praxis-pageheader.css"></praxis-block>
+<template data-source-only data-example="Wiring the back button">
+<script src="praxis-breadcrumb-back.js"></script>
+</template>
+
+<h3>Why it is not one line</h3>
+
+<p>The obvious implementation is <code>location.href = lastCrumb.href</code>. It does not work
+here, and the reason is worth knowing because it is a property of real markup rather than a
+design choice:</p>
+
+<p>The breadcrumb <em>structure</em> is consistent — a <code>&lt;nav class="breadcrumb"&gt;</code>
+with <code>&lt;a&gt;</code> ancestors, <code>.breadcrumb__sep</code> separators and a final
+<code>.breadcrumb__current</code>. The <strong>hrefs are not</strong>. Six of the twenty pages
+point their ancestor links at <code>"#"</code>. Following those takes you nowhere and adds a
+history entry, so the script has to resolve a real destination rather than trusting the
+attribute.</p>
+
+<div class="note">
+  <p>The practical instruction: <strong>give your breadcrumb ancestors real hrefs.</strong> The
+  script copes with <code>"#"</code>, but it copes by guessing, and a correct href is always
+  better than a good guess.</p>
+</div>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td><code>&lt;nav class="breadcrumb"&gt;</code></td><td>With an <code>aria-label</code>, so it is announced as navigation rather than a run of links</td></tr>
+    <tr><td>Ancestor hrefs</td><td><strong>Real URLs.</strong> The script copes with <code>"#"</code> by guessing, and a correct href is always better than a good guess</td></tr>
+    <tr><td><code>.breadcrumb__sep</code></td><td><code>aria-hidden="true"</code>. Decorative</td></tr>
+    <tr><td><code>.breadcrumb__current</code></td><td>Not a link. Add <code>aria-current="page"</code></td></tr>
+    <tr><td>Back button</td><td><code>aria-label="Back"</code> — this is how the script finds it</td></tr>
+    <tr><td>JS API</td><td>Self-wiring on <code>DOMContentLoaded</code>. No init call, and it no-ops on a page with no breadcrumb</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<praxis-block name="tokens" prefix="--ph-"></praxis-block>
+
+<p>Beyond those, the breadcrumb uses <code>--praxis-color-text-secondary</code> for ancestors,
+<code>--praxis-color-text-primary</code> for the current page and
+<code>--praxis-color-text-disabled</code> for the home glyph and separators.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<div class="note">
+  <p>The practical instruction: <strong>give your breadcrumb ancestors real hrefs.</strong> The
+  script copes with <code>"#"</code>, but it copes by guessing.</p>
+</div>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Label the nav and label the back button.</li>
+  <li>Keep the trail structural — it reflects where the record sits, not where the user has been.</li>
+  <li>Let it wrap rather than truncating it silently.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Point an ancestor at <code>"#"</code>.</li>
+  <li>Make the current page a link.</li>
+  <li>Use the back button as browser history. It steps the trail, which is not the same thing —
+  and that difference is the reason the script exists.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The trail is a labelled <code>&lt;nav&gt;</code> landmark.</li>
+  <li>Separators are <code>aria-hidden</code>, so a screen reader hears the path rather than
+  "chevron right" four times.</li>
+  <li>The current page carries <code>aria-current="page"</code> and is not focusable.</li>
+  <li>The back button must have an accessible name. This is also a functional requirement, since
+  the script keys on it.</li>
+  <li>A deep wrapped trail is verbose to hear. That is the cost of not having an overflow form,
+  and it is tracked on <a href="breadcrumb-overflow.html">Breadcrumb overflow</a>.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.breadcrumb</code></td><td>Size / weight</td><td>13px / 600</td></tr>
+    <tr><td><code>.breadcrumb</code></td><td>Gap / bottom margin</td><td>6px / 6px</td></tr>
+    <tr><td>Separator glyph</td><td>Size</td><td>18px</td></tr>
+    <tr><td><code>.pageheader</code></td><td>Min height</td><td><code>--ph-h</code>, 68px — a floor</td></tr>
+    <tr><td>Back button</td><td>Size</td><td>40px, <code>.tbtn--icon</code></td></tr>
+  </tbody>
+</table>

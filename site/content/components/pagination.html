@@ -1,0 +1,189 @@
+<!--praxis
+title: Pagination
+summary: .pager and .pager__btn exist as names — hover and disabled states applied over no base. Every list view needs this. Planned.
+order: 50
+tier: planned
+icon: list
+classes: pager
+keywords: pagination pager page next previous rows per page infinite scroll load more planned
+-->
+
+<div class="note note--planned">
+  <p><strong><code>.pager</code> has no base rule.</strong> <code>praxis-core.css</code> styles
+  <code>.pager__btn</code> on hover, on disabled-hover and in the press-feedback pass — three
+  rules refining a button that is never defined. Tier 1 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>This is one of the six name-only families the roadmap audit turned up beyond the ones
+<a href="../foundations/gaps.html">gaps.html</a> already lists, and it is the one that matters
+most: every search result, every audit register, every findings list needs paging, and there is
+nothing to build it from.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Range readout</strong> — "1–25 of 1,284". The most useful part and the one most
+  often left out.</li>
+  <li><strong>Previous / next</strong> — <code>.pager__btn</code>, disabled at the ends.</li>
+  <li><strong>Page numbers</strong> — optional, with truncation. See Variants.</li>
+  <li><strong>Rows per page</strong> — a select. Belongs here rather than in the toolbar,
+  because it changes what paging means.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th><th>Note</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Simple</strong></td><td>Previous / next plus the range readout</td><td>Correct default for a server-paged table where the total is expensive to know</td></tr>
+    <tr><td><strong>Numbered</strong></td><td>Adds page numbers with an ellipsis</td><td>Only worth it when a user might jump. Needs a truncation rule: how many either side of current, and whether first and last are always shown</td></tr>
+    <tr><td><strong>Load more</strong></td><td>A single button appending the next page</td><td>Wrong for this domain. An auditor needs to cite "row 340 of 1,284"; an append-only list has no addressable position</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Open decision:</strong> whether infinite scroll is permitted at all. The
+recommendation is no, for the reason above — regulated work needs stable, quotable positions,
+and an infinite list cannot be printed either (see <code>ROADMAP.md</code> F1).</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>First page</strong> — previous disabled.</li>
+  <li><strong>Last page</strong> — next disabled. Requires knowing the total; the simple
+  variant may not.</li>
+  <li><strong>Single page</strong> — the whole component hides. Undecided whether the range
+  readout stays, and it probably should: "25 of 25" is information.</li>
+  <li><strong>Loading</strong> — the range readout is the natural place for it. Depends on the
+  loading component.</li>
+  <li><strong>Current page</strong> — <code>.pager__btn--active</code>, which
+  <code>praxis-core.css</code> already excludes from the hover treatment, so the name is
+  effectively reserved.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Layout</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Desktop</td><td>Range left, numbers centre, rows-per-page right</td><td></td></tr>
+    <tr><td>Tablet</td><td>Numbers truncate harder</td><td></td></tr>
+    <tr><td>Phone (≤640px)</td><td>Simple variant only: range, then previous/next</td><td>Page numbers at 390px are 24px targets in a row — below the 44px minimum and unusable. Dropping to the simple form is the fix, not shrinking them</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo — <code>.pager</code> renders as unstyled text. The frame shows the buttons
+that <em>would</em> carry the states already defined, built from <code>.tbtn</code> so the
+intended treatment is visible.</p>
+
+<template data-example="Approximated with .tbtn, since .pager has no base" data-height="130">
+  <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+    <span style="font-size:.8125rem;color:var(--praxis-color-text-secondary)">1–25 of 1,284</span>
+    <button class="tbtn tbtn--icon" type="button" disabled aria-label="Previous page">
+      <span class="material-symbols-rounded">chevron_left</span>
+    </button>
+    <button class="tbtn tbtn--icon" type="button" aria-label="Next page">
+      <span class="material-symbols-rounded">chevron_right</span>
+    </button>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p>Belongs in <code>praxis-core.css</code> beside the hover rules that already reference it.
+CSS only — paging is the application's data concern, and a Praxis script that owned page state
+would be reaching past where the system stops.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<nav class="pager" aria-label="Pagination">
+  <p class="pager__range">1–25 of 1,284</p>
+  <button class="pager__btn" type="button" disabled aria-label="Previous page">
+    <span class="material-symbols-rounded">chevron_left</span>
+  </button>
+  <button class="pager__btn pager__btn--active" type="button" aria-current="page">1</button>
+  <button class="pager__btn" type="button">2</button>
+  <span class="pager__gap" aria-hidden="true">…</span>
+  <button class="pager__btn" type="button">52</button>
+  <button class="pager__btn" type="button" aria-label="Next page">
+    <span class="material-symbols-rounded">chevron_right</span>
+  </button>
+  <label class="pager__size">
+    Rows <select class="filter-select"><option>25</option><option>50</option><option>100</option></select>
+  </label>
+</nav>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Element</td><td><code>&lt;nav aria-label="Pagination"&gt;</code>. The label is required — a page with a nav landmark called nothing is worse than no landmark</td></tr>
+    <tr><td><code>aria-current="page"</code></td><td>On the current page button. This is the state a screen reader reads; the <code>--active</code> class is only paint</td></tr>
+    <tr><td><code>aria-label</code></td><td>On previous and next, since both are icon-only</td></tr>
+    <tr><td>Disabled</td><td>The <code>disabled</code> attribute. <code>praxis-core.css</code> already has <code>.pager__btn:disabled:hover</code>, so the contract is set</td></tr>
+    <tr><td>Ellipsis</td><td><code>aria-hidden</code>. It is not a control and must not be announced or focusable</td></tr>
+    <tr><td>JS</td><td>None from Praxis</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-control-h</code></td><td>32px button</td></tr>
+    <tr><td><code>--px-tool</code> / <code>--px-tool-shadow</code></td><td>Rest</td></tr>
+    <tr><td><code>--px-hover-btn</code></td><td>Hover wash — the stronger one, because a 32px control is too small for the 2.5% <code>--px-hover</code></td></tr>
+    <tr><td><code>--praxis-type-size-sm</code></td><td>Range readout</td></tr>
+    <tr><td><code>--praxis-color-text-secondary</code></td><td>Range readout ink</td></tr>
+  </tbody>
+</table>
+
+<p>Nothing missing. Every value exists.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Show the range readout. It is the difference between paging and guessing.</li>
+  <li>Put rows-per-page in the pager, not the toolbar.</li>
+  <li>Keep the control in the same place on every list.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use infinite scroll for a register an auditor might cite.</li>
+  <li>Hide the pager when there is one page — say so instead.</li>
+  <li>Reset to page 1 silently when a filter changes. Say that too.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><code>aria-current="page"</code> is what conveys position; the class is decoration.</li>
+  <li>Icon-only previous and next need labels.</li>
+  <li>After a page change, focus should not be lost. Moving it to the top of the table, or
+  announcing the new range in a live region, are the two workable answers; doing neither leaves
+  a keyboard user at the bottom of a page that just replaced itself.</li>
+  <li>Targets: 32px is below the 44px WCAG 2.5.8 minimum. Acceptable at desktop under the
+  spacing exception, which is precisely why the phone variant drops the numbers.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td><code>__btn</code></td><td>Size</td><td>32×32 icon-only, 32px high with 10px inline padding for a number</td></tr>
+    <tr><td><code>__btn</code></td><td>Radius</td><td>8px</td></tr>
+    <tr><td><code>.pager</code></td><td>Gap</td><td><code>--praxis-space-4</code> between buttons, <code>--praxis-space-12</code> between groups</td></tr>
+    <tr><td><code>__range</code></td><td>Size</td><td>13px</td></tr>
+  </tbody>
+</table>
+

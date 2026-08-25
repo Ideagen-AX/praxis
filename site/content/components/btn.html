@@ -1,0 +1,197 @@
+<!--praxis
+title: Button base
+summary: The highest-traffic hole in the system. Praxis names ten button classes and fully defines two; .btn is the one everything else assumes and nothing provides. Planned.
+order: 30
+tier: planned
+icon: bolt
+classes: btn
+keywords: btn button base primary secondary danger ghost size planned promotion
+-->
+
+<div class="note note--planned">
+  <p><strong><code>.btn</code> has no base rule anywhere in <code>src/</code>.</strong>
+  <code>.btn--primary</code> styles a fill with no box, so a <code>.btn</code> renders as
+  coloured text. Tier 1 on <code>ROADMAP.md</code>, and already the headline entry on
+  <a href="../foundations/gaps.html">what Praxis does not define</a>.</p>
+</div>
+
+<p>This is the one gap that costs an hour every time someone meets it, because the failure is
+silent and looks like a Praxis bug rather than a missing definition.
+<a href="buttons.html">The buttons page</a> documents the current state exactly:
+<code>.tbtn</code> and <code>.admin-ghostbtn</code> are complete, four classes get a fill only,
+five get a press transform and no box at all. <code>praxis-filters.css</code> says outright
+that its variants sit "on top of the host's <code>.btn</code> set" — a host that does not
+exist.</p>
+
+<p>So this page is not really about designing a button. <code>.tbtn</code> already <em>is</em>
+the Praxis button, at 40px with a tool shadow. The question is what <code>.btn</code> should
+be given that.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Box</strong> — height, inline padding, radius, the thing that is missing.</li>
+  <li><strong>Label</strong> — 14px/600 in every existing Praxis button.</li>
+  <li><strong>Leading glyph</strong> — optional, 18–20px, <code>gap:7px</code> in
+  <code>.tbtn</code>.</li>
+  <li><strong>Trailing glyph</strong> — for a split or menu button.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<p><strong>The decision this page exists to force.</strong> Three options, and they are not
+equivalent:</p>
+
+<table>
+  <thead><tr><th>Option</th><th>What <code>.btn</code> becomes</th><th>Cost</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Alias</strong></td><td><code>.btn</code> is a second name for <code>.tbtn</code> — same 40px, same tool shadow</td><td>Cheapest, and honest about the fact that Praxis has one button. But <code>.btn--primary</code> and <code>.tbtn--primary</code> already both exist with the same treatment, so the alias makes the duplication permanent</td></tr>
+    <tr><td><strong>Smaller sibling</strong></td><td><code>.btn</code> is the 32px form-and-dialog button; <code>.tbtn</code> stays the 40px toolbar button</td><td>Matches how <code>.iconbtn</code> (34px) and <code>.tbtn--icon</code> (40px) already coexist, and that precedent is documented as deliberate. Two names, two real sizes</td></tr>
+    <tr><td><strong>Base plus size modifiers</strong></td><td><code>.btn</code> is the box; <code>.btn--sm/--md/--lg</code> set height; <code>.tbtn</code> becomes an alias of <code>.btn--lg</code></td><td>The conventional answer and the most work. It also means touching <code>.tbtn</code>, which is load-bearing in six sheets</td></tr>
+  </tbody>
+</table>
+
+<p>Recommendation: <strong>the smaller sibling</strong>. It is the only one of the three that
+adds something the system does not have — a button that fits inside a card or a dialog footer
+without the 40px toolbar presence — and it does not touch <code>.tbtn</code>.</p>
+
+<p>Tone variants, whichever option wins: <code>--primary</code> (exists as a fill),
+<code>--danger</code> (missing entirely and needed by the
+<a href="dialog.html">confirm dialog</a>), <code>--ghost</code> (exists on <code>.tbtn</code>).</p>
+
+<h2>States</h2>
+
+<p>All of these already exist and are already correct — they are applied to
+<code>.btn</code> in <code>praxis-core.css</code> today, over nothing. Defining the base is
+what makes them visible.</p>
+
+<ul>
+  <li><strong>Hover</strong> — shadow lift via <code>--px-tool-shadow-hover</code>.</li>
+  <li><strong>Press</strong> — <code>scale(.97)</code>, from the global press-feedback pass in
+  <code>praxis-core.css</code>.</li>
+  <li><strong>Focus-visible</strong> — 2px <code>--praxis-color-border-focus</code>.</li>
+  <li><strong>Disabled</strong> — <code>opacity:.45</code>, <code>cursor:not-allowed</code>,
+  no shadow, matching <code>.iconbtn</code>.</li>
+  <li><strong>Loading</strong> — does not exist. Depends on the loading component.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>None of its own. Buttons inherit the phone gutter through their container, and
+<code>--praxis-control-h</code> (32px) already exists as the "compact action control height"
+token — which is a strong hint that the smaller sibling above was always the intent.</p>
+
+<h2>Interactive demo</h2>
+
+<p>The frame shows what exists today, so the gap is visible rather than described: a real
+<code>.tbtn</code> beside a bare <code>.btn</code> and a <code>.btn--primary</code>.</p>
+
+<template data-example="Today: .tbtn works, .btn does not" data-height="130">
+  <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap">
+    <button class="tbtn" type="button">.tbtn — complete</button>
+    <button class="btn" type="button">.btn — no base</button>
+    <button class="btn btn--primary" type="button">.btn--primary — fill only</button>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p>Belongs in <code>praxis-core.css</code>, not <code>praxis-admin.css</code>. <code>.tbtn</code>
+lives in the admin sheet for historical reasons and that sheet is the largest in the system;
+<code>.btn</code> is foundational and every page loads core.</p>
+
+<template data-source-only data-example="Proposed — the smaller sibling option">
+<button class="btn" type="button">Cancel</button>
+<button class="btn btn--primary" type="button">Submit</button>
+<button class="btn btn--danger" type="button">Void permit</button>
+<button class="btn btn--ghost" type="button">
+  <span class="material-symbols-rounded">edit</span>Edit
+</button>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Element</td><td><code>&lt;button type="button"&gt;</code>. Praxis's press-feedback rules key on <code>button, [role="button"]</code>, so a styled <code>&lt;div&gt;</code> gets the visual and none of the keyboard behaviour</td></tr>
+    <tr><td><code>type</code></td><td>Always explicit. An unset <code>type</code> inside a form is <code>submit</code>, which is the single most common cause of a Cancel button submitting</td></tr>
+    <tr><td>Icon</td><td><code>.material-symbols-rounded</code> span, converted by <code>praxis-lucide.js</code>. Sized by the button rule, not the span</td></tr>
+    <tr><td>Icon-only</td><td>Not this component. Use <code>.iconbtn</code> (34px) or <code>.tbtn--icon</code> (40px), and give it an <code>aria-label</code></td></tr>
+    <tr><td>Disabled</td><td>The <code>disabled</code> attribute, or <code>aria-disabled="true"</code> where the control must stay focusable to explain why</td></tr>
+    <tr><td>JS</td><td>None. This is CSS only</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<p>Every value needed already exists, which is the clearest possible sign this should have been
+defined long ago.</p>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-control-h</code></td><td>32px — the "compact action control height", already in the token file and used by almost nothing</td></tr>
+    <tr><td><code>--px-tool</code> / <code>--px-tool-shadow</code></td><td>Neutral fill and rest shadow</td></tr>
+    <tr><td><code>--px-tool-shadow-hover</code></td><td>Hover</td></tr>
+    <tr><td><code>--px-primary-grad</code> / <code>--px-primary-fg</code> / <code>--px-primary-shadow</code></td><td>The primary variant, already audited to 5.00:1</td></tr>
+    <tr><td><code>--praxis-radius-sm</code></td><td>8px. Note <code>.tbtn</code> uses a hard-coded 10px, which is off the 8/12/16 scale — worth correcting rather than copying</td></tr>
+    <tr><td><code>--praxis-color-border-focus</code></td><td>Focus ring</td></tr>
+  </tbody>
+</table>
+
+<p>Missing: a danger fill. There is <code>--praxis-color-status-danger</code> for an ink and
+<code>--praxis-tone-danger-*</code> for a chip, but no gradient equivalent of
+<code>--px-primary-grad</code>, and a red button built from the status ink would fail contrast
+the same way the teal one did before it was fixed.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use <code>.tbtn</code> in a toolbar band and <code>.btn</code> everywhere else, if the
+  smaller-sibling option is taken.</li>
+  <li>Label with a verb naming the outcome.</li>
+  <li>Keep one primary per view.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use <code>.btn</code> until it has a base — today it renders as coloured text and that is
+  not a bug you should work around locally.</li>
+  <li>Reach for <code>.pill-btn</code>, <code>.lg-btn</code>, <code>.qa</code> or
+  <code>.sortbtn</code> expecting a button. All four are fill-or-hover-only. See
+  <a href="buttons.html">Buttons</a>.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>Real <code>&lt;button&gt;</code>, so Enter and Space work and the control is in the tab
+  order without help.</li>
+  <li>Focus indicator is never removed — the fill alone does not indicate focus, a point
+  <a href="form-controls.html">Form controls</a> already makes about checkboxes.</li>
+  <li>Contrast: the primary fill was measured at 5.00:1 at the top of the gradient after a
+  documented failure at 3.86:1. Any new fill variant must be measured the same way, across the
+  whole gradient rather than at one stop.</li>
+  <li><strong>Forced colors:</strong> a button whose only boundary is a shadow disappears.
+  This component is the strongest argument for <code>ROADMAP.md</code> F2.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Existing (<code>.tbtn</code>)</th><th>Proposed (<code>.btn</code>)</th></tr></thead>
+  <tbody>
+    <tr><td>Box</td><td>Height</td><td>40px</td><td>32px (<code>--praxis-control-h</code>)</td></tr>
+    <tr><td>Box</td><td>Inline padding</td><td>14px, 18px for primary</td><td>12px, 14px for primary</td></tr>
+    <tr><td>Box</td><td>Radius</td><td>10px (off-scale)</td><td>8px (<code>--praxis-radius-sm</code>)</td></tr>
+    <tr><td>Label</td><td>Size / weight</td><td>14px / 600</td><td>Same</td></tr>
+    <tr><td>Glyph</td><td>Size / gap</td><td>20px / 7px</td><td>18px / 6px</td></tr>
+  </tbody>
+</table>
+
