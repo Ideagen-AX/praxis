@@ -63,8 +63,95 @@ python3 build-site.py --coverage    # class-family coverage report
 python3 build-site.py --agents-doc  # regenerate PRAXIS-FOR-AGENTS.md
 ```
 
-29 pages as of 2026-08-18, and **every one of the 234 class families in `src/` is
+31 pages as of 2026-08-25, and **every one of the 237 class families in `src/` is
 claimed by a page**.
+
+### The site is built in Praxis
+
+Since 2026-08-25 the docs chrome is not a separate design system. `page.html`
+loads `dist/praxis.css` and the body carries
+`data-variant="praxis" data-theme`, so the site wears the real shell — `.app`,
+`.appbar`, `.adminnav`, `.content`, `.pageheader`, `.toolbar`, `.admin-body` —
+with `.admin-card`, `.admin-table`, `.admin-pill`, `.tbtn`, `.px-skip`,
+`.px-navtoggle` and Material Symbols ligatures through `praxis-lucide.js`.
+
+It used to carry a parallel `--doc-*` token layer with hand-written dark values,
+built on rungs the Praxis dark theme deliberately does not remap. That layer
+could only agree with Praxis by coincidence, and it meant the theme toggle
+demonstrated an imitation of dark mode rather than dark mode. It is gone.
+
+**`site/assets/site.css` is now only what Praxis genuinely does not define**, and
+its header comment enumerates each item with the reason. Four things are marked
+`GAP` there and listed on `/foundations/gaps.html`: long-form prose typography
+(Praxis styles no document text at all, by design), a callout box, a secondary
+overline label, and the brand lockup. Adding anything else to that file means
+either the system has a hole worth naming or the site is reaching for something
+it should not — say which in the comment.
+
+**The document is a sheet, and nesting steps the surface rather than the shadow.**
+`.doc` is an `.admin-card` on the raised tier, so the dot grid around it reads as
+the material it lies on. That makes every card in the prose a card on a white
+card, and white on white can only separate by shadow — too faint to survive a lit
+edge in light, and in dark the sheet is already the lightest surface in the shell,
+so a lift has nothing to lift away from. So everything on the sheet
+(`.admin-card`, `.note`, `.sw`, `.rs`, `.scale`, `.admin-table-wrap`,
+`.admin-panel`, the example frame) takes `--px-surface-2`, which is the step
+Praxis itself uses for `.admin-panel` inside an `.admin-card`, and which moves
+*away* from the sheet in whichever direction is visible: `#F4F6F8` under white in
+light, `#232C3B` over `#192336` in dark. One declaration, right in both themes.
+
+Two details that are easy to get wrong here:
+
+- **The hairline must be `--praxis-color-border-default`, not `-subtle`.**
+  `border-subtle` resolves to `#222B39` in dark, which is the surface-2 fill, so
+  a subtle hairline is invisible in exactly the theme that needs it. The same
+  trap caught `.scale__row`.
+- **`.tone` and `.rs__sample` are excluded on purpose** and their fills stay
+  hard-coded per theme. A tone chip has to be judged on the surface its own theme
+  provides; stepping it to surface-2 would be the docs restyling the sample it
+  exists to show.
+- **The inline code chip is carried as `--doc-chip`, an inherited property**, not
+  a second list of containers. `--px-chip` is a step off white, so inside a recess
+  it is a step off the wrong surface (`#EEF1F4` on `#F4F6F8`) and nearly vanishes.
+  The recess sets `--doc-chip` once and inheritance takes it down; a parallel
+  selector list would drift from the first one.
+
+Two more consequences worth keeping in mind:
+
+- **The iframe around every example stopped being cosmetic and became
+  load-bearing.** The chrome and the examples now share a stylesheet, so the
+  iframe is the only thing preventing a docs prose rule from reaching into an
+  example.
+- **Specificity fights are with Praxis itself now, not with nothing.** Two real
+  ones: `.adminnav.is-open` (0,2,0) loses to
+  `body[data-variant="praxis"] .adminnav` (0,2,1), so the phone drawer never
+  slid in; and `.adminnav__item span` loses to admin.css's
+  `.adminnav__item span:not(.material-symbols-rounded)`, so every label in that
+  drawer was invisible. Match the prefix, do not add `!important`.
+
+**`tier: planned` is a real tier, and it is excluded from the agent doc.** A
+planned page documents a component that has no rule in `src/` yet — see
+`ROADMAP.md` for the backlog and the thirteen-section convention those pages
+follow. It gets its own nav section and a neutral pill, and `agents_doc()` skips
+it, because `PRAXIS-FOR-AGENTS.md` ships in the tarball and its contract is that
+it states what is *defined*. Rendering a planned component into it would invite an
+agent to write markup against a class that does not exist, which is the failure
+`.btn` causes today.
+
+**Every component page follows one twelve-section skeleton, and it is a gate.**
+Anatomy, Variants, States, Responsive behavior, Interactive demo, Code, Markup
+contract, Token reference, Figma adaptation, Usage guidelines, Accessibility,
+Dimensions — taken from the previous EHSQ-E design system docs, with *API*
+replaced by *Markup contract* because Praxis ships no framework bindings and has
+no props or events to document. `skeleton_problems()` fails the build on a missing,
+misordered or duplicated section. Extra headings are fine; the twelve must all be
+present and in relative order. Foundation pages are exempt — they are essays, and
+an "Anatomy" heading on the colour page would have nothing under it.
+
+**`icon:` metadata is checked against the converter's own map.** `praxis-lucide.js`
+falls back to a plain circle for a ligature it does not know, which is silent, so
+`build-site.py` parses `MAT2LUCIDE` out of the script and fails the build on an
+unknown ligature rather than rendering the fallback.
 
 **`site/content/` is the source of the prose. `_site/` is generated and
 gitignored.** Same rule as `src/` and `dist/`. Adding a page means adding one file

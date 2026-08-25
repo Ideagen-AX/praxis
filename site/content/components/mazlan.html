@@ -8,6 +8,7 @@ scripts: praxis-mazlan.js
 classes: mazlan-mark, mazlan-drawer, mazlan-menu, mazlan-reasoning, mazlan-msg, mazlan-suggestions, mazlan-content, mazbtn, mazlan-thread, mazlan-welcome, mazlan-sugg, mazlan-followup, mazlan-followups, mazlan-sources, mazlan-source, mazlan-typing, mazlan-scrim, mazlan-dropdown, mazlan-more, mazlan-more-wrap, mazlan-tool-btn, mazlan-scope-btn, mazlan-chat-only, mazlan-plus-wrap, mz-input, is-spinning
 summary: The four-dot signature glyph, the agentic gradient, and the one real blocker in Praxis — the conversational drawer whose markup the package does not ship.
 keywords: mazlan ai agentic gradient dots drawer reasoning glyph blocker
+icon: forum
 -->
 
 <div class="note note--trap">
@@ -28,7 +29,21 @@ keywords: mazlan ai agentic gradient dots drawer reasoning glyph blocker
 conversational drawer, the menu, reasoning timeline, message bubbles, follow-ups and content
 panel. All of that CSS is here and ready. What is missing is the markup it styles.</p>
 
-<h2>What you can use today</h2>
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Mark</strong> — <code>.mazlan-mark</code>, the four-dot brand glyph. The one part
+  that is safe to use on its own.</li>
+  <li><strong>Drawer</strong> — <code>.mazlan-drawer</code>, the conversation surface.</li>
+  <li><strong>Thread</strong> — <code>.mazlan-thread</code> holding <code>.mazlan-msg</code>.</li>
+  <li><strong>Input</strong> — <code>.mz-input</code>, with tool and scope buttons.</li>
+  <li><strong>Suggestions and follow-ups</strong> — <code>.mazlan-suggestions</code>,
+  <code>.mazlan-followups</code>.</li>
+  <li><strong>Sources and reasoning</strong> — <code>.mazlan-sources</code>,
+  <code>.mazlan-reasoning</code>.</li>
+</ol>
+
+<h3>What you can use today</h3>
 
 <h3>The four-dot signature</h3>
 
@@ -115,18 +130,11 @@ emphasis — its whole job is to mean "a machine did this".</p>
 <code>praxis-rfield.css</code> rather than here. See
 <a href="rfield.html#sub-sections-and-the-mazlan-hand-off">fields</a>.</p>
 
-<h2>Configuration, for when you have the markup</h2>
+<h2>Variants</h2>
 
-<p><code>window.MAZLAN_CONFIG</code> takes
-<code>{ greeting, suggestions: [{icon, cat, text, reply, action}], scope }</code> and is
-read lazily on each open, so you can refresh it on the trigger click. This only matters once
-you have the drawer markup.</p>
+<p>One drawer, and a chat-only mode via <code>.mazlan-chat-only</code>.</p>
 
-<p>The drawer is a prototype surface with canned replies, not an integration with a model.
-It references no host globals directly; it uses <code>window.announce</code> when present
-and optionally <code>window.openAgentic</code> and <code>window.closeDetailPanel</code>.</p>
-
-<h2>The drawer inventory</h2>
+<h3>The drawer inventory</h3>
 
 <p>Everything below is <strong>fully styled and has no shipped markup</strong>. There is
 nothing to demonstrate — an example would be me inventing the markup, which is exactly what
@@ -196,6 +204,105 @@ specific, considered answer to "where did this come from", and it is all here.</
   usable today and cover most of what a prototype needs to signal an agentic moment.</p>
 </div>
 
-<h2>Everything this sheet defines</h2>
+<h2>States</h2>
+
+<ul>
+  <li><strong>Open</strong> — <code>.is-open</code> on the drawer, with
+  <code>.mazlan-scrim</code>.</li>
+  <li><strong>Typing</strong> — <code>.mazlan-typing</code>, the three dots. Currently the only
+  loading affordance anywhere in Praxis; see <a href="loading.html">Loading states</a>.</li>
+  <li><strong>Spinning</strong> — <code>.is-spinning</code>, on a tool button while it works.</li>
+  <li><strong>Reasoning shown</strong> — <code>.mazlan-reasoning</code> expanded.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>The drawer's motion depends on three tokens that used to be defined on
+one page only — <code>--praxis-motion-drawer</code>, <code>--praxis-ease-spring</code> and
+<code>--praxis-ease-spring-soft</code>. Before they were promoted, those declarations were invalid
+at computed-value time everywhere else, so the drawer had no transition at all on nineteen of
+twenty pages.</p>
+
+<p>Beyond that, the drawer's own breakpoints are not documented here because the markup is not
+shipped — which is the subject of the trap in Markup contract.</p>
+
+<h2>Interactive demo</h2>
+
+<h3>Configuration, for when you have the markup</h3>
+
+<p><code>window.MAZLAN_CONFIG</code> takes
+<code>{ greeting, suggestions: [{icon, cat, text, reply, action}], scope }</code> and is
+read lazily on each open, so you can refresh it on the trigger click. This only matters once
+you have the drawer markup.</p>
+
+<p>The drawer is a prototype surface with canned replies, not an integration with a model.
+It references no host globals directly; it uses <code>window.announce</code> when present
+and optionally <code>window.openAgentic</code> and <code>window.closeDetailPanel</code>.</p>
+
+<h2>Code</h2>
+
+<p><code>praxis-mazlan.css</code> and <code>praxis-mazlan.js</code>. The script
+auto-initialises and mutates the document globally.</p>
+
+<template data-source-only data-example="What you can load">
+<link rel="stylesheet" href="praxis-mazlan.css">
+<script src="praxis-mazlan.js"></script>
+</template>
+
+<h2>Markup contract</h2>
+
+<div class="note note--trap">
+  <p><strong>Praxis ships this sheet's CSS without its markup.</strong> Fifteen of its class
+  families are an inventory with no working example, because the drawer's DOM lives in the
+  prototype rather than in Praxis. So the classes below are documented as an inventory, not as a
+  contract you can build against — if you need the drawer, you need the markup too, and this
+  package does not have it.</p>
+</div>
+
+<p>The one exception is <code>.mazlan-mark</code>, which is self-contained and safe to use. That is
+why it appears in the app bar examples on <a href="app-shell.html">The app shell</a> and nothing
+else here does.</p>
+
+<h2>Token reference</h2>
+
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-mazlan.css"></praxis-block>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use <code>.mazlan-mark</code> on its own. It is complete.</li>
+  <li>Treat the rest as an inventory of what exists, for reading rather than building.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Try to reconstruct the drawer from these class names. Fifteen families with no example is not
+  a specification.</li>
+  <li>Use this for human comments on a record — that is a different component, and it is planned.
+  See <a href="comments.html">Comment thread</a>.</li>
+  <li>Use <code>.mazlan-typing</code> as a general loading indicator. It is tied to this surface.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<p>Not assessable from here, and that is the honest answer: the markup that
+would carry the roles, the live regions and the focus management is not in this package.</p>
+
+<p>What can be said is what a conversation surface needs, so it is not forgotten when the markup
+does arrive: a live region for streamed responses that does not re-announce the whole thread, focus
+management on open and close, an escape route, and a non-visual equivalent for the typing
+indicator. <code>.mazlan-typing</code> is currently three animated dots and nothing else, which
+communicates nothing to a screen reader.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not documented, for the same reason as Markup contract — the drawer's geometry
+is expressed against markup that is not shipped. <code>.mazlan-mark</code> is the exception and it
+is sized by its container.</p>

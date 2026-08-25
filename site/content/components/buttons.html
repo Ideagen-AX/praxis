@@ -7,6 +7,7 @@ sheet: praxis-admin.css, praxis-core.css, praxis-controls.css
 classes: tbtn, iconbtn, admin-ghostbtn, btn, pill-btn, icon-btn, iconbtn-ghost, lg-btn, qa, sortbtn, filter-toggle
 summary: One button is fully defined — .tbtn. Everything else named here is a variant or an interaction layer that assumes a base you write yourself.
 keywords: button buttons tbtn primary ghost icon cta press hover disabled
+icon: bolt
 -->
 
 <p>This is the page most likely to save you an hour. Praxis names ten button classes and
@@ -14,7 +15,17 @@ keywords: button buttons tbtn primary ghost icon cta press hover disabled
 a press transform on top of a base box that is yours. Use one without writing that base and
 you get colored text where you expected a button.</p>
 
-<h2>What is actually defined</h2>
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Box</strong> — height, inline padding, radius, shadow.</li>
+  <li><strong>Label</strong> — 14px/600 in every complete Praxis button.</li>
+  <li><strong>Glyph</strong> — optional, leading, 20px with a 7px gap in <code>.tbtn</code>.</li>
+</ol>
+
+<p>Only two of the ten classes named on this page own all three.</p>
+
+<h3>What is actually defined</h3>
 
 <table>
   <thead><tr><th>Class</th><th>Praxis gives you</th><th>Where</th></tr></thead>
@@ -36,7 +47,9 @@ you get colored text where you expected a button.</p>
   <code>.btn</code> set".</p>
 </div>
 
-<h2>The toolbar button</h2>
+<h2>Variants</h2>
+
+<h3>The toolbar button</h3>
 
 <template data-example="Every .tbtn variant, at rest" data-height="150" data-scripts="lucide">
   <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
@@ -75,7 +88,7 @@ reader to fall back on.</p>
   base, style its disabled state yourself.</p>
 </div>
 
-<h2>The primary action</h2>
+<h3>The primary action</h3>
 
 <p>One definition for the whole application: <code>--px-primary-grad</code> fill,
 <code>--px-primary-fg</code> ink, <code>--px-primary-shadow</code>. It is applied to
@@ -106,7 +119,7 @@ treatment — <code>--px-primary-soft</code> rather than the gradient — scoped
   </div>
 </template>
 
-<h2>The two icon buttons are different sizes on purpose</h2>
+<h3>The two icon buttons are different sizes on purpose</h3>
 
 <p><code>.iconbtn</code> is in <code>praxis-controls.css</code>, not the sheet the rest of
 this page documents — a page that wants it does not have to take the admin shell with it.</p>
@@ -144,7 +157,9 @@ available to a screen reader.</p>
   </div>
 </template>
 
-<h2>Press feedback is global</h2>
+<h2>States</h2>
+
+<h3>Press feedback is global</h3>
 
 <p>Praxis applies a press transform to a broad <code>:where()</code> list — every
 <code>button</code> and <code>[role="button"]</code>, plus <code>.btn</code>,
@@ -158,7 +173,60 @@ buttons to <code>.97</code>, and it is suppressed on <code>:disabled</code> and
 is a real <code>&lt;button&gt;</code>. And because the selector is <code>:where()</code>, it
 carries zero specificity, so overriding it takes only a plain class selector.</p>
 
-<h2>Writing the base Praxis does not give you</h2>
+<h3>The rest of the state set</h3>
+
+<ul>
+  <li><strong>Hover</strong> — <code>--px-tool-shadow-hover</code> on <code>.tbtn</code>,
+  a wash on <code>.tbtn--ghost</code> and <code>.admin-ghostbtn</code>.</li>
+  <li><strong>Focus-visible</strong> — 2px <code>--praxis-color-border-focus</code> on
+  <code>.iconbtn</code>. <code>.tbtn</code> has no focus rule of its own and falls back to the
+  UA outline.</li>
+  <li><strong>Disabled</strong> — <code>.tbtn:disabled</code> and
+  <code>[aria-disabled="true"]</code> are both handled; <code>.iconbtn</code> uses
+  <code>opacity:.45</code> and drops its shadow.</li>
+  <li><strong>On</strong> — <code>.iconbtn--on</code> takes the pink selection accent, so a
+  toggled filter reads the same as a selected row.</li>
+  <li><strong>Loading</strong> — does not exist anywhere. See
+  <a href="loading.html">Loading states</a>.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>Buttons have no breakpoints of their own. Two things reach them from
+outside:</p>
+
+<ul>
+  <li>Below 640px the shared <code>--px-gutter</code> sets the inline inset of the band they sit
+  in, so a row of toolbar buttons lines up with the app bar and the content.</li>
+  <li><a href="compact-toolbar.html">The compact toolbar</a> moves overflow buttons into a
+  popover and gives each the full row width.</li>
+</ul>
+
+<p><code>--praxis-control-h</code> (32px) exists in the token file as the "compact action control
+height" and almost nothing uses it — which is the strongest hint that the missing
+<a href="btn.html"><code>.btn</code></a> was always meant to be the smaller sibling.</p>
+
+<h2>Interactive demo</h2>
+
+<p>The examples are distributed through Variants above, one per class family,
+so each sits beside the prose describing it. The one worth looking at first is in
+<a href="btn.html">Button base</a>: it shows <code>.btn</code> rendering as coloured text next to
+a working <code>.tbtn</code>.</p>
+
+<h2>Code</h2>
+
+<p>Buttons come from three sheets and which one you load decides what you get:</p>
+
+<table>
+  <thead><tr><th>Sheet</th><th>Gives you</th></tr></thead>
+  <tbody>
+    <tr><td><code>praxis-admin.css</code></td><td><code>.tbtn</code> and all its variants, <code>.admin-ghostbtn</code>. Also the whole application shell</td></tr>
+    <tr><td><code>praxis-controls.css</code></td><td><code>.iconbtn</code>. Four kilobytes, depends on nothing but tokens</td></tr>
+    <tr><td><code>praxis-core.css</code></td><td>The primary fill, the press pass, the hover pass. Every page loads this</td></tr>
+  </tbody>
+</table>
+
+<h3>Writing the base Praxis does not give you</h3>
 
 <p>If you need a <code>.btn</code> scale — because you are porting markup that has one, or
 because you want a link-shaped button — this is the minimum that makes the Praxis variants
@@ -184,3 +252,91 @@ land correctly on top of it.</p>
   </div>
 </template>
 
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Element</td><td>A real <code>&lt;button&gt;</code>. The press-feedback pass keys on <code>button, [role="button"]</code>, so a styled <code>&lt;div&gt;</code> gets the paint and none of the keyboard behaviour</td></tr>
+    <tr><td><code>type</code></td><td>Always explicit. An unset <code>type</code> inside a form is <code>submit</code>, which is the most common cause of a Cancel button submitting</td></tr>
+    <tr><td>Icon-only</td><td><code>aria-label</code>, always. And a <a href="tooltip.html">tooltip</a>, once that exists</td></tr>
+    <tr><td>Glyph</td><td><code>.material-symbols-rounded</code> span, converted by <code>praxis-lucide.js</code>, sized by the button rule rather than the span</td></tr>
+    <tr><td>Disabled</td><td>The attribute, or <code>aria-disabled="true"</code> where the control must stay focusable to explain why it is unavailable</td></tr>
+    <tr><td>JS</td><td>None. All CSS</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<praxis-block name="tokens" prefix="--px-primary|--px-tool"></praxis-block>
+
+<p>Plus <code>--praxis-control-h</code> for the compact height and
+<code>--praxis-color-border-focus</code> for the focus ring.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Reach for <code>.tbtn</code> unless you have a reason not to — it is the only button you can
+  use without writing CSS.</li>
+  <li>Use <code>.iconbtn</code> (34px) in a card or panel header and
+  <code>.tbtn--icon</code> (40px) in a toolbar band. The two sizes are deliberate.</li>
+  <li>Keep one primary action per view.</li>
+  <li>Label with a verb naming the outcome.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Reach for <code>.btn</code>, <code>.qa</code>, <code>.lg-btn</code>,
+  <code>.iconbtn-ghost</code> or <code>.sortbtn</code> expecting a button. All five are
+  fill-or-hover-only over a base you must write.</li>
+  <li>Use <code>.icon-btn</code> outside <code>.filter-drawer</code> — it is 36px square there
+  and nothing anywhere else.</li>
+  <li>Remove the focus indicator.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>Real <code>&lt;button&gt;</code> elements, so Enter and Space work and the control is in the
+  tab order without help.</li>
+  <li>Every icon-only button needs an accessible name.</li>
+  <li><strong>The primary fill was a real contrast failure.</strong> White on
+  <code>--px-primary-grad</code> measured 3.86:1 at the top of the gradient and exactly 4.50:1 at
+  the bottom, so the label failed across the upper half of every primary button in the app. Both
+  stops moved; it is now 5.00:1 to 5.88:1. Any new fill variant has to be measured across the
+  whole gradient, not at one stop.</li>
+  <li>In dark, <code>--praxis-color-interactive-default</code> brightens to a light cyan, so white
+  text on it as a fill measures 1.86:1. <code>--px-primary-fg</code> is the dark ink that exists
+  for exactly this, at 12.4:1.</li>
+  <li><code>aria-disabled</code> rather than <code>disabled</code> where the user needs to be able
+  to focus the control and find out why it is unavailable.</li>
+  <li><strong>Forced colors:</strong> <code>.tbtn</code> and <code>.iconbtn</code> both set
+  <code>border:0</code> and draw their edge with a shadow, which that mode discards — they become
+  unbounded text. See <a href="../foundations/forced-colors.html">Forced colors</a>.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>Height</th><th>Inline padding</th><th>Radius</th></tr></thead>
+  <tbody>
+    <tr><td><code>.tbtn</code></td><td>40px</td><td>14px</td><td>10px</td></tr>
+    <tr><td><code>.tbtn--primary</code></td><td>40px</td><td>18px</td><td>10px</td></tr>
+    <tr><td><code>.tbtn--icon</code></td><td>40px</td><td>40px square</td><td>10px</td></tr>
+    <tr><td><code>.admin-ghostbtn</code></td><td>34px</td><td>—</td><td>—</td></tr>
+    <tr><td><code>.iconbtn</code></td><td>34px</td><td>34px square</td><td>8px</td></tr>
+    <tr><td><code>.icon-btn</code></td><td>36px</td><td>36px square</td><td>—</td></tr>
+  </tbody>
+</table>
+
+<p>The 10px radius on <code>.tbtn</code> is off the Praxis 8/12/16 scale. Noted rather than
+defended — <code>.iconbtn</code> deliberately moved to 8px when it was promoted, on the grounds
+that a design system should not ship a value off its own scale to preserve one pixel.</p>
+
+<p>Label is 14px/600 and glyphs are 20px in <code>.tbtn</code>, 18px in <code>.iconbtn</code>,
+throughout.</p>

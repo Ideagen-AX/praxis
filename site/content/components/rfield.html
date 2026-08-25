@@ -7,6 +7,7 @@ sheet: praxis-rfield.css
 classes: rfield, rfield__label, rfield__control, rfield__hint, rfield__group, pillset, pill, rref, rtable, subsec, form-alert, mazbtn, admin-field, req
 summary: The record form system — the most exercised component in Praxis and the one place every page that shows data agrees.
 keywords: field form input label locked static readonly validation picklist reference table
+icon: description
 -->
 
 <p>A field is either <strong>interactive</strong> — this workflow step owns it — or
@@ -14,7 +15,19 @@ keywords: field form input label locked static readonly validation picklist refe
 deliberately different shapes, because the same record body is editable in one step and
 frozen in the next, and the user has to tell at a glance which is which.</p>
 
-<h2>Interactive versus static</h2>
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Row</strong> — <code>.rfield</code>, a label and a control side by side.</li>
+  <li><strong>Label</strong> — <code>.rfield__label</code>, with <code>.req</code> for required.</li>
+  <li><strong>Control</strong> — <code>.rfield__control</code>. Fields carry no border, so the
+  <code>--px-field</code> fill is the whole affordance.</li>
+  <li><strong>Hint</strong> — <code>.rfield__hint</code>, under the control.</li>
+  <li><strong>Alert</strong> — <code>.form-alert</code>, the inline validation message.</li>
+  <li><strong>Group</strong> — <code>.rfield__group</code>, several controls on one row.</li>
+</ol>
+
+<h3>Interactive versus static</h3>
 
 <table>
   <thead><tr><th></th><th>Interactive</th><th>Static</th></tr></thead>
@@ -70,7 +83,9 @@ frozen in the next, and the user has to tell at a glance which is which.</p>
 it for labels that are already questions — "Was high energy present?<strong>:</strong>" is
 not an improvement.</p>
 
-<h2>Groups</h2>
+<h2>Variants</h2>
+
+<h3>Groups</h3>
 
 <p>A <code>.rfield__group</code> puts fields side by side and stacks them automatically
 once locked, because a static row is already a two-column layout and nesting one inside
@@ -99,7 +114,116 @@ another reads as noise.</p>
   </div>
 </template>
 
-<h2>Validation</h2>
+<h3>Picklists</h3>
+
+<p><code>.pill</code> wraps a real <code>&lt;input type="radio"&gt;</code>
+<strong>followed by a <code>&lt;span&gt;</code></strong> — the styling hangs off
+<code>input:checked + span</code>. Not <code>&lt;button aria-checked&gt;</code>: that
+carried no state and no keyboard model while looking selectable.</p>
+
+<template data-example="A picklist with a real radio group behind it" data-height="180">
+  <div class="rfield rfield--choice">
+    <span class="rfield__label">Severity</span>
+    <div class="pillset">
+      <label class="pill"><input type="radio" name="sev2" checked><span>Near miss</span></label>
+      <label class="pill"><input type="radio" name="sev2"><span>First aid</span></label>
+      <label class="pill"><input type="radio" name="sev2"><span>Medical treatment</span></label>
+      <label class="pill"><input type="radio" name="sev2"><span>Lost time</span></label>
+    </div>
+  </div>
+</template>
+
+<h3>Reference field</h3>
+
+<p><code>.rref__input</code> plus <code>.rref__btn</code> plus a
+<code>.rref__menu[hidden]</code> of <code>.rref__opt</code> buttons. Options live in
+markup so each page configures its own list. Typing filters; only click or Enter commits;
+blur reverts uncommitted free text.</p>
+
+<div class="note">
+  <p>Store the committed value in <code>data-committed</code> on the element, not in a
+  closure, so a value restored from storage survives the next blur.</p>
+</div>
+
+<template data-example="Reference field, with its menu open" data-height="280">
+  <div class="rfield">
+    <label class="rfield__label" for="own">Owner</label>
+    <div class="rref" data-committed="Marcus Silva">
+      <input class="rref__input" id="own" type="text" value="Marcus Silva" autocomplete="off">
+      <button class="rref__btn" type="button" aria-label="Browse people">
+        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+      </button>
+      <div class="rref__menu">
+        <button class="rref__opt" type="button">Marcus Silva</button>
+        <button class="rref__opt" type="button">Aoife Byrne</button>
+        <button class="rref__opt" type="button">Priya Raman</button>
+        <button class="rref__opt" type="button">Tom Okafor</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h3>In-record table</h3>
+
+<p><code>.rtable__actions</code> plus a <code>&lt;table&gt;</code>. White fill, not the
+field grey — a table of rows is content, and the grey read as one large input.
+<code>.rtable--locked</code> keeps the rows and drops the controls.</p>
+
+<template data-example="An in-record table with its empty state in a second tbody" data-height="300">
+  <div class="rtable">
+    <div class="rtable__actions">
+      <button class="rtable__action" type="button">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span> Add witness
+      </button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Role</th><th>Statement</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Aoife Byrne</td><td>Supervisor</td><td>Taken 8 July</td>
+            <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
+              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
+        <tr><td>Tom Okafor</td><td>Driver</td><td>Pending</td>
+            <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
+              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
+      </tbody>
+      <!-- Own tbody, deliberately. See the striping gotcha below. -->
+      <tbody hidden>
+        <tr class="rtable__empty"><td colspan="4">No witnesses recorded.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<h3>Sub-sections and the Mazlan hand-off</h3>
+
+<template data-example="A titled run of fields, with the quiet AI pill beside the title" data-height="260" data-scripts="lucide">
+  <div class="subsec">
+    <p class="subsec__title">Immediate actions
+      <button class="mazbtn" type="button">
+        <span class="mazlan-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        Ask Mazlan
+      </button>
+    </p>
+    <div class="rfield">
+      <label class="rfield__label" for="cont">Containment</label>
+      <input class="rfield__control" id="cont" type="text" value="Bay 4 cordoned, stack re-banded">
+    </div>
+    <div class="rfield rfield--locked">
+      <label class="rfield__label">Verified by</label>
+      <input class="rfield__control" value="Priya Raman" readonly>
+    </div>
+  </div>
+</template>
+
+<p><code>.mazbtn</code> uses <code>.mazlan-mark</code>, so link
+<code>praxis-mazlan.css</code> too if you use it — the four child spans
+<em>are</em> the four dots.</p>
+
+<h2>States</h2>
+
+<h3>Validation</h3>
 
 <p><code>.rfield--invalid</code> is set by your save or submit check <strong>only</strong>
 — never on load. A field the user has not reached yet is not wrong.</p>
@@ -133,114 +257,45 @@ another reads as noise.</p>
   </script>
 </template>
 
-<h2>Picklists</h2>
+<h3>The rest of the state set</h3>
 
-<p><code>.pill</code> wraps a real <code>&lt;input type="radio"&gt;</code>
-<strong>followed by a <code>&lt;span&gt;</code></strong> — the styling hangs off
-<code>input:checked + span</code>. Not <code>&lt;button aria-checked&gt;</code>: that
-carried no state and no keyboard model while looking selectable.</p>
+<ul>
+  <li><strong>Locked</strong> — <code>.rfield--locked</code>, a read-only value with no control
+  affordance.</li>
+  <li><strong>Required</strong> — <code>.req</code> on the label.</li>
+  <li><strong>Collapsed</strong> — <code>.is-collapsed</code> on a containing
+  <code>.section</code>. A field inside a collapsed section is invisible <em>and</em> out of the
+  tab order, which is why <a href="error-summary.html">the error summary</a> has to expand
+  ancestors before focusing a target.</li>
+</ul>
 
-<template data-example="A picklist with a real radio group behind it" data-height="180">
-  <div class="rfield rfield--choice">
-    <span class="rfield__label">Severity</span>
-    <div class="pillset">
-      <label class="pill"><input type="radio" name="sev2" checked><span>Near miss</span></label>
-      <label class="pill"><input type="radio" name="sev2"><span>First aid</span></label>
-      <label class="pill"><input type="radio" name="sev2"><span>Medical treatment</span></label>
-      <label class="pill"><input type="radio" name="sev2"><span>Lost time</span></label>
-    </div>
-  </div>
-</template>
+<h2>Responsive behavior</h2>
 
-<h2>Reference field</h2>
+<p><code>--praxis-record-rail-w</code> is 300px and narrows at
+breakpoints — that is the <code>.record__guide</code> / <code>.record__tree</code> rail beside the
+form, not the field. The field row itself reflows its label above its control at narrow widths.</p>
 
-<p><code>.rref__input</code> plus <code>.rref__btn</code> plus a
-<code>.rref__menu[hidden]</code> of <code>.rref__opt</code> buttons. Options live in
-markup so each page configures its own list. Typing filters; only click or Enter commits;
-blur reverts uncommitted free text.</p>
+<p>Below 640px the record family takes <code>--px-gutter</code> as inline padding, along with the
+app bar and the page header, so all three edges line up on one number.</p>
 
-<div class="note">
-  <p>Store the committed value in <code>data-committed</code> on the element, not in a
-  closure, so a value restored from storage survives the next blur.</p>
-</div>
+<h2>Interactive demo</h2>
 
-<template data-example="Reference field, with its menu open" data-height="280">
-  <div class="rfield">
-    <label class="rfield__label" for="own">Owner</label>
-    <div class="rref" data-committed="Marcus Silva">
-      <input class="rref__input" id="own" type="text" value="Marcus Silva" autocomplete="off">
-      <button class="rref__btn" type="button" aria-label="Browse people">
-        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-      </button>
-      <div class="rref__menu">
-        <button class="rref__opt" type="button">Marcus Silva</button>
-        <button class="rref__opt" type="button">Aoife Byrne</button>
-        <button class="rref__opt" type="button">Priya Raman</button>
-        <button class="rref__opt" type="button">Tom Okafor</button>
-      </div>
-    </div>
-  </div>
-</template>
+<p>Each variant carries its own frame in the sections above. Seven examples
+on one page is a lot, and they are distributed rather than grouped so each sits beside the rule it
+demonstrates.</p>
 
-<h2>In-record table</h2>
+<h2>Code</h2>
 
-<p><code>.rtable__actions</code> plus a <code>&lt;table&gt;</code>. White fill, not the
-field grey — a table of rows is content, and the grey read as one large input.
-<code>.rtable--locked</code> keeps the rows and drops the controls.</p>
+<p><code>praxis-rfield.css</code>. No script.</p>
 
-<template data-example="An in-record table with its empty state in a second tbody" data-height="300">
-  <div class="rtable">
-    <div class="rtable__actions">
-      <button class="rtable__action" type="button">
-        <span class="material-symbols-rounded" aria-hidden="true">add</span> Add witness
-      </button>
-    </div>
-    <table>
-      <thead>
-        <tr><th>Name</th><th>Role</th><th>Statement</th><th></th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Aoife Byrne</td><td>Supervisor</td><td>Taken 8 July</td>
-            <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
-              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
-        <tr><td>Tom Okafor</td><td>Driver</td><td>Pending</td>
-            <td class="rtable__cell-actions"><button class="rtable__rm" type="button" aria-label="Remove">
-              <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td></tr>
-      </tbody>
-      <!-- Own tbody, deliberately. See the striping gotcha below. -->
-      <tbody hidden>
-        <tr class="rtable__empty"><td colspan="4">No witnesses recorded.</td></tr>
-      </tbody>
-    </table>
-  </div>
-</template>
+<p>It depends on <code>--px-field</code> and <code>--px-field-hover</code> from
+<code>praxis-core.css</code>, which is the shared form-field fill — the same one
+<code>.admin-field</code> uses. That is why the two look like one system despite living in
+different sheets.</p>
 
-<h2>Sub-sections and the Mazlan hand-off</h2>
+<h2>Markup contract</h2>
 
-<template data-example="A titled run of fields, with the quiet AI pill beside the title" data-height="260" data-scripts="lucide">
-  <div class="subsec">
-    <p class="subsec__title">Immediate actions
-      <button class="mazbtn" type="button">
-        <span class="mazlan-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-        Ask Mazlan
-      </button>
-    </p>
-    <div class="rfield">
-      <label class="rfield__label" for="cont">Containment</label>
-      <input class="rfield__control" id="cont" type="text" value="Bay 4 cordoned, stack re-banded">
-    </div>
-    <div class="rfield rfield--locked">
-      <label class="rfield__label">Verified by</label>
-      <input class="rfield__control" value="Priya Raman" readonly>
-    </div>
-  </div>
-</template>
-
-<p><code>.mazbtn</code> uses <code>.mazlan-mark</code>, so link
-<code>praxis-mazlan.css</code> too if you use it — the four child spans
-<em>are</em> the four dots.</p>
-
-<h2>Four gotchas, each learned the hard way</h2>
+<h3>Four gotchas, each learned the hard way</h3>
 
 <ul>
   <li><strong>Zebra striping counts hidden rows.</strong> <code>nth-of-type</code> counts
@@ -261,6 +316,82 @@ field grey — a table of rows is content, and the grey read as one large input.
       <code>.admin-field &gt; .admin-field__value</code> and you get it for free.</li>
 </ul>
 
-<h2>Everything this sheet defines</h2>
+<h3>The contract itself</h3>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Label</td><td>A real <code>&lt;label for&gt;</code>, or the row is a styled div with no association</td></tr>
+    <tr><td>Hint</td><td>Wired with <code>aria-describedby</code>. Visual proximity is not association</td></tr>
+    <tr><td>Alert</td><td>Also <code>aria-describedby</code>, and the input gets <code>aria-invalid="true"</code></td></tr>
+    <tr><td>Required</td><td><code>.req</code> is decoration. The input needs <code>required</code> or <code>aria-required</code></td></tr>
+    <tr><td>Picklist</td><td><code>.pillset</code>/<code>.pill</code> wrap real radios — the selection, keyboard navigation and screen-reader semantics come from the input, not the pill</td></tr>
+    <tr><td>Locked</td><td><code>readonly</code> or <code>disabled</code>, chosen deliberately: <code>disabled</code> leaves the tab order, <code>readonly</code> does not</td></tr>
+    <tr><td>JS</td><td>None</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-rfield.css"></praxis-block>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Read the four gotchas in Markup contract before building a form. Each one was learned by
+  getting it wrong.</li>
+  <li>Use <code>.pillset</code> for three or four options — it shows them all without a click.</li>
+  <li>Wire hints and alerts with <code>aria-describedby</code>.</li>
+  <li>Say what a validation message wants, not that something is wrong: "Enter the immediate
+  cause".</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Rely on <code>.req</code> alone to make a field required.</li>
+  <li>Use <code>.pillset</code> for a long list. There is no select in this sheet — see
+  <a href="select.html">Select and combobox</a>.</li>
+  <li>Put a date field here and expect a picker. There is none; see
+  <a href="date-picker.html">Date picker</a>.</li>
+  <li>Assume a border. Fields have none, and the fill is doing all the work.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Label association is the whole thing.</strong> A <code>.rfield__label</code> that is
+  not a <code>&lt;label for&gt;</code> looks identical and is useless to a screen reader.</li>
+  <li>Hints and alerts need <code>aria-describedby</code>; <code>aria-invalid</code> on the input
+  is what conveys the error state.</li>
+  <li><strong>Fields carry no border</strong>, so <code>--px-field</code> against
+  <code>--px-surface</code> is the control boundary and has to clear 3:1 under WCAG 1.4.11. This is
+  the reason <code>--praxis-color-border-strong</code> was repointed after measuring 2.95:1.</li>
+  <li>A form with more than a handful of fields needs an
+  <a href="error-summary.html">error summary</a>, which Praxis does not have — and a field inside a
+  collapsed section is unreachable without one.</li>
+  <li><code>.pillset</code> wraps real radios, so arrow-key navigation and group semantics come
+  free. Do not replace them with buttons.</li>
+  <li><code>readonly</code> versus <code>disabled</code> is an accessibility decision: a disabled
+  field cannot be read by a keyboard user tabbing through the form.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.rfield</code></td><td>Row min height</td><td>64px where the field rules raise it</td></tr>
+    <tr><td><code>.rtable</code></td><td>Margin / border</td><td>4px 16px 0 / 1px <code>--praxis-color-neutral-20</code></td></tr>
+    <tr><td><code>.rtable</code> cells</td><td>Padding</td><td>8px 12px head, 10px 12px body</td></tr>
+    <tr><td><code>.rtable__action</code></td><td>Height</td><td>32px</td></tr>
+    <tr><td>Record rail</td><td>Width</td><td><code>--praxis-record-rail-w</code>, 300px</td></tr>
+    <tr><td><code>.pill</code></td><td>Inset</td><td>10px inside the radio label</td></tr>
+  </tbody>
+</table>

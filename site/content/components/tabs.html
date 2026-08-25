@@ -1,0 +1,179 @@
+<!--praxis
+title: Tabs
+summary: .admin-tabs works and is admin-named. .subtab is a name with no base. This is the promotion plus the missing sibling. Planned.
+order: 110
+tier: planned
+icon: category
+classes: tabs, subtab
+keywords: tabs tab panel subtab underline content switcher promotion planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Two problems, one page.</strong> <code>.admin-tabs</code> is complete but named for one section, and <code>.subtab</code> — the second-level form — has no base at all, only a <code>__count</code> colour fix in the dark theme. Tier 2 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>A record page in EHSQ Enterprise routinely has two levels of tab: the record's own views
+(Details, Actions, Attachments, History) and a second level inside one of them. Praxis has a
+complete implementation of the first wearing the wrong name, and a name for the second with
+nothing behind it.</p>
+
+<p>Per <code>ROADMAP.md</code> decision 2 this is an alias, not a rename —
+<code>.admin-tabs</code> keeps working forever.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Tablist</strong> — <code>.tabs</code> / <code>.admin-tabs</code>, a flex row closed
+  by a hairline.</li>
+  <li><strong>Tab</strong> — <code>.tab</code> / <code>.admin-tab</code>, with a 2px bottom
+  border that carries the active state and a <code>-1px</code> margin so it sits on the
+  tablist's rule rather than under it.</li>
+  <li><strong>Count</strong> — <code>.subtab__count</code>, a badge. Defined only as a dark-mode
+  ink correction today.</li>
+  <li><strong>Panel</strong> — no class. The application's.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>State today</th></tr></thead>
+  <tbody>
+    <tr><td>Underline (primary)</td><td>Complete as <code>.admin-tabs</code> — teal-70 ink, teal-60 border</td></tr>
+    <tr><td>Second level (<code>.subtab</code>)</td><td>Name only. Should be quieter than the primary: smaller, no rule, a pill or a text-weight change rather than a second underline. Two stacked underlines read as one broken one</td></tr>
+    <tr><td>With counts</td><td><code>.subtab__count</code> reserved</td></tr>
+    <tr><td>Scrollable</td><td>Missing. <code>.admin-tabs</code> uses <code>flex-wrap</code>, which is fine for five tabs and wrong for twelve</td></tr>
+  </tbody>
+</table>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Active</strong> — <code>--active</code>. Exists.</li>
+  <li><strong>Hover</strong> — ink to primary. Exists.</li>
+  <li><strong>Focus-visible</strong> — <strong>missing</strong>. <code>.admin-tab</code> has no
+  focus rule, so keyboard users get the UA default outline over a 2px border, which is where it
+  is least visible.</li>
+  <li><strong>Disabled</strong> — missing.</li>
+  <li><strong>Contains an error</strong> — missing, and needed for the same reason as
+  <a href="accordion.html">accordion</a>: a tab hiding an invalid field must say so.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Desktop</td><td>One row</td></tr>
+    <tr><td>Tablet</td><td>Wraps — the current behaviour, and it moves the closing rule, which looks like a bug</td></tr>
+    <tr><td>Phone</td><td>Should scroll horizontally with the active tab scrolled into view, not wrap. This is the change worth making when the base is written</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<template data-example="Today: .admin-tabs is complete, .subtab is not" data-height="170">
+  <div>
+    <div class="admin-tabs">
+      <button class="admin-tab admin-tab--active" type="button">Details</button>
+      <button class="admin-tab" type="button">Actions</button>
+      <button class="admin-tab" type="button">Attachments</button>
+      <button class="admin-tab" type="button">History</button>
+    </div>
+    <div class="subtab" style="margin-top:1rem">
+      <button class="subtab__btn" type="button">Open <span class="subtab__count">4</span></button>
+      <button class="subtab__btn" type="button">Closed <span class="subtab__count">17</span></button>
+    </div>
+  </div>
+</template>
+
+<p>The second row is <code>.subtab</code>, and it renders as two bare buttons — which is what
+"a name with no base" looks like.</p>
+
+<h2>Code</h2>
+
+<p>The alias belongs in <code>praxis-core.css</code>; <code>.subtab</code>'s base
+belongs there too, beside the <code>__count</code> rule that already exists.</p>
+
+<template data-source-only data-example="Proposed">
+<div class="tabs" role="tablist" aria-label="Record views">
+  <button class="tab tab--active" type="button" role="tab"
+          aria-selected="true" aria-controls="p-details" id="t-details">Details</button>
+  <button class="tab" type="button" role="tab"
+          aria-selected="false" aria-controls="p-actions" id="t-actions" tabindex="-1">Actions</button>
+</div>
+<div role="tabpanel" id="p-details" aria-labelledby="t-details">…</div>
+
+<!-- Still works, unchanged -->
+<div class="admin-tabs">…</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td><code>role="tablist"</code> / <code>"tab"</code> / <code>"tabpanel"</code></td><td>Required for the real tab pattern. If the tabs are links to separate pages they are <em>not</em> tabs and must not claim the roles — this distinction is the one most often got wrong</td></tr>
+    <tr><td><code>aria-selected</code></td><td>On every tab, true on one</td></tr>
+    <tr><td><code>aria-controls</code> / <code>aria-labelledby</code></td><td>Tab to panel and back</td></tr>
+    <tr><td><code>tabindex</code></td><td>Roving: <code>0</code> on the active tab, <code>-1</code> on the rest. Arrow keys move between tabs, Tab leaves the set</td></tr>
+    <tr><td>JS</td><td>Needed for roving focus and arrow keys. Praxis has none</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-color-teal-70</code> / <code>-60</code></td><td>Active ink and border. Already used</td></tr>
+    <tr><td><code>--praxis-color-text-secondary</code></td><td>Inactive ink</td></tr>
+    <tr><td><code>--praxis-color-border-default</code></td><td>Tablist rule</td></tr>
+    <tr><td><code>--px-primary-fg</code></td><td>Count badge ink in dark — the existing fix</td></tr>
+    <tr><td><code>--praxis-color-border-focus</code></td><td>The missing focus ring</td></tr>
+  </tbody>
+</table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use tabs for views of one thing, not for steps in a process — that is
+  <a href="stepper.html">a stepper</a>.</li>
+  <li>Keep the set short enough to see at once.</li>
+  <li>Put counts on tabs where the count is the reason to switch.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Give <code>.subtab</code> a second underline.</li>
+  <li>Claim <code>role="tab"</code> for links that navigate.</li>
+  <li>Hide a required field behind an unmarked tab.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>Roving <code>tabindex</code> and arrow-key movement, or it is a row of buttons with tab
+  paint.</li>
+  <li><code>aria-selected</code> is the state; the border is decoration.</li>
+  <li><strong>The missing focus ring is a live defect</strong>, not a planned nicety —
+  <code>.admin-tab</code> ships today with no <code>:focus-visible</code> rule.</li>
+  <li>A panel with no interactive content should be focusable so a keyboard user can read it.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.admin-tab</code></td><td>Padding</td><td>10px 14px (existing)</td></tr>
+    <tr><td><code>.admin-tab</code></td><td>Size / weight</td><td>13px / 700 (existing)</td></tr>
+    <tr><td><code>.admin-tab</code></td><td>Active border</td><td>2px, <code>margin-bottom:-1px</code> (existing)</td></tr>
+    <tr><td><code>.subtab__btn</code></td><td>Padding</td><td>6px 10px proposed — quieter than the primary</td></tr>
+    <tr><td>Tablist</td><td>Gap</td><td>2px (existing)</td></tr>
+  </tbody>
+</table>

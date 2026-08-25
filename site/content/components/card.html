@@ -1,0 +1,179 @@
+<!--praxis
+title: Card base
+summary: .admin-card is a complete card wearing the name of one section. This is the promotion — canonical .card, .admin-card kept as an alias.
+order: 40
+tier: planned
+icon: view_module
+classes: card
+keywords: card surface panel elevation admin-card promotion alias planned
+-->
+
+<div class="note note--planned">
+  <p><strong>This is a promotion, not a new component.</strong> <code>.admin-card</code> already
+  works and is used across the admin section and this reference site. What is missing is a
+  neutral name for it. Tier 1 on <code>ROADMAP.md</code>; the aliasing approach is
+  decision 2 there.</p>
+</div>
+
+<p><code>.card</code> is on <a href="../foundations/gaps.html">the gaps list</a> today, and for
+a good reason: <code>praxis-workspace.css</code> gives it a slate shadow and a 12px radius and
+nothing else — no fill, no padding. So a <code>.card</code> is a shadow around transparent
+space. Meanwhile <code>.admin-card</code> is complete: <code>--px-surface</code> fill,
+<code>--praxis-card</code> shadow, 12px radius, 20px/22px padding, a
+<code>__title</code>, a <code>__meta</code> and a <code>--flush</code> density.</p>
+
+<p>See <a href="card-and-page.html">Card, page and texture</a> for what <code>.card</code>
+does today and why the page material matters underneath it.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Surface</strong> — fill, radius, shadow. Present on <code>.admin-card</code>,
+  absent on <code>.card</code>.</li>
+  <li><strong>Title</strong> — <code>__title</code>, 16px/700, 16px bottom margin.</li>
+  <li><strong>Meta</strong> — <code>__meta</code>, right-aligned count or timestamp in the
+  title row.</li>
+  <li><strong>Body</strong> — unstyled. The card does not own its contents.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>State</th></tr></thead>
+  <tbody>
+    <tr><td>Default</td><td>Exists as <code>.admin-card</code></td></tr>
+    <tr><td><code>--flush</code></td><td>Exists. 16px/18px padding for a denser grid</td></tr>
+    <tr><td>Elevation tier</td><td><strong>Not exposed.</strong> <code>praxis-core.css</code> defines three tiers — <code>--px-card-rail</code> (recedes), <code>--praxis-card</code> (default), <code>--px-card-raised</code> (the subject) — with a comment explaining that a page of identically-shadowed cards reads as one flat plane. Only the middle one is reachable through a class. Candidates: <code>--rail</code> and <code>--raised</code></td></tr>
+    <tr><td>Interactive</td><td><strong>Missing.</strong> A card that is a link needs a hover and a focus ring. This reference site had to write both itself for its page grids</td></tr>
+  </tbody>
+</table>
+
+<h2>States</h2>
+
+<p>A static card has none. An interactive one needs hover, focus-visible and press — and the
+right hover depends on what the card sits on, which is the interesting part. On the page
+material a lift is correct; on another card a lift is wrong and the fill should step instead.
+This reference site solved that for itself and the reasoning is in
+<code>site/assets/site.css</code> under "THE SHEET"; the general answer belongs here.</p>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Desktop</td><td>Sized by its grid — <code>.admin-grid--2/3/4/6</code> or <code>.admin-cols</code></td></tr>
+    <tr><td>≤1024px</td><td><code>.admin-cols</code> collapses to one column, <code>--4</code>/<code>--6</code> to two. Already defined</td></tr>
+    <tr><td>≤768px</td><td><code>--2</code>/<code>--3</code> collapse. Already defined</td></tr>
+    <tr><td>≤640px</td><td>Inline padding follows <code>--px-gutter</code> through the container</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<template data-example="Today: .admin-card is complete, .card is a shadow around nothing" data-height="200">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="admin-card">
+      <p class="admin-card__title">.admin-card<span class="admin-card__meta">complete</span></p>
+      <p style="margin:0;font-size:.875rem;color:var(--praxis-color-text-secondary)">Fill, shadow, radius, padding.</p>
+    </div>
+    <div class="card">
+      <p style="margin:0;font-size:.875rem;color:var(--praxis-color-text-secondary)">.card — shadow and radius only. No fill, no padding.</p>
+    </div>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p>The alias belongs in <code>praxis-core.css</code>, since every page loads it and
+<code>.admin-card</code>'s home is the largest sheet in the system. That means the canonical
+definition moves to core and <code>praxis-admin.css</code> keeps only the alias — the reverse
+of the usual promotion, and worth doing that way round so a record page can use a card without
+loading the admin shell.</p>
+
+<template data-source-only data-example="Proposed">
+<!-- Canonical -->
+<div class="card">
+  <p class="card__title">Open findings<span class="card__meta">14</span></p>
+  …
+</div>
+
+<!-- Still works, unchanged, forever -->
+<div class="admin-card">…</div>
+
+<!-- Elevation tiers, newly reachable -->
+<div class="card card--raised">…</div>
+<div class="card card--rail">…</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Element</td><td>Any block. <code>&lt;a&gt;</code> for an interactive card, which is what forces the hover and focus states above</td></tr>
+    <tr><td><code>__title</code></td><td>A real heading where the card is a landmark in the page. <code>.admin-card__title</code> is a <code>&lt;p&gt;</code> in every current use, which is fine for a label and wrong for a section</td></tr>
+    <tr><td>Nesting</td><td>A card inside a card should step the surface to <code>--px-surface-2</code>, not stack a second shadow. Praxis already does this with <code>.admin-panel</code></td></tr>
+    <tr><td>JS</td><td>None</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--px-surface</code></td><td>Fill</td></tr>
+    <tr><td><code>--praxis-card</code></td><td>Default shadow</td></tr>
+    <tr><td><code>--px-card-rail</code> / <code>--px-card-raised</code></td><td>The two unreachable tiers</td></tr>
+    <tr><td><code>--praxis-radius-md</code></td><td>12px. Note <code>--praxis-radius-card</code> is 20px in the token file and 12px under the Praxis variant — the variant wins, and this is one of the nine documented overrides</td></tr>
+    <tr><td><code>--px-surface-2</code></td><td>A nested card</td></tr>
+  </tbody>
+</table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use <code>.admin-card</code> today — it is the one that works.</li>
+  <li>Step to <code>--px-surface-2</code> for anything inside a card rather than stacking
+  shadows.</li>
+  <li>Let the grid size the card.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use bare <code>.card</code> expecting a surface.</li>
+  <li>Give every card on a page the same elevation — that is what the three tiers exist to
+  prevent, and the comment in <code>praxis-core.css</code> says so explicitly.</li>
+  <li>Put a card's padding on its contents. The card owns its inset.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>A card is not a landmark. If it needs to be findable, its title is a heading.</li>
+  <li>An interactive card needs one clear target — a card wrapped in an anchor that also
+  contains buttons produces nested interactive elements, which is invalid and unpredictable.</li>
+  <li>Focus-visible must be on the card, not only on a link inside it.</li>
+  <li><strong>Forced colors:</strong> a card is a fill plus a shadow, and in forced-colors both
+  the shadow and the fill distinction go. Every card on a page becomes one undifferentiated
+  block. F2 again.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Card</td><td>Padding</td><td>20px 22px</td></tr>
+    <tr><td><code>--flush</code></td><td>Padding</td><td>16px 18px</td></tr>
+    <tr><td>Card</td><td>Radius</td><td>12px</td></tr>
+    <tr><td><code>__title</code></td><td>Size / weight / margin</td><td>16px / 700 / 0 0 16px</td></tr>
+    <tr><td>Grid gap</td><td><code>.admin-grid</code></td><td>18px 34px</td></tr>
+  </tbody>
+</table>
+

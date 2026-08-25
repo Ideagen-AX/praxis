@@ -1,0 +1,150 @@
+<!--praxis
+title: File upload and attachments
+summary: Nothing at all. Incident photos, audit evidence, CAPA documents — every module needs this and no module has it. Planned.
+order: 140
+tier: planned
+icon: attach_file
+classes: px-upload
+keywords: file upload attachment evidence photo drop zone progress virus scan planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Zero rules.</strong> No upload control, no attachment list, no drop zone, no progress. Tier 2 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>An incident without a photo is a weaker record. An audit finding without evidence is
+contested. A CAPA without the closing document is not closed. Attachments are not a peripheral
+feature in this domain — they are frequently the substance of the record — and Praxis has no way
+to draw one.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Drop zone</strong> — with a visible button, because drag-and-drop alone is not
+  keyboard reachable.</li>
+  <li><strong>Constraints line</strong> — accepted types and max size, <em>before</em> the
+  picker opens.</li>
+  <li><strong>Attachment row</strong> — name, size, type glyph, remove.</li>
+  <li><strong>Progress</strong> — per file.</li>
+  <li><strong>Thumbnail</strong> — for images. <code>.thumb</code> exists in
+  <code>praxis-admin.css</code> and may be reusable.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table><thead><tr><th>Variant</th><th>Use</th></tr></thead><tbody>
+  <tr><td>Single</td><td>A signature image, one certificate</td></tr>
+  <tr><td>Multiple</td><td>The common case. Incident photos</td></tr>
+  <tr><td>Inline / compact</td><td>An attach button in a toolbar or comment box, list beneath</td></tr>
+  <tr><td>Camera capture</td><td>Phone only. <code>capture="environment"</code> on the input, which is one attribute and materially changes field use</td></tr>
+</tbody></table>
+
+<h2>States</h2>
+
+<ul>
+  <li>Idle / dragging-over / uploading / complete / failed.</li>
+  <li><strong>Rejected</strong> — wrong type or too large. Must name which, and must not silently
+  drop the file.</li>
+  <li><strong>Scanning</strong> — the state this domain adds. Regulated deployments virus-scan
+  before an attachment is available, so "uploaded" and "usable" are different moments and the UI
+  has to say so.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>Desktop: drop zone plus button. Phone: no drop zone — there is
+nothing to drag from — so it becomes a pair of buttons, "Take photo" and "Choose file". Dropping
+the drop zone at phone width is the correct behaviour, not a degradation.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>New sheet. Needs a script for drag events, progress and per-file state, and the
+script must not own the transport — upload is the application's.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<div class="px-upload">
+  <div class="px-upload__zone">
+    <p class="px-upload__prompt">Drag files here, or</p>
+    <label class="btn" for="ev">Choose files
+      <input id="ev" type="file" multiple accept="image/*,.pdf" class="visually-hidden">
+    </label>
+    <p class="px-upload__limits" id="ev-limits">JPG, PNG or PDF · up to 10 MB each</p>
+  </div>
+  <ul class="px-upload__list">
+    <li class="px-upload__item">
+      <span class="material-symbols-rounded">description</span>
+      <span class="px-upload__name">isolation-tag.jpg</span>
+      <span class="px-upload__size">2.1 MB</span>
+      <span class="admin-pill admin-pill--info">Scanning</span>
+      <button class="admin-rowx" type="button" aria-label="Remove isolation-tag.jpg">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </li>
+  </ul>
+</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table><thead><tr><th>Item</th><th>Requirement</th></tr></thead><tbody>
+  <tr><td>Input</td><td>A real <code>&lt;input type="file"&gt;</code>, visually hidden but present. A drop zone with no input is unusable by keyboard</td></tr>
+  <tr><td><code>accept</code></td><td>Set, and the same constraint stated in visible text — <code>accept</code> is a filter, not a guarantee</td></tr>
+  <tr><td>Constraints</td><td>Associated with <code>aria-describedby</code></td></tr>
+  <tr><td>Progress</td><td><code>role="progressbar"</code> with <code>aria-valuenow</code>, or a live region announcing completion</td></tr>
+  <tr><td>Remove</td><td>Names the file: "Remove isolation-tag.jpg", not "Remove"</td></tr>
+  <tr><td>Rejection</td><td>Announced in a live region. A file that silently fails to attach is the worst outcome this component has</td></tr>
+  <tr><td>JS</td><td>Required</td></tr>
+</tbody></table>
+
+<h2>Token reference</h2>
+
+<table><thead><tr><th>Token</th><th>Use</th></tr></thead><tbody>
+  <tr><td><code>--px-surface-2</code></td><td>Drop zone fill</td></tr>
+  <tr><td><code>--praxis-color-border-strong</code></td><td>Dashed boundary — the 1.4.11 rung, since this is a control boundary</td></tr>
+  <tr><td><code>--praxis-color-interactive-default</code></td><td>Drag-over</td></tr>
+  <tr><td><code>--praxis-tone-danger-bg</code> / <code>-fg</code></td><td>Rejected</td></tr>
+  <tr><td><code>--praxis-tone-info-bg</code> / <code>-fg</code></td><td>Scanning</td></tr>
+</tbody></table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>State types and size limits before the picker opens.</li>
+  <li>Keep a visible button. Drag-and-drop is an enhancement.</li>
+  <li>Distinguish uploaded from scanned from available.</li>
+</ul>
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Rely on <code>accept</code> for validation.</li>
+  <li>Remove a file without confirmation once it is part of a submitted record — that is an
+  <a href="dialog.html">alert dialog</a>.</li>
+  <li>Show a drop zone on a phone.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The file input is the control; the drop zone is decoration over it.</li>
+  <li>Progress and completion announced, not only drawn.</li>
+  <li>Remove buttons name their file.</li>
+  <li>Drag-and-drop has no keyboard equivalent, which is precisely why the button is required
+  rather than optional.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table><thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead><tbody>
+  <tr><td>Drop zone</td><td>Min height</td><td>120px, 0 on phone (hidden)</td></tr>
+  <tr><td>Drop zone</td><td>Border</td><td>1px dashed, radius 12px</td></tr>
+  <tr><td>Item</td><td>Min height</td><td>44px — it carries a remove button, so it is a touch row</td></tr>
+  <tr><td>Thumbnail</td><td>Size</td><td>40px</td></tr>
+</tbody></table>

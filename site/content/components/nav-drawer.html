@@ -8,6 +8,7 @@ scripts: praxis-navdrawer.js
 classes: px-navtoggle, px-navdrawer, ws-pop, ws-item, praxis-navrail, is-open
 summary: The rail's phone form, derived from the rail you already wrote, plus the workspace flyout it opens. No second markup contract to keep in step.
 keywords: nav drawer navdrawer hamburger phone rail flyout workspace dashboards ws-pop
+icon: menu
 -->
 
 <p>Below 640px the 56px icon rail costs a sixth of the viewport and its items are
@@ -19,7 +20,20 @@ labels</strong>.</p>
 duplicating the markup. There is no second contract. Change a rail button and the drawer
 follows; there is nothing to keep in step.</p>
 
-<h2>What you supply</h2>
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Toggle</strong> — <code>.px-navtoggle</code>, a hamburger in the app bar's left
+  corner. <code>display:none</code> above 640px.</li>
+  <li><strong>Scrim</strong> — <code>.px-navdrawer__scrim</code>.</li>
+  <li><strong>Drawer</strong> — <code>.px-navdrawer</code>, with a head, a brand and a close.</li>
+  <li><strong>Items</strong> — <code>.px-navdrawer__item</code>, the rail's destinations with
+  labels.</li>
+</ol>
+
+<p>None of it is markup you write. See Markup contract.
+
+<h3>What you supply</h3>
 
 <p>Nothing beyond <a href="app-shell.html">the rail you already wrote</a>. The script reads
 each <code>.praxis-navrail__btn</code> and <code>.praxis-navrail__link</code>, takes its label
@@ -39,7 +53,104 @@ from <code>aria-label</code>, and carries two modifiers across:</p>
   rail button is merely terse at desktop width; in the drawer it is a blank row.</p>
 </div>
 
-<h2>Live, at phone width</h2>
+<h2>Variants</h2>
+
+<p>One drawer. Two flyouts share this page because they are the rail's other
+popovers:</p>
+
+<h3>The rail's own flyout</h3>
+
+<p><code>.ws-pop</code> is the popover the rail opens for workspace and dashboard switching.
+It is defined here, not in the workspace sheet, and its rows are <code>.ws-item</code>:</p>
+
+<table>
+  <thead><tr><th>Part</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.ws-item__icon</code></td><td>Leading glyph. Takes <code>.icon</code> inside.</td></tr>
+    <tr><td><code>.ws-item__text</code></td><td>Wrapper for the two lines</td></tr>
+    <tr><td><code>.ws-item__name</code> / <code>__sub</code></td><td>Primary and secondary line</td></tr>
+    <tr><td><code>.ws-item__badge</code></td><td>Trailing count or state</td></tr>
+    <tr><td><code>.ws-item--current</code></td><td>The one you are on</td></tr>
+    <tr><td><code>.ws-item--new</code></td><td>The create affordance; gets the brand tint</td></tr>
+    <tr><td><code>.ws-item--home</code></td><td>Given its own dark treatment so it does not read as current</td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong><code>.ws-pop</code> styles a <code>.px-menu__head</code> that does not
+  exist.</strong> The sheet has a rule for it, so a head element is clearly intended, but no
+  Praxis sheet defines <code>.px-menu</code> or <code>.px-menu__head</code>. Use
+  <code>.px-pop</code> from <code>praxis-admin.css</code> if you need the popover shell, and
+  write the head yourself. See <a href="../foundations/gaps.html">what Praxis does not
+  define</a>.</p>
+</div>
+
+<template data-example="A workspace flyout" data-height="300" data-scripts="lucide">
+  <div class="ws-pop" style="position:relative">
+    <div class="ws-item ws-item--current">
+      <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">crisis_alert</span></span>
+      <span class="ws-item__text">
+        <span class="ws-item__name">Incident management</span>
+        <span class="ws-item__sub">Teesside works</span>
+      </span>
+      <span class="ws-item__badge">12</span>
+    </div>
+    <div class="ws-item ws-item--home">
+      <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">home</span></span>
+      <span class="ws-item__text">
+        <span class="ws-item__name">Home hub</span>
+        <span class="ws-item__sub">All modules</span>
+      </span>
+    </div>
+    <div class="ws-item">
+      <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">fact_check</span></span>
+      <span class="ws-item__text">
+        <span class="ws-item__name">Audit programme</span>
+        <span class="ws-item__sub">Rotherham plant</span>
+      </span>
+      <span class="ws-item__badge">3</span>
+    </div>
+    <div class="ws-item ws-item--new">
+      <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">add</span></span>
+      <span class="ws-item__text"><span class="ws-item__name">New workspace</span></span>
+    </div>
+  </div>
+</template>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Closed</strong> — <code>[hidden]</code> plus a <code>translateX(-100%)</code>.</li>
+  <li><strong>Open</strong> — <code>.is-open</code> on both drawer and scrim, so the panel slides
+  and the scrim fades together.</li>
+  <li><strong>Current destination</strong> — carried over from the rail, either from
+  <code>--active</code>/<code>aria-current</code> or, where the rail does not mark it, by matching
+  the link target against the current filename.</li>
+  <li><strong>Create</strong> — leads the list as a filled action, so the drawer is self-sufficient
+  on pages with no in-page Create button.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>&gt; 640px</td><td>The 56px icon rail. <code>.px-navtoggle</code> is <code>display:none</code></td></tr>
+    <tr><td>≤ 640px</td><td>The rail is <code>display:none !important</code>, <code>--navrail-w</code> is zeroed so every page's content offset collapses regardless of how it was expressed, and the toggle appears</td></tr>
+  </tbody>
+</table>
+
+<p>Zeroing the token is the part worth noticing: pages offset content by the rail width in at
+least three different ways — <code>margin-left</code>, <code>padding-left</code>, a grid column —
+and one token covers all of them.</p>
+
+<p>The drawer's surface is a fixed slate in both themes rather than <code>--px-surface</code>,
+because it is chrome over the page rather than a page surface, and a constant panel colour reads
+the same wherever it is opened from.</p>
+
+<h2>Interactive demo</h2>
+
+<h3>Live, at phone width</h3>
 
 <p>The frame below is narrower than 640px, so the rail is hidden and the drawer has taken
 over. Press the hamburger. Widen the frame past 640px and the rail returns.</p>
@@ -100,7 +211,34 @@ over. Press the hamburger. Widen the frame past 640px and the rail returns.</p>
   </div>
 </template>
 
-<h2>What the drawer defines</h2>
+<h2>Code</h2>
+
+<p><code>praxis-navrail.css</code> for both, plus
+<code>praxis-navdrawer.js</code>. One script tag and nothing else:</p>
+
+<template data-source-only data-example="Wiring the drawer">
+<script src="praxis-navdrawer.js"></script>
+</template>
+
+<p>It <em>derives</em> the drawer from the live rail rather than duplicating the markup, so a rail
+change propagates automatically and there is nothing to keep in sync across twenty pages. It
+no-ops on a page with no rail — which is why this reference site, which has no rail, builds its
+own drawer instead.</p>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Labels</td><td><strong>The contract.</strong> Each rail item needs an <code>aria-label</code>, a <code>title</code>, or an <code>img alt</code> — that is where the drawer's text comes from. An unlabelled rail button is silently dropped from the drawer</td></tr>
+    <tr><td>Rail</td><td>A <code>.praxis-navrail</code> and an <code>.appbar</code> must both exist or the script returns immediately</td></tr>
+    <tr><td>Current</td><td><code>--active</code>, <code>aria-current="page"</code>, or a matching <code>href</code></td></tr>
+    <tr><td>Glyphs</td><td>Cloned from the rail as they are at that moment, so a Material ligature already converted by <code>praxis-lucide.js</code> comes across as the SVG</td></tr>
+    <tr><td>JS API</td><td>Self-wiring. No init call, and it refuses to build twice</td></tr>
+  </tbody>
+</table>
+
+<h3>What the drawer defines</h3>
 
 <p>Fully specified in <code>praxis-navrail.css</code>, so you do not style any of it:
 <code>.px-navdrawer</code> with <code>.is-open</code> and <code>[hidden]</code> states, a
@@ -110,65 +248,58 @@ over. Press the hamburger. Widen the frame past 640px and the rail returns.</p>
 The icon slot accepts an <code>&lt;svg&gt;</code>, an <code>&lt;img&gt;</code> or a
 <code>.material-symbols-rounded</code> ligature.</p>
 
-<h2>The rail's own flyout</h2>
+<h2>Token reference</h2>
 
-<p><code>.ws-pop</code> is the popover the rail opens for workspace and dashboard switching.
-It is defined here, not in the workspace sheet, and its rows are <code>.ws-item</code>:</p>
-
-<table>
-  <thead><tr><th>Part</th><th>What it is</th></tr></thead>
-  <tbody>
-    <tr><td><code>.ws-item__icon</code></td><td>Leading glyph. Takes <code>.icon</code> inside.</td></tr>
-    <tr><td><code>.ws-item__text</code></td><td>Wrapper for the two lines</td></tr>
-    <tr><td><code>.ws-item__name</code> / <code>__sub</code></td><td>Primary and secondary line</td></tr>
-    <tr><td><code>.ws-item__badge</code></td><td>Trailing count or state</td></tr>
-    <tr><td><code>.ws-item--current</code></td><td>The one you are on</td></tr>
-    <tr><td><code>.ws-item--new</code></td><td>The create affordance; gets the brand tint</td></tr>
-    <tr><td><code>.ws-item--home</code></td><td>Given its own dark treatment so it does not read as current</td></tr>
-  </tbody>
-</table>
-
-<div class="note note--trap">
-  <p><strong><code>.ws-pop</code> styles a <code>.px-menu__head</code> that does not
-  exist.</strong> The sheet has a rule for it, so a head element is clearly intended, but no
-  Praxis sheet defines <code>.px-menu</code> or <code>.px-menu__head</code>. Use
-  <code>.px-pop</code> from <code>praxis-admin.css</code> if you need the popover shell, and
-  write the head yourself. See <a href="../foundations/gaps.html">what Praxis does not
-  define</a>.</p>
-</div>
-
-<template data-example="A workspace flyout" data-height="300" data-scripts="lucide">
-  <div class="ws-pop" style="position:relative">
-    <div class="ws-item ws-item--current">
-      <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">crisis_alert</span></span>
-      <span class="ws-item__text">
-        <span class="ws-item__name">Incident management</span>
-        <span class="ws-item__sub">Teesside works</span>
-      </span>
-      <span class="ws-item__badge">12</span>
-    </div>
-    <div class="ws-item ws-item--home">
-      <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">home</span></span>
-      <span class="ws-item__text">
-        <span class="ws-item__name">Home hub</span>
-        <span class="ws-item__sub">All modules</span>
-      </span>
-    </div>
-    <div class="ws-item">
-      <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">fact_check</span></span>
-      <span class="ws-item__text">
-        <span class="ws-item__name">Audit programme</span>
-        <span class="ws-item__sub">Rotherham plant</span>
-      </span>
-      <span class="ws-item__badge">3</span>
-    </div>
-    <div class="ws-item ws-item--new">
-      <span class="ws-item__icon"><span class="material-symbols-rounded" aria-hidden="true">add</span></span>
-      <span class="ws-item__text"><span class="ws-item__name">New workspace</span></span>
-    </div>
-  </div>
-</template>
-
-<h2>Everything this sheet defines</h2>
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-navrail.css"></praxis-block>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Label every rail item. It is the whole contract.</li>
+  <li>Let the script derive the drawer — do not hand-write one.</li>
+  <li>Mark the current destination on the rail so the drawer inherits it.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Duplicate the rail's markup into a drawer.</li>
+  <li>Rely on the drawer where there is no rail — it will not exist.</li>
+  <li>Hide a destination from the rail and expect it in the drawer.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The labels are an accessibility requirement and a functional one at the same time, which is
+  the useful thing about this design: an unlabelled rail button is invisible to a screen reader
+  <em>and</em> missing from the drawer.</li>
+  <li>The toggle carries <code>aria-expanded</code>.</li>
+  <li>The drawer traps focus while open, Escape closes, and focus returns to the toggle.</li>
+  <li>The scrim is not focusable.</li>
+  <li>Motion honours <code>prefers-reduced-motion</code> — both the drawer transform and the scrim
+  fade are disabled in that mode.</li>
+  <li>At ≤640px the rail is genuinely hidden, so its destinations exist only in the drawer. That is
+  why "the drawer is self-sufficient" matters rather than being a nicety.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Rail</td><td>Width</td><td><code>--praxis-navrail-width</code>, 56px</td></tr>
+    <tr><td>Drawer</td><td>Width</td><td>280px, <code>max-width:85vw</code></td></tr>
+    <tr><td>Drawer</td><td>Surface</td><td><code>rgb(36,48,60)</code> in both themes</td></tr>
+    <tr><td>Drawer head</td><td>Height</td><td><code>--praxis-appbar-h</code>, 64px</td></tr>
+    <tr><td>Item</td><td>Min height</td><td>48px</td></tr>
+    <tr><td>Toggle / close</td><td>Size</td><td>40px</td></tr>
+    <tr><td>Transition</td><td>Drawer / scrim</td><td>220ms / 200ms</td></tr>
+  </tbody>
+</table>

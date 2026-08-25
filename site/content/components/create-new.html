@@ -8,6 +8,7 @@ scripts: praxis-create-new.js
 classes: cn-overlay, cn-scrim, cn-flyout, cn-modal, cn-head, cn-close, cn-controls, cn-find, cn-seg, cn-body, cn-content, cn-group, cn-grid, cn-item, cn-tpl, cn-tpl-list, cn-manage-note, cn-footer, cn-list, cn-section-label, cn-row, material-symbols-rounded
 summary: A full flyout stylesheet and a shared catalog of record types — with no render logic between them. The CSS and the data ship; the markup is yours.
 keywords: create new flyout menu catalog templates record types solution tone modal
+icon: add
 -->
 
 <div class="note note--trap">
@@ -21,38 +22,22 @@ keywords: create new flyout menu catalog templates record types solution tone mo
 page both build a Create New menu, and the two must not drift on <em>what</em> can be created.
 They are free to differ on how it looks.</p>
 
-<h2>Getting at the data, and the trap</h2>
+<h2>Anatomy</h2>
 
-<p>Both arrays are on <code>window</code>, and both bare identifiers still work. Measured in a
-browser:</p>
+<ol>
+  <li><strong>Overlay and scrim</strong> — <code>.cn-overlay</code>, <code>.cn-scrim</code>.</li>
+  <li><strong>Flyout or modal</strong> — <code>.cn-flyout</code> from the rail,
+  <code>.cn-modal</code> as a centred dialog.</li>
+  <li><strong>Head</strong> — <code>.cn-head</code> with <code>.cn-close</code> and
+  <code>.cn-controls</code>.</li>
+  <li><strong>Find</strong> — <code>.cn-find</code>, a leading-glyph search inside the menu.</li>
+  <li><strong>Segmented</strong> — <code>.cn-seg</code>, the Shortcuts / All / Templates switch.</li>
+  <li><strong>Body</strong> — <code>.cn-body</code> and <code>.cn-content</code>, holding
+  <code>.cn-group</code>, <code>.cn-grid</code> and <code>.cn-item</code>.</li>
+  <li><strong>Footer</strong> — <code>.cn-footer</code>, with <code>.cn-manage-note</code>.</li>
+</ol>
 
-<table>
-  <thead><tr><th>Access</th><th>Result</th></tr></thead>
-  <tbody>
-    <tr><td><code>window.CREATE_CATALOG</code></td><td>6 groups</td></tr>
-    <tr><td><code>window.CN_TEMPLATES</code></td><td>5 templates</td></tr>
-    <tr><td><code>CREATE_CATALOG</code> from another classic <code>&lt;script&gt;</code></td><td>Still works</td></tr>
-  </tbody>
-</table>
-
-<div class="note">
-  <p><strong>This was broken until 2026-08-18, and the failure mode is worth recognising.</strong>
-  Both were declared with top-level <code>const</code> and never assigned anywhere. In a classic
-  script that creates a global <em>lexical</em> binding — readable as a bare identifier from
-  another classic script, but <strong>not a property of <code>window</code></strong>, so a guard
-  like <code>if (window.CREATE_CATALOG)</code> always failed.</p>
-  <p>Worse, <code>package.json</code> declares <code>"type": "module"</code> and no shipped
-  script has an <code>export</code>. Imported through a bundler, both <code>const</code>s became
-  module-scoped and invisible to everything else, with no error — so
-  <code>import '@ideagen-ax/praxis/dist/praxis-create-new.js'</code>, the documented npm path,
-  was a silent no-op.</p>
-  <p>Only three shipped scripts assign to <code>window</code> at all:
-  <code>PraxisFilters</code>, <code>PraxisDotField</code> and the Mazlan globals. The rest
-  survive a module import because they self-wire as a side effect; a pure-data file had nothing
-  to fall back on.</p>
-</div>
-
-<h2>The catalog shape</h2>
+<h3>The catalog shape</h3>
 
 <p>Six groups, each with a brand <code>tone</code> that drives the group header colour, and a
 Material Symbols ligature for its icon.</p>
@@ -80,7 +65,74 @@ Material Symbols ligature for its icon.</p>
 <code>.cn-group--*</code> modifiers exactly, so a group renders correctly by passing its tone
 straight through.</p>
 
-<h2>Rendering it</h2>
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>.cn-flyout</code></td><td>Opened from the nav rail's Create button</td></tr>
+    <tr><td><code>.cn-modal</code></td><td>Centred, for a full catalogue</td></tr>
+    <tr><td>Shortcuts / All / Templates</td><td>The three views, switched by <code>.cn-seg</code>. Templates uses <code>.cn-tpl</code> and <code>.cn-tpl-list</code> rather than the item grid</td></tr>
+  </tbody>
+</table>
+
+<h3>Templates</h3>
+
+<template data-example="The template list, from CN_TEMPLATES" data-height="330" data-scripts="lucide,create-new">
+  <div class="cn-flyout" style="position:relative;inset:auto">
+    <div class="cn-head"><p class="cn-head__title">Start from a template</p></div>
+    <div class="cn-body"><div class="cn-tpl-list" id="tpls"></div></div>
+    <div class="cn-footer">
+      <p class="cn-manage-note">Templates are managed per solution.</p>
+    </div>
+  </div>
+  <script>
+    document.getElementById('tpls').innerHTML = CN_TEMPLATES.map(function (t) {
+      return '<button class="cn-tpl" type="button">'
+        + '<span class="cn-tpl__icon"><span class="material-symbols-rounded">' + t.icon + '</span></span>'
+        + '<span class="cn-tpl__body">'
+        + '<div class="cn-tpl__name">' + t.label + '</div>'
+        + '<div class="cn-tpl__meta">' + t.type + ' · ' + t.sub + '</div>'
+        + '</span></button>';
+    }).join('');
+  </script>
+</template>
+
+<div class="note note--trap">
+  <p><strong><code>.cn-tpl__name</code> and <code>.cn-tpl__meta</code> must be block-level,
+  and nothing in the sheet enforces it.</strong> The name sets
+  <code>white-space:nowrap</code> with <code>text-overflow:ellipsis</code> and the meta sets
+  <code>margin-top</code> — both meaningless on an inline element. Their parent
+  <code>.cn-tpl__body</code> is <code>flex:1; min-width:0</code>, not a flex column, so
+  <code>&lt;span&gt;</code>s run together on one line with no truncation.</p>
+  <p>The equivalent <code>.ws-item__text</code> in <code>praxis-navrail.css</code>
+  <em>is</em> <code>display:flex; flex-direction:column</code>, so spans stack there. Two
+  near-identical two-line rows, two different contracts. Use <code>&lt;div&gt;</code>s in
+  <code>.cn-tpl__body</code> and you are safe in both.</p>
+</div>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Closed / open</strong> — <code>[hidden]</code> on the overlay.</li>
+  <li><strong>Collapsed group</strong> — <code>.is-collapsed</code>.</li>
+  <li><strong>Filtered</strong> — driven by <code>.cn-find</code>.</li>
+  <li><strong>Empty</strong> — no matches. This sheet has no empty-state class of its own, which is
+  part of why <a href="empty-state.html">Empty state</a> is on the roadmap.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>The flyout is anchored to the rail, and below 640px the rail itself is
+hidden — so on a phone the Create action arrives through
+<a href="nav-drawer.html">the nav drawer</a>, which leads its list with Create as a filled action
+specifically so the catalogue stays reachable.</p>
+
+<p>That is the responsive story: the component does not adapt so much as hand over.</p>
+
+<h2>Interactive demo</h2>
+
+<h3>Rendering it</h3>
 
 <p>The example below reads the real shipped catalog and builds the flyout from it with the
 real classes. This is roughly the minimum render, and it is the part you own.</p>
@@ -121,42 +173,57 @@ real classes. This is roughly the minimum render, and it is the part you own.</p
   </script>
 </template>
 
-<h2>Templates</h2>
+<h2>Code</h2>
 
-<template data-example="The template list, from CN_TEMPLATES" data-height="330" data-scripts="lucide,create-new">
-  <div class="cn-flyout" style="position:relative;inset:auto">
-    <div class="cn-head"><p class="cn-head__title">Start from a template</p></div>
-    <div class="cn-body"><div class="cn-tpl-list" id="tpls"></div></div>
-    <div class="cn-footer">
-      <p class="cn-manage-note">Templates are managed per solution.</p>
-    </div>
-  </div>
-  <script>
-    document.getElementById('tpls').innerHTML = CN_TEMPLATES.map(function (t) {
-      return '<button class="cn-tpl" type="button">'
-        + '<span class="cn-tpl__icon"><span class="material-symbols-rounded">' + t.icon + '</span></span>'
-        + '<span class="cn-tpl__body">'
-        + '<div class="cn-tpl__name">' + t.label + '</div>'
-        + '<div class="cn-tpl__meta">' + t.type + ' · ' + t.sub + '</div>'
-        + '</span></button>';
-    }).join('');
-  </script>
-</template>
+<p><code>praxis-create-new.css</code> and <code>praxis-create-new.js</code>. The
+script auto-initialises.</p>
 
-<div class="note note--trap">
-  <p><strong><code>.cn-tpl__name</code> and <code>.cn-tpl__meta</code> must be block-level,
-  and nothing in the sheet enforces it.</strong> The name sets
-  <code>white-space:nowrap</code> with <code>text-overflow:ellipsis</code> and the meta sets
-  <code>margin-top</code> — both meaningless on an inline element. Their parent
-  <code>.cn-tpl__body</code> is <code>flex:1; min-width:0</code>, not a flex column, so
-  <code>&lt;span&gt;</code>s run together on one line with no truncation.</p>
-  <p>The equivalent <code>.ws-item__text</code> in <code>praxis-navrail.css</code>
-  <em>is</em> <code>display:flex; flex-direction:column</code>, so spans stack there. Two
-  near-identical two-line rows, two different contracts. Use <code>&lt;div&gt;</code>s in
-  <code>.cn-tpl__body</code> and you are safe in both.</p>
+<h3>Getting at the data, and the trap</h3>
+
+<p>Both arrays are on <code>window</code>, and both bare identifiers still work. Measured in a
+browser:</p>
+
+<table>
+  <thead><tr><th>Access</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td><code>window.CREATE_CATALOG</code></td><td>6 groups</td></tr>
+    <tr><td><code>window.CN_TEMPLATES</code></td><td>5 templates</td></tr>
+    <tr><td><code>CREATE_CATALOG</code> from another classic <code>&lt;script&gt;</code></td><td>Still works</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <p><strong>This was broken until 2026-08-18, and the failure mode is worth recognising.</strong>
+  Both were declared with top-level <code>const</code> and never assigned anywhere. In a classic
+  script that creates a global <em>lexical</em> binding — readable as a bare identifier from
+  another classic script, but <strong>not a property of <code>window</code></strong>, so a guard
+  like <code>if (window.CREATE_CATALOG)</code> always failed.</p>
+  <p>Worse, <code>package.json</code> declares <code>"type": "module"</code> and no shipped
+  script has an <code>export</code>. Imported through a bundler, both <code>const</code>s became
+  module-scoped and invisible to everything else, with no error — so
+  <code>import '@ideagen-ax/praxis/dist/praxis-create-new.js'</code>, the documented npm path,
+  was a silent no-op.</p>
+  <p>Only three shipped scripts assign to <code>window</code> at all:
+  <code>PraxisFilters</code>, <code>PraxisDotField</code> and the Mazlan globals. The rest
+  survive a module import because they self-wire as a side effect; a pure-data file had nothing
+  to fall back on.</p>
 </div>
 
-<h2>The rest of the vocabulary</h2>
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Overlay</td><td><code>[hidden]</code> closed. <code>role="dialog"</code> with <code>aria-modal</code> for the modal form</td></tr>
+    <tr><td>Find</td><td>A real labelled input. Its result count should be announced</td></tr>
+    <tr><td>Segmented</td><td><code>.cn-seg</code> is a choice control and needs the roles to match — either tabs or a radio group, not unlabelled buttons</td></tr>
+    <tr><td>Items</td><td><code>.cn-item</code> is shared with <a href="module-selector.html">the module selector</a>, so keep the icon and label structure identical</td></tr>
+    <tr><td>Close</td><td>Labelled. Escape should also close</td></tr>
+    <tr><td>JS</td><td>Self-wiring</td></tr>
+  </tbody>
+</table>
+
+<h3>The rest of the vocabulary</h3>
 
 <table>
   <thead><tr><th>Class</th><th>What it is</th></tr></thead>
@@ -176,6 +243,55 @@ real classes. This is roughly the minimum render, and it is the part you own.</p
   bases. Another reason to load the bundle.</p>
 </div>
 
-<h2>Everything this sheet defines</h2>
+<h2>Token reference</h2>
+
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-create-new.css"></praxis-block>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Keep <code>.cn-item</code> markup identical to the module selector's — they are one
+  vocabulary on purpose.</li>
+  <li>Announce how many results a filter left.</li>
+  <li>Provide the Create action somewhere else at phone width.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use this as a generic modal. <code>.cn-modal</code> is the Create New catalogue; a
+  confirmation needs <a href="dialog.html">a dialog</a>, which does not exist yet.</li>
+  <li>Style <code>.cn-item</code> locally. Two catalogues depend on it.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The modal form needs <code>aria-modal</code>, a focus trap, Escape, and focus restoration.
+  None of it is supplied by the script.</li>
+  <li><code>.cn-seg</code> must carry real roles. A three-way switch built from bare buttons tells
+  a screen-reader user nothing about which view is active.</li>
+  <li>The find field's result count belongs in a live region.</li>
+  <li>Collapsed groups should leave the tab order.</li>
+  <li>Item glyphs are decorative; the label is the accessible name.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.cn-item</code> marker</td><td>Size</td><td>32px</td></tr>
+    <tr><td>Item glyph</td><td>Size</td><td>20px</td></tr>
+    <tr><td><code>.cn-group</code> head</td><td>Height</td><td>32px</td></tr>
+  </tbody>
+</table>
+
+<p>Matched deliberately with <code>praxis-module-selector.css</code>, so the two catalogues line
+up.</p>

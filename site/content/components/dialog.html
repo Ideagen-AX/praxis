@@ -1,0 +1,181 @@
+<!--praxis
+title: Confirm and alert dialog
+summary: Praxis has two modals, both welded to the feature that needed them. There is nothing to put a destructive confirmation in. Planned.
+order: 20
+tier: planned
+icon: warning
+classes: px-dialog
+keywords: dialog modal confirm alert destructive delete discard scrim focus trap planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Nothing generic is defined.</strong> <code>.cn-modal</code> is the Create New
+  modal and <code>.filter-drawer</code> is the filter drawer — both complete, both bound to
+  one feature. Tier 1 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>The ARIA Authoring Practices Guide lists <em>Alert and Message Dialogs</em> as a pattern
+separate from <em>Dialog</em>, and the distinction is the whole point of this page: a message
+dialog interrupts to ask one question with two answers. Voiding a permit, deleting an audit
+finding, discarding an unsaved incident — in a regulated application these are the moments
+that most need a consistent, unmistakable surface, and Praxis currently offers none.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Scrim</strong> — dims and blocks the page. Three exist already
+  (<code>.cn-scrim</code>, <code>.drawer-scrim</code>, <code>.mazlan-scrim</code>) and they
+  should collapse into one.</li>
+  <li><strong>Panel</strong> — the dialog itself, centred, small.</li>
+  <li><strong>Title</strong> — a question or a statement of consequence, not a noun.</li>
+  <li><strong>Body</strong> — one short paragraph. What will happen and what cannot be
+  undone.</li>
+  <li><strong>Footer</strong> — cancel and confirm. Order and emphasis are decisions, below.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th><th>Confirm button</th></tr></thead>
+  <tbody>
+    <tr><td><code>--confirm</code></td><td>Reversible. "Submit for approval?"</td><td><code>.tbtn--primary</code></td></tr>
+    <tr><td><code>--danger</code></td><td>Irreversible or destructive. "Void this permit?"</td><td>A red confirm — and Praxis has no red button. <code>.filter-drawer .btn--clear</code> is the closest thing and it is scoped to the filter drawer</td></tr>
+    <tr><td><code>--alert</code></td><td>One acknowledgement, no choice. "Your session expired."</td><td>A single dismiss</td></tr>
+  </tbody>
+</table>
+
+<p><strong>The open decision:</strong> whether the destructive confirm is a filled red button
+or a neutral button with red text. A filled red primary is the industry default, but Praxis's
+primary is a teal gradient with a lit edge (<code>--px-primary-grad</code>), and a red
+equivalent would be the second gradient recipe in the system.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Closed</strong> — <code>hidden</code>. Every Praxis overlay uses the
+  <code>[hidden]</code> attribute rather than a class, and this should match.</li>
+  <li><strong>Open</strong> — <code>.is-open</code> on the panel and scrim for the
+  transition, following <code>.filter-drawer</code> and <code>.px-navdrawer</code>.</li>
+  <li><strong>Confirm pending</strong> — the confirm button disabled with a spinner while the
+  action is in flight. Depends on the loading component, also Tier 1.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Panel</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>Desktop</td><td>Centred, <code>min(28rem, 100% - 4rem)</code></td><td>Narrow on purpose. A confirmation that fills the screen reads as a page</td></tr>
+    <tr><td>Tablet</td><td>Unchanged</td><td></td></tr>
+    <tr><td>Phone (≤640px)</td><td>Inset by <code>--px-gutter</code></td><td>Undecided whether it becomes a bottom sheet. Praxis has no bottom-sheet precedent, so the default answer is no</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo. The closest existing surface is <code>.px-pop</code>, which is a popover
+rather than a dialog — it does not trap focus, block the page or take a scrim.</p>
+
+<h2>Code</h2>
+
+<p>Belongs in <code>praxis-controls.css</code> with a script, for the same reason as the
+tooltip. Focus trapping, restore-on-close and Escape are not expressible in CSS.</p>
+
+<p>The <code>&lt;dialog&gt;</code> element is worth considering seriously: it gives the focus
+trap, the top layer, the scrim via <code>::backdrop</code> and Escape for free. The reason to
+hesitate is that Praxis's three existing overlays are all <code>div</code>-based with their
+own scrim elements, so adopting it here makes this component structurally unlike its
+neighbours.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<div class="px-dialog__scrim" hidden></div>
+<div class="px-dialog px-dialog--danger" role="alertdialog" aria-modal="true"
+     aria-labelledby="d1-title" aria-describedby="d1-body" hidden>
+  <h2 class="px-dialog__title" id="d1-title">Void permit PTW-2024-0031?</h2>
+  <div class="px-dialog__body" id="d1-body">
+    <p>The permit closes immediately and the four assigned operatives lose site access.
+       Voiding cannot be undone.</p>
+  </div>
+  <div class="px-dialog__foot">
+    <button class="tbtn" type="button" data-px-dialog-cancel>Cancel</button>
+    <button class="tbtn tbtn--danger" type="button">Void permit</button>
+  </div>
+</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td><code>role</code></td><td><code>alertdialog</code> for confirm and danger, <code>dialog</code> for anything else. The distinction is real: <code>alertdialog</code> makes a screen reader announce the body immediately</td></tr>
+    <tr><td><code>aria-modal="true"</code></td><td>Required</td></tr>
+    <tr><td><code>aria-labelledby</code> / <code>aria-describedby</code></td><td>Pointing at the title and body</td></tr>
+    <tr><td>Initial focus</td><td>On <em>cancel</em>, not confirm. A dialog that opens with the destructive action focused turns a stray Enter into a data loss</td></tr>
+    <tr><td>Focus restore</td><td>Back to the trigger on close, always</td></tr>
+    <tr><td>JS API</td><td>Undecided. The other Praxis scripts are self-wiring, but a confirmation needs a return value, so this one probably needs a real call — <code>Praxis.confirm(opts) → Promise&lt;boolean&gt;</code> is the shape worth considering, matching how <code>praxis-toast.js</code> exposes a function rather than only auto-initialising</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--px-overlay</code></td><td>Panel shadow</td></tr>
+    <tr><td><code>--px-drawer</code></td><td>Panel fill. The shared drawer/panel surface, so a dialog and the filter drawer are the same material</td></tr>
+    <tr><td><code>--praxis-radius-md</code></td><td>12px</td></tr>
+    <tr><td><code>--praxis-motion-fast</code> / <code>--praxis-ease-default</code></td><td>Entry</td></tr>
+    <tr><td><code>--praxis-tone-danger-bg</code> / <code>-fg</code></td><td>The danger variant's heading treatment</td></tr>
+  </tbody>
+</table>
+
+<p>Missing: a scrim colour token. All three existing scrims hard-code their own rgba —
+<code>rgba(16,22,30,.55)</code> in <code>.px-navdrawer__scrim</code> and two others. Candidate:
+<code>--px-scrim</code>, which would let the three collapse into one.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Name the consequence in the title. "Void permit PTW-2024-0031?", not "Are you sure?"</li>
+  <li>Label the confirm button with the verb. "Void permit", not "OK".</li>
+  <li>Say what cannot be undone, in the body, in one sentence.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use it for anything reversible — that is a <a href="toast.html">toast</a> with an undo.</li>
+  <li>Put a form in it. A dialog with fields is a modal, and that is <code>.cn-modal</code>'s
+  territory.</li>
+  <li>Stack two. If confirming raises another question, the flow is wrong.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Focus must be trapped</strong> while open and <strong>restored</strong> on close.
+  These are the two things that get missed and the two that make a dialog unusable by keyboard.</li>
+  <li>Escape closes and counts as cancel.</li>
+  <li>The scrim is <code>aria-hidden</code> and not focusable; clicking it cancels.</li>
+  <li>Initial focus on the safe action.</li>
+  <li><strong>Forced colors:</strong> the panel separates from the scrim by shadow alone, which
+  is dropped. Needs a border in that mode.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Panel</td><td>Width</td><td><code>min(28rem, 100% - 4rem)</code></td></tr>
+    <tr><td>Panel</td><td>Padding</td><td>20px 22px, matching <code>.admin-card</code></td></tr>
+    <tr><td>Footer</td><td>Gap</td><td><code>--praxis-space-8</code></td></tr>
+    <tr><td>Scrim</td><td>Blur</td><td>2px, matching <code>.px-navdrawer__scrim</code></td></tr>
+  </tbody>
+</table>
+

@@ -8,6 +8,7 @@ scripts: praxis-toolbar-compact.js
 classes: tb-compact, tb-is-compact, tb-options, tb-options-scrim, tb-display, tb-menu, tb-viewlabel, colmenu, sortmenu, sortbtn, exp-head, viewswitch, is-open
 summary: The toolbar collapses when its contents would no longer fit on one line — measured, not at a breakpoint. Three toolbars have three natural widths, so any single pixel value is wrong for two of them.
 keywords: toolbar compact collapse overflow tools options sort display measured breakpoint
+icon: instant_mix
 -->
 
 <p>Nothing here needs wiring. <code>praxis-toolbar-compact.js</code> is self-wiring: it
@@ -27,7 +28,76 @@ line, setting <code>body.tb-is-compact</code>.</p>
 Options popover <strong>only if the page actually has sort or display controls</strong> — an
 empty Options button would be worse than none.</p>
 
-<h2>Live</h2>
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Band</strong> — the <code>.toolbar</code> row the compact behaviour applies to.</li>
+  <li><strong>Kept controls</strong> — what stays visible when space runs out.</li>
+  <li><strong>Tools trigger</strong> — the button that opens the overflow.</li>
+  <li><strong>Options popover</strong> — <code>.tb-options</code>, holding everything that moved,
+  each control at full row width.</li>
+  <li><strong>Scrim</strong> — <code>.tb-options-scrim</code>.</li>
+</ol>
+
+<h3>The vocabulary</h3>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>body.tb-is-compact</code></td><td>The switch. Set by this script, read by this sheet <strong>and by <a href="quick-rail.html">the quick-filter rail</a></strong>, which watches the body class rather than a media query so both change at the same instant.</td></tr>
+    <tr><td><code>.tb-compact</code></td><td>The collapsed cluster. <code>__menu</code>, <code>__btn</code>, <code>__caret</code>, <code>__pop</code>.</td></tr>
+    <tr><td><code>.tb-options</code></td><td>The Options sheet, with <code>.is-open</code> and <code>[hidden]</code>. Paired with <code>.tb-options-scrim</code>.</td></tr>
+    <tr><td><code>.tb-options__head</code>, <code>__title</code>, <code>__close</code>, <code>__search</code>, <code>__body</code>, <code>__panel</code>, <code>__sechead</code>, <code>__label</code>, <code>__empty</code></td><td>Its internals. <code>__sr</code> is a screen-reader-only live region.</td></tr>
+    <tr><td><code>.tb-display__btn</code>, <code>.tb-display__pop</code></td><td>The density and column switch. <code>[aria-expanded="true"]</code> is the open state.</td></tr>
+    <tr><td><code>.tb-viewlabel</code></td><td>The current view's name, shown when the switcher itself does not fit</td></tr>
+    <tr><td><code>.colmenu</code>, <code>.sortmenu</code>, <code>.sortbtn</code></td><td>Column and sort menus. Praxis styles these <strong>only inside</strong> <code>.tb-options__body</code> and <code>.tb-display__pop</code> — see the trap.</td></tr>
+    <tr><td><code>.exp-head</code></td><td>Expandable section head inside the options panel</td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong><code>.colmenu</code>, <code>.sortmenu</code>, <code>.sortbtn</code>,
+  <code>.tb-display</code> and <code>.panel</code> have no base rule in Praxis.</strong> The
+  only rules that mention them are <em>inside</em> the compact popovers, and several are
+  <code>display:none !important</code> — this sheet's job for those classes is to
+  <em>suppress</em> your full-width controls once they have been folded into the Options
+  sheet, not to define them. If you use one outside a popover you get nothing. The
+  <a href="../foundations/gaps.html#families-praxis-never-keys-a-rule-on">unkeyed families</a>
+  table measures this every build.</p>
+</div>
+
+<h2>Variants</h2>
+
+<p>Two, and the switch between them is automatic rather than authored:
+the full band, and the compact band marked by <code>.tb-is-compact</code>.</p>
+
+<p><code>.tb-display</code> is the third thing in this family and it has no base — it is one of
+the part-only names catalogued on <a href="core-page-families.html">Page families</a>.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Full</strong> — every control in the band.</li>
+  <li><strong>Compact</strong> — <code>.tb-is-compact</code> on the band. The script sets it;
+  do not set it by hand.</li>
+  <li><strong>Options open</strong> — <code>.is-open</code>, with the scrim shown.</li>
+  <li><strong>A menu inside the overflow</strong> — a <code>.tb-menu</code> moved into the popover
+  takes the full row width, so <a href="toolbar-menu.html">the toolbar menu</a> stays usable there.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>This component <em>is</em> the responsive behaviour of the toolbar
+band, which is why it has no breakpoint table of its own: the switch is driven by measured
+available width rather than a viewport size, so a band inside a narrow column goes compact on a
+wide screen.</p>
+
+<p>That is the important property. A media query cannot see that a toolbar is in a 600px panel on
+a 1920px monitor; this can.</p>
+
+<h2>Interactive demo</h2>
+
+<h3>Live</h3>
 
 <template data-example="Drag the frame narrower until the toolbar collapses" data-height="400" data-shell data-scripts="lucide,toolbar-compact">
   <div class="app">
@@ -83,33 +153,83 @@ empty Options button would be worse than none.</p>
   </div>
 </template>
 
-<h2>The vocabulary</h2>
+<h2>Code</h2>
+
+<p><code>praxis-toolbar-compact.css</code> and
+<code>praxis-toolbar-compact.js</code>. The script auto-initialises on
+<code>DOMContentLoaded</code> and mutates the document, which is why every example on this site
+runs in its own iframe.</p>
+
+<template data-source-only data-example="Loading it">
+<link rel="stylesheet" href="praxis-toolbar-compact.css">
+<script src="praxis-toolbar-compact.js"></script>
+</template>
+
+<h2>Markup contract</h2>
 
 <table>
-  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
   <tbody>
-    <tr><td><code>body.tb-is-compact</code></td><td>The switch. Set by this script, read by this sheet <strong>and by <a href="quick-rail.html">the quick-filter rail</a></strong>, which watches the body class rather than a media query so both change at the same instant.</td></tr>
-    <tr><td><code>.tb-compact</code></td><td>The collapsed cluster. <code>__menu</code>, <code>__btn</code>, <code>__caret</code>, <code>__pop</code>.</td></tr>
-    <tr><td><code>.tb-options</code></td><td>The Options sheet, with <code>.is-open</code> and <code>[hidden]</code>. Paired with <code>.tb-options-scrim</code>.</td></tr>
-    <tr><td><code>.tb-options__head</code>, <code>__title</code>, <code>__close</code>, <code>__search</code>, <code>__body</code>, <code>__panel</code>, <code>__sechead</code>, <code>__label</code>, <code>__empty</code></td><td>Its internals. <code>__sr</code> is a screen-reader-only live region.</td></tr>
-    <tr><td><code>.tb-display__btn</code>, <code>.tb-display__pop</code></td><td>The density and column switch. <code>[aria-expanded="true"]</code> is the open state.</td></tr>
-    <tr><td><code>.tb-viewlabel</code></td><td>The current view's name, shown when the switcher itself does not fit</td></tr>
-    <tr><td><code>.colmenu</code>, <code>.sortmenu</code>, <code>.sortbtn</code></td><td>Column and sort menus. Praxis styles these <strong>only inside</strong> <code>.tb-options__body</code> and <code>.tb-display__pop</code> — see the trap.</td></tr>
-    <tr><td><code>.exp-head</code></td><td>Expandable section head inside the options panel</td></tr>
+    <tr><td>Band</td><td>A <code>.toolbar</code> with its controls as direct children of <code>.toolbar__inner</code></td></tr>
+    <tr><td>Labels</td><td>Every control needs a real label — the script uses it for the popover row, so an unlabelled icon button becomes an unlabelled row</td></tr>
+    <tr><td><code>.tb-is-compact</code></td><td>Set by the script. Read it, do not write it</td></tr>
+    <tr><td>Trigger</td><td><code>aria-expanded</code> maintained by the script</td></tr>
+    <tr><td>JS API</td><td>Self-wiring, no init call. It no-ops on a page with no toolbar</td></tr>
   </tbody>
 </table>
 
-<div class="note note--trap">
-  <p><strong><code>.colmenu</code>, <code>.sortmenu</code>, <code>.sortbtn</code>,
-  <code>.tb-display</code> and <code>.panel</code> have no base rule in Praxis.</strong> The
-  only rules that mention them are <em>inside</em> the compact popovers, and several are
-  <code>display:none !important</code> — this sheet's job for those classes is to
-  <em>suppress</em> your full-width controls once they have been folded into the Options
-  sheet, not to define them. If you use one outside a popover you get nothing. The
-  <a href="../foundations/gaps.html#families-praxis-never-keys-a-rule-on">unkeyed families</a>
-  table measures this every build.</p>
-</div>
-
-<h2>Everything this sheet defines</h2>
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-toolbar-compact.css"></praxis-block>
+
+<h2>Token reference</h2>
+
+<praxis-block name="tokens" prefix="--px-toolbar"></praxis-block>
+
+<p>The band's height and padding come from <code>praxis-pageheader.css</code>, so the compact form
+does not change the masthead's combined 128px — which is the promise that keeps page content
+starting at the same y on every page.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Label every control in the band.</li>
+  <li>Put the primary action first, so it is the last thing to move into the overflow.</li>
+  <li>Let the script decide when to go compact.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Set <code>.tb-is-compact</code> yourself.</li>
+  <li>Rely on a media query to hide toolbar controls — this measures the container, which is the
+  thing that actually matters.</li>
+  <li>Put a control in the band that must always be visible without also providing it elsewhere.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>Control labels are load-bearing twice over: for assistive technology, and because the script
+  reuses them as popover row labels.</li>
+  <li>The trigger carries <code>aria-expanded</code>.</li>
+  <li>Moving a focused control into the popover would lose focus — worth verifying in any page
+  that changes its toolbar contents dynamically.</li>
+  <li>The scrim is not focusable and clicking it closes the popover; Escape should too.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Band</td><td>Min height</td><td><code>--px-toolbar-h</code>, 60px</td></tr>
+    <tr><td>Band</td><td>Padding</td><td><code>--px-toolbar-pad-y</code> 10px, <code>--ph-pad-x</code> per page</td></tr>
+    <tr><td>Popover row</td><td>Width</td><td>Full width of the popover</td></tr>
+    <tr><td>Masthead</td><td>Combined height</td><td>128px, unchanged by the compact form</td></tr>
+  </tbody>
+</table>

@@ -7,13 +7,31 @@ sheet: praxis-admin.css, praxis-core.css, praxis-controls.css
 classes: switch, track, thumb, onoff, segmented, filterfield, px-skip, visually-hidden, icon, toggle-group, chip-area
 summary: The checkbox, the toggle switch, the skip link and the scrollbar treatment — including the two markup forms of .switch, which now render identically after one of them turned out to be styled by nothing at all.
 keywords: checkbox switch toggle radio scrollbar skip link accessibility focus indeterminate segmented
+icon: check_box
 -->
 
 <p>Praxis restyles bare <code>&lt;input type="checkbox"&gt;</code> and defines one toggle
 switch. Everything else on a form is <a href="rfield.html">a field</a>. The interesting part
 of this page is the last section, where two sheets disagree.</p>
 
-<h2>Checkbox</h2>
+<h2>Anatomy</h2>
+
+<p>This page covers six small controls rather than one component, so its anatomy is
+a list of what each is made of:</p>
+
+<ul>
+  <li><strong>Checkbox</strong> — the bare element, restyled. No wrapper, no parts.</li>
+  <li><strong>Switch</strong> — a wrapper, a hidden input, and two decorative spans
+  (<code>__track</code>, <code>__thumb</code>). The order of those spans matters.</li>
+  <li><strong>Segmented</strong> — a container and its options.</li>
+  <li><strong>Skip link</strong> — <code>.px-skip</code>, one element.</li>
+  <li><strong>Filter field</strong> — an input and a trailing glyph.</li>
+  <li><strong>Hidden text</strong> — <code>.visually-hidden</code>, and the icon conventions.</li>
+</ul>
+
+<h2>Variants</h2>
+
+<h3>Checkbox</h3>
 
 <p>Styled on the bare element, so you get it without a class. 16px, 4px radius, 1.5px
 border, and it fills with <code>--praxis-color-text-primary</code> rather than the brand
@@ -48,7 +66,7 @@ attribute</strong> — it is a DOM property, so a three-state header checkbox ha
 <p>Focus is a 2px outline in the interactive teal at 60% mix, offset 2px. Do not remove it;
 the fill alone does not indicate focus, only state.</p>
 
-<h2>Toggle switch</h2>
+<h3>Toggle switch</h3>
 
 <p>A wrapper, a hidden input, and two decorative spans. The input carries the state and the
 label association; <code>.track</code> and <code>.thumb</code> are painted from it with
@@ -88,7 +106,7 @@ bundle rather than picking sheets.</p>
   styling</strong> — see below.</p>
 </div>
 
-<h2>Two markup forms, both supported</h2>
+<h3>Two markup forms, both supported</h3>
 
 <p>Praxis shipped two contradictory ideas of what <code>.switch</code> means, and until
 2026-08-18 only one of them was styled. Both work now, from one set of values, and they render
@@ -154,7 +172,7 @@ put in a shared stylesheet. Do not use them in new markup.</p>
   another.</p>
 </div>
 
-<h2>Segmented control</h2>
+<h3>Segmented control</h3>
 
 <p><code>.segmented</code> is defined in <code>praxis-filters.css</code> and is not scoped to
 the drawer, so it is usable anywhere. A 1px neutral border, 12px radius, and
@@ -176,39 +194,7 @@ the drawer, so it is usable anywhere. A 1px neutral border, 12px radius, and
   </div>
 </template>
 
-<h2>Skip link</h2>
-
-<p><code>.px-skip</code> is fully defined: fixed at top left, 36px tall, 10px radius, and it
-overrides the global press transform to <code>none</code> because a skip link that shrinks
-under the pointer reads as broken. Put it first in <code>&lt;body&gt;</code> and point it at
-your scroll container.</p>
-
-<template data-example="Shown focused, which is the only state it is visible in" data-height="150">
-  <a class="px-skip" href="#c" id="skip">Skip to content</a>
-  <p class="rfield__hint" style="margin-top:3rem">Focused on load so there is something to
-     see. In a real page it sits off the visible flow until the first Tab press.</p>
-  <div id="c"></div>
-  <script>document.getElementById('skip').focus();</script>
-</template>
-
-<h2>Scrollbars</h2>
-
-<p>Praxis sets <code>scrollbar-color</code> only, using <code>--px-scroll</code> and
-<code>--px-scroll-hover</code>. That is deliberate and worth not "improving": it is the one
-scrollbar property that does not change the gutter, so Chrome and Firefox keep their overlay
-scrollbars and nothing reflows when the thumb appears. Declaring
-<code>::-webkit-scrollbar</code> or <code>scrollbar-width</code> switches those elements to
-classic scrollbars and shifts your layout by the scrollbar's width.</p>
-
-<h2>Icons and hidden text</h2>
-
-<p>Two small utilities from <code>praxis-admin.css</code> you will want:
-<code>.icon</code> sizes an inline SVG to 22px square with <code>fill:currentColor</code>, and
-takes <code>--20</code>, <code>--18</code> and <code>--16</code>.
-<code>.visually-hidden</code> is the standard clip-rect pattern, for a label a screen reader
-needs and the layout does not.</p>
-
-<h2>Filter field</h2>
+<h3>Filter field</h3>
 
 <p><code>.filterfield</code> is type-to-filter beside a list: the report tree's Filter, the
 workspace editor's Search reports. It is a <code>&lt;label&gt;</code> wrapping an
@@ -236,3 +222,168 @@ shadow. Give the wrapper the width you want — <code>flex:1</code> in a panel h
     </button>
   </div>
 </template>
+
+<h3>Skip link</h3>
+
+<p><code>.px-skip</code> is fully defined: fixed at top left, 36px tall, 10px radius, and it
+overrides the global press transform to <code>none</code> because a skip link that shrinks
+under the pointer reads as broken. Put it first in <code>&lt;body&gt;</code> and point it at
+your scroll container.</p>
+
+<template data-example="Shown focused, which is the only state it is visible in" data-height="150">
+  <a class="px-skip" href="#c" id="skip">Skip to content</a>
+  <p class="rfield__hint" style="margin-top:3rem">Focused on load so there is something to
+     see. In a real page it sits off the visible flow until the first Tab press.</p>
+  <div id="c"></div>
+  <script>document.getElementById('skip').focus();</script>
+</template>
+
+<h2>States</h2>
+
+<p>Each control's states are described in its section above. Two things are worth
+pulling out because they are system-wide rather than per-control:</p>
+
+<ul>
+  <li><strong>Focus is never removed.</strong> The checkbox rule uses a 2px outline in the
+  interactive teal at 60% mix, offset 2px. As that section says: the fill alone does not indicate
+  focus, only state.</li>
+  <li><strong>Indeterminate has no HTML attribute.</strong> It is a DOM property, so a three-state
+  header checkbox has to set <code>el.indeterminate = true</code> from script. Praxis styles it
+  either way.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>None of these six has a breakpoint. The one size note that matters:
+a 16px checkbox and a 34×20 switch are both below the 44px WCAG 2.5.8 target minimum, which is
+acceptable at desktop under the spacing exception and worth checking wherever they appear in a
+dense touch row.</p>
+
+<p><code>.filterfield</code> is sized to match <code>.iconbtn</code> — same 34px, same radius,
+same tool shadow — so a header row of both lines up.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Each control has its own frame in the sections above, beside the prose
+that describes it. That is deliberate for this page: six controls in one gallery would make it
+harder to tell which rule belongs to which.</p>
+
+<h2>Code</h2>
+
+<p>Three sheets, and which one you need depends on the control:</p>
+
+<table>
+  <thead><tr><th>Control</th><th>Sheet</th></tr></thead>
+  <tbody>
+    <tr><td>Checkbox, scrollbars, <code>.px-skip</code></td><td><code>praxis-core.css</code> — every page has it</td></tr>
+    <tr><td>Switch (both forms), <code>.visually-hidden</code></td><td><code>praxis-admin.css</code></td></tr>
+    <tr><td><code>.filterfield</code></td><td><code>praxis-controls.css</code></td></tr>
+    <tr><td><code>.segmented</code>, <code>.onoff</code></td><td><code>praxis-filters.css</code></td></tr>
+  </tbody>
+</table>
+
+<p>The switch being in the admin sheet is the awkward one: a record page wanting a toggle either
+loads the application shell or writes its own. That is the same problem
+<code>praxis-controls.css</code> was created to solve and the switch has not moved yet.</p>
+
+<h3>Scrollbars</h3>
+
+<p>Praxis sets <code>scrollbar-color</code> only, using <code>--px-scroll</code> and
+<code>--px-scroll-hover</code>. That is deliberate and worth not "improving": it is the one
+scrollbar property that does not change the gutter, so Chrome and Firefox keep their overlay
+scrollbars and nothing reflows when the thumb appears. Declaring
+<code>::-webkit-scrollbar</code> or <code>scrollbar-width</code> switches those elements to
+classic scrollbars and shifts your layout by the scrollbar's width.</p>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Control</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Checkbox</td><td>Nothing — style comes from the bare element. Do not add <code>class="switch"</code> to a checkbox input unless you mean the switch: that class opts the input out of every checkbox rule, which is exactly what the selector <code>input[type="checkbox"]:not(.switch):not(.switch *)</code> is for</td></tr>
+    <tr><td>Switch, wrapper form</td><td><code>.switch</code> on the wrapper, input inside, then <code>__track</code> and <code>__thumb</code>. <strong>Canonical.</strong></td></tr>
+    <tr><td>Switch, sibling form</td><td><code>.switch</code> on the input, track as its next sibling. Supported because <code>praxis-filters.js</code> emits it and <code>.onoff:has(.switch:checked)</code> depends on it</td></tr>
+    <tr><td>Switch part names</td><td><code>__track</code> / <code>__thumb</code> are canonical. Bare <code>.track</code> / <code>.thumb</code> still work and are two of the most collision-prone names it is possible to put in a shared sheet — do not use them in new markup</td></tr>
+    <tr><td>Segmented</td><td>Real roles. A choice control built from bare buttons says nothing about which option is active</td></tr>
+    <tr><td><code>.px-skip</code></td><td>First focusable element in the document, <code>href</code> pointing at your content container</td></tr>
+    <tr><td><code>.filterfield</code></td><td>A labelled input. The glyph is <code>aria-hidden</code> and <code>pointer-events:none</code></td></tr>
+    <tr><td>JS</td><td>None for any of them, except setting <code>indeterminate</code></td></tr>
+  </tbody>
+</table>
+
+<h3>Icons and hidden text</h3>
+
+<p>Two small utilities from <code>praxis-admin.css</code> you will want:
+<code>.icon</code> sizes an inline SVG to 22px square with <code>fill:currentColor</code>, and
+takes <code>--20</code>, <code>--18</code> and <code>--16</code>.
+<code>.visually-hidden</code> is the standard clip-rect pattern, for a label a screen reader
+needs and the layout does not.</p>
+
+<h2>Token reference</h2>
+
+<praxis-block name="tokens" prefix="--px-check|--px-field"></praxis-block>
+
+<p><code>--praxis-color-border-strong</code> is the one worth knowing about here. It is the
+control-boundary token — checkbox boxes, input underlines, <code>--px-check-stroke</code> — so it
+has to clear 3:1 against the surface it sits on under WCAG 1.4.11. It was repointed from
+neutral-40 to neutral-50 after measuring 2.95:1 on white, a rounding error short. The rung itself
+was not edited, because <code>--praxis-color-text-disabled</code> resolves to neutral-40 and must
+not move with it.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use the bare <code>&lt;input type="checkbox"&gt;</code>. You get the Praxis treatment with no
+  class at all.</li>
+  <li>Use the wrapper form for new switches, with <code>__track</code> and <code>__thumb</code>.</li>
+  <li>Use a switch for a commitment and a checkbox for a selection — the switch is the one control
+  that uses the brand teal, and that is why.</li>
+  <li>Put <code>.px-skip</code> on every page.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Put <code>class="switch"</code> on a checkbox you want styled as a checkbox.</li>
+  <li>Use bare <code>.track</code> or <code>.thumb</code>.</li>
+  <li>Remove the focus outline.</li>
+  <li>Reach for a radio and expect it to be styled — it is not. See <a href="radio.html">Radio</a>.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Focus indicators are load-bearing and easy to lose.</strong> The checkbox's fill
+  indicates <em>state</em>, not focus, so removing the outline leaves a keyboard user with no way
+  to know where they are.</li>
+  <li>Every control needs a real label. <code>.visually-hidden</code> is there for the cases where
+  the label should not be seen.</li>
+  <li>Indeterminate is a DOM property. A tri-state header checkbox also needs
+  <code>aria-checked="mixed"</code> if it is a custom control rather than a native input.</li>
+  <li>The segmented control must carry roles matching what it is — tabs or a radio group.</li>
+  <li><code>.px-skip</code> exists for WCAG 2.4.1, and it is a rule with no markup: you have to add
+  the link.</li>
+  <li>The scrollbar treatment fades scrollbars until hover or focus-within. <code>:focus-within</code>
+  is in that selector deliberately, so keyboard users — who never trigger <code>:hover</code> — still
+  get a position indicator.</li>
+  <li>16px checkboxes and 34×20 switches are below the 44px target minimum; check them in dense
+  touch contexts.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Control</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Checkbox</td><td>Size / radius / border</td><td>16px / 4px / 1.5px</td></tr>
+    <tr><td>Checkbox</td><td>Focus outline</td><td>2px, offset 2px, teal at 60% mix</td></tr>
+    <tr><td>Switch</td><td>Track / thumb / travel</td><td>34×20 / 16px / 14px</td></tr>
+    <tr><td><code>.filterfield</code></td><td>Height / radius / glyph</td><td>34px / 8px / 18px at right:12px</td></tr>
+    <tr><td><code>.px-skip</code></td><td>Height / padding</td><td>36px / 0 16px, at top:8px left:8px, z-index 1000</td></tr>
+    <tr><td><code>.admin-check</code></td><td>Size</td><td>16px, <code>accent-color</code> teal-60</td></tr>
+  </tbody>
+</table>

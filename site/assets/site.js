@@ -1,12 +1,12 @@
 /* =====================================================================
    Praxis reference site — docs chrome behaviour.
 
-   Vanilla, no dependency, matching the system it documents. Five jobs:
+   Vanilla, no dependency, matching the system it documents. Six jobs:
 
      1. theme       toggle the docs chrome AND every example iframe
      2. probes      resolve token values in BOTH themes, in-browser
      3. examples    source toggle, live width readout
-     4. nav         filter, current-page marking
+     4. nav         filter, current-page marking, phone drawer
      5. toc         active-heading tracking
 
    (2) is the one that earns its keep. A generated table can only show what a
@@ -15,6 +15,11 @@
    type-size-base, and --r-lg is 1rem against a canonical 16px, equal only
    because nothing overrides the root font size. So the resolved column is read
    off two real documents rather than derived.
+
+   The docs chrome is Praxis now, which changes exactly one thing here: the
+   theme attribute goes on <body>, not <html>, because every Praxis dark rule is
+   scoped body[data-variant="praxis"][data-theme="dark"]. It is written to both
+   so `color-scheme` still reaches the UA form controls and scrollbars.
    ===================================================================== */
 (function () {
   'use strict';
@@ -27,7 +32,14 @@
     return Array.prototype.slice.call(document.querySelectorAll('iframe[data-example]'));
   }
 
+  function currentTheme() {
+    return document.body.getAttribute('data-theme') || 'light';
+  }
+
   function applyTheme(theme) {
+    /* Body carries the Praxis theme; html carries it too so color-scheme and
+       the UA scrollbars follow. */
+    document.body.setAttribute('data-theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
     var btn = document.getElementById('themetoggle');
     if (btn) btn.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
@@ -46,6 +58,9 @@
     try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; }
   }
 
+  /* The inline script at the top of <body> already set the attribute before
+     first paint. This re-runs it so the toggle's aria-pressed and the example
+     frames pick up the same value. */
   var initial = stored()
     || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   applyTheme(initial);
@@ -53,7 +68,7 @@
   document.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest('#themetoggle');
     if (!t) return;
-    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
     try { localStorage.setItem(THEME_KEY, next); } catch (err) {}
     applyTheme(next);
   });
@@ -64,7 +79,7 @@
       if (f.dataset.pinned === '1') return;
       try {
         var b = f.contentDocument && f.contentDocument.body;
-        if (b) b.setAttribute('data-theme', document.documentElement.getAttribute('data-theme'));
+        if (b) b.setAttribute('data-theme', currentTheme());
       } catch (e) {}
     });
   });
@@ -259,18 +274,55 @@
   function navFilter() {
     var input = document.getElementById('navsearch');
     if (!input) return;
-    var items = Array.prototype.slice.call(document.querySelectorAll('.nav__list li'));
-    var groups = Array.prototype.slice.call(document.querySelectorAll('.nav__section'));
+    var items = Array.prototype.slice.call(document.querySelectorAll('.adminnav__item'));
+    var groups = Array.prototype.slice.call(document.querySelectorAll('.adminnav__scroll > div'));
     input.addEventListener('input', function () {
       var q = input.value.trim().toLowerCase();
-      items.forEach(function (li) {
-        var hay = (li.textContent + ' ' + (li.dataset.keywords || '')).toLowerCase();
-        li.hidden = q !== '' && hay.indexOf(q) === -1;
+      items.forEach(function (a) {
+        var hay = (a.textContent + ' ' + (a.dataset.keywords || '')).toLowerCase();
+        a.hidden = q !== '' && hay.indexOf(q) === -1;
       });
       groups.forEach(function (g) {
-        var any = g.querySelector('.nav__list li:not([hidden])');
-        g.hidden = !any;
+        g.hidden = !g.querySelector('.adminnav__item:not([hidden])');
       });
+    });
+  }
+
+  /* ---- 4b. phone nav drawer ------------------------------------------
+     praxis-navdrawer.js derives a drawer from the nav RAIL, and this site has
+     no rail — the reference has no app modules to put in one, and a decorative
+     rail would be documenting something that is not there. So the .adminnav
+     panel becomes its own off-canvas drawer below 900px (see site.css) and this
+     drives it: the same open/scrim/Escape/focus behaviour, ~30 lines. */
+  function navDrawer() {
+    var toggle = document.getElementById('navtoggle');
+    var nav = document.getElementById('docnav');
+    if (!toggle || !nav) return;
+
+    var scrim = document.createElement('div');
+    scrim.className = 'doc-navscrim';
+    scrim.hidden = true;
+    document.body.appendChild(scrim);
+
+    function set(open) {
+      nav.classList.toggle('is-open', open);
+      scrim.hidden = !open;
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) nav.querySelector('#navsearch').focus();
+      else toggle.focus();
+    }
+
+    toggle.addEventListener('click', function () {
+      set(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+    scrim.addEventListener('click', function () { set(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) set(false);
+    });
+    /* Following a link inside the drawer navigates, so the drawer must not be
+       left open behind the new page on a same-page anchor. */
+    nav.addEventListener('click', function (e) {
+      if (e.target.closest('.adminnav__item')) set(false);
     });
   }
 
@@ -289,7 +341,10 @@
         var a = byId[en.target.id];
         if (a) a.classList.add('is-active');
       });
-    }, { rootMargin: '-72px 0px -70% 0px' });
+    /* .admin-body is the scroll container and it starts below the 192px of
+       fixed chrome, so the viewport-relative top inset the old sticky topbar
+       needed is no longer part of the geometry. */
+    }, { rootMargin: '0px 0px -70% 0px' });
     heads.forEach(function (h) { io.observe(h); });
   }
 
@@ -297,5 +352,6 @@
   fitFrames();
   widthReadouts();
   navFilter();
+  navDrawer();
   tocTracking();
 })();

@@ -1,0 +1,67 @@
+<!--praxis
+title: Breadcrumb overflow
+summary: .breadcrumb exists and has no truncation behaviour. Deep hierarchies wrap it into the page header.
+order: 320
+tier: planned
+icon: more_vert
+classes: breadcrumb
+keywords: breadcrumb overflow truncate collapse deep hierarchy wrap planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Tier 3 placeholder.</strong> Real, not urgent, and nothing is defined in <code>src/</code>. This page reserves the name and records what is known; expect it to stay in this state for a while. See <code>ROADMAP.md</code>.</p>
+</div>
+
+<p><code>praxis-pageheader.css</code> defines <code>.breadcrumb</code> properly, and its
+comment is explicit that "the breadcrumb is allowed to wrap at narrow widths and take the header
+with it" — height is a floor, not a fix. That is a deliberate choice, and it means a five-level
+path on a phone pushes the title down.</p>
+<p>An asset hierarchy is routinely five or six levels. This page is about what to do then.</p>
+
+<h2>Anatomy</h2>
+
+<p>Not designed yet.</p>
+
+<h2>Variants</h2>
+
+<p>Collapse the middle into an overflow menu (Primer and Atlassian both do this); truncate individual labels with an ellipsis; or keep wrapping. Wrapping is the current behaviour and is defensible — the overflow menu hides the path, which for an asset tree is the information.</p>
+
+<h2>States</h2>
+
+<p>Full, collapsed, and expanded-from-collapsed. Where does focus go when the overflow opens is the detail that gets missed.</p>
+
+<h2>Responsive behavior</h2>
+
+<p>The whole point of the page. Desktop shows the full path; below some width it collapses or truncates. Which width, and which behaviour, is the open decision.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>No sheet chosen yet.</p>
+
+<h2>Markup contract</h2>
+
+<p>The overflow trigger is a button in the list, not a link. Collapsed items stay in the DOM so the path remains available to assistive technology and to in-page search — hiding them entirely would trade a layout problem for an information one.</p>
+
+<h2>Token reference</h2>
+
+<p>No new tokens expected.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p>Not written yet.</p>
+
+<h2>Accessibility</h2>
+
+<p><code>aria-label</code> on the nav. The current page is <code>aria-current="page"</code> and is not a link. Truncated labels need their full text available, which means a <a href="tooltip.html">tooltip</a> or a <code>title</code> — another dependency on Tier 1.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not decided yet.</p>

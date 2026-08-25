@@ -1,0 +1,77 @@
+<!--praxis
+title: Data grid extensions
+summary: Column pin, reorder, resize, density, saved views, row expand. Where enterprise tables live or die, and where Praxis stops at sort and column visibility.
+order: 210
+tier: planned
+icon: table
+classes: px-grid
+keywords: data grid table column pin freeze reorder resize density saved view row expand virtualisation planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Tier 3 placeholder.</strong> Real, not urgent, and nothing is defined in <code>src/</code>. This page reserves the name and records what is known; expect it to stay in this state for a while. See <code>ROADMAP.md</code>.</p>
+</div>
+
+<p><code>.admin-table</code> is a good table and <code>praxis-toolbar-compact.css</code>
+already ships <code>.colmenu</code> (column visibility) and <code>.sortmenu</code>. Everything
+past that is missing, and the missing part is what separates a table from a grid.</p>
+<p>An auditor working a 1,284-row register needs to pin the reference column, widen the finding
+text, drop six columns they do not care about, and have that arrangement still be there
+tomorrow.</p>
+
+<h2>Anatomy</h2>
+
+<p>Not designed yet.</p>
+
+<h2>Variants</h2>
+
+<table><thead><tr><th>Capability</th><th>State</th></tr></thead><tbody>
+  <tr><td>Sort</td><td>Exists — <code>.sortbtn</code>, <code>.sortmenu</code></td></tr>
+  <tr><td>Column visibility</td><td>Exists — <code>.colmenu</code></td></tr>
+  <tr><td>Pin / freeze</td><td>Missing. Sticky first column, plus a shadow so the seam is visible</td></tr>
+  <tr><td>Reorder</td><td>Missing. Drag, and a keyboard path that is not drag</td></tr>
+  <tr><td>Resize</td><td>Missing</td></tr>
+  <tr><td>Density</td><td>Missing. Condensed 40 / regular 48 / relaxed 56 is the conventional scale</td></tr>
+  <tr><td>Row expand</td><td>Missing</td></tr>
+  <tr><td>Saved views</td><td>Missing, and the one users ask for by name</td></tr>
+</tbody></table>
+
+<h2>States</h2>
+
+<ul><li>Row hover, selected, and <strong>selected while filtered</strong> — "12 selected, 4 not visible" is a real and dangerous state for a bulk action.</li><li>Column being resized or dragged.</li><li>Pinned-column seam.</li></ul>
+
+<h2>Responsive behavior</h2>
+
+<p>A grid does not become a phone layout by shrinking. The two workable answers are a card-per-row transformation or horizontal scroll with a pinned identity column; picking one is the main open decision.</p>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>No sheet chosen yet.</p>
+
+<h2>Markup contract</h2>
+
+<p>Stays a real <code>&lt;table&gt;</code> wherever possible. Pinning is CSS <code>position:sticky</code>; reorder and resize need script and both need keyboard equivalents. Bulk selection needs a live region reporting the count, and it must state how many selected rows are outside the current filter.</p>
+
+<h2>Token reference</h2>
+
+<p><code>--px-hover</code> for rows (the faint wash, correct for a large target), <code>--px-hover-btn</code> for header controls, <code>--admin-row-selected</code> already exists for selection. Missing: a density scale and a pinned-column seam shadow.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p>Not written yet.</p>
+
+<h2>Accessibility</h2>
+
+<p>Sort state via <code>aria-sort</code>. Resize and reorder must be keyboard-operable or they are decoration. Virtualised rows break screen-reader row counts unless <code>aria-rowcount</code> is set — the trap that makes virtualisation an accessibility decision rather than a performance one.</p>
+
+<h2>Dimensions</h2>
+
+<p>Not decided yet.</p>

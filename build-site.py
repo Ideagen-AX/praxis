@@ -72,15 +72,44 @@ SECTIONS = [
     ('ready', 'Components — ready'),
     ('settling', 'Components — settling'),
     ('unstable', 'Components — unstable'),
+    # Planned last, and a section of its own rather than a chip on a real page:
+    # a reader scanning the nav should be able to tell what EXISTS from what is
+    # only intended without opening anything.
+    ('planned', 'Components — planned'),
 ]
 
 TIER_LABEL = {
     'ready': 'Ready · in daily use and load-bearing',
     'settling': 'Settling · real and working, one or two consumers',
     'unstable': 'Unstable · page-scoped, expect reorganisation',
+    'planned': 'Planned · nothing is defined in src/ yet — this page is the brief',
 }
 
+# The pill in .pageheader__status is 22px tall and holds one word. The long
+# labels above stay as the title attribute, which is where the sentence belongs.
+TIER_SHORT = {'ready': 'Ready', 'settling': 'Settling', 'unstable': 'Unstable',
+              'planned': 'Planned'}
+
+# .admin-pill variant per tier. Reuses the status vocabulary the system already
+# has rather than inventing a docs-only one.
+TIER_PILL = {'ready': 'ok', 'settling': 'info', 'unstable': 'warning',
+             'planned': 'off'}
+
+# A Material Symbols ligature per section, used in .pageheader__icon. Pages
+# override with an `icon:` line.
+SECTION_ICON = {
+    'overview': 'home', 'foundations': 'tune',
+    'ready': 'grid_view', 'settling': 'grid_view', 'unstable': 'grid_view',
+    'planned': 'construction',
+}
+
+GITHUB = 'https://github.com/Ideagen-AX/praxis'
+
 problems = []
+
+# Pages whose <h2> set does not match SKELETON. A GATE — see the block above the
+# definition for why extras are allowed and order is not.
+skeleton_report = []
 
 
 def fail(where, message):
@@ -99,6 +128,33 @@ def slugify(text):
 
 def read(path):
     return open(path, encoding='utf-8').read()
+
+
+# ---------------------------------------------------------------------------
+# The icon vocabulary, read from the converter rather than transcribed.
+#
+# praxis-lucide.js maps ~200 Material Symbols ligatures onto Lucide names and
+# falls back to a plain circle for anything it does not know. A wrong ligature
+# is therefore SILENT: the page renders a circle and nothing says why. So the
+# ligature set is parsed out of the script and an unknown `icon:` fails the
+# build instead.
+# ---------------------------------------------------------------------------
+
+def ligatures():
+    if ligatures.cache is None:
+        js = read(os.path.join(SRC, 'praxis-lucide.js'))
+        m = re.search(r'var MAT2LUCIDE = \{(.*?)\n  \};', js, re.S)
+        if not m:
+            fail('praxis-lucide.js', 'could not find the MAT2LUCIDE map. The `icon:` '
+                                     'metadata is checked against it, so the check is '
+                                     'now blind — fix the pattern in ligatures().')
+            ligatures.cache = set()
+        else:
+            ligatures.cache = set(re.findall(r'"([a-z0-9_]+)"\s*:\s*"', m.group(1)))
+    return ligatures.cache
+
+
+ligatures.cache = None
 
 
 def fill(template, values):
@@ -154,13 +210,24 @@ def parse_content(path):
     if section == 'components':
         section = meta.get('tier', 'settling')
         if section not in TIER_LABEL:
-            fail(rel, 'tier must be ready, settling or unstable (got %r)' % section)
+            fail(rel, 'tier must be one of %s (got %r)'
+                 % (', '.join(sorted(TIER_LABEL)), section))
             section = 'settling'
 
     # Old paths this page should answer for, so a rename does not 404 a URL
     # someone has already shared. Site-root-relative, comma separated.
     redirects = [r.strip().lstrip('/') for r in (meta.get('redirect_from') or '').split(',')
                  if r.strip()]
+
+    # .pageheader__icon. Checked against the converter's own ligature map, so a
+    # typo fails here rather than rendering the fallback circle in silence.
+    icon = meta.get('icon') or SECTION_ICON.get(section, 'grid_view')
+    known = ligatures()
+    if known and icon not in known:
+        fail(rel, 'icon: %s is not a ligature praxis-lucide.js knows, so it would '
+                  'render as the fallback circle. Pick one it maps, or add it to '
+                  'MAT2LUCIDE.' % icon)
+    meta['icon'] = icon
 
     slug = meta.get('slug') or os.path.splitext(os.path.basename(path))[0]
     subdir = os.path.dirname(rel)
@@ -238,7 +305,8 @@ def block_tokens(args):
     if not rows:
         fail('block tokens', 'no tokens matched prefix=%r group=%r'
              % (args.get('prefix'), args.get('group')))
-    out = ['<table class="tokentable">',
+    out = ['<div class="admin-table-wrap"><div class="admin-table-scroll">',
+           '<table class="admin-table tokentable">',
            '<thead><tr><th>Token</th><th>Declared</th>'
            '<th>Resolved · light</th><th>Resolved · dark</th></tr></thead>', '<tbody>']
     for _grp, name, light, dark in rows:
@@ -250,7 +318,7 @@ def block_tokens(args):
             '<td data-computed="%s" data-theme="light"></td>'
             '<td data-computed="%s" data-theme="dark"></td></tr>'
             % (html.escape(name), declared, html.escape(name), html.escape(name)))
-    out += ['</tbody></table>']
+    out += ['</tbody></table></div></div>']
     return '\n'.join(out)
 
 
@@ -349,7 +417,8 @@ def block_scale_md(args):
 
 
 def _rows_table(rows, note=''):
-    out = ['<table class="tokentable">',
+    out = ['<div class="admin-table-wrap"><div class="admin-table-scroll">',
+           '<table class="admin-table tokentable">',
            '<thead><tr><th>Token</th><th>Declared</th>'
            '<th>Resolved · light</th><th>Resolved · dark</th></tr></thead>', '<tbody>']
     for _grp, name, light, dark in rows:
@@ -361,7 +430,7 @@ def _rows_table(rows, note=''):
             '<td data-computed="%s" data-theme="light"></td>'
             '<td data-computed="%s" data-theme="dark"></td></tr>'
             % (html.escape(name), declared, html.escape(name), html.escape(name)))
-    out.append('</tbody></table>')
+    out.append('</tbody></table></div></div>')
     if note:
         out.append('<p class="sw__val">%s</p>' % note)
     return '\n'.join(out)
@@ -770,9 +839,10 @@ def block_stats(args):
         (m['sheets'], 'stylesheets'),
         (len(praxis_meta.token_cycles()), 'cyclic var() chains'),
     ]
-    out = ['<div class="stat">']
+    out = ['<div class="admin-grid admin-grid--4 stat">']
     for n, k in cells:
-        out.append('<div class="stat__cell"><span class="stat__n">%s</span>'
+        out.append('<div class="admin-card admin-card--flush stat__cell">'
+                   '<span class="stat__n">%s</span>'
                    '<span class="stat__k">%s</span></div>' % (n, html.escape(k)))
     out.append('</div>')
     return '\n'.join(out)
@@ -868,13 +938,14 @@ def block_pages(args):
     a new content file appears here without anyone updating an index."""
     want = [s.strip() for s in (args.get('section') or '').split(',') if s.strip()]
     pages = block_pages.pages or []
-    out = ['<div class="cardgrid">']
+    out = ['<div class="admin-grid admin-grid--2 cardgrid">']
     for p in pages:
         if want and p['section'] not in want:
             continue
         if p['section'] == 'overview':
             continue
-        out.append('<a href="%s%s"><strong>%s</strong><span>%s</span></a>'
+        out.append('<a class="admin-card admin-card--flush" href="%s%s">'
+                   '<strong>%s</strong><span>%s</span></a>'
                    % (block_pages.root, p['href'],
                       html.escape(p['meta']['title']), html.escape(p['meta']['summary'])))
     out.append('</div>')
@@ -996,7 +1067,7 @@ def extract_examples(body, page, rel):
             return (
                 '<figure class="ex ex--src">\n'
                 '  <figcaption class="ex__cap">%(cap)s</figcaption>\n'
-                '  <pre class="ex__src"><code>%(code)s</code></pre>\n'
+                '  <pre class="admin-panel ex__src"><code>%(code)s</code></pre>\n'
                 '</figure>\n'
             ) % {'cap': html.escape(attrs.get('data-example') or 'Markup'),
                  'code': html.escape(markup)}
@@ -1022,6 +1093,10 @@ def extract_examples(body, page, rel):
         })
 
         src = '%sexamples/%s.html' % (page['root'], name)
+        # The bar's controls are .tbtn--ghost and the source panel is
+        # .admin-panel — the transparent toolbar button and the recessed
+        # --px-surface-2 panel Praxis already defines. Only the frame itself is
+        # docs-local, because a resizable viewport is not an app component.
         return (
             '<figure class="ex">\n'
             '  <figcaption class="ex__cap">%(cap)s</figcaption>\n'
@@ -1031,11 +1106,14 @@ def extract_examples(body, page, rel):
             '            title="%(cap)s" loading="lazy"></iframe>\n'
             '  </div>\n'
             '  <div class="ex__bar">\n'
-            '    <button type="button" data-src-toggle aria-pressed="false">Source</button>\n'
-            '    <a href="%(src)s" target="_blank" rel="noopener">Open on its own</a>\n'
+            '    <button class="tbtn tbtn--ghost" type="button" data-src-toggle '
+            'aria-pressed="false">'
+            '<span class="material-symbols-rounded">data_object</span>Source</button>\n'
+            '    <a class="tbtn tbtn--ghost" href="%(src)s" target="_blank" rel="noopener">'
+            '<span class="material-symbols-rounded">open_in_new</span>Open on its own</a>\n'
             '    <span class="ex__w"></span>\n'
             '  </div>\n'
-            '  <pre class="ex__src" hidden><code>%(code)s</code></pre>\n'
+            '  <pre class="admin-panel ex__src" hidden><code>%(code)s</code></pre>\n'
             '</figure>\n'
         ) % {'cap': html.escape(caption), 'h': attrs.get('data-height', '180'),
              'name': html.escape(name), 'pin': '1' if 'data-theme' in attrs else '0',
@@ -1068,6 +1146,64 @@ def write_example(ex, template):
         'markup': markup.rstrip(),
         'scripts': '\n'.join(scripts),
     })
+
+
+# ---------------------------------------------------------------------------
+# The component page skeleton
+#
+# Every component page carries the same sections in the same order, taken from
+# the previous EHSQ-E design system docs. Two adaptations, both forced by what
+# Praxis is:
+#
+#   API -> "Markup contract".  That section is Vue props, events and TypeScript
+#   interfaces on the old site. Praxis ships no framework bindings, so there are
+#   none; the contract is the markup, the classes, the ARIA attributes and the
+#   script entry point. Keeping the old heading over that content would be
+#   documenting a thing Praxis does not have.
+#
+#   "Helix alignment" dropped, 2026-08-25. It was an open question on every page
+#   and is no longer relevant.
+#
+# EXTRA headings are allowed and expected — the old site's nav-rail page inserts
+# "Create New button", "Pinned items" and "Visibility rules" between Variants and
+# States. What is checked is that all twelve canonical sections are PRESENT and in
+# canonical RELATIVE order. That makes the skeleton a real contract without
+# forcing every component into exactly twelve sections.
+# ---------------------------------------------------------------------------
+
+SKELETON = [
+    'Anatomy', 'Variants', 'States', 'Responsive behavior', 'Interactive demo',
+    'Code', 'Markup contract', 'Token reference', 'Figma adaptation',
+    'Usage guidelines', 'Accessibility', 'Dimensions',
+]
+
+# Component tiers only. Foundation pages are essays about the system rather than
+# documentation of one component, and forcing an "Anatomy" section onto the colour
+# page would produce a heading with nothing under it.
+SKELETON_SECTIONS = {'ready', 'settling', 'unstable', 'planned'}
+
+H2 = re.compile(r'<h2>(.*?)</h2>', re.S)
+
+
+def skeleton_problems(page, body):
+    """Which canonical sections a component page is missing or has out of order."""
+    if page['section'] not in SKELETON_SECTIONS:
+        return []
+    found = [re.sub(r'<[^>]+>', '', h).strip() for h in H2.findall(body)]
+    out = []
+    missing = [s for s in SKELETON if s not in found]
+    if missing:
+        out.append('missing section(s): %s' % ', '.join(missing))
+    # Relative order of the ones that ARE present.
+    present = [s for s in found if s in SKELETON]
+    expected = [s for s in SKELETON if s in present]
+    if present != expected:
+        out.append('sections out of order: got %s, expected %s'
+                   % (' > '.join(present), ' > '.join(expected)))
+    dupes = sorted({s for s in present if present.count(s) > 1})
+    if dupes:
+        out.append('duplicated section(s): %s' % ', '.join(dupes))
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -1106,55 +1242,125 @@ def headings(body):
 # Navigation
 # ---------------------------------------------------------------------------
 
+# A bare prose <table> in a content file, given the Praxis table treatment at
+# build time rather than in 30 content files. The content stays plain semantic
+# HTML — which the markdown converter needs anyway, since a class attribute is
+# noise in PRAXIS-FOR-AGENTS.md — and the site still gets .admin-table.
+#
+# Non-greedy and anchored on the classless open tag, so it cannot touch the
+# token tables (which already carry a class and their own wrapper) and cannot
+# re-wrap a table it has already wrapped.
+PROSE_TABLE = re.compile(r'<table>(.*?)</table>', re.S)
+
+
+def praxisify(body):
+    return PROSE_TABLE.sub(
+        lambda m: ('<div class="admin-table-wrap"><div class="admin-table-scroll">'
+                   '<table class="admin-table">%s</table></div></div>' % m.group(1)),
+        body)
+
+
 def render_nav(pages, current):
+    """The reference nav as .adminnav — the labelled side nav Praxis already
+    ships for exactly this shape: grouped destinations with an active marker,
+    beside a filter field. It replaced a hand-rolled .nav__list that reimplemented
+    the same three states with different values."""
     out = []
     for key, label in SECTIONS:
         group = [p for p in pages if p['section'] == key]
         if not group:
             continue
-        out.append('    <div class="nav__section">')
-        out.append('      <p class="nav__title">%s</p>' % html.escape(label))
-        out.append('      <ul class="nav__list">')
+        # A classless wrapper, on purpose: the filter hides a whole group when
+        # nothing in it matches, and it needs something to hide. Naming it
+        # .adminnav__something would be the docs site inventing a part of a
+        # Praxis component from the outside.
+        out.append('        <div>')
+        out.append('          <p class="adminnav__group">%s</p>' % html.escape(label))
         for p in group:
             cur = ' aria-current="page"' if p is current else ''
+            active = ' adminnav__item--active' if p is current else ''
             kw = html.escape('%s %s %s' % (p['meta'].get('classes', ''),
                                            p['meta'].get('sheet', ''),
                                            p['meta'].get('keywords', '')))
-            out.append('        <li data-keywords="%s"><a href="%s%s"%s>%s</a></li>'
-                       % (kw, current['root'], p['href'], cur, html.escape(p['meta']['title'])))
-        out.append('      </ul>')
-        out.append('    </div>')
+            # No glyph. .adminnav__item has an icon slot, but every page in a
+            # section would carry its section's icon and twelve identical
+            # glyphs down one column is noise, not navigation.
+            out.append('          <a class="adminnav__item%s" data-keywords="%s" '
+                       'href="%s%s"%s><span>%s</span></a>'
+                       % (active, kw, current['root'], p['href'], cur,
+                          html.escape(p['meta']['title'])))
+        out.append('        </div>')
     return '\n'.join(out)
 
 
+def render_breadcrumb(page):
+    """Home glyph, section, current page — the .breadcrumb component's own
+    anatomy. The section is not a page, so it is plain text rather than a dead
+    link to nothing."""
+    label = dict(SECTIONS).get(page['section'], page['section'])
+    # The overview page IS home, so it gets the glyph and its own name and no
+    # trail: "home > Praxis" on the Praxis page is a crumb pointing at itself.
+    if page['section'] == 'overview':
+        return ('          <span class="breadcrumb__current">'
+                '<span class="material-symbols-rounded">home</span>%s</span>'
+                % html.escape(page['meta']['title']))
+    parts = ['          <a class="breadcrumb__home" href="%sindex.html" aria-label="Praxis home">'
+             '<span class="material-symbols-rounded">home</span></a>' % page['root'],
+             '          <span class="breadcrumb__sep">'
+             '<span class="material-symbols-rounded">chevron_right</span></span>',
+             '          <span>%s</span>' % html.escape(label),
+             '          <span class="breadcrumb__sep">'
+             '<span class="material-symbols-rounded">chevron_right</span></span>',
+             '          <span class="breadcrumb__current">%s</span>'
+             % html.escape(page['meta']['title'])]
+    return '\n'.join(parts)
+
+
+def render_status(page):
+    """The tier, as an .admin-pill in .pageheader__status. One word in the pill
+    and the full sentence in the title attribute — the pill is 22px tall and the
+    long label was being truncated."""
+    tier = page['meta'].get('tier')
+    if not tier:
+        return ''
+    return ('<span class="admin-pill admin-pill--%s" title="%s">%s</span>'
+            % (TIER_PILL.get(tier, 'off'),
+               html.escape(TIER_LABEL.get(tier, tier)),
+               html.escape(TIER_SHORT.get(tier, tier))))
+
+
 def render_meta(page):
-    meta, chips = page['meta'], []
-    tier = meta.get('tier')
-    if tier:
-        chips.append('<span class="chip chip--%s">%s</span>'
-                     % (tier, html.escape(TIER_LABEL.get(tier, tier))))
-    if meta.get('sheet'):
-        for sheet in [s.strip() for s in meta['sheet'].split(',') if s.strip()]:
-            if not os.path.exists(os.path.join(SRC, sheet)):
-                fail(page['rel'], 'sheet: %s does not exist in src/' % sheet)
-            chips.append('<span class="chip">%s</span>' % html.escape(sheet))
-    if meta.get('scripts'):
-        for s in [s.strip() for s in meta['scripts'].split(',') if s.strip()]:
-            chips.append('<span class="chip">%s</span>' % html.escape(s))
-    return ''.join(chips)
+    """The toolbar band: the sheets and scripts this page documents, as links to
+    their source.
+
+    These were decorative chips under the title. Every one of them names a real
+    file in src/, so making them .tbtn links to that file turns page metadata
+    into the action a reader actually wants next — and the band is what Praxis
+    provides for page-level actions."""
+    meta, out = page['meta'], []
+    for key, glyph, folder in (('sheet', 'draw', 'src'), ('scripts', 'bolt', 'src')):
+        for name in [x.strip() for x in (meta.get(key) or '').split(',') if x.strip()]:
+            if not os.path.exists(os.path.join(SRC, name)):
+                fail(page['rel'], '%s: %s does not exist in src/' % (key, name))
+            out.append('        <a class="tbtn tbtn--ghost" href="%s/blob/main/%s/%s">'
+                       '<span class="material-symbols-rounded">%s</span>%s</a>'
+                       % (GITHUB, folder, name, glyph, html.escape(name)))
+    return '\n'.join(out)
 
 
 def render_pagenav(pages, page, root):
+    """Previous / next as .admin-card, the card surface the rest of the system
+    uses. They were bespoke bordered boxes with their own hover shadow."""
     i = pages.index(page)
     parts = []
-    if i > 0:
-        prev = pages[i - 1]
-        parts.append('<a href="%s%s"><span>Previous</span><strong>%s</strong></a>'
-                     % (root, prev['href'], html.escape(prev['meta']['title'])))
-    if i < len(pages) - 1:
-        nxt = pages[i + 1]
-        parts.append('<a href="%s%s"><span>Next</span><strong>%s</strong></a>'
-                     % (root, nxt['href'], html.escape(nxt['meta']['title'])))
+    for label, other in (('Previous', pages[i - 1] if i > 0 else None),
+                         ('Next', pages[i + 1] if i < len(pages) - 1 else None)):
+        if not other:
+            continue
+        parts.append('<a class="admin-card admin-card--flush" href="%s%s">'
+                     '<span class="pagenav__dir">%s</span>'
+                     '<strong>%s</strong></a>'
+                     % (root, other['href'], label, html.escape(other['meta']['title'])))
     return '\n'.join(parts)
 
 
@@ -1192,6 +1398,7 @@ def build():
     pages = load_pages()
     block_pages.pages = pages
     n_examples = 0
+    del skeleton_report[:]
 
     for page in pages:
         block_pages.root = page['root']
@@ -1201,6 +1408,11 @@ def build():
         body = page['body'].replace('{{version}}', ver)
         body = expand_blocks(body, page['rel'])
         body, examples = extract_examples(body, page, page['rel'])
+        # After extract_examples: a <template>'s markup is escaped text by now,
+        # so example markup that contains a <table> is not rewritten.
+        body = praxisify(body)
+        for problem in skeleton_problems(page, body):
+            skeleton_report.append('%s: %s' % (page['rel'], problem))
         body, toc = headings(body)
 
         for ex in examples:
@@ -1213,8 +1425,13 @@ def build():
         open(out_path, 'w', encoding='utf-8').write(fill(page_tpl, {
             'title': html.escape(page['meta']['title']),
             'summary': html.escape(page['meta']['summary']),
+            'icon': html.escape(page['meta']['icon']),
+            'rel': page['rel'].replace(os.sep, '/'),
+            'breadcrumb': render_breadcrumb(page),
+            'status': render_status(page),
             'meta': render_meta(page),
             'nav': render_nav(pages, page),
+            'pagecount': len(pages),
             'body': body,
             'toc': toc,
             'pagenav': render_pagenav(pages, page, page['root']),
@@ -1250,12 +1467,6 @@ def build():
             }))
             n_redirects += 1
 
-    # The docs script needs to know how far up examples/ is to load the probes.
-    for page in pages:
-        p = os.path.join(OUT, page['href'])
-        s = read(p).replace('<body>', '<body data-root="%s">' % page['root'], 1)
-        open(p, 'w', encoding='utf-8').write(s)
-
     # Coverage is a GATE now, not advisory. It went from 15% to 100% while these
     # pages were written; leaving it advisory would let the next component sheet
     # land undocumented and nobody would notice until a teammate could not find
@@ -1282,6 +1493,15 @@ def build():
              'see --praxis-color-surface-subtle for the pattern.'
              % (len(frozen_now),
                 ', '.join('%s -> %s' % (t, r) for t, r, _d in frozen_now)))
+
+    # A GATE. The skeleton is what makes 39 component pages answer the same
+    # questions in the same order; a page that quietly drops "Accessibility"
+    # looks complete and is not. Checked on the EXPANDED body, so a section
+    # emitted by a praxis-block counts.
+    if skeleton_report:
+        fail('skeleton', '%d component page(s) do not follow the section skeleton:\n    %s'
+             % (len({r.split(':')[0] for r in skeleton_report}),
+                '\n    '.join(skeleton_report)))
 
     every = {name for _g, name, _l, _d in praxis_meta.token_rows()}
     every |= {name for _g, name, _l, _d in praxis_meta.material_rows()}
@@ -1519,12 +1739,25 @@ def relink(text, href_to_anchor):
 
 
 def agents_doc(pages):
-    """Render every content page to one markdown document, in nav order."""
+    """Render every content page to one markdown document, in nav order.
+
+    `tier: planned` pages are EXCLUDED, and that is not a size decision.
+    PRAXIS-FOR-AGENTS.md ships in the npm tarball and its whole contract — stated
+    at the top of CLAUDE.md — is that it says what Praxis *defines*, not what it
+    intends. A planned page describes a component with no rule in `src/`; putting
+    it in the guide invites an agent to write markup against a class that does not
+    exist, which is the exact failure the `.btn` gap causes today and the reason
+    that gap is documented rather than implied.
+
+    They are still on the SITE, in their own nav section, with a Planned pill and
+    an opening callout. A human reading a page titled "Planned" understands it;
+    an agent grepping one markdown file for a class name does not.
+    """
     href_to_anchor = {os.path.basename(p['href']): '#' + slugify(p['meta']['title'])
-                      for p in pages}
+                      for p in pages if p['section'] != 'planned'}
     parts = []
     for page in pages:
-        if page['section'] == 'overview':
+        if page['section'] in ('overview', 'planned'):
             continue
         blocks = []
         body = page['body'].replace('{{version}}', version())
@@ -1680,9 +1913,15 @@ def main():
             return 1
         before = read(out) if os.path.exists(out) else None
         open(out, 'w', encoding='utf-8').write(doc)
-        print('wrote %s (%d pages, %d lines)%s'
-              % (os.path.basename(out), len(pages) - counts['overview'],
-                 doc.count('\n'), '' if before == doc else '  — CHANGED'))
+        # Count what was WRITTEN, not what was offered. agents_doc() skips the
+        # overview and every `tier: planned` page, so subtracting only the
+        # overview overstated the total by the size of the backlog.
+        rendered = sum(1 for p in pages if p['section'] not in ('overview', 'planned'))
+        skipped = counts.get('planned', 0)
+        print('wrote %s (%d pages, %d lines%s)%s'
+              % (os.path.basename(out), rendered, doc.count('\n'),
+                 ', %d planned page(s) excluded' % skipped if skipped else '',
+                 '' if before == doc else '  — CHANGED'))
         return 0
 
     if '--coverage' in argv:

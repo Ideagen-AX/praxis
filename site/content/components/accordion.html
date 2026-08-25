@@ -1,0 +1,182 @@
+<!--praxis
+title: Accordion and disclosure
+summary: .section__header has a tick, a flex order and a collapse rotation, and no base. Long audit checklists need this to be a component. Planned.
+order: 100
+tier: planned
+icon: list
+classes: section, chevron-btn
+keywords: accordion disclosure collapse expand section details summary checklist planned
+-->
+
+<div class="note note--planned">
+  <p><strong>The container, the header row and the panel are all undefined.</strong> <code>praxis-rfield.css</code> styles the tick, the child order and the collapse rotation — everything except the box. Tier 2 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p><code>praxis-rfield.css</code> styles a great deal <em>about</em>
+<code>.section</code> — the teal tick before the header, the flex <code>order</code> that puts
+the chevron first and the title second, the <code>-90deg</code> rotation when
+<code>.is-collapsed</code> is set — and never defines the container, the header row or the
+panel. So the collapse animation works on a box that has no box.</p>
+
+<p><a href="rfield.html">Fields</a> documents the current state. What is missing is the base,
+and a general form of it: an audit checklist is thirty collapsible groups, and it should not
+have to be a record form to get them.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Container</strong> — <code>.section</code>. Undefined.</li>
+  <li><strong>Header</strong> — <code>.section__header</code>. Partly defined: the tick and the
+  child ordering exist, the row does not.</li>
+  <li><strong>Trigger</strong> — <code>.chevron-btn</code>. Positioned by the header rules,
+  otherwise undefined.</li>
+  <li><strong>Title</strong> — <code>.section__title</code>. Ordering only.</li>
+  <li><strong>Panel</strong> — the collapsible region. No class at all today.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Single disclosure</td><td>One header, one panel, independent of its neighbours. What a record form needs</td></tr>
+    <tr><td>Accordion</td><td>A set where opening one closes the others. Rarely right for this domain — an auditor comparing two sections should not have to choose</td></tr>
+    <tr><td><code>--subsec</code></td><td>Nested. <code>.subsec</code> exists in <code>praxis-rfield.css</code> and is described there as deliberately lighter than <code>.section__title</code> so nesting reads without a second border</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Open decision:</strong> whether to build on <code>&lt;details&gt;</code>. It gives
+the toggle, the keyboard behaviour and — importantly — content that is findable by in-page
+search even when closed, which matters for a long checklist. The cost is that its animation
+story is still poor and Praxis already animates this one.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Expanded</strong> — default.</li>
+  <li><strong>Collapsed</strong> — <code>.is-collapsed</code> on the container. Already the
+  convention, and already what rotates the chevron.</li>
+  <li><strong>Contains an error</strong> — the state no general accordion has and every form
+  needs. A collapsed section hiding an invalid field must say so on its header, or the
+  <a href="error-summary.html">error summary</a> is the only route to it.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<p>None of its own. One note that is not cosmetic: at phone width
+more sections should start collapsed, because a form that opens at 4,000px of scroll is
+unusable — but "collapsed by default" is a page decision, not a component one.</p>
+
+<h2>Interactive demo</h2>
+
+<p>The frame shows the current state — a real <code>.section</code> with
+its header parts, so the missing box is visible rather than described.</p>
+
+<template data-example="Today: the tick and the chevron order exist, the box does not" data-height="180">
+  <div class="section">
+    <div class="section__header">
+      <button class="chevron-btn" type="button" aria-expanded="true">
+        <span class="material-symbols-rounded">expand_more</span>
+      </button>
+      <p class="section__title">Immediate actions</p>
+    </div>
+    <div>
+      <div class="rfield">
+        <label class="rfield__label" for="ac-1">Action taken</label>
+        <div class="rfield__control"><input id="ac-1" type="text" value="Area isolated"></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p><code>praxis-rfield.css</code>, where the partial rules already live. A general
+disclosure that is not a record section is an argument for <code>praxis-core.css</code>
+instead — worth settling before the base is written, because moving it later means touching
+both sheets.</p>
+
+<template data-source-only data-example="Proposed — the missing base">
+<section class="section" id="s-actions">
+  <div class="section__header">
+    <button class="chevron-btn" type="button" aria-expanded="true" aria-controls="s-actions-panel">
+      <span class="material-symbols-rounded">expand_more</span>
+      <span class="visually-hidden">Collapse Immediate actions</span>
+    </button>
+    <h3 class="section__title">Immediate actions</h3>
+    <span class="admin-pill admin-pill--warning">2 to complete</span>
+  </div>
+  <div class="section__panel" id="s-actions-panel">…</div>
+</section>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td><code>aria-expanded</code></td><td>On the trigger, not the container. The single most common error in this pattern</td></tr>
+    <tr><td><code>aria-controls</code></td><td>On the trigger, pointing at the panel <code>id</code></td></tr>
+    <tr><td>Trigger</td><td>A real <code>&lt;button&gt;</code>. Whether the whole header row is the target is an open question — a bigger target is better, but the row often carries a pill or a count that should not be part of the button</td></tr>
+    <tr><td>Title</td><td>A real heading at the right level. <code>.section__title</code> is a <code>&lt;p&gt;</code> in the current examples, which loses the document outline</td></tr>
+    <tr><td>Collapsed panel</td><td><code>hidden</code>, not <code>height:0</code>. A zero-height panel keeps its contents focusable, so tabbing walks into a section that is not on screen</td></tr>
+    <tr><td>JS</td><td>Needed for the toggle. Praxis has none for this today</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--px-surface</code></td><td>Container fill</td></tr>
+    <tr><td><code>--praxis-card</code></td><td>Container elevation, where a section is a card</td></tr>
+    <tr><td><code>--praxis-color-border-default</code></td><td>Header rule</td></tr>
+    <tr><td><code>--praxis-motion-fast</code></td><td>Chevron rotation. Already applied</td></tr>
+    <tr><td><code>--praxis-color-teal-60</code></td><td>The header tick, already defined</td></tr>
+  </tbody>
+</table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Let sections open independently.</li>
+  <li>Put a count or a status on the header so a collapsed section still says something.</li>
+  <li>Mark a section that contains an error.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Collapse a section that contains a required empty field on first load.</li>
+  <li>Use <code>height:0</code> to hide the panel.</li>
+  <li>Nest more than two levels. <code>.subsec</code> is the second and there should not be a
+  third.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><code>aria-expanded</code> on the trigger and <code>aria-controls</code> to the panel.</li>
+  <li>Collapsed content is <code>hidden</code>, so it leaves the tab order.</li>
+  <li>The title is a heading, so a screen-reader user can navigate the form by section.</li>
+  <li>The chevron is decorative; the button needs a real accessible name, which is what the
+  <code>.visually-hidden</code> span in the proposed markup is for.</li>
+  <li>Respect <code>prefers-reduced-motion</code> for the rotation and any height transition.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Header</td><td>Min height</td><td>48px</td></tr>
+    <tr><td><code>.chevron-btn</code></td><td>Size</td><td>28px, with the existing <code>margin:0 2px 0 6px</code></td></tr>
+    <tr><td><code>.section__title</code></td><td>Size / weight</td><td>15px / 700</td></tr>
+    <tr><td>Panel</td><td>Padding</td><td>0 16px 16px, matching <code>.rtable</code>'s inset</td></tr>
+  </tbody>
+</table>

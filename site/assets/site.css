@@ -1,308 +1,478 @@
 /* =====================================================================
-   Praxis reference site — docs chrome.
+   Praxis reference site — the part of the docs chrome Praxis does not ship.
 
-   NOT a Praxis component, and deliberately so. Praxis defines no layout
-   primitives (no .btn, no .section, no grid) and its chrome components assume
-   they own the document, so building the site out of them would mean writing
-   the missing half of the system just to hold the site up. Instead the chrome
-   draws on the Praxis palette for brand and defines its own semantic layer.
+   THE SITE IS BUILT IN PRAXIS. `page.html` loads `praxis/praxis.css` — the same
+   bundled sheet a consumer installs — and wears the app shell: `.app`,
+   `.appbar`, `.adminnav`, `.content`, `.pageheader`, `.toolbar`, `.admin-body`.
+   Cards are `.admin-card`, tables are `.admin-table`, status is `.admin-pill`,
+   toolbar controls are `.tbtn`, the nav filter is `.adminnav__filter`, the skip
+   link is `.px-skip`, the phone nav toggle is `.px-navtoggle`. Icons are
+   Material Symbols ligatures converted by `praxis-lucide.js`, exactly as a real
+   Praxis page does it. Theming is `body[data-variant="praxis"][data-theme]`, so
+   the toggle in the app bar drives the actual Praxis dark theme rather than a
+   parallel imitation of it.
 
-   Every live example is real Praxis, inside its own iframe. This file must
-   never style anything inside one.
+   This file used to be the whole site. It carried a `--doc-*` token layer with
+   hand-written dark values built on rungs the Praxis dark theme does not remap —
+   a second design system, maintained beside the one being documented, whose
+   dark mode could agree with Praxis only by coincidence. All of that is gone.
 
-   Note on dark: the Praxis dark theme remaps palette rungs, not just semantic
-   tokens — neutral-05/10/15/20 and teal-10/20/80 all move. So the --doc-*
-   tokens below are built on rungs that DON'T move (neutral-80/90/100, white,
-   teal-60/70) and get explicit dark values, rather than inheriting a remap
-   that is scoped to body[data-variant="praxis"] and would not apply here.
+   WHAT IS LEFT, AND WHY EACH THING IS STILL HERE
+
+     1. Long-form prose. Praxis is an application design system: it styles no
+        h2, no paragraph rhythm, no prose list, no code span, no blockquote.
+        A reference site is mostly prose, so this is the largest section.
+     2. The table of contents. No equivalent; a docs affordance, not an app one.
+     3. The example frame. A resizable viewport holding an iframe is an
+        instrument, not a component. Its chrome is Praxis (`.tbtn--ghost`,
+        `.admin-panel`); the frame geometry is here.
+     4. The colour and scale instruments — palette grid, hue ramps, role
+        swatches, tone pairs, scale rows. These exist to SHOW the system, so
+        they cannot be built out of it without begging the question.
+     5. The docs shell's own deviations: the two-column doc + TOC split, the
+        sheet-and-recess hierarchy (see THE SHEET below), and the phone
+        behaviour, because Praxis folds a hidden `.adminnav` into a nav drawer
+        derived from a nav rail and this site has no rail.
+     6. Four small gaps Praxis genuinely has: a callout box (`.note`), a
+        secondary label (`.pagenav__dir`), the brand lockup, and a base for
+        `.gl-theme-btn`. Each is marked GAP below and listed on
+        /foundations/gaps.html.
+
+   Every live example still runs in its own iframe, and that matters more now
+   than it did: the chrome and the examples share a stylesheet, so the iframe is
+   the only thing stopping a docs rule from reaching into an example. Nothing in
+   this file may style anything inside one.
    ===================================================================== */
 
+/* ---------------------------------------------------------------------
+   Docs-only foundation. Three values, not a token layer.
+   --------------------------------------------------------------------- */
 :root{
-  --doc-bg:#f7f8f9;
-  --doc-panel:var(--praxis-color-white);
-  --doc-panel-2:#eef1f3;
-  --doc-ink:var(--praxis-color-neutral-100);
-  --doc-ink-2:#4d657f;
-  --doc-ink-3:#718499;
-  --doc-line:#dfe4e9;
-  --doc-line-2:#eaeef1;
-  --doc-accent:var(--praxis-color-teal-60);
-  --doc-accent-ink:var(--praxis-color-teal-70);
-  --doc-code-bg:#eef1f3;
-  --doc-sidebar-w:264px;
   --doc-toc-w:200px;
-  --doc-max:52rem;
-  --doc-radius:12px;
-  --doc-radius-sm:8px;
-  --doc-shadow:0 1px 2px rgb(32 42 53 / .06);
-  --doc-shadow-2:0 4px 6px -1px rgb(32 42 53 / .1), 0 2px 4px -2px rgb(32 42 53 / .06);
+  --doc-measure:44rem;          /* prose line length */
   --doc-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
 }
 
-html[data-theme="dark"]{
-  color-scheme:dark;
-  --doc-bg:#12171f;
-  --doc-panel:#192336;
-  --doc-panel-2:#222b39;
-  --doc-ink:#e7ebf1;
-  --doc-ink-2:#9aa7b4;
-  --doc-ink-3:#8b98a6;
-  --doc-line:rgba(255,255,255,.12);
-  --doc-line-2:rgba(255,255,255,.07);
-  --doc-accent:#5ce0e5;
-  --doc-accent-ink:#8ceef1;
-  --doc-code-bg:#0d1219;
-  --doc-shadow:0 1px 2px rgb(0 0 0 / .4);
-  --doc-shadow-2:0 8px 20px -8px rgb(0 0 0 / .6);
-}
-
-*,*::before,*::after{box-sizing:border-box}
-
-html{scroll-behavior:smooth;scroll-padding-top:5rem}
+html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
-body{
-  margin:0;
-  font-family:'Gilroy','Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-  font-size:0.9375rem;
-  line-height:1.6;
-  color:var(--doc-ink);
-  background:var(--doc-bg);
-  -webkit-font-smoothing:antialiased;
+/* The dot grid's left fade clears the nav rail on an app page. There is no rail
+   here, so the token that positions it points at the nav panel instead — the
+   token exists for exactly this and the grid lines up for free. */
+body[data-variant="praxis"]{--navrail-w:var(--adminnav-w,260px)}
+
+/* .admin-body is the scroll container, so anchor offsets belong to it. */
+.admin-body{scroll-padding-top:1rem}
+
+/* ---------------------------------------------------------------------
+   Shell deviations
+   --------------------------------------------------------------------- */
+
+/* GAP — .gl-theme-btn has colour rules in praxis-workspace.css and no base, so
+   the sun/moon swap works but the button has no geometry of its own. Geometry
+   comes from .appbar__iconbtn; only the two SVGs need sizing. */
+.gl-theme-btn svg{width:20px;height:20px}
+.appbar__iconbtn svg{width:20px;height:20px}
+
+/* GAP — no brand lockup. The mark is the Ideagen teal→pink gradient, which is
+   the one piece of brand the palette does not express as a single token. */
+.doc-brand__mark{
+  align-self:center;width:18px;height:18px;border-radius:6px;margin-right:.5rem;
+  background:linear-gradient(135deg,var(--praxis-color-teal-50),var(--praxis-color-pink-60));
+}
+.doc-brand__name{font-weight:700;font-size:1rem;letter-spacing:-.01em}
+.doc-brand__ver{
+  font-family:var(--doc-mono);font-size:var(--praxis-type-size-xs);
+  margin-left:.375rem;color:var(--praxis-color-text-secondary);
+}
+.appbar__brand{gap:0;color:var(--praxis-color-text-primary)}
+.appbar__brand:hover{color:var(--praxis-color-text-primary)}
+
+/* The alpha indicator. Deliberately not a full-width banner: it sits on all 29
+   pages, and a banner that loud on every one of them gets tuned out by the
+   second page, which is the failure mode of the thing it is trying to prevent.
+   It is a plain .admin-pill--warning; the only docs rule is the hover, because
+   a pill is not normally a link. */
+.doc-alpha{flex-shrink:0;text-decoration:none;border:1px solid transparent}
+.doc-alpha:hover{border-color:currentColor;text-decoration:none}
+@media (max-width:520px){.doc-alpha{display:none}}
+
+/* The nav needs a title on the docs site (an admin page's nav is titled by the
+   section it belongs to). The head's own padding is fine; only the sub line's
+   inline code needs to not look like prose code. */
+.adminnav__sub code{font-family:var(--doc-mono);font-size:.95em}
+
+/* Praxis collapses .adminnav to an icon rail at 640px and hides it outright
+   under the Praxis variant, folding its destinations into the nav drawer that
+   praxis-navdrawer.js derives from the nav RAIL. This site has no rail, so that
+   drawer never gets built and the nav would simply disappear. Below 900px the
+   panel becomes an off-canvas drawer of its own, driven by .px-navtoggle. */
+@media (max-width:900px){
+  .px-navtoggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:40px;height:40px;flex-shrink:0;
+    border:0;border-radius:var(--praxis-radius-md);background:transparent;
+    color:var(--praxis-color-text-secondary);cursor:pointer;
+  }
+  .px-navtoggle:hover{background-color:var(--px-hover-btn);color:var(--praxis-color-text-primary)}
+  .px-navtoggle svg{width:24px;height:24px}
+
+  body[data-variant="praxis"] .adminnav{
+    display:flex !important;                 /* clears the phone rule in praxis-core.css */
+    position:fixed;top:0;bottom:0;left:0;z-index:141;
+    width:280px;max-width:85vw;
+    box-shadow:var(--px-overlay);
+    transform:translateX(-100%);
+    transition:transform 220ms var(--praxis-ease-default);
+  }
+  /* Same [data-variant] prefix as the rule above it, or the closed transform
+     (0,2,1) outranks this one (0,2,0) and the drawer never slides in. */
+  body[data-variant="praxis"] .adminnav.is-open{transform:none}
+  /* Labels stay. praxis-admin.css hides them below 640px for the icon-rail
+     collapse — sound for an admin page, wrong here, because these items carry
+     no icon and hiding the label empties the drawer. Its selector for the
+     label is .adminnav__item span:not(.material-symbols-rounded), which is
+     (0,2,0), so an .adminnav__item span override loses on specificity however
+     late it loads. Matched exactly instead. */
+  .adminnav__item span:not(.material-symbols-rounded){display:revert}
+  .adminnav__head,.adminnav__filter{display:revert}
+  .adminnav__group{display:revert;text-align:left;padding:14px 10px 4px}
+  .adminnav__item{justify-content:flex-start;padding:0 12px}
+  .adminnav__scroll{padding:12px 10px 18px}
+
+  .doc-navscrim{
+    position:fixed;inset:0;z-index:140;
+    background:rgba(16,22,30,.55);
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  }
+  .doc-navscrim[hidden]{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  body[data-variant="praxis"] .adminnav{transition:none}
 }
 
-a{color:var(--doc-accent-ink);text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);text-underline-offset:2px}
-a:hover{text-decoration-color:currentColor}
-
-.skip{
-  position:fixed;top:0;left:50%;transform:translate(-50%,-120%);
-  z-index:100;padding:.5rem 1rem;border-radius:0 0 var(--doc-radius-sm) var(--doc-radius-sm);
-  background:var(--doc-accent);color:#fff;text-decoration:none;
-}
-.skip:focus{transform:translate(-50%,0)}
-
-/* ---- top bar ---------------------------------------------------------- */
-
-.topbar{
-  position:sticky;top:0;z-index:20;
-  display:flex;align-items:center;gap:.75rem;
-  height:56px;padding:0 1rem;
-  background:color-mix(in srgb,var(--doc-panel) 88%,transparent);
-  backdrop-filter:blur(12px) saturate(1.4);
-  border-bottom:1px solid var(--doc-line);
-}
-.topbar__spacer{flex:1}
-
-.brand{display:flex;align-items:baseline;gap:.5rem;text-decoration:none;color:var(--doc-ink)}
-.brand__mark{
-  align-self:center;width:18px;height:18px;border-radius:6px;
-  background:linear-gradient(135deg,#29D2D7,#E30072);
-}
-.brand__name{font-weight:600;font-size:1rem;letter-spacing:-.01em}
-.brand__ver{font-family:var(--doc-mono);font-size:.75rem;color:var(--doc-ink-3)}
-
-/* Alpha indicator. Deliberately not a full-width banner: this sits on all 29
-   pages, and a banner that loud on every one of them gets tuned out by the second
-   page, which is the failure mode of the thing it is trying to prevent. Warning
-   tone, small, and it links to the explanation rather than trying to be it. */
-.alphachip{
-  display:inline-flex;align-items:center;gap:.375rem;
-  height:22px;padding:0 .5rem;border-radius:999px;
-  font-size:.6875rem;font-weight:600;text-decoration:none;
-  background:var(--praxis-tone-warning-bg);color:var(--praxis-tone-warning-fg);
-  border:1px solid transparent;white-space:nowrap;
-}
-.alphachip:hover{border-color:currentColor}
-.alphachip__dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-@media (max-width:520px){.alphachip{display:none}}
-
-.search{position:relative;display:flex;align-items:center}
-.search input{
-  width:12rem;height:32px;padding:0 .625rem;
-  font:inherit;font-size:.8125rem;color:var(--doc-ink);
-  background:var(--doc-panel-2);border:1px solid transparent;
-  border-radius:var(--doc-radius-sm);
-}
-.search input:focus{outline:2px solid var(--doc-accent);outline-offset:1px;background:var(--doc-panel)}
-.search input::placeholder{color:var(--doc-ink-3)}
-
-.themetoggle{
-  height:32px;padding:0 .75rem;
-  font:inherit;font-size:.8125rem;color:var(--doc-ink);
-  background:var(--doc-panel-2);border:1px solid var(--doc-line);
-  border-radius:var(--doc-radius-sm);cursor:pointer;
-}
-.themetoggle:hover{background:var(--doc-line-2)}
-.themetoggle [data-when="dark"]{display:none}
-html[data-theme="dark"] .themetoggle [data-when="light"]{display:none}
-html[data-theme="dark"] .themetoggle [data-when="dark"]{display:inline}
-
-/* ---- layout ----------------------------------------------------------- */
-
-.layout{display:grid;grid-template-columns:var(--doc-sidebar-w) minmax(0,1fr);align-items:start}
-
-.sidebar{
-  position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;
-  padding:1.25rem 0 3rem 1rem;border-right:1px solid var(--doc-line);
-}
-.nav__section{margin:0 0 1.25rem}
-.nav__title{
-  margin:0 0 .375rem;padding:0 .5rem;
-  font-size:.75rem;font-weight:600;color:var(--doc-ink-3);
-}
-.nav__list{list-style:none;margin:0;padding:0}
-.nav__list a{
-  display:block;padding:.25rem .5rem;border-radius:6px;
-  font-size:.875rem;text-decoration:none;color:var(--doc-ink-2);
-}
-.nav__list a:hover{background:var(--doc-panel-2);color:var(--doc-ink)}
-.nav__list a[aria-current="page"]{
-  background:color-mix(in srgb,var(--doc-accent) 14%,transparent);
-  color:var(--doc-accent-ink);font-weight:600;
-}
-.nav__list li[hidden]{display:none}
-
-.main{
-  display:grid;grid-template-columns:minmax(0,1fr) var(--doc-toc-w);
-  gap:2.5rem;padding:2rem 2rem 5rem;align-items:start;
-}
-.doc{max-width:var(--doc-max);min-width:0}
-
-.toc{position:sticky;top:calc(56px + 2rem);font-size:.8125rem}
-.toc__title{margin:0 0 .375rem;font-size:.75rem;font-weight:600;color:var(--doc-ink-3)}
-.toc ol{list-style:none;margin:0;padding:0}
-.toc a{display:block;padding:.1875rem 0;color:var(--doc-ink-2);text-decoration:none;border-left:2px solid var(--doc-line-2);padding-left:.625rem}
-.toc a:hover{color:var(--doc-ink)}
-.toc a.is-active{color:var(--doc-accent-ink);border-left-color:var(--doc-accent)}
-
+/* Doc + table of contents. .admin-cols supplies the grid and the alignment; the
+   column template is the page's to set, the same way .toolbar__inner takes its
+   max-width from the page that uses it. */
+.admin-cols--doc{grid-template-columns:minmax(0,1fr) var(--doc-toc-w);gap:2.5rem}
 @media (max-width:1180px){
-  .main{grid-template-columns:minmax(0,1fr)}
+  .admin-cols--doc{grid-template-columns:minmax(0,1fr)}
   .toc{display:none}
 }
-@media (max-width:860px){
-  .layout{grid-template-columns:minmax(0,1fr)}
-  .sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--doc-line);padding:1rem}
-  .main{padding:1.5rem 1rem 4rem}
+
+/* Below the drawer breakpoint the shell stops being an app and becomes a
+   document again: one scroll, no viewport lock. Two full-height flex columns
+   with their own overflow is the wrong shape for reading on a phone, and it
+   fights the dynamic viewport. */
+@media (max-width:900px){
+  .app{height:auto;overflow:visible}
+  .main{display:block}
+  .content{display:block}
+  .admin-body{overflow:visible;padding-bottom:3rem}
+  .appbar{position:sticky;top:0;z-index:30}
 }
 
-/* ---- document --------------------------------------------------------- */
+/* ---------------------------------------------------------------------
+   The toolbar band
+   --------------------------------------------------------------------- */
 
-.doc__head{margin:0 0 2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--doc-line)}
-.doc__head h1{margin:0;font-size:2rem;line-height:1.2;letter-spacing:-.02em;font-weight:600}
-.doc__summary{margin:.5rem 0 0;font-size:1.0625rem;color:var(--doc-ink-2);max-width:44rem}
-.doc__meta{display:flex;flex-wrap:wrap;gap:.375rem;margin:.875rem 0 0}
-.doc__meta:empty{display:none}
+/* The band holds source links, which are quieter than page actions. .tbtn is
+   40px because it is a primary page control; here it is a label with a glyph. */
+.toolbar .tbtn{height:32px;padding:0 10px;font-size:var(--praxis-type-size-sm);font-weight:600}
+.toolbar .tbtn .material-symbols-rounded{font-size:16px}
+.toolbar .tbtn:hover{text-decoration:none}
 
-.chip{
-  display:inline-flex;align-items:center;gap:.3125rem;
-  padding:.125rem .5rem;border-radius:999px;
-  font-size:.75rem;font-family:var(--doc-mono);
-  background:var(--doc-panel-2);color:var(--doc-ink-2);
-  border:1px solid var(--doc-line-2);
+/* ---------------------------------------------------------------------
+   Prose — the whole reason this file still exists
+   --------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------
+   THE SHEET, AND HOW ANYTHING ON IT SEPARATES
+
+   The document is an object lying on the page, not the page itself: .doc is an
+   .admin-card on the raised tier, so the dot grid around it reads as the
+   material it lies on. It fills its grid column rather than keeping its own
+   max-width — a 52rem sheet inside a 56rem column reads as a mistake — and the
+   prose inside keeps the measure instead.
+
+   That makes every card inside it a card on a white card, and white on white
+   can only be separated by shadow. Shadow is the wrong tool at that scale: it
+   is faint enough to vanish against a lit edge in light, and in dark the sheet
+   is already the lightest surface in the shell, so a lift has nothing to lift
+   away from.
+
+   So nesting steps the SURFACE, not the shadow — which is what Praxis already
+   does on its own pages, where .admin-panel and .admin-setting-card are
+   --px-surface-2 inside an .admin-card. That token steps AWAY from the sheet in
+   whichever direction is visible: #F4F6F8 under white in light, #232C3B over
+   #192336 in dark. One declaration, correct in both themes, which is the whole
+   reason to use the token rather than pick two colours.
+
+   A hairline comes with it. The dark step is about ten points of lightness and
+   the shadow is no longer doing any of that work, so the edge has to be drawn.
+   --praxis-color-border-default, not --border-subtle: subtle resolves to
+   #222B39 in dark, which is the surface-2 fill, so that hairline would be
+   invisible in exactly the theme that needs it most.
+   --------------------------------------------------------------------- */
+
+.doc{min-width:0;box-shadow:var(--px-card-raised);padding:2rem 2.5rem 2.5rem}
+@media (max-width:640px){.doc{padding:1.25rem 1.25rem 1.75rem}}
+
+/* Everything that was a raised card, a bordered box or a white panel in the
+   prose, stepped down onto the sheet as one recess. */
+.doc :is(.admin-card, .note, .sw, .rs, .scale, .admin-table-wrap){
+  background:var(--px-surface-2);
+  box-shadow:none;
+  border:1px solid var(--praxis-color-border-default);
+  border-radius:var(--praxis-radius-sm);
+  --doc-chip:var(--px-surface);
 }
-.chip--ready{background:var(--praxis-tone-success-bg);color:var(--praxis-tone-success-fg);border-color:transparent}
-.chip--settling{background:var(--praxis-tone-info-bg);color:var(--praxis-tone-info-fg);border-color:transparent}
-.chip--unstable{background:var(--praxis-tone-warning-bg);color:var(--praxis-tone-warning-fg);border-color:transparent}
+.doc :is(.admin-card, .admin-table-wrap){border-radius:var(--praxis-radius-md)}
+/* .admin-panel is already the recess; it only needs the edge. */
+.doc .admin-panel{border:1px solid var(--praxis-color-border-default);--doc-chip:var(--px-surface)}
+/* .tone is NOT in the list above. Its fill is hard-coded per theme on purpose —
+   a tone chip has to be judged on the surface its own theme provides — so it
+   gets the edge and keeps the sample. */
+.doc .tone{border:1px solid var(--praxis-color-border-default)}
+/* The sticky header takes the wrap's own fill. It cannot be transparent — rows
+   scroll under it — and leaving it at --px-surface put a white band over a
+   surface-2 body, which reads as the head being the lifted thing. */
+.doc .admin-table thead th{background:var(--px-surface-2)}
+/* The two tone variants keep their status tint; the rule above would otherwise
+   outrank .note--trap on specificity whatever the source order. */
+.doc .note--trap{background:var(--praxis-tone-danger-bg)}
+.doc .note--alpha{background:var(--praxis-tone-warning-bg)}
+.doc .note--planned{background:var(--praxis-tone-info-bg)}
+/* An inline code chip is --px-chip, a step off white — so inside a recess it is
+   a step off the wrong surface and nearly vanishes (#EEF1F4 on #F4F6F8).
+   Carried as an inherited custom property rather than a second selector list:
+   the recess above sets it once, inheritance takes it to a chip at any depth,
+   and there is no parallel list of containers to keep in step with the first. */
+.doc{--doc-chip:var(--px-chip)}
+.doc code{background:var(--doc-chip)}
 
-#alpha{scroll-margin-top:5rem}
-.doc h2{margin:2.75rem 0 .75rem;font-size:1.375rem;font-weight:600;letter-spacing:-.01em;scroll-margin-top:5rem}
-.doc h3{margin:2rem 0 .5rem;font-size:1.0625rem;font-weight:600;scroll-margin-top:5rem}
-.doc h4{margin:1.5rem 0 .375rem;font-size:.9375rem;font-weight:600;color:var(--doc-ink-2)}
-.doc p{margin:0 0 1rem;max-width:44rem}
-.doc ul,.doc ol{margin:0 0 1rem;padding-left:1.25rem;max-width:44rem}
-.doc li{margin:.25rem 0}
+/* Hover on a recessed card is a deeper wash and a live border, not a lift: a
+   card that is set INTO the sheet cannot rise off it without contradicting the
+   rest of the page. The wash is the same overlay praxis-core.css uses for a
+   hovered tool. */
+.doc .admin-card:is(a, a:hover){text-decoration:none}
+.doc a.admin-card:hover{
+  background-color:var(--px-surface-2);
+  background-image:linear-gradient(0deg, var(--px-hover-btn), var(--px-hover-btn));
+  border-color:var(--praxis-color-interactive-default);
+  box-shadow:none;
+}
+
+.doc__summary{
+  margin:0 0 2rem;font-size:var(--praxis-type-size-md);line-height:1.6;
+  color:var(--praxis-color-text-secondary);max-width:var(--doc-measure);
+}
+
+.doc h2{
+  margin:2.75rem 0 .75rem;font-size:var(--praxis-type-size-xl);font-weight:700;
+  letter-spacing:-.01em;scroll-margin-top:1rem;color:var(--praxis-color-text-primary);
+}
+.doc h3{
+  margin:2rem 0 .5rem;font-size:var(--praxis-type-size-md);font-weight:700;
+  scroll-margin-top:1rem;color:var(--praxis-color-text-primary);
+}
+.doc h4{
+  margin:1.5rem 0 .375rem;font-size:var(--praxis-type-size-base);font-weight:700;
+  color:var(--praxis-color-text-secondary);
+}
+#alpha{scroll-margin-top:1rem}
+
+.doc p{margin:0 0 1rem;max-width:var(--doc-measure);line-height:1.65}
+/* praxis-reset.css strips list markers, and it is not loaded here for that
+   reason — but praxis-admin.css does normalise enough that prose lists need
+   their indent stated rather than assumed. */
+.doc ul,.doc ol{margin:0 0 1rem;padding-left:1.25rem;max-width:var(--doc-measure);list-style:revert}
+.doc li{margin:.25rem 0;line-height:1.65}
+
+.doc a{color:var(--praxis-color-text-link);text-decoration:underline;
+  text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);text-underline-offset:2px}
+.doc a:hover{text-decoration-color:currentColor}
+
 .doc blockquote{
-  margin:0 0 1rem;padding:.75rem 1rem;max-width:44rem;
-  border-left:3px solid var(--doc-accent);border-radius:0 var(--doc-radius-sm) var(--doc-radius-sm) 0;
-  background:var(--doc-panel-2);color:var(--doc-ink-2);
+  margin:0 0 1rem;padding:.75rem 1rem;max-width:var(--doc-measure);
+  border-left:3px solid var(--praxis-color-interactive-default);
+  border-radius:0 var(--praxis-radius-sm) var(--praxis-radius-sm) 0;
+  background:var(--px-surface-2);color:var(--praxis-color-text-secondary);
 }
 .doc blockquote p:last-child{margin:0}
-.doc hr{margin:2.5rem 0;border:0;border-top:1px solid var(--doc-line)}
+.doc hr{margin:2.5rem 0;border:0;border-top:1px solid var(--praxis-color-border-default)}
 
 .doc code{
   font-family:var(--doc-mono);font-size:.8125em;
   padding:.0625rem .25rem;border-radius:4px;
-  background:var(--doc-code-bg);color:var(--doc-ink);
+  background:var(--px-chip);color:var(--praxis-color-text-primary);
 }
 .doc pre{margin:0;overflow:auto}
-.doc pre code{display:block;padding:1rem;background:none;font-size:.75rem;line-height:1.6}
+.doc pre code{display:block;padding:0;background:none;font-size:.75rem;line-height:1.6}
 
-.doc table{border-collapse:collapse;width:100%;margin:0 0 1.25rem;font-size:.875rem;display:block;overflow-x:auto}
-.doc th,.doc td{text-align:left;padding:.5rem .625rem;border-bottom:1px solid var(--doc-line-2);vertical-align:top}
-.doc th{font-weight:600;color:var(--doc-ink-2);border-bottom:1px solid var(--doc-line);white-space:nowrap}
-.doc tbody tr:hover{background:var(--doc-panel-2)}
+/* .admin-table gives the surface, the sticky head and the zebra; prose tables
+   need the measure and the wrapping a data grid does not want. */
+.doc .admin-table th{white-space:normal}
+.doc .admin-table td code{white-space:nowrap}
 
 .anchor{
-  margin-left:.375rem;opacity:0;text-decoration:none;color:var(--doc-ink-3);
-  font-weight:400;font-size:.8em;
+  margin-left:.375rem;opacity:0;text-decoration:none;font-weight:400;font-size:.8em;
+  color:var(--praxis-color-text-secondary);
 }
-h2:hover .anchor,h3:hover .anchor,.anchor:focus{opacity:1}
+.doc h2:hover .anchor,.doc h3:hover .anchor,.anchor:focus{opacity:1}
 
-.doc__foot{margin:3.5rem 0 0;padding-top:1.25rem;border-top:1px solid var(--doc-line)}
-.doc__foot p{margin:0;font-size:.8125rem;color:var(--doc-ink-3);max-width:44rem}
+.doc__foot{margin:3.5rem 0 0;padding-top:1.25rem;border-top:1px solid var(--praxis-color-border-default)}
+.doc__foot p{margin:0;font-size:var(--praxis-type-size-sm);color:var(--praxis-color-text-secondary);
+  max-width:var(--doc-measure)}
 
-.pagenav{display:flex;gap:.75rem;margin:3rem 0 0}
-.pagenav a{
-  flex:1;padding:.75rem .875rem;border:1px solid var(--doc-line);border-radius:var(--doc-radius);
-  text-decoration:none;background:var(--doc-panel);
-}
-.pagenav a:hover{border-color:var(--doc-accent);box-shadow:var(--doc-shadow)}
-.pagenav span{display:block;font-size:.75rem;color:var(--doc-ink-3)}
-.pagenav strong{font-weight:600;color:var(--doc-ink)}
-.pagenav a:last-child{text-align:right}
+/* ---------------------------------------------------------------------
+   Previous / next
+   --------------------------------------------------------------------- */
 
-/* ---- live example ---------------------------------------------------- */
+.pagenav{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin:3rem 0 0}
+.pagenav .admin-card{display:block;
+  transition:background-color var(--praxis-motion-fast),border-color var(--praxis-motion-fast)}
+.pagenav .admin-card:only-child{grid-column:2}
+.pagenav .admin-card:last-child:not(:only-child){text-align:right}
+/* GAP — no secondary/overline label. .admin-setting-row__label is the closest
+   thing and it is bound to a settings row. */
+.pagenav__dir{display:block;font-size:var(--praxis-type-size-xs);
+  color:var(--praxis-color-text-secondary)}
+.pagenav strong{font-weight:700;color:var(--praxis-color-text-primary)}
+@media (max-width:640px){.pagenav{grid-template-columns:1fr}
+  .pagenav .admin-card:only-child,.pagenav .admin-card:last-child{grid-column:1;text-align:left}}
+
+/* ---------------------------------------------------------------------
+   Table of contents
+   --------------------------------------------------------------------- */
+
+.toc{position:sticky;top:0;font-size:var(--praxis-type-size-sm)}
+.toc__title{margin:0 0 .375rem;font-size:var(--praxis-type-size-xs);font-weight:700;
+  color:var(--praxis-color-text-secondary)}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc a{display:block;padding:.1875rem 0 .1875rem .625rem;text-decoration:none;
+  color:var(--praxis-color-text-secondary);border-left:2px solid var(--praxis-color-border-subtle)}
+.toc a:hover{color:var(--praxis-color-text-primary)}
+.toc a.is-active{color:var(--praxis-color-text-link);
+  border-left-color:var(--praxis-color-interactive-default)}
+
+/* ---------------------------------------------------------------------
+   Live example
+   --------------------------------------------------------------------- */
 
 .ex{margin:0 0 1.75rem}
-.ex__cap{margin:0 0 .5rem;font-size:.8125rem;font-weight:600;color:var(--doc-ink-2)}
+.ex__cap{margin:0 0 .5rem;font-size:var(--praxis-type-size-sm);font-weight:600;
+  color:var(--praxis-color-text-secondary)}
+/* The frame and its bar are one object on the sheet, so they take one edge
+   between them: a real border rather than a shadow, because the iframe fills the
+   frame and paints over any inset ring. The frame's own fill barely shows —
+   the example document brings its own background — but it is the recess colour
+   for the moment before the iframe loads. */
 .ex__frame{
-  position:relative;
-  min-width:20rem;max-width:100%;
-  width:100%;
+  position:relative;min-width:20rem;max-width:100%;width:100%;
   /* Native horizontal resize — no drag JS. Lets you check the documented
      breakpoints (the rail collapse, the toolbar going compact) by hand. */
   resize:horizontal;overflow:hidden;
-  border:1px solid var(--doc-line);border-radius:var(--doc-radius) var(--doc-radius) 0 0;
-  background:var(--doc-panel);
+  background:var(--px-surface-2);
+  border:1px solid var(--praxis-color-border-default);
+  border-radius:var(--praxis-radius-md) var(--praxis-radius-md) 0 0;
 }
 .ex__frame iframe{display:block;width:100%;height:var(--ex-h,180px);border:0}
 .ex__bar{
-  display:flex;align-items:center;gap:.5rem;
-  padding:.375rem .5rem;
-  border:1px solid var(--doc-line);border-top:0;
-  border-radius:0 0 var(--doc-radius) var(--doc-radius);
-  background:var(--doc-panel-2);
-  font-size:.75rem;
+  display:flex;align-items:center;gap:.25rem;padding:.375rem .5rem;
+  background:var(--px-surface-2);
+  border:1px solid var(--praxis-color-border-default);border-top:0;
+  border-radius:0 0 var(--praxis-radius-md) var(--praxis-radius-md);
+  font-size:var(--praxis-type-size-xs);
 }
-.ex__bar button,.ex__bar a{
-  height:26px;padding:0 .5rem;display:inline-flex;align-items:center;
-  font:inherit;color:var(--doc-ink-2);text-decoration:none;
-  background:transparent;border:1px solid transparent;border-radius:6px;cursor:pointer;
-}
-.ex__bar button:hover,.ex__bar a:hover{background:var(--doc-panel);color:var(--doc-ink);border-color:var(--doc-line)}
-.ex__bar button[aria-pressed="true"]{background:var(--doc-panel);border-color:var(--doc-line);color:var(--doc-ink)}
-.ex__w{margin-left:auto;font-family:var(--doc-mono);color:var(--doc-ink-3)}
-.ex__src{
-  margin:.5rem 0 0;border:1px solid var(--doc-line);border-radius:var(--doc-radius);
-  background:var(--doc-code-bg);
-}
+/* praxis-admin.css underlines every <a> on hover; a .tbtn that happens to be a
+   link is a button, not prose. */
+.ex__bar .tbtn,.ex__bar .tbtn:hover{text-decoration:none}
+.ex__bar .tbtn{height:28px;padding:0 8px;font-size:var(--praxis-type-size-xs);
+  color:var(--praxis-color-text-secondary)}
+.ex__bar .tbtn:hover{color:var(--praxis-color-text-primary)}
+.ex__bar .tbtn .material-symbols-rounded{font-size:15px}
+.ex__bar .tbtn[aria-pressed="true"]{background:var(--px-surface);box-shadow:var(--px-tool-shadow)}
+.ex__w{margin-left:auto;font-family:var(--doc-mono);color:var(--praxis-color-text-secondary)}
+.ex__src{margin:.5rem 0 0}
 /* Shown, never run — no frame, so the code block IS the figure. */
 .ex--src .ex__src{margin:0}
 
-/* ---- generated blocks ------------------------------------------------- */
+/* ---------------------------------------------------------------------
+   GAP — callout box. Praxis has .admin-note (italic prose) and nothing that
+   frames an aside. The trap and alpha variants carry a status tone, which is
+   the part Praxis does supply.
+   --------------------------------------------------------------------- */
+.note{
+  margin:0 0 1.25rem;padding:.75rem 1rem;max-width:var(--doc-measure);
+  border-left:3px solid var(--praxis-color-text-secondary);
+  border-radius:0 var(--praxis-radius-sm) var(--praxis-radius-sm) 0;
+  background:var(--px-surface);box-shadow:var(--px-card-rail);
+  font-size:var(--praxis-type-size-base);
+}
+.note p:last-child{margin:0}
+.note--trap{border-left-color:var(--praxis-color-status-danger);
+  background:var(--praxis-tone-danger-bg);box-shadow:none}
+.note--trap strong{color:var(--praxis-tone-danger-fg)}
+/* Info tone, and used only on `tier: planned` pages. It is not a warning: the
+   page is not wrong, it describes something that does not exist yet. Every
+   planned page opens with one so the status survives being deep-linked to,
+   where the nav section and the header pill are both easy to miss. */
+.note--planned{border-left-color:var(--praxis-color-status-info);
+  background:var(--praxis-tone-info-bg);box-shadow:none}
+.note--planned strong{color:var(--praxis-tone-info-fg)}
 
-.tokentable td:first-child,.tokentable td:nth-child(2){font-family:var(--doc-mono);font-size:.75rem;white-space:nowrap}
-.tokentable td[data-computed]{font-family:var(--doc-mono);font-size:.75rem;color:var(--doc-ink-2)}
-.scale__val[data-computed]{color:var(--doc-ink)}
+/* Warning rather than danger. --trap is red because it marks something that
+   will bite you; alpha status is a caveat, and reusing red for both would
+   flatten the distinction on the one page that carries them side by side.
+   Matches the app bar's pill so the two read as the same message. */
+.note--alpha{border-left-color:var(--praxis-color-status-warning);
+  background:var(--praxis-tone-warning-bg);box-shadow:none}
+.note--alpha strong{color:var(--praxis-tone-warning-fg)}
+
+/* ---------------------------------------------------------------------
+   Redirect stub
+   --------------------------------------------------------------------- */
+.doc-stub{display:block;max-width:34rem;margin:0 auto;padding:4rem 1.5rem}
+.doc-stub p{margin:0 0 .5rem}
+.doc-stub a{color:var(--praxis-color-text-link);text-decoration:underline}
+
+/* ---------------------------------------------------------------------
+   Generated blocks: token tables and stat tiles
+   --------------------------------------------------------------------- */
+
+.tokentable td:first-child,.tokentable td:nth-child(2){font-family:var(--doc-mono);
+  font-size:var(--praxis-type-size-xs);white-space:nowrap}
+.tokentable td[data-computed]{font-family:var(--doc-mono);font-size:var(--praxis-type-size-xs);
+  color:var(--praxis-color-text-secondary)}
+.scale__val[data-computed]{color:var(--praxis-color-text-primary)}
 .tokentable td[data-computed]::before{
   content:"";display:inline-block;vertical-align:-2px;
   width:.75rem;height:.75rem;margin-right:.375rem;border-radius:3px;
-  border:1px solid var(--doc-line);background:var(--sw,transparent);
+  border:1px solid var(--praxis-color-border-default);background:var(--sw,transparent);
 }
 .tokentable td[data-computed]:not([data-swatch])::before{display:none}
 .tokentable .is-missing{color:var(--praxis-tone-danger-fg);background:var(--praxis-tone-danger-bg)}
 
-/* ---- colour: seeing, not reading -------------------------------------- */
+.stat__cell{display:flex;flex-direction:column;justify-content:center}
+.stat__n{display:block;font-size:var(--praxis-type-size-2xl);font-weight:700;
+  letter-spacing:-.02em;line-height:1.1;color:var(--praxis-color-text-primary)}
+.stat__k{display:block;font-size:var(--praxis-type-size-xs);
+  color:var(--praxis-color-text-secondary);margin-top:.125rem}
+
+.cardgrid a{transition:background-color var(--praxis-motion-fast),border-color var(--praxis-motion-fast)}
+.cardgrid strong{display:block;color:var(--praxis-color-text-primary);font-weight:700}
+.cardgrid span{display:block;font-size:var(--praxis-type-size-sm);
+  color:var(--praxis-color-text-secondary);margin-top:.125rem}
+
+/* ---------------------------------------------------------------------
+   COLOUR AND SCALE INSTRUMENTS
+
+   These draw the system rather than consume it, so they are deliberately not
+   built out of it — a swatch that inherited a card's surface would be showing
+   you the card, not the colour. They use --praxis-* only where the value is
+   incidental (a hairline, a label ink).
+   --------------------------------------------------------------------- */
 
 /* The whole palette at once. Hues down, rungs across, so a hue's progression
    and two hues' relative weight at the same rung are both comparable in one
@@ -310,13 +480,12 @@ h2:hover .anchor,h3:hover .anchor,.anchor:focus{opacity:1}
 .palette{
   display:grid;
   grid-template-columns:3.5rem repeat(var(--palette-cols),minmax(0,1fr));
-  gap:3px;align-items:center;
-  margin:0 0 .75rem;
+  gap:3px;align-items:center;margin:0 0 .75rem;
 }
-.palette__corner{}
-.palette__rung{text-align:center;font-size:.6875rem;font-family:var(--doc-mono);color:var(--doc-ink-3)}
-.palette__hue{font-size:.75rem;color:var(--doc-ink-2);padding-right:.5rem}
-.palette__gap{}
+.palette__rung{text-align:center;font-size:var(--praxis-type-size-2xs);
+  font-family:var(--doc-mono);color:var(--praxis-color-text-secondary)}
+.palette__hue{font-size:var(--praxis-type-size-xs);color:var(--praxis-color-text-secondary);
+  padding-right:.5rem}
 .palette__cell{
   display:flex;flex-direction:column;
   height:3.25rem;border-radius:5px;overflow:hidden;
@@ -327,42 +496,44 @@ h2:hover .anchor,h3:hover .anchor,.anchor:focus{opacity:1}
 
 /* One hue, continuous. Gaps between steps read as separate colours instead of
    one progression, which is the thing you are actually judging. */
-.ramp{display:flex;border-radius:var(--doc-radius-sm);overflow:hidden;box-shadow:inset 0 0 0 1px rgb(0 0 0 / .08)}
+.ramp{display:flex;border-radius:var(--praxis-radius-sm);overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgb(0 0 0 / .08)}
 .ramp__step{
   flex:1;min-width:0;min-height:5rem;
   display:flex;flex-direction:column;justify-content:flex-end;gap:.125rem;
   padding:.375rem .375rem .4375rem;
-  background:var(--sw,transparent);
-  color:var(--ink,inherit);
+  background:var(--sw,transparent);color:var(--ink,inherit);
 }
-.ramp__step b{font-size:.75rem;font-weight:600;line-height:1}
-.ramp__step small{font-size:.5625rem;font-family:var(--doc-mono);opacity:.85;line-height:1;overflow:hidden;text-overflow:ellipsis}
-.ramp__label{margin:.25rem 0 1rem;font-size:.6875rem;color:var(--doc-ink-3)}
+.ramp__step b{font-size:var(--praxis-type-size-xs);font-weight:700;line-height:1}
+.ramp__step small{font-size:.5625rem;font-family:var(--doc-mono);opacity:.85;line-height:1;
+  overflow:hidden;text-overflow:ellipsis}
+.ramp__label{margin:.25rem 0 1rem;font-size:var(--praxis-type-size-2xs);
+  color:var(--praxis-color-text-secondary)}
 
 /* Semantic colours drawn as what they are for. */
-.roleswatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:.75rem;margin:0 0 1rem}
-.rs{
-  padding:.5rem;border:1px solid var(--doc-line);
-  border-radius:var(--doc-radius);background:var(--doc-panel);
-}
-.rs__name{display:block;margin:.375rem .25rem .125rem;font-family:var(--doc-mono);font-size:.6875rem;word-break:break-all;color:var(--doc-ink)}
+.roleswatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));
+  gap:.75rem;margin:0 0 1rem}
+.rs{padding:.5rem;border-radius:var(--praxis-radius-md);
+  background:var(--px-surface);box-shadow:var(--px-card-rail)}
+.rs__name{display:block;margin:.375rem .25rem .125rem;font-family:var(--doc-mono);
+  font-size:var(--praxis-type-size-2xs);word-break:break-all;color:var(--praxis-color-text-primary)}
 
 /* Each sample sits on the surface its own theme provides, not on whatever the
-   docs chrome is currently using. */
-.rs__sample{padding:.375rem;border-radius:var(--doc-radius-sm);background:var(--praxis-color-white)}
+   docs chrome is currently using. These two literals are the point: they are
+   the light and dark page surfaces, stated, so the sample does not move when
+   the chrome's theme does. */
+.rs__sample{padding:.375rem;border-radius:var(--praxis-radius-sm);background:#ffffff}
 .rs__sample[data-theme="dark"]{background:#161c27;margin-top:.25rem}
 .rs__val{display:block;margin-top:.25rem;font-family:var(--doc-mono);font-size:.625rem;color:#718499}
 .rs__sample[data-theme="dark"] .rs__val{color:#8b98a6}
 .rs__val--same::after{
-  content:"same in both";
-  margin-left:.375rem;padding:0 .25rem;border-radius:3px;
-  background:var(--doc-panel-2);color:var(--doc-ink-3);
+  content:"same in both";margin-left:.375rem;padding:0 .25rem;border-radius:3px;
+  background:rgb(128 128 128 / .18);
 }
-
 .rs__block{display:block;height:2.5rem;border-radius:5px;
   background:var(--sw,transparent);box-shadow:inset 0 0 0 1px rgb(128 128 128 / .35)}
 .rs__ink{display:flex;align-items:center;height:2.5rem;padding:0 .5rem;
-  color:var(--ink,inherit);font-size:.9375rem;font-weight:600}
+  color:var(--ink,inherit);font-size:var(--praxis-type-size-base);font-weight:700}
 /* text-inverse is white in both themes; only a colored fill shows it at all. */
 .rs__sample[data-inverse]::after{
   content:"on a fill";display:block;margin-top:.125rem;
@@ -372,75 +543,62 @@ h2:hover .anchor,h3:hover .anchor,.anchor:focus{opacity:1}
 .rs__border{display:block;height:2.5rem;border-radius:5px;
   background:transparent;border:2px solid var(--sw,transparent)}
 .rs__fill{display:flex;align-items:center;justify-content:center;height:2.5rem;
-  border-radius:5px;background:var(--sw,transparent);font-size:.8125rem;font-weight:600}
+  border-radius:5px;background:var(--sw,transparent);font-size:var(--praxis-type-size-sm);
+  font-weight:700}
 .rs__fill > span{color:var(--ink,#fff)}
 
 /* Tone pairs, both halves at once. Showing them apart invites using one
    without the other, which is the documented mistake with these. */
-.tonepairs{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr));gap:.5rem;margin:0 0 1rem}
-.tone{padding:.5rem;border-radius:var(--doc-radius-sm);background:var(--doc-panel)}
+.tonepairs{display:grid;grid-template-columns:repeat(auto-fill,minmax(8.5rem,1fr));
+  gap:.5rem;margin:0 0 1rem}
+.tone{padding:.5rem;border-radius:var(--praxis-radius-sm);background:#ffffff}
 /* A dark chip needs the surface it was designed against — several dark tone
    backgrounds are translucent white and vanish on a light page. */
 .tone[data-theme="dark"]{background:#161c27}
 .tone[data-theme="dark"] .tone__theme{color:#8b98a6}
 .tone__chip{
   display:flex;align-items:center;justify-content:center;
-  height:2.5rem;border-radius:999px;
-  background:var(--sw,transparent);font-size:.8125rem;font-weight:600;
+  height:2.5rem;border-radius:var(--praxis-radius-full);
+  background:var(--sw,transparent);font-size:var(--praxis-type-size-sm);font-weight:700;
 }
 .tone__chip > span{color:var(--ink,inherit)}
-.tone__theme{display:block;margin-top:.25rem;font-size:.625rem;color:var(--doc-ink-3);text-align:center}
+.tone__theme{display:block;margin-top:.25rem;font-size:.625rem;color:#718499;text-align:center}
 
 /* The compact grid, still used for the small sets. */
-.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:.625rem;margin:0 0 1.5rem}
-.sw{border:1px solid var(--doc-line);border-radius:var(--doc-radius-sm);overflow:hidden;background:var(--doc-panel)}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));
+  gap:.625rem;margin:0 0 1.5rem}
+.sw{border-radius:var(--praxis-radius-sm);overflow:hidden;
+  background:var(--px-surface);box-shadow:var(--px-card-rail)}
 .sw__chip{height:3rem;display:flex}
 .sw__half{flex:1;position:relative;background:var(--sw,transparent)}
 .sw__body{padding:.375rem .5rem}
-.sw__name{display:block;font-family:var(--doc-mono);font-size:.6875rem;word-break:break-all;color:var(--doc-ink)}
-.sw__val{display:block;font-family:var(--doc-mono);font-size:.625rem;color:var(--doc-ink-3)}
+.sw__name{display:block;font-family:var(--doc-mono);font-size:var(--praxis-type-size-2xs);
+  word-break:break-all;color:var(--praxis-color-text-primary)}
+.sw__val{display:block;font-family:var(--doc-mono);font-size:.625rem;
+  color:var(--praxis-color-text-secondary)}
 
-.scale{margin:0 0 1.5rem;border:1px solid var(--doc-line);border-radius:var(--doc-radius);overflow:hidden}
-.scale__row{display:grid;grid-template-columns:14rem 5.5rem 5.5rem minmax(0,1fr);gap:.75rem;align-items:center;padding:.5rem .75rem;border-bottom:1px solid var(--doc-line-2)}
-@media (max-width:900px){.scale__row{grid-template-columns:minmax(0,1fr) 5rem 5rem}.scale__demo{grid-column:1/-1}}
+.scale{margin:0 0 1.5rem;border-radius:var(--praxis-radius-md);overflow:hidden;
+  background:var(--px-surface);box-shadow:var(--px-card-rail)}
+.scale__row{display:grid;grid-template-columns:14rem 5.5rem 5.5rem minmax(0,1fr);
+  gap:.75rem;align-items:center;padding:.5rem .75rem;
+  border-bottom:1px solid var(--praxis-color-border-default)}
+@media (max-width:900px){.scale__row{grid-template-columns:minmax(0,1fr) 5rem 5rem}
+  .scale__demo{grid-column:1/-1}}
 .scale__row:last-child{border-bottom:0}
-.scale__name{font-family:var(--doc-mono);font-size:.75rem;word-break:break-all}
-.scale__val{font-family:var(--doc-mono);font-size:.75rem;color:var(--doc-ink-3)}
+.scale__name{font-family:var(--doc-mono);font-size:var(--praxis-type-size-xs);word-break:break-all}
+.scale__val{font-family:var(--doc-mono);font-size:var(--praxis-type-size-xs);
+  color:var(--praxis-color-text-secondary)}
 .scale__demo{min-width:0}
-.scale__bar{height:.75rem;border-radius:3px;background:var(--doc-accent)}
+.scale__bar{height:.75rem;border-radius:3px;background:var(--praxis-color-interactive-default)}
 /* Big enough that 8px and 20px are visibly different — at 64x40 every step in
    an 8/12/16/20 scale reads as the same rounded rectangle. */
-.scale__box{height:5rem;width:9rem;background:var(--doc-panel-2);border:1px solid var(--doc-line)}
-.scale__type{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--doc-ink)}
-.scale__shadow{height:2.5rem;width:6rem;border-radius:var(--doc-radius-sm);background:var(--doc-panel)}
-.scale__motion{height:.75rem;width:.75rem;border-radius:999px;background:var(--doc-accent)}
-
-.note{
-  margin:0 0 1.25rem;padding:.75rem 1rem;max-width:44rem;
-  border:1px solid var(--doc-line);border-left:3px solid var(--doc-ink-3);
-  border-radius:0 var(--doc-radius-sm) var(--doc-radius-sm) 0;
-  background:var(--doc-panel);font-size:.875rem;
-}
-.note--trap{border-left-color:var(--praxis-color-status-danger);background:var(--praxis-tone-danger-bg)}
-.note--trap strong{color:var(--praxis-tone-danger-fg)}
-/* Warning rather than danger. --trap is red because it marks something that will
-   bite you; alpha status is a caveat, and reusing red for both would flatten the
-   distinction on the one page that carries them side by side. Matches the header
-   chip's tone so the two read as the same message. */
-.note--alpha{border-left-color:var(--praxis-color-status-warning);background:var(--praxis-tone-warning-bg)}
-.note--alpha strong{color:var(--praxis-tone-warning-fg)}
-.note p:last-child{margin:0}
-
-.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.625rem;margin:0 0 1.5rem}
-.stat__cell{padding:.75rem .875rem;border:1px solid var(--doc-line);border-radius:var(--doc-radius);background:var(--doc-panel)}
-.stat__n{display:block;font-size:1.5rem;font-weight:600;letter-spacing:-.02em;line-height:1.1}
-.stat__k{display:block;font-size:.75rem;color:var(--doc-ink-3);margin-top:.125rem}
-
-.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.75rem;margin:0 0 1.5rem}
-.cardgrid a{
-  display:block;padding:.875rem 1rem;text-decoration:none;
-  border:1px solid var(--doc-line);border-radius:var(--doc-radius);background:var(--doc-panel);
-}
-.cardgrid a:hover{border-color:var(--doc-accent);box-shadow:var(--doc-shadow-2)}
-.cardgrid strong{display:block;color:var(--doc-ink);font-weight:600}
-.cardgrid span{display:block;font-size:.8125rem;color:var(--doc-ink-3);margin-top:.125rem}
+/* --px-surface, not surface-2: this box demonstrates a radius, so it has to be
+   a filled shape, and .scale is itself the recess now. */
+.scale__box{height:5rem;width:9rem;background:var(--px-surface);
+  border:1px solid var(--praxis-color-border-default)}
+.scale__type{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:var(--praxis-color-text-primary)}
+.scale__shadow{height:2.5rem;width:6rem;border-radius:var(--praxis-radius-sm);
+  background:var(--px-surface)}
+.scale__motion{height:.75rem;width:.75rem;border-radius:var(--praxis-radius-full);
+  background:var(--praxis-color-interactive-default)}

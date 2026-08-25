@@ -1,0 +1,175 @@
+<!--praxis
+title: Date picker and range
+summary: Date controls exist only inside the filter system. A record form date field has no picker at all. Planned.
+order: 120
+tier: planned
+icon: calendar_month
+classes: px-date
+keywords: date picker calendar range from to due occurred timezone planned
+-->
+
+<div class="note note--planned">
+  <p><strong>There is a date control, and you cannot use it.</strong> <code>.filter-date</code>, <code>.filter-date-range</code> and <code>.cf-date-range</code> are all scoped to <code>praxis-filters.css</code>. A <code>.rfield</code> date field is a bare text input. Tier 2 on <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Dates carry unusual weight in this domain. An incident has a date occurred and a date
+reported and the gap between them is a compliance metric. A permit has a validity window. A CAPA
+has a due date that drives escalation. Getting a date wrong is not a typo, it is a finding.</p>
+
+<p>So the important part of this component is not the calendar — it is the text input beside it.
+A user who knows the date types it; the calendar is for the user who is counting back from
+today.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Text input</strong> — the primary entry path. Must accept a typed date.</li>
+  <li><strong>Trigger</strong> — opens the calendar. An <code>.iconbtn</code>-sized button.</li>
+  <li><strong>Calendar panel</strong> — a <code>.px-pop</code> surface.</li>
+  <li><strong>Grid</strong> — weeks as rows.</li>
+  <li><strong>Footer</strong> — Today, Clear.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table>
+  <thead><tr><th>Variant</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td>Single</td><td>Date occurred, due date</td></tr>
+    <tr><td>Range</td><td>Permit validity, report period. Two inputs, one panel, with the second bounded by the first</td></tr>
+    <tr><td>With time</td><td>Incidents need it — "14:20 on 3 March" is materially different from "3 March". Undecided whether time is part of this component or a sibling</td></tr>
+    <tr><td>Relative presets</td><td>Last 7 days, this quarter. Belongs to the filter form, not the record form. <code>.filter-date-range</code> is where this already lives</td></tr>
+  </tbody>
+</table>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Empty / filled / invalid</strong> — the invalid case needs
+  <code>aria-invalid</code> and an inline message, wired to
+  <a href="error-summary.html">the error summary</a>.</li>
+  <li><strong>Out of range</strong> — a future date on "date occurred" is not a format error,
+  it is a logic error, and the message should say which.</li>
+  <li><strong>Disabled dates</strong> — before a record was opened, after today.</li>
+  <li><strong>Today</strong> — marked in the grid, distinctly from selected.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>Desktop</td><td>Panel anchored under the input</td></tr>
+    <tr><td>Phone</td><td>Panel becomes a centred sheet, or defers to the native picker. Deferring is the pragmatic answer and it loses the range affordance, so probably: native for single, custom for range</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<p>The frame shows the filter-scoped control that exists, beside the bare
+input a record form gets.</p>
+
+<template data-example="Today: .filter-date works inside filters; .rfield gets a text input" data-height="200" data-scripts="lucide">
+  <div style="display:grid;gap:1rem">
+    <div class="filter-date"><input type="date" aria-label="Filter by date"></div>
+    <div class="rfield">
+      <label class="rfield__label" for="dp-1">Date occurred</label>
+      <div class="rfield__control"><input id="dp-1" type="text" placeholder="dd/mm/yyyy"></div>
+    </div>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p>New sheet, or <code>praxis-controls.css</code>. It needs a script — a calendar grid
+with keyboard navigation is not CSS — which argues for its own file so a page that only needs
+the text input does not pay for the panel.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<div class="px-date">
+  <input class="px-date__input" id="occurred" type="text"
+         inputmode="numeric" placeholder="dd/mm/yyyy"
+         aria-describedby="occurred-fmt">
+  <button class="px-date__trigger iconbtn" type="button"
+          aria-label="Choose date" aria-expanded="false" aria-controls="occurred-cal">
+    <span class="material-symbols-rounded">calendar_month</span>
+  </button>
+  <p class="rfield__hint" id="occurred-fmt">For example, 03/03/2026</p>
+  <div class="px-date__panel px-pop" id="occurred-cal" role="dialog"
+       aria-label="Choose date" hidden>
+    <table class="px-date__grid" role="grid">…</table>
+  </div>
+</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Input</td><td>Text, not <code>type="date"</code>, if a custom panel is used — the two together give a browser picker and a Praxis picker on one field</td></tr>
+    <tr><td>Format hint</td><td>A visible example, wired with <code>aria-describedby</code>. GOV.UK's research is unambiguous that this reduces errors more than any placeholder</td></tr>
+    <tr><td>Grid</td><td><code>role="grid"</code> with arrow-key navigation, per APG</td></tr>
+    <tr><td>Panel</td><td><code>role="dialog"</code>, Escape closes, focus returns to the trigger</td></tr>
+    <tr><td>Announcement</td><td>The selected date announced on change, in full ("3 March 2026"), not as the numeric string</td></tr>
+    <tr><td>Timezone</td><td>The component takes and returns a date string. Timezone is the application's problem and the component must not silently apply the browser's</td></tr>
+    <tr><td>JS</td><td>Required</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--px-field</code> / <code>--px-field-hover</code></td><td>Input fill. Fields carry no border in Praxis, so this is the whole affordance</td></tr>
+    <tr><td><code>--px-overlay</code></td><td>Panel shadow</td></tr>
+    <tr><td><code>--praxis-color-interactive-default</code></td><td>Selected day</td></tr>
+    <tr><td><code>--praxis-color-pink-60</code></td><td>Today. Pink is the app's selection accent elsewhere, so today should not use it — an open question</td></tr>
+    <tr><td><code>--praxis-color-text-disabled</code></td><td>Out-of-month and disabled days</td></tr>
+  </tbody>
+</table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Let the user type. The calendar is the fallback, not the path.</li>
+  <li>Show a format example beside the label.</li>
+  <li>Say why a date is rejected — "cannot be in the future", not "invalid".</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use a calendar for a date of birth or any date far from today.</li>
+  <li>Combine <code>type="date"</code> with a custom panel.</li>
+  <li>Put relative presets on a record field. They belong in filters.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>Typing must always work. A calendar-only date field is a keyboard trap for anyone who
+  knows the date.</li>
+  <li>Grid follows APG: arrows move by day, PageUp/Down by month, Home/End to week bounds.</li>
+  <li>Escape closes and restores focus.</li>
+  <li>The format hint is associated with <code>aria-describedby</code>, not left as placeholder
+  text — placeholders vanish on focus, which is when they are needed.</li>
+  <li>Announce the selection in words, not digits.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Input</td><td>Height</td><td>Inherits <code>.rfield__control</code></td></tr>
+    <tr><td>Trigger</td><td>Size</td><td>34px, matching <code>.iconbtn</code></td></tr>
+    <tr><td>Day cell</td><td>Size</td><td>36px — above the 24px minimum target and below a phone-sized 44px, which is why the phone variant defers to native</td></tr>
+    <tr><td>Panel</td><td>Width</td><td>~19rem single, ~36rem for a two-month range</td></tr>
+  </tbody>
+</table>

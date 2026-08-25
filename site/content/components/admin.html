@@ -8,6 +8,7 @@ scripts: praxis-admin-chrome.js
 classes: app, main, content, adminnav, admin-cols, admin-card, admin-subhead, admin-grid, admin-field, admin-tabs, admin-tab, admin-table, admin-table-wrap, admin-table-scroll, admin-tabletools, admin-rowx, admin-pill, admin-panel, admin-setting-row, admin-setting-card, admin-settings-grid, admin-drill, admin-stat, admin-banner, admin-menurow, admin-menulist, admin-note, admin-addmenu, admin-cnbtn, admin-cngrid, admin-cngroup, admin-check, admin-link, admin-preview, admin-body, admin-toolbar, ss-pop, ss-row, ss-sec, lg-btn, lg-cs, lg-err, lg-jv, lg-tm, thumb, track, visually-hidden, px-pop, px-skip
 summary: Read this even if you are not building admin. Despite the name, this sheet carries the application shell, the toolbar button, the switch, the icon base and the popover — and praxis.css includes it.
 keywords: admin shell app main content adminnav table settings tabs stat banner drill nav
+icon: settings
 -->
 
 <div class="note note--trap">
@@ -26,7 +27,9 @@ largest single component surface in Praxis. It sits in the <strong>unstable</str
 because it is page-scoped: the ten admin pages emit an identical shell and this sheet was
 extracted from them, so it is shaped by those screens rather than by a general case.</p>
 
-<h2>The shell primitives</h2>
+<h2>Anatomy</h2>
+
+<h3>The shell primitives</h3>
 
 <table>
   <thead><tr><th>Class</th><th>What it is</th></tr></thead>
@@ -37,7 +40,7 @@ extracted from them, so it is shaped by those screens rather than by a general c
   </tbody>
 </table>
 
-<h2>The admin nav</h2>
+<h3>The admin nav</h3>
 
 <p>A third navigation level, beside the rail: <code>.adminnav</code> at
 <code>--adminnav-w</code>, with a head, a type-to-filter field, a scrolling group list and
@@ -52,7 +55,9 @@ items. It is the largest family in the sheet at 24 rules.</p>
   own component rather than reviving this one.</p>
 </div>
 
-<h2>Layout and cards</h2>
+<h2>Variants</h2>
+
+<h3>Layout and cards</h3>
 
 <template data-example="The admin layout primitives" data-height="420" data-scripts="lucide">
   <div class="admin-cols">
@@ -77,18 +82,18 @@ items. It is the largest family in the sheet at 24 rules.</p>
 
       <div class="admin-card" style="margin-top:1rem">
         <p class="admin-subhead">Status</p>
-        <div class="admin-grid">
+        <div class="admin-drill__stats">
           <div class="admin-stat">
-            <span class="admin-stat__n">1,284</span>
-            <span class="admin-stat__k">Active users</span>
+            <button class="admin-stat__btn" type="button">Active users</button>
+            <span class="admin-stat__metric"><b>1,284</b> across 6 sites</span>
           </div>
           <div class="admin-stat">
-            <span class="admin-stat__n">37</span>
-            <span class="admin-stat__k">Pending invites</span>
+            <button class="admin-stat__btn" type="button">Pending invites</button>
+            <span class="admin-stat__metric"><b>37</b> awaiting reply</span>
           </div>
           <div class="admin-stat">
-            <span class="admin-stat__n">4</span>
-            <span class="admin-stat__k">Failed jobs</span>
+            <button class="admin-stat__btn" type="button">Failed jobs</button>
+            <span class="admin-stat__metric"><b>4</b> in the last hour</span>
           </div>
         </div>
       </div>
@@ -114,61 +119,7 @@ items. It is the largest family in the sheet at 24 rules.</p>
 automatically</a>, selected with <code>:has(&gt; .admin-field__value)</code> — so generated
 admin pages needed no markup change to pick up the record-form look.</p>
 
-<h2>Tables</h2>
-
-<p>Three wrappers, and they are not interchangeable: <code>.admin-table-wrap</code> is the
-outer container, <code>.admin-table-scroll</code> adds the horizontal scroll for wide column
-sets, and <code>.admin-tabletools</code> is the control strip above.</p>
-
-<template data-example="An admin table with tools, pills and a row action" data-height="380" data-scripts="lucide">
-  <div class="admin-card">
-    <div class="admin-tabs">
-      <button class="admin-tab admin-tab--active" type="button">All users</button>
-      <button class="admin-tab" type="button">Pending</button>
-      <button class="admin-tab" type="button">Disabled</button>
-    </div>
-    <div class="admin-tabletools">
-      <button class="admin-ghostbtn" type="button">
-        <span class="material-symbols-rounded" aria-hidden="true">add</span> Invite user
-      </button>
-    </div>
-    <div class="admin-table-wrap">
-      <div class="admin-table-scroll">
-        <table class="admin-table">
-          <thead>
-            <tr><th>Name</th><th>Role</th><th>Site</th><th>Status</th><th></th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Marcus Silva</td><td>EHS coordinator</td><td>Teesside works</td>
-              <td><span class="admin-pill admin-pill--success">Active</span></td>
-              <td><button class="admin-rowx" type="button" aria-label="Remove">
-                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
-            </tr>
-            <tr>
-              <td>Aoife Byrne</td><td>Supervisor</td><td>Teesside works</td>
-              <td><span class="admin-pill admin-pill--warning">Invited</span></td>
-              <td><button class="admin-rowx" type="button" aria-label="Remove">
-                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
-            </tr>
-            <tr>
-              <td>Tom Okafor</td><td>Driver</td><td>Rotherham plant</td>
-              <td><span class="admin-pill">Disabled</span></td>
-              <td><button class="admin-rowx" type="button" aria-label="Remove">
-                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</template>
-
-<p>Zebra striping is <code>tbody tr:nth-child(even)</code>, and the same warning applies as
-for <a href="rfield.html">in-record tables</a>: <strong>a hidden empty-state row still
-counts</strong>. Put it in its own <code>&lt;tbody&gt;</code>.</p>
-
-<h2>Settings rows and drill-downs</h2>
+<h3>Settings rows and drill-downs</h3>
 
 <template data-example="Settings rows with switches, and a drill-down" data-height="330" data-scripts="lucide">
   <div class="admin-settings-grid">
@@ -201,7 +152,90 @@ counts</strong>. Put it in its own <code>&lt;tbody&gt;</code>.</p>
   </div>
 </template>
 
-<h2>Search suggestions</h2>
+<h2>States</h2>
+
+<ul>
+  <li><strong>Tab active</strong> — <code>.admin-tab--active</code>, teal ink and a 2px border.
+  No focus rule; see Accessibility.</li>
+  <li><strong>Nav item active</strong> — <code>.adminnav__item--active</code>, a teal tint plus a
+  3px left bar, remapped to cyan in dark.</li>
+  <li><strong>Row selected</strong> — <code>.admin-table__row--selected</code>, using the amber
+  <code>--admin-row-selected</code>.</li>
+  <li><strong>Row hover</strong> — <code>--px-hover</code>.</li>
+  <li><strong>Pill states</strong> — <code>--ok</code>, <code>--off</code>, <code>--lock</code>,
+  <code>--info</code>, <code>--warning</code>.</li>
+  <li><strong>Empty table</strong> — <code>.admin-table__empty</code>.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td>≤1024px</td><td><code>.admin-cols</code> variants collapse to one column; <code>--4</code> and <code>--6</code> grids to two</td></tr>
+    <tr><td>≤768px</td><td><code>--adminnav-w</code> drops to 224px; <code>--2</code> and <code>--3</code> grids and the settings grid collapse</td></tr>
+    <tr><td>≤640px</td><td>The side nav collapses to a 60px icon rail — and under the Praxis variant <code>praxis-core.css</code> hides it outright, because 60px of unlabelled icons is unusable and it offsets the header and content so they cannot line up with the full-width app bar. Its destinations fold into <a href="nav-drawer.html">the nav drawer</a></td></tr>
+    <tr><td>≤480px</td><td><code>--4</code>, <code>--6</code> and the drill stats go to one column; the app switcher hides</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<h3>Tables</h3>
+
+<p>Three wrappers, and they are not interchangeable: <code>.admin-table-wrap</code> is the
+outer container, <code>.admin-table-scroll</code> adds the horizontal scroll for wide column
+sets, and <code>.admin-tabletools</code> is the control strip above.</p>
+
+<template data-example="An admin table with tools, pills and a row action" data-height="380" data-scripts="lucide">
+  <div class="admin-card">
+    <div class="admin-tabs">
+      <button class="admin-tab admin-tab--active" type="button">All users</button>
+      <button class="admin-tab" type="button">Pending</button>
+      <button class="admin-tab" type="button">Disabled</button>
+    </div>
+    <div class="admin-tabletools">
+      <button class="admin-ghostbtn" type="button">
+        <span class="material-symbols-rounded" aria-hidden="true">add</span> Invite user
+      </button>
+    </div>
+    <div class="admin-table-wrap">
+      <div class="admin-table-scroll">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Name</th><th>Role</th><th>Site</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Marcus Silva</td><td>EHS coordinator</td><td>Teesside works</td>
+              <td><span class="admin-pill admin-pill--ok">Active</span></td>
+              <td><button class="admin-rowx" type="button" aria-label="Remove">
+                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+            </tr>
+            <tr>
+              <td>Aoife Byrne</td><td>Supervisor</td><td>Teesside works</td>
+              <td><span class="admin-pill admin-pill--warning">Invited</span></td>
+              <td><button class="admin-rowx" type="button" aria-label="Remove">
+                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+            </tr>
+            <tr>
+              <td>Tom Okafor</td><td>Driver</td><td>Rotherham plant</td>
+              <td><span class="admin-pill admin-pill--off">Disabled</span></td>
+              <td><button class="admin-rowx" type="button" aria-label="Remove">
+                <span class="material-symbols-rounded" aria-hidden="true">close</span></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+
+<p>Zebra striping is <code>tbody tr:nth-child(even)</code>, and the same warning applies as
+for <a href="rfield.html">in-record tables</a>: <strong>a hidden empty-state row still
+counts</strong>. Put it in its own <code>&lt;tbody&gt;</code>.</p>
+
+<h3>Search suggestions</h3>
 
 <p><code>.ss-pop</code>, <code>.ss-sec</code> and <code>.ss-row</code> are the app-bar search
 suggestion popover, wired by <code>praxis-admin-chrome.js</code>. <code>.ss-row mark</code>
@@ -215,7 +249,21 @@ so wrap the matched substring in <code>&lt;mark&gt;</code> rather than a span.</
   table for that reason.</p>
 </div>
 
-<h2>Chrome wiring</h2>
+<h2>Code</h2>
+
+<p><code>praxis-admin.css</code> — 520 lines and the largest sheet in the system —
+plus <code>praxis-admin-chrome.js</code>.</p>
+
+<div class="note note--trap">
+  <p><strong>This sheet is not a component library.</strong> It carries the application shell, a
+  bare-element <code>box-sizing</code> reset, <code>html,body{height:100%}</code>, an
+  <code>a</code> rule and its own <code>.tbtn</code>. Loading it to get one card restyles your
+  whole page. That is exactly why <code>praxis-controls.css</code> exists, and why
+  <a href="card.html">Card base</a> and <a href="table.html">Table base</a> propose moving the
+  canonical definitions to core.</p>
+</div>
+
+<h3>Chrome wiring</h3>
 
 <p><code>praxis-admin-chrome.js</code> wires the shared chrome for all ten admin pages at
 once, because they emit an identical shell with the same <code>ad-</code> element IDs: the
@@ -230,6 +278,79 @@ the Mazlan drawer.</p>
   this file does not give you a working admin header on its own.</p>
 </div>
 
-<h2>Everything this sheet defines</h2>
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Shell</td><td><code>.app</code> &gt; <code>.appbar</code> + <code>.main</code> &gt; rail + <code>.adminnav</code> + <code>.content</code>. <code>.content</code> sets <code>--ph-pad-x:24px</code>, which the header, the band and <code>.admin-body</code> all inherit</td></tr>
+    <tr><td><code>.adminnav</code></td><td>A labelled <code>&lt;nav&gt;</code>. Active item gets <code>aria-current="page"</code> alongside the class</td></tr>
+    <tr><td><code>.admin-tabs</code></td><td>Real tab roles, or do not claim them. See <a href="tabs.html">Tabs</a></td></tr>
+    <tr><td><code>.admin-table</code></td><td>A real table with <code>scope</code> on header cells. <code>__num</code> for numeric columns</td></tr>
+    <tr><td><code>.admin-card__title</code></td><td>A <code>&lt;p&gt;</code> in every current example. Use a heading where the card is a section of the page</td></tr>
+    <tr><td>JS</td><td><code>praxis-admin-chrome.js</code>, self-wiring, mutates the document</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-admin.css"></praxis-block>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use <code>.admin-card</code>, <code>.admin-table</code> and <code>.admin-pill</code> — all
+  three are complete, and they are what this reference site is built from.</li>
+  <li>Use <code>.admin-panel</code> for anything nested inside a card.</li>
+  <li>Give the side nav a label and mark the current page.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Load this sheet for one rule. Read the trap in Code first.</li>
+  <li>Rely on the side nav below 640px — it is hidden under the Praxis variant.</li>
+  <li>Combine zebra striping with a selected-row fill and expect both to read. The stripe is
+  <code>tbody tr:nth-child(even)</code> and the selection is an amber wash; on alternating rows
+  they interact.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong><code>.admin-tab</code> has no <code>:focus-visible</code> rule.</strong> A keyboard
+  user gets the UA outline over a 2px bottom border, which is where it is least visible. This is a
+  live defect, not a planned improvement — tracked on <a href="tabs.html">Tabs</a>.</li>
+  <li>The tabs also carry no tab roles in the current examples, so they are a row of buttons with
+  tab paint.</li>
+  <li><code>.adminnav</code> needs a label and <code>aria-current</code>; the 3px active bar is a
+  <code>::before</code> and conveys nothing to assistive technology.</li>
+  <li>Tables need <code>scope</code> on header cells and a name on the table.</li>
+  <li><code>.admin-pill--ok</code> and <code>--lock</code> were repointed to the audited tone pairs
+  after measuring 3.81:1 and 3.88:1 against a 4.5 requirement at 12px/700. Any new pill variant has
+  to be measured, not eyeballed.</li>
+  <li>Row actions like <code>.admin-rowx</code> are icon-only and need labels naming the row they
+  act on.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Shell</td><td><code>--appbar-h</code> / <code>--navrail-w</code> / <code>--adminnav-w</code></td><td>64px / 56px / 260px (224px ≤768px, 60px ≤640px)</td></tr>
+    <tr><td><code>.admin-card</code></td><td>Padding / radius</td><td>20px 22px / 12px</td></tr>
+    <tr><td><code>.admin-panel</code></td><td>Padding</td><td>18px 20px</td></tr>
+    <tr><td><code>.admin-table</code></td><td>Cell padding</td><td>12px 14px body, sticky head</td></tr>
+    <tr><td><code>.admin-table-scroll</code></td><td>Max height</td><td>440px, 560px for <code>--tall</code></td></tr>
+    <tr><td><code>.admin-pill</code></td><td>Height / padding</td><td>22px / 0 9px, 12px/700</td></tr>
+    <tr><td><code>.adminnav__item</code></td><td>Min height</td><td>40px</td></tr>
+    <tr><td><code>.admin-grid</code></td><td>Gap</td><td>18px 34px</td></tr>
+  </tbody>
+</table>

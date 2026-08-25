@@ -1,0 +1,176 @@
+<!--praxis
+title: E-signature and attestation
+summary: Sign-off with attribution and intent is a regulated requirement, not a feature. No general design system ships it, which is why it belongs here. Planned.
+order: 180
+tier: planned
+icon: verified
+classes: px-sign
+keywords: signature attestation sign-off approval meaning of signature 21 CFR Part 11 Annex 11 re-authentication planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Nothing exists.</strong> Praxis has no sign-off control, no attestation statement and no signed-record display. Tier 2 on <code>ROADMAP.md</code>, and first-class by decision 3 there.</p>
+</div>
+
+<p>This is the one component on the roadmap that exists because of the domain rather than
+because other design systems have it. In regulated environments an electronic signature is not a
+styled button: it has to capture <em>who</em> signed, <em>when</em>, and <em>what the signature
+means</em> — approval, review, authorship, responsibility — and it usually has to re-verify
+identity at the moment of signing.</p>
+
+<p>The reference points are FDA 21 CFR Part 11 and EU GMP Annex 11. Neither is a design
+specification, and both constrain this component more than any style guide does. Nothing here
+should be treated as a compliance opinion — the point of writing it down is that the
+<em>UI</em> obligations are stable even where the legal ones vary by customer.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Attestation statement</strong> — the sentence the user is agreeing to, shown in
+  full. Not a link to terms, not a truncated summary.</li>
+  <li><strong>Meaning</strong> — which act this signature represents.</li>
+  <li><strong>Identity confirmation</strong> — re-entered credentials or a second factor.</li>
+  <li><strong>Sign control</strong> — deliberately not a default-focused primary.</li>
+  <li><strong>Signed record</strong> — the durable display afterwards: name, meaning, timestamp,
+  and what was signed.</li>
+</ol>
+
+<h2>Variants</h2>
+
+<table><thead><tr><th>Variant</th><th>Use</th></tr></thead><tbody>
+  <tr><td>Single signature</td><td>An inspector closing a finding</td></tr>
+  <tr><td>Co-signature</td><td>Two roles must sign, often in order. The UI has to show whose turn it is</td></tr>
+  <tr><td>Witnessed</td><td>A second person attests to the first signing. Present in nuclear and pharma operations</td></tr>
+  <tr><td>Signed record (read-only)</td><td>The display form. Appears in the <a href="audit-trail.html">audit trail</a> and on print</td></tr>
+</tbody></table>
+
+<p><strong>Open decision:</strong> whether Praxis ships the identity-confirmation step at all, or
+only the attestation and the signed record. Re-authentication is an application and
+identity-provider concern and getting it wrong is a security problem, not a styling one. The
+narrower scope — attestation, meaning, and signed-record display — is the safer thing for a
+design system to own.</p>
+
+<h2>States</h2>
+
+<ul>
+  <li><strong>Unsigned</strong> — the statement visible, the control enabled only once the record
+  is valid.</li>
+  <li><strong>Awaiting my signature</strong> versus <strong>awaiting someone else's</strong>.
+  Different, and routinely conflated.</li>
+  <li><strong>Signing</strong> — in flight. Must not be double-submittable.</li>
+  <li><strong>Signed</strong> — immutable display.</li>
+  <li><strong>Invalidated</strong> — the record changed after signing, so the signature no longer
+  covers it. This is the state that matters most and the one most often missing; a stale signature
+  presented as current is a compliance failure.</li>
+  <li><strong>Failed</strong> — identity not confirmed. Must not clear the form.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table><thead><tr><th>Viewport</th><th>Behaviour</th></tr></thead><tbody>
+  <tr><td>Desktop</td><td>A panel at the end of the record, or a <a href="dialog.html">dialog</a> raised from a toolbar action</td></tr>
+  <tr><td>Phone</td><td>Full-screen. A signature is not something to do in a 280px sheet</td></tr>
+  <tr><td>Print</td><td>The signed record must print with the meaning and the timestamp. Coupled to <code>ROADMAP.md</code> F1</td></tr>
+</tbody></table>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo.</p>
+
+<h2>Code</h2>
+
+<p>New sheet — <code>praxis-sign.css</code>. Deliberately separate: a page that shows a
+signed record should not have to load the signing flow.</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<!-- Signing -->
+<form class="px-sign">
+  <h3 class="px-sign__title">Sign off finding AF-2026-0114</h3>
+  <p class="px-sign__statement" id="sign-stmt">
+    By signing I confirm that I have reviewed this finding and its corrective actions,
+    and that the information recorded is accurate to the best of my knowledge.
+  </p>
+  <div class="rfield">
+    <label class="rfield__label" for="sign-meaning">This signature means</label>
+    <div class="rfield__control">
+      <select id="sign-meaning" class="px-select">
+        <option>Approval</option><option>Review</option><option>Authorship</option>
+      </select>
+    </div>
+  </div>
+  <button class="btn btn--primary" type="submit" aria-describedby="sign-stmt">Sign</button>
+</form>
+
+<!-- Signed, durable -->
+<div class="px-sign px-sign--signed">
+  <span class="px-avatar px-avatar--sm" aria-hidden="true">MS</span>
+  <p class="px-sign__record">
+    <strong>Marcus Silva</strong> — Approval<br>
+    <time datetime="2026-03-14T16:40:00Z">14 Mar 2026, 16:40 UTC</time>
+  </p>
+  <span class="admin-pill admin-pill--ok">Signature valid</span>
+</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<table><thead><tr><th>Item</th><th>Requirement</th></tr></thead><tbody>
+  <tr><td>Statement</td><td>Visible text, associated with the control via <code>aria-describedby</code>. Never behind a link or a tooltip</td></tr>
+  <tr><td>Meaning</td><td>An explicit, recorded field. Not inferred from which button was pressed</td></tr>
+  <tr><td>Sign control</td><td><code>type="submit"</code> in a real form, and <strong>not</strong> auto-focused. Focusing a signature control turns a stray Enter into an attested statement</td></tr>
+  <tr><td>Double submit</td><td>Disabled while in flight, and idempotent server-side. The UI cannot be the only guard</td></tr>
+  <tr><td><code>&lt;time datetime&gt;</code></td><td>Absolute, with timezone, on the signed record</td></tr>
+  <tr><td>Invalidated</td><td>Rendered as a distinct state with its own text, never by hiding the signature</td></tr>
+  <tr><td>JS</td><td>None from Praxis. Identity confirmation is the application's</td></tr>
+</tbody></table>
+
+<h2>Token reference</h2>
+
+<table><thead><tr><th>Token</th><th>Use</th></tr></thead><tbody>
+  <tr><td><code>--px-surface-2</code></td><td>Panel</td></tr>
+  <tr><td><code>--praxis-tone-success-bg</code> / <code>-fg</code></td><td>Valid signature pill</td></tr>
+  <tr><td><code>--praxis-tone-danger-bg</code> / <code>-fg</code></td><td>Invalidated</td></tr>
+  <tr><td><code>--px-primary-grad</code></td><td>Sign control</td></tr>
+  <tr><td><code>--praxis-color-border-default</code></td><td>Statement rule</td></tr>
+</tbody></table>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Show the full attestation statement.</li>
+  <li>Record what the signature means, explicitly.</li>
+  <li>Show whose signature is outstanding.</li>
+  <li>Mark a signature invalidated when the record changes underneath it.</li>
+</ul>
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Auto-focus the sign control.</li>
+  <li>Hide the statement behind a link.</li>
+  <li>Let one button mean approval on one screen and review on another.</li>
+  <li>Treat this as a styled submit. It is the most consequential control in the product.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The statement is associated with the control, so a screen-reader user hears what they are
+  signing before they activate it.</li>
+  <li>No auto-focus on a consequential control.</li>
+  <li>State — awaiting, signed, invalidated — carried in text, not colour.</li>
+  <li>Errors must not clear the form, because re-authentication may have to be retried.</li>
+  <li>The signed record is readable text, not an image of a signature.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table><thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead><tbody>
+  <tr><td>Panel</td><td>Padding</td><td>20px 22px</td></tr>
+  <tr><td>Statement</td><td>Size / measure</td><td>14px, 40rem max</td></tr>
+  <tr><td>Signed record</td><td>Min height</td><td>56px — two lines plus a pill</td></tr>
+  <tr><td>Panel</td><td>Max width</td><td>34rem in a dialog</td></tr>
+</tbody></table>

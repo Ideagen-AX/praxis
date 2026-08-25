@@ -1,0 +1,205 @@
+<!--praxis
+title: Tooltip
+summary: The one thing Praxis has no rule for at all, on a system whose chrome is mostly icon-only buttons. Planned — this page is the brief.
+order: 10
+tier: planned
+icon: help
+classes: px-tip
+keywords: tooltip tip hover label icon button title aria-describedby popover planned
+-->
+
+<div class="note note--planned">
+  <p><strong>Nothing is defined in <code>src/</code> for this.</strong> Not a class, not a
+  rule, not a script — a grep for <code>tooltip</code> across every sheet returns zero. This
+  page is the brief for what it should be, not documentation of what it is. Tier 1 on
+  <code>ROADMAP.md</code>.</p>
+</div>
+
+<p>Praxis leans on icon-only controls harder than most systems: <code>.iconbtn</code> (34px),
+<code>.tbtn--icon</code> (40px), <code>.appbar__iconbtn</code> (40px) and every button in the
+nav rail. Four separate sizes of unlabelled square, and no component to label any of them.</p>
+
+<p>Today the only thing holding that together is the native <code>title</code> attribute,
+which the app shell and this reference site both use. That is not a substitute: it does not
+appear on keyboard focus, it cannot be styled, its delay is fixed by the browser, and on
+touch it does not appear at all.</p>
+
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Trigger</strong> — the control being labelled. Not part of the component; the
+  tooltip attaches to whatever is already there.</li>
+  <li><strong>Bubble</strong> — the floating label. Single line in the common case, wrapping
+  at a max-width for the rest.</li>
+  <li><strong>Tail</strong> — optional. Open question below.</li>
+</ol>
+
+<p>Three parts, and the third is the only real decision. Everything else about this component
+is positioning, timing and accessibility wiring.</p>
+
+<h2>Variants</h2>
+
+<p>One. A tooltip that carries anything more than a short label is a popover, and Praxis
+already has that surface in <code>.px-pop</code>.</p>
+
+<p><strong>The naming question, which is worth settling before any CSS is written.</strong>
+Praxis prefixes shared chrome primitives with <code>px-</code> — <code>.px-pop</code>,
+<code>.px-skip</code>, <code>.px-menu</code>, <code>.px-navdrawer</code>,
+<code>.px-navtoggle</code>. A tooltip is chrome, so <code>.px-tip</code> follows the
+convention. But there is a case for making it <code>.px-pop--tip</code> instead, so a menu, a
+flyout and a tooltip are visibly one surface with three densities. That would be consistent
+with how <code>praxis-controls.css</code> already reasons about <code>.tb-dropdown</code>
+("surface follows <code>.px-pop</code> exactly, so a menu opened from the toolbar and one
+opened from the nav rail are the same object"). The counter-argument is that a tooltip is not
+interactive and a popover is, and merging them invites putting a link in a tooltip.</p>
+
+<h2>States</h2>
+
+<p>Hidden, shown, and shown-from-keyboard. The third is the one the <code>title</code>
+attribute gets wrong and the reason this component has to exist.</p>
+
+<ul>
+  <li><strong>Hover</strong> — appears after a delay, disappears immediately. The delay is
+  what stops a tooltip firing on every control the pointer crosses on the way somewhere.</li>
+  <li><strong>Focus-visible</strong> — appears with no delay. A keyboard user has already
+  committed to the control.</li>
+  <li><strong>Escape</strong> — dismisses without moving focus. Required by WCAG 1.4.13.</li>
+</ul>
+
+<h2>Responsive behavior</h2>
+
+<table>
+  <thead><tr><th>Input</th><th>Behaviour</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Pointer</td><td>Hover with delay</td><td>The standard case</td></tr>
+    <tr><td>Keyboard</td><td>On <code>:focus-visible</code>, no delay</td><td>The case the native attribute drops</td></tr>
+    <tr><td>Touch</td><td>Does not appear</td><td>There is no hover. An icon-only control that is <em>only</em> labelled by a tooltip is unusable on a phone, which makes this a constraint on the app rather than on the component: below <code>--px-phone</code> the label has to be somewhere else. The nav rail already does this correctly — it becomes a labelled drawer</td></tr>
+  </tbody>
+</table>
+
+<h2>Interactive demo</h2>
+
+<p>Nothing to demo. What the frame below shows is the <em>current</em> state: three real
+Praxis icon buttons carrying <code>title</code> attributes. Hover one to see the native
+tooltip, then tab to it and see that nothing appears.</p>
+
+<template data-example="Today: three icon buttons and a native title attribute" data-height="120">
+  <div style="display:flex;gap:.75rem;align-items:center">
+    <button class="iconbtn" type="button" title="Pin this record" aria-label="Pin this record">
+      <span class="material-symbols-rounded">flag</span>
+    </button>
+    <button class="iconbtn" type="button" title="Expand all sections" aria-label="Expand all sections">
+      <span class="material-symbols-rounded">open_in_full</span>
+    </button>
+    <button class="tbtn tbtn--icon" type="button" title="Filter" aria-label="Filter">
+      <span class="material-symbols-rounded">instant_mix</span>
+    </button>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p>Nothing to link yet. When it lands it belongs in <code>praxis-controls.css</code> — that
+sheet exists for exactly this class of thing, "the small shared controls that are not the
+toolbar band", and every page that needs a tooltip can afford four more kilobytes.</p>
+
+<p>It will need a script. Positioning that survives a scroll container, a viewport edge and
+a <code>resize:horizontal</code> frame is not expressible in CSS alone, and Praxis has no
+positioning library. The proposed markup:</p>
+
+<template data-source-only data-example="Proposed markup — not implemented">
+<!-- The trigger owns the relationship. The bubble is generated. -->
+<button class="iconbtn" type="button" data-px-tip="Pin this record" aria-label="Pin this record">
+  <span class="material-symbols-rounded">flag</span>
+</button>
+
+<!-- praxis-tip.js generates, positions and wires this: -->
+<div class="px-tip" role="tooltip" id="px-tip-1" hidden>Pin this record</div>
+</template>
+
+<h2>Markup contract</h2>
+
+<p>Praxis ships no framework bindings, so there are no props and no events — the contract is
+the markup and the attributes.</p>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td><code>data-px-tip</code></td><td>On the trigger. Its value is the label. Undecided: whether this is the only entry point, or whether an existing <code>title</code> is adopted automatically — auto-adoption would upgrade every icon button in the app shell with no markup change, at the cost of being surprising</td></tr>
+    <tr><td><code>aria-label</code></td><td>Still required on the trigger, independently. A tooltip is a visual affordance; the accessible name must not depend on it</td></tr>
+    <tr><td><code>aria-describedby</code></td><td>Set by the script, pointing at the bubble</td></tr>
+    <tr><td><code>role="tooltip"</code></td><td>On the bubble</td></tr>
+    <tr><td>JS API</td><td>Self-wiring on <code>DOMContentLoaded</code> with a <code>MutationObserver</code>, matching how <code>praxis-lucide.js</code> and the five chrome scripts already behave. No init call</td></tr>
+  </tbody>
+</table>
+
+<h2>Token reference</h2>
+
+<p>Nothing new should be needed. The bubble is a floating chrome surface and Praxis already
+has the material for one:</p>
+
+<table>
+  <thead><tr><th>Token</th><th>Use</th></tr></thead>
+  <tbody>
+    <tr><td><code>--px-overlay</code></td><td>The shadow. Same as <code>.px-pop</code> and <code>.tb-dropdown</code></td></tr>
+    <tr><td><code>--px-surface</code></td><td>Fill, under the Praxis variant</td></tr>
+    <tr><td><code>--praxis-radius-sm</code></td><td>8px. A tooltip should be the tighter radius, not the 12px of a menu</td></tr>
+    <tr><td><code>--praxis-type-size-sm</code></td><td>13px</td></tr>
+    <tr><td><code>--praxis-motion-fast</code></td><td>120ms for the fade</td></tr>
+  </tbody>
+</table>
+
+<p>One value is genuinely missing: the hover delay. Nothing in the token file expresses "wait
+before showing", and it is a shared decision, not a per-call one. Candidate:
+<code>--praxis-motion-tip-delay</code>.</p>
+
+<h2>Figma adaptation</h2>
+
+<p>Praxis has no Figma library, so there is nothing to adapt from or to. Recorded here because
+the section exists on every component page and the honest answer is "not mapped" rather than
+silence.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Use it to name an icon-only control.</li>
+  <li>Keep it to a few words. If it needs a sentence, the control needs a visible label.</li>
+  <li>Set <code>aria-label</code> as well, always.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Put a link, a button or anything focusable inside it — that is <code>.px-pop</code>.</li>
+  <li>Use it to hold information a user needs to complete a task. On touch they will never see it.</li>
+  <li>Use it on a control that already has a visible label.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>WCAG 1.4.13 Content on Hover or Focus</strong> is the governing criterion:
+  dismissable without moving the pointer, hoverable so the pointer can move onto it, and
+  persistent until dismissed or the trigger loses focus. All three are easy to get wrong and
+  the native <code>title</code> fails the first.</li>
+  <li>The bubble is <code>role="tooltip"</code> and referenced by
+  <code>aria-describedby</code> — a description, not a name.</li>
+  <li>It must not be the only source of the accessible name.</li>
+  <li><strong>Forced colors:</strong> the bubble's separation from the page comes entirely from
+  <code>--px-overlay</code>, and shadows are dropped in forced-colors mode. It needs a border
+  that only appears there. See <code>ROADMAP.md</code> F2 — this component is a concrete
+  instance of that foundation gap rather than a special case.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Bubble</td><td>Max width</td><td>18rem, then wrap</td></tr>
+    <tr><td>Bubble</td><td>Padding</td><td>6px 10px</td></tr>
+    <tr><td>Bubble</td><td>Offset from trigger</td><td>6px, matching <code>.tb-dropdown</code>'s <code>calc(100% + 6px)</code></td></tr>
+    <tr><td>Tail</td><td>Size</td><td>Undecided — see Variants</td></tr>
+  </tbody>
+</table>
+

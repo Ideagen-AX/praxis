@@ -8,6 +8,7 @@ scripts: praxis-module-chip.js
 classes: msel, cn-grid, cn-group, cn-item, is-sel, is-open, is-collapsed
 summary: The search-scope picker in the app bar, and the chip that represents its result in the filter bar — because the modules a search is scoped to are a filter in every sense the user cares about.
 keywords: module selector search scope chip msel filter modules
+icon: apps
 -->
 
 <p>The app bar's search is scoped to one or more modules. <code>.msel</code> is the picker;
@@ -21,7 +22,19 @@ leaving it as separate state the user has to remember.</p>
   default, not a filter, so no chip appears.</p>
 </div>
 
-<h2>The picker</h2>
+<h2>Anatomy</h2>
+
+<ol>
+  <li><strong>Trigger</strong> — <code>.msel</code>, the app-bar chip showing the current module.</li>
+  <li><strong>Panel</strong> — the picker.</li>
+  <li><strong>Group</strong> — <code>.cn-group</code>, a labelled run of modules.</li>
+  <li><strong>Item</strong> — <code>.cn-item</code>, one module.</li>
+</ol>
+
+<p>The grid and item vocabulary is shared with <a href="create-new.html">the Create New
+menu</a> — deliberately, since both are catalogues of the same modules.</p>
+
+<h3>The picker</h3>
 
 <p>It reuses the Create New grid vocabulary — <code>.cn-grid</code>,
 <code>.cn-group</code>, <code>.cn-item</code> — rather than inventing a parallel one, so a
@@ -78,7 +91,9 @@ module tile and a record-type tile are the same object. Selection is
   </div>
 </template>
 
-<h2>The vocabulary</h2>
+<h2>Variants</h2>
+
+<h3>The vocabulary</h3>
 
 <table>
   <thead><tr><th>Class</th><th>What it is</th></tr></thead>
@@ -93,7 +108,107 @@ module tile and a record-type tile are the same object. Selection is
   </tbody>
 </table>
 
-<h2>The chip, and why it is awkward</h2>
+<h2>States</h2>
+
+<ul>
+  <li><strong>Closed / open</strong> — <code>.is-open</code>.</li>
+  <li><strong>Selected</strong> — <code>.is-sel</code> on the current module.</li>
+  <li><strong>Collapsed group</strong> — <code>.is-collapsed</code>.</li>
+</ul>
+
+<p>Three state classes, all following the <code>is-</code> convention documented on
+<a href="../foundations/conventions.html">Naming and state conventions</a>.</p>
+
+<h2>Responsive behavior</h2>
+
+<p>The trigger is hidden below 768px on every page except Search:
+<code>body:not([data-page="search"]) .msel{display:none}</code> in
+<code>praxis-appbar.css</code>. The reasoning is in that sheet — the chip's true home is the
+Search page, and on other pages it was taking width the search input needed.</p>
+
+<p>So on a phone, outside Search, this component is not present at all and its destinations have
+to be reachable another way.</p>
+
+<h2>Interactive demo</h2>
+
+<h3>The picker</h3>
+
+<p>It reuses the Create New grid vocabulary — <code>.cn-grid</code>,
+<code>.cn-group</code>, <code>.cn-item</code> — rather than inventing a parallel one, so a
+module tile and a record-type tile are the same object. Selection is
+<code>.is-sel</code>, and the menu's own parts are <code>.msel__*</code>.</p>
+
+<template data-example="The module selector, open" data-height="420" data-scripts="lucide">
+  <div class="msel is-open" style="position:relative;max-width:26rem">
+    <div class="msel__input">
+      All modules
+      <span class="msel__caret"><span class="material-symbols-rounded">expand_more</span></span>
+    </div>
+    <div class="msel__menu" style="position:relative;inset:auto;margin-top:.5rem">
+      <div class="msel__titlebar">
+        <span class="msel__title">Scope the search</span>
+        <button class="msel__clear" type="button">Clear</button>
+      </div>
+      <input class="msel__filter" type="search" placeholder="Filter modules" aria-label="Filter modules">
+      <div class="msel__groups">
+        <div class="cn-group cn-group--pink">
+          <div class="cn-group__head">
+            <span class="cn-group__icon"><span class="material-symbols-rounded">emergency_home</span></span>
+            <span class="cn-group__title">Incidents &amp; Events</span>
+          </div>
+          <div class="cn-grid">
+            <button class="cn-item is-sel" type="button">
+              <span class="cn-item__icon"><span class="material-symbols-rounded">crisis_alert</span></span>
+              <span class="cn-item__label">Incidents</span>
+            </button>
+            <button class="cn-item" type="button">
+              <span class="cn-item__icon"><span class="material-symbols-rounded">warning</span></span>
+              <span class="cn-item__label">Near-misses</span>
+            </button>
+          </div>
+        </div>
+        <div class="cn-group cn-group--teal">
+          <div class="cn-group__head">
+            <span class="cn-group__icon"><span class="material-symbols-rounded">frame_inspect</span></span>
+            <span class="cn-group__title">Audit &amp; Findings</span>
+          </div>
+          <div class="cn-grid">
+            <button class="cn-item is-sel" type="button">
+              <span class="cn-item__icon"><span class="material-symbols-rounded">fact_check</span></span>
+              <span class="cn-item__label">Audits</span>
+            </button>
+            <button class="cn-item" type="button">
+              <span class="cn-item__icon"><span class="material-symbols-rounded">flag</span></span>
+              <span class="cn-item__label">Findings</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<h2>Code</h2>
+
+<p><code>praxis-module-selector.css</code> for the panel,
+<code>praxis-appbar.css</code> for the trigger's place in the bar, and
+<code>praxis-module-chip.js</code> for the behaviour. The script auto-initialises and mutates the
+document.</p>
+
+<h2>Markup contract</h2>
+
+<table>
+  <thead><tr><th>Item</th><th>Requirement</th></tr></thead>
+  <tbody>
+    <tr><td>Trigger</td><td><code>aria-haspopup</code> and <code>aria-expanded</code></td></tr>
+    <tr><td>Panel</td><td>Labelled by the trigger</td></tr>
+    <tr><td>Selected</td><td><code>.is-sel</code> plus <code>aria-current</code> — the class is paint</td></tr>
+    <tr><td>Groups</td><td>A real heading or an <code>aria-label</code> on the group, not a styled div alone</td></tr>
+    <tr><td>JS</td><td><code>praxis-module-chip.js</code>, self-wiring</td></tr>
+  </tbody>
+</table>
+
+<h3>The chip, and why it is awkward</h3>
 
 <div class="note note--trap">
   <p><strong><code>praxis-filters.js</code> owns <code>[data-chips]</code> and rewrites it
@@ -103,6 +218,52 @@ module tile and a record-type tile are the same object. Selection is
   same fight, and read the script before adding a third writer.</p>
 </div>
 
-<h2>Everything this sheet defines</h2>
+<h2>Token reference</h2>
+
+<h3>Everything this sheet defines</h3>
 
 <praxis-block name="sheet-classes" sheet="praxis-module-selector.css"></praxis-block>
+
+<h2>Figma adaptation</h2>
+
+<p>Not mapped. Praxis has no Figma library.</p>
+
+<h2>Usage guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Mark the current module with both <code>.is-sel</code> and <code>aria-current</code>.</li>
+  <li>Provide another route to the modules on phone, where the chip is hidden.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use it as a general-purpose dropdown. It is a module catalogue and shares its item
+  vocabulary with Create New for that reason.</li>
+  <li>Assume it is present. Outside the Search page it disappears below 768px.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The trigger needs an accessible name that includes the current module, so a screen-reader
+  user knows where they are without opening it.</li>
+  <li><code>aria-current</code> on the selected item.</li>
+  <li>Group labels must reach the accessibility tree.</li>
+  <li>Escape closes and focus returns to the trigger.</li>
+  <li>A collapsed group's contents should leave the tab order.</li>
+</ul>
+
+<h2>Dimensions</h2>
+
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td><code>.cn-item</code> marker</td><td>Size</td><td>32px</td></tr>
+    <tr><td>Item glyph</td><td>Size</td><td>20px</td></tr>
+    <tr><td>Group head</td><td>Height</td><td>32px</td></tr>
+  </tbody>
+</table>
+
+<p>Those three are matched deliberately across this sheet and
+<code>praxis-create-new.css</code>, so the two catalogues line up.</p>
