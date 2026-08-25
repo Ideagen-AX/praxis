@@ -1,0 +1,141 @@
+/* ============================================================================
+   PRAXIS DIALOG — the centred modal.
+
+   Promoted from the groom-lake prototype on 2026-08-25, where five pages had
+   written it independently: Save As Report and Create New on the search page,
+   Create New on contextual-awareness, the workspace Share and Delete dialogs,
+   and the workspace editor's layout picker. Praxis had no dialog at all, which
+   is why they kept being written locally — and they had drifted the way five
+   copies do: 520px wide here and 560 there, `.save-modal__close` overriding
+   `.icon-btn` because it lost on source order, 16px body padding in one and 24
+   in the rest.
+
+   WHAT CHANGED ON THE WAY UP: the head. Every copy put a
+   --praxis-color-neutral-100 band across the top of the dialog with white text
+   on it. That was the loudest thing in the box and it was never carrying
+   information — a dialog's own edges and its scrim already say where it starts
+   and that it is modal. The head here is a plain continuation of the card,
+   divided by a hairline, with the title in ordinary ink. It also removes a
+   contrast trap the prototype hit twice: neutral-100 is not remapped for the
+   dark theme (only 05-20 are), so the band was the same navy in both, and any
+   control that landed on it inherited the wrong colour until someone forced
+   white by hand.
+
+   Depends on praxis-tokens.css and praxis-core.css for --px-* and the
+   --praxis-* scales, and on nothing else. No JS: the consumer toggles `hidden`
+   for presence and `.is-open` for the transition, which is the same two-step
+   every overlay in this system uses.
+   ========================================================================= */
+
+/* ---- Scrim -------------------------------------------------------------
+   A separate element rather than a ::before on the dialog, because it has to
+   sit BELOW the dialog in the stacking order and take the click that dismisses
+   it. Same ink as the nav drawer's scrim.
+
+   z-index 1300/1301, above the popover band (200) and the nav rail: a dialog
+   opened from a flyout has to cover the flyout it came from. */
+.px-dialog-scrim{position:fixed;inset:0;z-index:1300;background:rgba(16,24,38,.5);opacity:0;
+  transition:opacity var(--praxis-motion-normal) var(--praxis-ease-default);}
+.px-dialog-scrim.is-open{opacity:1;}
+.px-dialog-scrim[hidden],.px-dialog[hidden]{display:none;}
+
+/* ---- The card ----------------------------------------------------------
+   max-height with a scrolling body, not height:auto. A dialog whose content
+   outgrows the viewport otherwise runs off the bottom and takes its own footer
+   buttons with it — which is how a form becomes unsubmittable on a laptop.
+
+   The transform carries both the centring and the 4px rise, so `.is-open` has
+   one property to change and there is no wrapper to position. */
+.px-dialog{position:fixed;top:50%;left:50%;z-index:1301;transform:translate(-50%,-46%);
+  width:560px;max-width:calc(100vw - 32px);max-height:min(88vh,860px);
+  display:flex;flex-direction:column;overflow:hidden;opacity:0;
+  background:var(--px-surface);border-radius:var(--praxis-radius-lg);box-shadow:var(--px-overlay);
+  transition:opacity var(--praxis-motion-normal) var(--praxis-ease-default),
+             transform var(--praxis-motion-normal) var(--praxis-ease-default);}
+.px-dialog.is-open{opacity:1;transform:translate(-50%,-50%);}
+/* Four widths and not a free-for-all, but `width` is a plain declaration on a
+   single class, so a consumer with a genuine outlier (a fifteen-thumbnail
+   layout picker) can set its own without fighting specificity. */
+.px-dialog--sm{width:440px;}
+.px-dialog--lg{width:760px;}
+.px-dialog--xl{width:1080px;}
+@media (prefers-reduced-motion:reduce){
+  .px-dialog,.px-dialog-scrim{transition:none;}
+  /* Restated, or the card sits 4% high for ever with the transition removed. */
+  .px-dialog{transform:translate(-50%,-50%);}
+}
+
+/* ---- Head -------------------------------------------------------------
+   No fill. See the note at the top of this file. The hairline is what divides
+   it, and it is the same border the footer uses so the two ends of the dialog
+   match. */
+.px-dialog__head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;
+  gap:var(--praxis-space-12);padding:var(--praxis-space-16) var(--praxis-space-24);
+  border-bottom:1px solid var(--praxis-color-border-default);}
+body[data-theme="dark"] .px-dialog__head{border-bottom-color:rgba(255,255,255,.10);}
+/* Both, because the prototype's copies used a bare h2 and a class is the better
+   contract for anything new. A dialog's title is the heading of the thing it is
+   about, so it is an h2 in the document and styled here rather than left to
+   whatever the host page does to headings. */
+.px-dialog__title,.px-dialog__head h2{margin:0;font-size:var(--praxis-type-size-lg);font-weight:700;
+  color:var(--praxis-color-text-primary);
+  /* A dialog title routinely quotes the record it is about, and those names run
+     long. Truncating beats wrapping into the close button. */
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* Its own control rather than .iconbtn: that is a 34px square with a tool
+   shadow for a toolbar, and this is a 32px flat circle on a bare surface. The
+   prototype reached for .icon-btn here and then had to override its colour in
+   every copy. */
+.px-dialog__close{flex-shrink:0;width:32px;height:32px;display:grid;place-items:center;padding:0;
+  border:0;border-radius:50%;background:transparent;cursor:pointer;
+  color:var(--praxis-color-text-secondary);
+  transition:background var(--praxis-motion-fast),color var(--praxis-motion-fast);}
+.px-dialog__close:hover{background:var(--px-hover-btn);color:var(--praxis-color-text-primary);}
+.px-dialog__close:focus-visible{outline:2px solid var(--praxis-color-border-focus);outline-offset:-2px;}
+/* Opts out of the global :active press-scale from praxis-core.css: a 32px
+   circle scaled to .95 in the corner of a large card reads as a flicker. */
+.px-dialog__close:active:not(:disabled){transform:none;}
+.px-dialog__close .icon,.px-dialog__close svg{width:18px;height:18px;}
+/* Lucide is stroke-based — never fill it. */
+.px-dialog__close svg{fill:none;}
+.px-dialog__close .material-symbols-rounded{font-size:18px;}
+
+/* ---- Body -------------------------------------------------------------
+   The only part that scrolls, and overscroll-behavior:contain so reaching its
+   end does not start scrolling the page behind the scrim. */
+.px-dialog__body{flex:1 1 auto;min-height:0;padding:var(--praxis-space-24);
+  overflow-y:auto;overscroll-behavior:contain;
+  display:flex;flex-direction:column;gap:var(--praxis-space-24);}
+/* For a dialog that is one short sentence — a confirmation — where the flex
+   column and its 24px gap have nothing to act on. */
+.px-dialog__body--plain{display:block;}
+.px-dialog__body--plain p{margin:0;font-size:var(--praxis-type-size-base);line-height:1.55;
+  color:var(--praxis-color-text-primary);}
+
+/* ---- Foot -------------------------------------------------------------
+   A shade off the body, so the actions read as a band rather than as the last
+   row of the content. Right-aligned: the primary action is where the eye
+   finishes. */
+.px-dialog__foot{flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;
+  gap:var(--praxis-space-8);padding:var(--praxis-space-16) var(--praxis-space-24);
+  border-top:1px solid var(--praxis-color-border-default);background:var(--px-surface-2);}
+body[data-theme="dark"] .px-dialog__foot{border-top-color:rgba(255,255,255,.10);}
+/* Standing text in the footer — who owns the thing, what will happen on save —
+   pushed to the left so it shares the band with the buttons instead of needing
+   a row of its own. */
+.px-dialog__note{margin-right:auto;font-size:var(--praxis-type-size-sm);
+  color:var(--praxis-color-text-secondary);
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ---- Phone ------------------------------------------------------------
+   A docked sheet, not a shrunken card. At 380px a centred dialog with side
+   margins wastes the width it needs most, and its footer ends up mid-screen. */
+@media (max-width:560px){
+  .px-dialog,.px-dialog--sm,.px-dialog--lg,.px-dialog--xl{
+    width:auto;left:8px;right:8px;top:auto;bottom:8px;
+    transform:translateY(8px);max-height:92vh;}
+  .px-dialog.is-open{transform:none;}
+  .px-dialog__head,.px-dialog__body,.px-dialog__foot{
+    padding-left:var(--praxis-space-16);padding-right:var(--praxis-space-16);}
+  @media (prefers-reduced-motion:reduce){ .px-dialog{transform:none;} }
+}

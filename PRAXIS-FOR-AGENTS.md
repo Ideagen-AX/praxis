@@ -7,7 +7,7 @@
      To change anything here, edit the matching file under site/content/ and
      re-run:  python3 build-site.py --agents-doc
 
-     Measured from src/ at Praxis 0.1.9. Where a statement is inferred from
+     Measured from src/ at Praxis 0.1.10. Where a statement is inferred from
      CSS structure rather than observed, it says so.
 -->
 
@@ -54,7 +54,7 @@ The frame above is a real document. Its head and body are exactly this:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My prototype</title>
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.9/dist/praxis.css">
+        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.10/dist/praxis.css">
 </head>
 
 <body data-variant="praxis" data-theme="light">
@@ -74,7 +74,7 @@ The frame above is a real document. Its head and body are exactly this:
   </div>
 
   <!-- Only if you use icons. Loads its own pinned Lucide from beside itself. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.9/dist/praxis-lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.10/dist/praxis-lucide.js"></script>
 </body>
 </html>
 ```
@@ -84,7 +84,7 @@ The frame above is a real document. Its head and body are exactly this:
 In a bundled app the requirements are identical — stylesheet, the two `<body>` attributes, the icon script if you want icons.
 
 >
-`npm install @ideagen-ax/praxis@0.1.9`
+`npm install @ideagen-ax/praxis@0.1.10`
 
 `import '@ideagen-ax/praxis'` — tokens, core and every component
 `import '@ideagen-ax/praxis/dist/praxis-lucide.js'` — optional, icons only
@@ -174,6 +174,7 @@ Rule counts and class families, read from `src/` at build time. "Families" count
 | `praxis-controls.css` | 32 | `.tb-dropdown`, `.iconbtn`, `.filterfield`, `.icon`, `.material-symbols-rounded` |
 | `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
 | `praxis-create-new.css` | 83 | `.cn-group`, `.cn-flyout`, `.cn-row`, `.material-symbols-rounded`, `.cn-tpl` |
+| `praxis-dialog.css` | 33 | `.px-dialog`, `.px-dialog-scrim`, `.is-open`, `.icon`, `.material-symbols-rounded` |
 | `praxis-filters.css` | 403 | `.filter-row`, `.filter-drawer`, `.select-menu`, `.qfilter`, `.filter-chips` |
 | `praxis-mazlan.css` | 270 | `.mazlan-drawer`, `.mazlan-menu`, `.mazlan-reasoning`, `.material-symbols-rounded`, `.mazlan-msg` |
 | `praxis-module-selector.css` | 55 | `.msel`, `.cn-group`, `.cn-item`, `.cn-grid`, `.is-sel` |
@@ -1346,7 +1347,7 @@ Class names that appear in Praxis selectors and so look supported, but have no b
 
 These class names appear in Praxis selectors, which makes them look supported. They have no base definition. The distinction matters because the failure is silent: your `.btn` picks up the Praxis primary fill and none of the box it needs, so it renders as colored text.
 
-Verified by hand against `src/` at 0.1.9. The generated tables further down are measured every build.
+Verified by hand against `src/` at 0.1.10. The generated tables further down are measured every build.
 
 ### Classes with no base
 
@@ -3220,6 +3221,103 @@ That is where `.tbtn` lives, so it looks like the obvious home. But `praxis-admi
 ### Surface
 
 The panel follows `.px-pop` exactly — a hairline and `--praxis-elevation-4` by default, borderless over `--px-overlay` under `body[data-variant="praxis"]`. A menu opened from the toolbar and one opened from the nav rail are then the same object, which they were not in three of the four copies.
+
+---
+
+## Dialog
+
+The centred modal — scrim, light head over a hairline, scrolling body, actions in a footer band. Promoted from five copies in the prototype, all of which had put a dark navy bar across the top.
+
+
+Tier: **settling** · Sheet: `praxis-dialog.css`
+A scrim, a centred card, and three bands inside it: a head with the title and a close button, a body that is the only part that scrolls, and a footer holding the actions. Praxis had no dialog before 0.1.10, which is why five pages in the prototype had each written one.
+
+**The head has no fill.** Every one of those copies put a `--praxis-color-neutral-100` band across the top with white text on it, and that was the loudest thing in the box while carrying no information — the card's own edges and the scrim already say where the dialog starts and that it is modal. It also removed a contrast trap: `neutral-100` is not remapped for the dark theme, so the band stayed the same navy in both and every control that landed on it had to have its colour forced by hand.
+
+```html
+<div class="px-dialog-scrim is-open"></div>
+<div class="px-dialog px-dialog--lg is-open" role="dialog" aria-modal="true" aria-labelledby="d1">
+  <header class="px-dialog__head">
+    <h2 id="d1">Share “Quality Overview”</h2>
+    <button class="px-dialog__close" type="button" aria-label="Close">
+      <span class="material-symbols-rounded" aria-hidden="true">close</span>
+    </button>
+  </header>
+  <div class="px-dialog__body">
+    <div class="filterfield" style="width:100%">
+      <input type="text" placeholder="Add roles, teams or people…" aria-label="Add people" /></input>
+      <span class="material-symbols-rounded" aria-hidden="true">search</span>
+    </div>
+    <p style="margin:0;font-size:var(--praxis-type-size-sm);color:var(--praxis-color-text-secondary)">
+      Only the roles, teams and people you list can open it.
+    </p>
+  </div>
+  <footer class="px-dialog__foot">
+    <span class="px-dialog__note">Owned by James O’Connell (you)</span>
+    <button class="tbtn" type="button">Cancel</button>
+    <button class="tbtn tbtn--primary" type="button">Save</button>
+  </footer>
+</div>
+```
+
+### A confirmation
+
+One sentence and two buttons. `.px-dialog__body--plain` drops the body's flex column, which has nothing to act on when there is a single paragraph in it, and gives that paragraph its measure.
+
+```html
+<div class="px-dialog-scrim is-open"></div>
+<div class="px-dialog px-dialog--sm is-open" role="dialog" aria-modal="true" aria-labelledby="d2">
+  <header class="px-dialog__head">
+    <h2 id="d2">Delete this workspace?</h2>
+    <button class="px-dialog__close" type="button" aria-label="Close">
+      <span class="material-symbols-rounded" aria-hidden="true">close</span>
+    </button>
+  </header>
+  <div class="px-dialog__body px-dialog__body--plain">
+    <p><strong>Environmental Impact</strong> and its layout will be deleted. Anyone you
+    shared it with loses access.</p>
+  </div>
+  <footer class="px-dialog__foot">
+    <button class="tbtn" type="button">Cancel</button>
+    <button class="tbtn" type="button" style="background:var(--praxis-color-red-70);color:var(--praxis-color-white)">Delete</button>
+  </footer>
+</div>
+```
+
+### The parts
+
+| Class | What it is |
+|---|---|
+| `.px-dialog-scrim` | The overlay. A sibling of the dialog, not a       pseudo-element on it, because it has to sit below the card in the stacking order and       take the click that dismisses it. |
+| `.px-dialog` | The card. 560px, `max-height:min(88vh,860px)`,       and the only thing that scrolls inside it is the body. |
+| `.px-dialog--sm` / `--lg` / `--xl` | 440, 760, 1080. `width` is a plain declaration on a single class, so a       genuine outlier can set its own without fighting specificity. |
+| `.px-dialog__head` | Title and close, divided from the body by       the same hairline the footer uses. No fill. |
+| `.px-dialog__title` | Optional — a bare `h2` inside       the head is styled identically. Truncates rather than wrapping into the close button,       because dialog titles routinely quote a record name. |
+| `.px-dialog__close` | A 32px flat circle. Not       `.iconbtn`, which is a 34px square with a tool shadow for a toolbar band. |
+| `.px-dialog__body` | The scroller.       `overscroll-behavior:contain`, so reaching its end does not start scrolling       the page behind the scrim. |
+| `.px-dialog__body--plain` | For a body that is one paragraph. |
+| `.px-dialog__foot` | The action band, a shade off the body so it       does not read as the last row of the content. |
+| `.px-dialog__note` | Standing footer text, pushed left so it       shares the band with the buttons instead of taking a row of its own. |
+
+### Opening and closing
+
+No JavaScript ships with this. The consumer toggles `hidden` for presence and `.is-open` for the transition — the same two-step every overlay in Praxis uses, and the reason the card can fade out before it is removed rather than vanishing.
+
+`scrim.hidden = modal.hidden = false;`
+`requestAnimationFrame(() => { scrim.classList.add('is-open'); modal.classList.add('is-open'); });`
+
+Two frames are not needed here, but one is: a node unhidden and transitioned in the same frame has no start state to transition from, so it simply appears.
+
+Four things Praxis does not do for you, because none of them is decidable from CSS:
+
+- **Focus.** Move it into the dialog on open and back to whatever opened it on close. Put it on the dialog itself (`tabindex="-1"`) rather than on the first control, or that control arrives looking hovered.
+- **Containment.** `Tab` should wrap inside the dialog. It is modal — there is nothing behind the scrim to reach.
+- **Escape.** Closes it. If the dialog contains its own popover, that unwinds first.
+- **The roles.** `role="dialog"`, `aria-modal="true"`, and `aria-labelledby` pointing at the title.
+
+### Below 560px
+
+It docks to the bottom as a sheet rather than shrinking. A centred card with side margins wastes the width it needs most at 380px, and its footer ends up mid-screen.
 
 ---
 

@@ -1,0 +1,137 @@
+<!--praxis
+title: Dialog
+slug: dialog
+tier: settling
+order: 47
+sheet: praxis-dialog.css
+classes: px-dialog, px-dialog-scrim
+summary: The centred modal — scrim, light head over a hairline, scrolling body, actions in a footer band. Promoted from five copies in the prototype, all of which had put a dark navy bar across the top.
+keywords: dialog modal overlay scrim confirm confirmation px-dialog sheet close
+-->
+
+<p>A scrim, a centred card, and three bands inside it: a head with the title and a close
+button, a body that is the only part that scrolls, and a footer holding the actions. Praxis
+had no dialog before 0.1.10, which is why five pages in the prototype had each written one.</p>
+
+<p><strong>The head has no fill.</strong> Every one of those copies put a
+<code>--praxis-color-neutral-100</code> band across the top with white text on it, and that
+was the loudest thing in the box while carrying no information — the card's own edges and the
+scrim already say where the dialog starts and that it is modal. It also removed a contrast
+trap: <code>neutral-100</code> is not remapped for the dark theme, so the band stayed the
+same navy in both and every control that landed on it had to have its colour forced by
+hand.</p>
+
+<template data-example="A dialog with a form and two actions" data-height="460" data-scripts="lucide">
+  <div class="px-dialog-scrim is-open"></div>
+  <div class="px-dialog px-dialog--lg is-open" role="dialog" aria-modal="true" aria-labelledby="d1">
+    <header class="px-dialog__head">
+      <h2 id="d1">Share “Quality Overview”</h2>
+      <button class="px-dialog__close" type="button" aria-label="Close">
+        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+      </button>
+    </header>
+    <div class="px-dialog__body">
+      <div class="filterfield" style="width:100%">
+        <input type="text" placeholder="Add roles, teams or people…" aria-label="Add people" />
+        <span class="material-symbols-rounded" aria-hidden="true">search</span>
+      </div>
+      <p style="margin:0;font-size:var(--praxis-type-size-sm);color:var(--praxis-color-text-secondary)">
+        Only the roles, teams and people you list can open it.
+      </p>
+    </div>
+    <footer class="px-dialog__foot">
+      <span class="px-dialog__note">Owned by James O’Connell (you)</span>
+      <button class="tbtn" type="button">Cancel</button>
+      <button class="tbtn tbtn--primary" type="button">Save</button>
+    </footer>
+  </div>
+</template>
+
+<h2>A confirmation</h2>
+
+<p>One sentence and two buttons. <code>.px-dialog__body--plain</code> drops the body's flex
+column, which has nothing to act on when there is a single paragraph in it, and gives that
+paragraph its measure.</p>
+
+<template data-example="A destructive confirmation" data-height="300" data-scripts="lucide">
+  <div class="px-dialog-scrim is-open"></div>
+  <div class="px-dialog px-dialog--sm is-open" role="dialog" aria-modal="true" aria-labelledby="d2">
+    <header class="px-dialog__head">
+      <h2 id="d2">Delete this workspace?</h2>
+      <button class="px-dialog__close" type="button" aria-label="Close">
+        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+      </button>
+    </header>
+    <div class="px-dialog__body px-dialog__body--plain">
+      <p><strong>Environmental Impact</strong> and its layout will be deleted. Anyone you
+      shared it with loses access.</p>
+    </div>
+    <footer class="px-dialog__foot">
+      <button class="tbtn" type="button">Cancel</button>
+      <button class="tbtn" type="button" style="background:var(--praxis-color-red-70);color:var(--praxis-color-white)">Delete</button>
+    </footer>
+  </div>
+</template>
+
+<h2>The parts</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>What it is</th></tr></thead>
+  <tbody>
+    <tr><td><code>.px-dialog-scrim</code></td><td>The overlay. A sibling of the dialog, not a
+      pseudo-element on it, because it has to sit below the card in the stacking order and
+      take the click that dismisses it.</td></tr>
+    <tr><td><code>.px-dialog</code></td><td>The card. 560px, <code>max-height:min(88vh,860px)</code>,
+      and the only thing that scrolls inside it is the body.</td></tr>
+    <tr><td><code>.px-dialog--sm</code> / <code>--lg</code> / <code>--xl</code></td>
+      <td>440, 760, 1080. <code>width</code> is a plain declaration on a single class, so a
+      genuine outlier can set its own without fighting specificity.</td></tr>
+    <tr><td><code>.px-dialog__head</code></td><td>Title and close, divided from the body by
+      the same hairline the footer uses. No fill.</td></tr>
+    <tr><td><code>.px-dialog__title</code></td><td>Optional — a bare <code>h2</code> inside
+      the head is styled identically. Truncates rather than wrapping into the close button,
+      because dialog titles routinely quote a record name.</td></tr>
+    <tr><td><code>.px-dialog__close</code></td><td>A 32px flat circle. Not
+      <code>.iconbtn</code>, which is a 34px square with a tool shadow for a toolbar band.</td></tr>
+    <tr><td><code>.px-dialog__body</code></td><td>The scroller.
+      <code>overscroll-behavior:contain</code>, so reaching its end does not start scrolling
+      the page behind the scrim.</td></tr>
+    <tr><td><code>.px-dialog__body--plain</code></td><td>For a body that is one paragraph.</td></tr>
+    <tr><td><code>.px-dialog__foot</code></td><td>The action band, a shade off the body so it
+      does not read as the last row of the content.</td></tr>
+    <tr><td><code>.px-dialog__note</code></td><td>Standing footer text, pushed left so it
+      shares the band with the buttons instead of taking a row of its own.</td></tr>
+  </tbody>
+</table>
+
+<h2>Opening and closing</h2>
+
+<p>No JavaScript ships with this. The consumer toggles <code>hidden</code> for presence and
+<code>.is-open</code> for the transition — the same two-step every overlay in Praxis uses,
+and the reason the card can fade out before it is removed rather than vanishing.</p>
+
+<p><code>scrim.hidden = modal.hidden = false;</code><br />
+<code>requestAnimationFrame(() =&gt; { scrim.classList.add('is-open'); modal.classList.add('is-open'); });</code></p>
+
+<p>Two frames are not needed here, but one is: a node unhidden and transitioned in the same
+frame has no start state to transition from, so it simply appears.</p>
+
+<p>Four things Praxis does not do for you, because none of them is decidable from CSS:</p>
+
+<ul>
+  <li><strong>Focus.</strong> Move it into the dialog on open and back to whatever opened it
+  on close. Put it on the dialog itself (<code>tabindex="-1"</code>) rather than on the first
+  control, or that control arrives looking hovered.</li>
+  <li><strong>Containment.</strong> <code>Tab</code> should wrap inside the dialog. It is
+  modal — there is nothing behind the scrim to reach.</li>
+  <li><strong>Escape.</strong> Closes it. If the dialog contains its own popover, that
+  unwinds first.</li>
+  <li><strong>The roles.</strong> <code>role="dialog"</code>,
+  <code>aria-modal="true"</code>, and <code>aria-labelledby</code> pointing at the
+  title.</li>
+</ul>
+
+<h2>Below 560px</h2>
+
+<p>It docks to the bottom as a sheet rather than shrinking. A centred card with side margins
+wastes the width it needs most at 380px, and its footer ends up mid-screen.</p>

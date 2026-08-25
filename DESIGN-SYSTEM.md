@@ -47,13 +47,13 @@
 | Measure | Value |
 |---|---|
 | Distinct custom properties defined | **224** |
-| `var()` usages | **1,550** |
-| Raw colour literals remaining | 825 (370 hex / 455 rgb·rgba) |
-| Tokenization coverage | **65%** |
+| `var()` usages | **1,584** |
+| Raw colour literals remaining | 828 (370 hex / 458 rgb·rgba) |
+| Tokenization coverage | **66%** |
 | Tokens defined in more than one file | 75 |
 | Used but never defined (excluding runtime-set) | 3 — `--muted`, `--ph-pad-top`, `--praxis-filters-gutter` |
-| Defined but never referenced | 104 |
-| Stylesheets measured | 17 |
+| Defined but never referenced | 102 |
+| Stylesheets measured | 18 |
 | Consumer pages measured | none — src/ measured in isolation |
 <!-- /GENERATED:stats -->
 - **Tokens defined in more than one file: 130, down from 166.** The foundation now has
@@ -743,6 +743,7 @@ Measured by CSS class-block frequency across all sources. Grouped by area.
 | `praxis-controls.css` | 32 | `.tb-dropdown`, `.iconbtn`, `.filterfield`, `.icon`, `.material-symbols-rounded` |
 | `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
 | `praxis-create-new.css` | 83 | `.cn-group`, `.cn-flyout`, `.cn-row`, `.material-symbols-rounded`, `.cn-tpl` |
+| `praxis-dialog.css` | 33 | `.px-dialog`, `.px-dialog-scrim`, `.is-open`, `.icon`, `.material-symbols-rounded` |
 | `praxis-filters.css` | 403 | `.filter-row`, `.filter-drawer`, `.select-menu`, `.qfilter`, `.filter-chips` |
 | `praxis-mazlan.css` | 270 | `.mazlan-drawer`, `.mazlan-menu`, `.mazlan-reasoning`, `.material-symbols-rounded`, `.mazlan-msg` |
 | `praxis-module-selector.css` | 55 | `.msel`, `.cn-group`, `.cn-item`, `.cn-grid`, `.is-sel` |
