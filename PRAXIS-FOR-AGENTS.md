@@ -7,7 +7,7 @@
      To change anything here, edit the matching file under site/content/ and
      re-run:  python3 build-site.py --agents-doc
 
-     Measured from src/ at Praxis 0.1.9. Where a statement is inferred from
+     Measured from src/ at Praxis 0.1.10. Where a statement is inferred from
      CSS structure rather than observed, it says so.
 -->
 
@@ -54,7 +54,7 @@ The frame above is a real document. Its head and body are exactly this:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My prototype</title>
   <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.9/dist/praxis.css">
+        href="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.10/dist/praxis.css">
 </head>
 
 <body data-variant="praxis" data-theme="light">
@@ -74,7 +74,7 @@ The frame above is a real document. Its head and body are exactly this:
   </div>
 
   <!-- Only if you use icons. Loads its own pinned Lucide from beside itself. -->
-  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.9/dist/praxis-lucide.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ideagen-ax/praxis@0.1.10/dist/praxis-lucide.js"></script>
 </body>
 </html>
 ```
@@ -84,7 +84,7 @@ The frame above is a real document. Its head and body are exactly this:
 In a bundled app the requirements are identical — stylesheet, the two `<body>` attributes, the icon script if you want icons.
 
 >
-`npm install @ideagen-ax/praxis@0.1.9`
+`npm install @ideagen-ax/praxis@0.1.10`
 
 `import '@ideagen-ax/praxis'` — tokens, core and every component
 `import '@ideagen-ax/praxis/dist/praxis-lucide.js'` — optional, icons only
@@ -172,7 +172,7 @@ Rule counts and class families, read from `src/` at build time. "Families" count
 | `praxis-admin.css` | 261 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
 | `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.msel`, `.iconbtn-ghost` |
 | `praxis-controls.css` | 32 | `.tb-dropdown`, `.iconbtn`, `.filterfield`, `.icon`, `.material-symbols-rounded` |
-| `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
+| `praxis-core.css` | 48 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
 | `praxis-create-new.css` | 83 | `.cn-group`, `.cn-flyout`, `.cn-row`, `.material-symbols-rounded`, `.cn-tpl` |
 | `praxis-filters.css` | 403 | `.filter-row`, `.filter-drawer`, `.select-menu`, `.qfilter`, `.filter-chips` |
 | `praxis-mazlan.css` | 270 | `.mazlan-drawer`, `.mazlan-menu`, `.mazlan-reasoning`, `.material-symbols-rounded`, `.mazlan-msg` |
@@ -251,7 +251,7 @@ Pick one form and use it consistently within the component. If the component has
 
 The whole palette in one look, each ramp at a size you can judge, and the semantic layer drawn as what it is for. Every value resolved live in both themes.
 
-Every color on this page is painted from a live document, once per theme, rather than copied out of the stylesheet. That matters more here than anywhere else in Praxis: several color tokens are declared one way in `praxis-tokens.css` and [overridden](#the-praxis-variant-overrides-nine-tokens) under the Praxis variant, so the token file is not the answer to "what color is this".
+Every color on this page is painted from a live document, once per theme, rather than copied out of the stylesheet. It used to be the only way to get a true answer: nine tokens were declared one way in `praxis-tokens.css` and re-declared under the Praxis variant at a higher specificity, so the token file was not the answer to "what color is this". [That layer is gone](#one-declaration-site) — but the page still reads resolved values, because a build can only report what a token is *declared* as, and a token declared as `var(--rung)` is worth exactly whatever the cascade hands the rung.
 
 ### The whole palette
 
@@ -273,7 +273,7 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-white` | `#ffffff` | — |
 | `--praxis-color-blue-10` | `#edf0fd` | — |
 | `--praxis-color-blue-50` | `#6882ef` | — |
-| `--praxis-color-blue-60` | `#4766eb` | `#7a93e0` |
+| `--praxis-color-blue-60` | `#4361c4` | `#7a93e0` |
 | `--praxis-color-green-10` | `#e6f3ee` | — |
 | `--praxis-color-green-60` | `#098b53` | — |
 | `--praxis-color-orange-10` | `#fdf2e6` | — |
@@ -281,6 +281,7 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-pink-50` | `#e82e8b` | — |
 | `--praxis-color-pink-60` | `#e30072` | — |
 | `--praxis-color-pink-90` | `#810041` | — |
+| `--praxis-color-purple-60` | `#805ad5` | `#b088e8` |
 | `--praxis-color-red-10` | `#fceaeb` | — |
 | `--praxis-color-red-50` | `#e7535c` | — |
 | `--praxis-color-red-60` | `#e22d38` | — |
@@ -293,7 +294,7 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-yellow-10` | `#fdf9e6` | — |
 | `--praxis-color-yellow-50` | `#f2d02e` | — |
 | `--praxis-color-yellow-90` | `#887100` | — |
-| `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
+| `--praxis-color-border-default` | `#E2E5E9` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
 | `--praxis-color-border-strong` | `var(--praxis-color-neutral-50)` | — |
 | `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
@@ -304,8 +305,8 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-text-disabled` | `var(--praxis-color-neutral-40)` | `#62707e` |
 | `--praxis-color-text-inverse` | `var(--praxis-color-white)` | — |
 | `--praxis-color-text-link` | `var(--praxis-color-teal-60)` | `#5CE0E5` |
-| `--praxis-color-text-primary` | `var(--praxis-color-neutral-90)` | `#e7ebf1` |
-| `--praxis-color-text-secondary` | `var(--praxis-color-neutral-60)` | `#9aa7b4` |
+| `--praxis-color-text-primary` | `#2F4051` | `#e7ebf1` |
+| `--praxis-color-text-secondary` | `#5D6977` | `#9aa7b4` |
 | `--praxis-color-text-tertiary` | `#616f7e` | `#8b98a6` |
 | `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
 | `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
@@ -328,7 +329,7 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-radius-lg` | `16px` | — |
 | `--praxis-radius-md` | `12px` | — |
 | `--praxis-radius-sm` | `8px` | — |
-| `--praxis-elevation-1` | `0 1px 2px 0 rgb(32 42 53 / .06)` | — |
+| `--praxis-elevation-1` | `0 0 0 .5px rgba(16,36,58,.05),0 1px 2px rgba(16,36,58,.04)` | — |
 | `--praxis-elevation-2` | `0 1px 3px 0 rgb(32 42 53 / .1), 0 1px 2px -1px rgb(32 42 53 / .06)` | — |
 | `--praxis-elevation-3` | `0 4px 6px -1px rgb(32 42 53 / .1), 0 2px 4px -2px rgb(32 42 53 / .06)` | — |
 | `--praxis-elevation-4` | `0 10px 15px -3px rgb(32 42 53 / .1), 0 4px 6px -4px rgb(32 42 53 / .05)` | — |
@@ -341,9 +342,9 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-control-h` | `32px` | — |
 | `--praxis-navrail-width` | `56px` | — |
 | `--praxis-navrail-width-expanded` | `240px` | — |
-| `--praxis-elevation-card` | `0 2px 16px -4px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.1)` | — |
-| `--praxis-elevation-card-raised` | `0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.1)` | — |
-| `--praxis-elevation-popover` | `0 4px 6px rgba(32, 42, 53, 0.07), 0 10px 15px rgba(32, 42, 53, 0.08)` | — |
+| `--praxis-elevation-card` | `var(--praxis-card)` | — |
+| `--praxis-elevation-card-raised` | `var(--praxis-card)` | — |
+| `--praxis-elevation-popover` | `var(--px-overlay)` | — |
 | `--praxis-color-blue-100` | `#202e6a` | — |
 | `--praxis-color-blue-20` | `#d3dafa` | — |
 | `--praxis-color-blue-30` | `#b0bdf6` | — |
@@ -392,7 +393,7 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-color-yellow-60` | `#efc600` | — |
 | `--praxis-color-yellow-70` | `#cba800` | — |
 | `--praxis-color-yellow-80` | `#aa8d00` | — |
-| `--praxis-radius-card` | `20px` | — |
+| `--praxis-radius-card` | `12px` | — |
 | `--praxis-radius-xl` | `16px` | — |
 | `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | `#222b39` |
 | `--praxis-color-surface-muted` | `var(--praxis-color-neutral-10)` | `#222b39` |
@@ -432,36 +433,35 @@ Every color on this page is painted from a live document, once per theme, rather
 | `--praxis-tone-warning-fg` | `var(--praxis-color-orange-90)` | `#f5b45c` |
 | `--praxis-tone-danger-bg` | `var(--praxis-color-red-10)` | `rgba(226,45,56,.18)` |
 | `--praxis-tone-danger-fg` | `var(--praxis-color-red-70)` | `#f28b91` |
-| `--px-card-rail` | `0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6)` | `0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.30),inset 0 .5px 0 rgba(255,255,255,.05)` |
-| `--px-card-raised` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85)` | `0 0 0 .5px rgba(255,255,255,.11),0 1px 2px rgba(0,0,0,.45),0 4px 10px -3px rgba(0,0,0,.40),0 32px 60px -24px rgba(0,0,0,.75),inset 0 .5px 0 rgba(255,255,255,.10)` |
-| `--px-chip` | `#EEF1F4` | `rgba(255,255,255,.07)` |
-| `--px-dot` | `rgba(16,36,58,.11)` | `rgba(255,255,255,.09)` |
-| `--px-dot-clear` | `192px` | — |
-| `--px-drawer` | `#ffffff` | `#0e1324` |
-| `--px-edge` | `rgba(255,255,255,.6)` | `rgba(255,255,255,.08)` |
-| `--px-field` | `#EEF1F4` | `#262F3F` |
-| `--px-field-hover` | `#E6EAEF` | `#2C3646` |
-| `--px-glass` | `rgba(255,255,255,.82)` | `rgba(26,32,45,.72)` |
-| `--px-gutter` | `16px` | — |
-| `--px-hover` | `rgba(16,36,58,.025)` | `rgba(255,255,255,.05)` |
-| `--px-hover-btn` | `rgba(16,36,58,.075)` | `rgba(255,255,255,.10)` |
-| `--px-overlay` | `0 0 0 .5px rgba(16,36,58,.06),0 2px 6px rgba(16,36,58,.06),0 18px 38px -16px rgba(16,36,58,.18)` | `0 0 0 .5px rgba(255,255,255,.08),0 2px 6px rgba(0,0,0,.4),0 24px 50px -20px rgba(0,0,0,.7)` |
 | `--px-page` | `#F0F2F4` | `rgb(14,19,36)` |
-| `--px-primary-fg` | `#fff` | `#08313a` |
-| `--px-primary-grad` | `linear-gradient(180deg,#197b83,#156f77)` | `linear-gradient(180deg,#29d2d7,#1fb4b9)` |
-| `--px-primary-shadow` | `0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28)` | `0 0 0 .5px rgba(41,210,215,.30),0 1px 2px rgba(0,0,0,.45),0 8px 18px -8px rgba(41,210,215,.45),inset 0 1px 0 rgba(255,255,255,.22)` |
-| `--px-scroll` | `rgba(16,36,58,.28)` | `rgba(255,255,255,.26)` |
-| `--px-scroll-hover` | `rgba(16,36,58,.45)` | `rgba(255,255,255,.42)` |
 | `--px-surface` | `#ffffff` | `#192336` |
 | `--px-surface-2` | `#F4F6F8` | `#232c3b` |
 | `--px-tool` | `#ffffff` | `rgba(255,255,255,.06)` |
+| `--px-drawer` | `#ffffff` | `#0e1324` |
+| `--px-chip` | `#EEF1F4` | `rgba(255,255,255,.07)` |
+| `--px-glass` | `rgba(255,255,255,.82)` | `rgba(26,32,45,.72)` |
+| `--px-hover` | `rgba(16,36,58,.025)` | `rgba(255,255,255,.05)` |
+| `--px-dot` | `rgba(16,36,58,.11)` | `rgba(255,255,255,.09)` |
+| `--px-toolbar-gutter` | `16px` | — |
+| `--px-field` | `#EEF1F4` | `#262F3F` |
+| `--px-field-hover` | `#E6EAEF` | `#2C3646` |
+| `--px-hover-btn` | `rgba(16,36,58,.075)` | `rgba(255,255,255,.10)` |
+| `--px-scroll` | `rgba(16,36,58,.28)` | `rgba(255,255,255,.26)` |
+| `--px-scroll-hover` | `rgba(16,36,58,.45)` | `rgba(255,255,255,.42)` |
+| `--praxis-card` | `0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07)` |
 | `--px-tool-shadow` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35)` |
 | `--px-tool-shadow-hover` | `0 0 0 .5px rgba(16,36,58,.09),0 2px 8px -2px rgba(16,36,58,.16)` | `0 0 0 .5px rgba(255,255,255,.12),0 4px 12px -2px rgba(0,0,0,.5)` |
-| `--px-toolbar-gutter` | `16px` | — |
+| `--px-overlay` | `0 0 0 .5px rgba(16,36,58,.06),0 2px 6px rgba(16,36,58,.06),0 18px 38px -16px rgba(16,36,58,.18)` | `0 0 0 .5px rgba(255,255,255,.08),0 2px 6px rgba(0,0,0,.4),0 24px 50px -20px rgba(0,0,0,.7)` |
+| `--px-edge` | `rgba(255,255,255,.6)` | `rgba(255,255,255,.08)` |
+| `--px-card-rail` | `0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6)` | `0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.30),inset 0 .5px 0 rgba(255,255,255,.05)` |
+| `--px-card-raised` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85)` | `0 0 0 .5px rgba(255,255,255,.11),0 1px 2px rgba(0,0,0,.45),0 4px 10px -3px rgba(0,0,0,.40),0 32px 60px -24px rgba(0,0,0,.75),inset 0 .5px 0 rgba(255,255,255,.10)` |
+| `--px-primary-grad` | `linear-gradient(180deg,#197b83,#156f77)` | `linear-gradient(180deg,#29d2d7,#1fb4b9)` |
+| `--px-primary-fg` | `#fff` | `#08313a` |
+| `--px-primary-shadow` | `0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28)` | `0 0 0 .5px rgba(41,210,215,.30),0 1px 2px rgba(0,0,0,.45),0 8px 18px -8px rgba(41,210,215,.45),inset 0 1px 0 rgba(255,255,255,.22)` |
+| `--px-dot-clear` | `192px` | — |
+| `--px-gutter` | `16px` | — |
 | `--home-gutter` | `var(--px-gutter)` | — |
 | `--ph-pad-x` | `var(--px-gutter)` | — |
-| `--praxis-card` | `0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07)` |
-| `--praxis-color-purple-60` | `#805ad5` | `#b088e8` |
 | `--sp-gutter` | `var(--px-gutter)` | — |
 
 
@@ -477,8 +477,8 @@ Semantic color, not palette rungs. These are the tokens remapped per theme, so u
 | `--praxis-color-text-disabled` | `var(--praxis-color-neutral-40)` | `#62707e` |
 | `--praxis-color-text-inverse` | `var(--praxis-color-white)` | — |
 | `--praxis-color-text-link` | `var(--praxis-color-teal-60)` | `#5CE0E5` |
-| `--praxis-color-text-primary` | `var(--praxis-color-neutral-90)` | `#e7ebf1` |
-| `--praxis-color-text-secondary` | `var(--praxis-color-neutral-60)` | `#9aa7b4` |
+| `--praxis-color-text-primary` | `#2F4051` | `#e7ebf1` |
+| `--praxis-color-text-secondary` | `#5D6977` | `#9aa7b4` |
 | `--praxis-color-text-tertiary` | `#616f7e` | `#8b98a6` |
 
 
@@ -497,7 +497,7 @@ Semantic color, not palette rungs. These are the tokens remapped per theme, so u
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
+| `--praxis-color-border-default` | `#E2E5E9` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
 | `--praxis-color-border-strong` | `var(--praxis-color-neutral-50)` | — |
 | `--praxis-color-border-subtle` | `var(--praxis-color-neutral-10)` | `#222b39` |
@@ -613,7 +613,7 @@ Reach for a rung only when no semantic token fits. Each ramp is drawn light then
 |---|---|---|
 | `--praxis-color-blue-10` | `#edf0fd` | — |
 | `--praxis-color-blue-50` | `#6882ef` | — |
-| `--praxis-color-blue-60` | `#4766eb` | `#7a93e0` |
+| `--praxis-color-blue-60` | `#4361c4` | `#7a93e0` |
 | `--praxis-color-blue-100` | `#202e6a` | — |
 | `--praxis-color-blue-20` | `#d3dafa` | — |
 | `--praxis-color-blue-30` | `#b0bdf6` | — |
@@ -693,7 +693,7 @@ Reach for a rung only when no semantic token fits. Each ramp is drawn light then
 
 #### Purple
 
-One rung, and it is defined only under the Praxis variant in `praxis-core.css`. There is no purple ramp in the token file.
+One rung. There is no purple ramp in the EHSQ-E base — this is a Praxis solution accent, used to tint module and record-type icons alongside blue, orange, teal and pink.
 
 
 | Token | Light | Dark (via `praxis-core.css`) |
@@ -709,23 +709,19 @@ One rung, and it is defined only under the Praxis variant in `praxis-core.css`. 
 | `--praxis-color-white` | `#ffffff` | — |
 
 
-### The Praxis variant overrides nine tokens
+### One declaration site
 
-Measured, not asserted. Each row below is a token `praxis-tokens.css` declares and `praxis-core.css` then re-declares for the Praxis variant.
+Praxis used to declare nine tokens twice: on `:root` in `praxis-tokens.css`, and again under `body[data-variant="praxis"]` in `praxis-core.css`. The second won on specificity, so the token file gave the wrong answer for every one of them, and the difference was not cosmetic — `--praxis-radius-card` read `20px` and rendered `12px`.
+
+Overriding at a variant scope is a reasonable pattern when there is more than one variant. There is not: the frozen "Miramar" comparison view was pruned on 2026-08-12 and `data-variant` has been required-and-always-`praxis` ever since. The layer was buying nothing and costing the ambiguity.
+
+The nine moved to `:root` in 0.1.10, along with the whole `--px-*` material layer. The table below is regenerated from both stylesheets on every build, and an empty result is the assertion — a tenth override fails the build rather than quietly reintroducing the problem.
 
 
-| Token | Token file | Under Praxis |
-|---|---|---|
-| `--praxis-color-blue-60` | `#4766eb` | **`#4361c4`** |
-| `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | **`#E2E5E9`** |
-| `--praxis-color-text-primary` | `var(--praxis-color-neutral-90)` | **`#2F4051`** |
-| `--praxis-color-text-secondary` | `var(--praxis-color-neutral-60)` | **`#5D6977`** |
-| `--praxis-elevation-1` | `0 1px 2px 0 rgb(32 42 53 / .06)` | **`0 0 0 .5px rgba(16,36,58,.05),0 1px 2px rgba(16,36,58,.04)`** |
-| `--praxis-elevation-card` | `0 2px 16px -4px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.1)` | **`var(--praxis-card)`** |
-| `--praxis-elevation-card-raised` | `0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.1)` | **`var(--praxis-card)`** |
-| `--praxis-elevation-popover` | `0 4px 6px rgba(32, 42, 53, 0.07), 0 10px 15px rgba(32, 42, 53, 0.08)` | **`var(--px-overlay)`** |
-| `--praxis-radius-card` | `20px` | **`12px`** |
+None.
 
+
+Tidiness was not the reason. A token declared on `<body>` is invisible to any `:root` alias of it, which is the same defect as the frozen aliases below — and it had already produced one. `--praxis-color-status-info` aliases `blue-60`; the variant redefined `blue-60` from `#4766eb` to `#4361c4`; the alias, computed on `:root`, kept the old value. So the info color rendered a blue the palette no longer contained. Only its dark half had ever been restated, so the fix that landed on 2026-08-18 left the light half frozen for another week.
 
 ### Four semantic tokens do not change in dark
 
@@ -757,7 +753,15 @@ And `--praxis-color-status-danger` was the fifth. It was not frozen either — i
 None.
 
 
-That table is generated from the structure of the stylesheets on every build, and an empty result is now a **gate**: a fifth frozen alias fails the build rather than waiting for someone to notice a control behaving backwards. It is deliberately not derived from the resolved values — a resolver asked for the dark value substitutes the dark rung and reports a difference the browser never produces, which is the whole reason this went unseen.
+That table is generated from the declaration *sites* in the stylesheets on every build, and an empty result is a **gate**: another frozen alias fails the build rather than waiting for someone to notice a control behaving backwards. It is deliberately not derived from the resolved values — a resolver asked for the dark value substitutes the dark rung and reports a difference the browser never produces, which is the whole reason this went unseen.
+
+The check itself was wrong twice, in ways worth naming because both made it report clean while a real bug was live. It only looked at *dark* remaps, so it never saw the variant layer stranding `status-info` in light. And it treated "the token is restated on `body` somewhere" as a clean bill of health — which is how the same token stayed half-broken after being half-fixed. A restatement only covers a rung declaration whose conditions it is a subset of.
+
+Since 0.1.10 there is a stronger check underneath it: **no token may be declared on `<body>` at all.** That is what makes the class impossible rather than merely absent, and it is why the dark blocks now sit on `:root:has(body[data-theme="dark"])`. The theme attribute stays on `<body>`, so nothing about the markup contract changed.
+
+
+None. Every token is declared on `:root`.
+
 
 #### The four that remain, and why they are fine
 
@@ -788,7 +792,7 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
+| `--praxis-color-border-default` | `#E2E5E9` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
 | `--praxis-color-border-strong` | `var(--praxis-color-neutral-50)` | — |
 | `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
@@ -799,8 +803,8 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 | `--praxis-color-text-disabled` | `var(--praxis-color-neutral-40)` | `#62707e` |
 | `--praxis-color-text-inverse` | `var(--praxis-color-white)` | — |
 | `--praxis-color-text-link` | `var(--praxis-color-teal-60)` | `#5CE0E5` |
-| `--praxis-color-text-primary` | `var(--praxis-color-neutral-90)` | `#e7ebf1` |
-| `--praxis-color-text-secondary` | `var(--praxis-color-neutral-60)` | `#9aa7b4` |
+| `--praxis-color-text-primary` | `#2F4051` | `#e7ebf1` |
+| `--praxis-color-text-secondary` | `#5D6977` | `#9aa7b4` |
 | `--praxis-color-text-tertiary` | `#616f7e` | `#8b98a6` |
 | `--praxis-color-status-danger` | `var(--praxis-color-red-60)` | `#ed7b82` |
 | `--praxis-color-status-info` | `var(--praxis-color-blue-60)` | `#7a93e0` |
@@ -847,7 +851,7 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 | `--praxis-color-white` | `#ffffff` | — |
 | `--praxis-color-blue-10` | `#edf0fd` | — |
 | `--praxis-color-blue-50` | `#6882ef` | — |
-| `--praxis-color-blue-60` | `#4766eb` | `#7a93e0` |
+| `--praxis-color-blue-60` | `#4361c4` | `#7a93e0` |
 | `--praxis-color-green-10` | `#e6f3ee` | — |
 | `--praxis-color-green-60` | `#098b53` | — |
 | `--praxis-color-orange-10` | `#fdf2e6` | — |
@@ -855,6 +859,7 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 | `--praxis-color-pink-50` | `#e82e8b` | — |
 | `--praxis-color-pink-60` | `#e30072` | — |
 | `--praxis-color-pink-90` | `#810041` | — |
+| `--praxis-color-purple-60` | `#805ad5` | `#b088e8` |
 | `--praxis-color-red-10` | `#fceaeb` | — |
 | `--praxis-color-red-50` | `#e7535c` | — |
 | `--praxis-color-red-60` | `#e22d38` | — |
@@ -915,7 +920,6 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 | `--praxis-color-yellow-60` | `#efc600` | — |
 | `--praxis-color-yellow-70` | `#cba800` | — |
 | `--praxis-color-yellow-80` | `#aa8d00` | — |
-| `--praxis-color-purple-60` | `#805ad5` | `#b088e8` |
 
 
 ---
@@ -924,7 +928,7 @@ The exact declarations and what they resolve to, for copying. The visual blocks 
 
 The --px-* surfaces, shadows and washes that carry the Praxis look, plus the glass recipe for drawers and floating panels.
 
-The `--px-*` layer is where the Praxis look actually lives. It is not in `praxis-tokens.css` — every one of these is declared in `praxis-core.css` under `body[data-variant="praxis"]`, twice, once per theme. That is the single most common reason someone greps the token file for `--px-surface` and concludes it does not exist.
+The `--px-*` layer is where the Praxis look actually lives. Until 0.1.10 it was not in `praxis-tokens.css` at all — every one of these was declared in `praxis-core.css` under `body[data-variant="praxis"]`, which was the single most common reason someone grepped the token file for `--px-surface` and concluded it did not exist. All 27 moved to `:root` in the token file, beside the rest of the foundation; the dark half is still in `praxis-core.css`, one block per theme.
 
 ### The material layer
 
@@ -1011,15 +1015,13 @@ A frosted translucent surface for drawers and floating panels. Three pages each 
 
 ### Praxis-only layout hooks
 
-Declared under the variant and nowhere else. These are the ones a page reads or sets rather than consumes.
+Responsive layout hooks, set on `<body>` inside `@media` and nowhere else. These are the ones a page reads or sets rather than consumes, and they are the only token declarations in Praxis that are not on `:root` — exempted because nothing aliases them.
 
 
 | Token | Light |
 |---|---|
 | `--home-gutter` | `var(--px-gutter)` |
 | `--ph-pad-x` | `var(--px-gutter)` |
-| `--praxis-card` | `0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7)` |
-| `--praxis-color-purple-60` | `#805ad5` |
 | `--sp-gutter` | `var(--px-gutter)` |
 
 
@@ -1109,11 +1111,11 @@ The Praxis radius scale is 8/12/16. Note that `lg` and `xl` are both 16px — `x
 | `--praxis-radius-lg` | `16px` | — |
 | `--praxis-radius-md` | `12px` | — |
 | `--praxis-radius-sm` | `8px` | — |
-| `--praxis-radius-card` | `20px` | — |
+| `--praxis-radius-card` | `12px` | — |
 | `--praxis-radius-xl` | `16px` | — |
 
 
-**`--praxis-radius-card` is 20px in the token file and 12px under Praxis.** The Praxis override is the one that renders, so 12px is the card geometry. The resolved columns above show the real value; see [the nine overrides](#the-praxis-variant-overrides-nine-tokens) for the rest.
+**`--praxis-radius-card` is 12px, and the token file now says so.** It read 20px until 0.1.10, while `praxis-core.css` overrode it to 12px under the variant — so the file and the render disagreed. The override layer is gone; see [one declaration site](#one-declaration-site).
 
 ### Chrome metrics
 
@@ -1145,8 +1147,8 @@ Page content therefore starts at **192px**, and `--px-dot-clear` is set to exact
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--px-gutter` | `16px` | — |
 | `--px-toolbar-gutter` | `16px` | — |
+| `--px-gutter` | `16px` | — |
 | `--home-gutter` | `var(--px-gutter)` | — |
 | `--ph-pad-x` | `var(--px-gutter)` | — |
 | `--sp-gutter` | `var(--px-gutter)` | — |
@@ -1178,13 +1180,13 @@ Steps 1 to 4 are generic. `card`, `card-raised` and `popover` are remapped to `-
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-elevation-1` | `0 1px 2px 0 rgb(32 42 53 / .06)` | — |
+| `--praxis-elevation-1` | `0 0 0 .5px rgba(16,36,58,.05),0 1px 2px rgba(16,36,58,.04)` | — |
 | `--praxis-elevation-2` | `0 1px 3px 0 rgb(32 42 53 / .1), 0 1px 2px -1px rgb(32 42 53 / .06)` | — |
 | `--praxis-elevation-3` | `0 4px 6px -1px rgb(32 42 53 / .1), 0 2px 4px -2px rgb(32 42 53 / .06)` | — |
 | `--praxis-elevation-4` | `0 10px 15px -3px rgb(32 42 53 / .1), 0 4px 6px -4px rgb(32 42 53 / .05)` | — |
-| `--praxis-elevation-card` | `0 2px 16px -4px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.1)` | — |
-| `--praxis-elevation-card-raised` | `0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.1)` | — |
-| `--praxis-elevation-popover` | `0 4px 6px rgba(32, 42, 53, 0.07), 0 10px 15px rgba(32, 42, 53, 0.08)` | — |
+| `--praxis-elevation-card` | `var(--praxis-card)` | — |
+| `--praxis-elevation-card-raised` | `var(--praxis-card)` | — |
+| `--praxis-elevation-popover` | `var(--px-overlay)` | — |
 
 
 ```html
@@ -1253,16 +1255,18 @@ Praxis has one variant and two themes, and both are attributes on `<body>`. Ther
 
 | Attribute | Values | What depends on it |
 |---|---|---|
-| `data-variant` | `praxis` | Every `--px-*` material, the dot grid, the 8/12/16 radius scale, the primary button, and the nine token overrides. Without it you get the unstyled base layer, not a fallback theme. |
+| `data-variant` | `praxis` | Every component rule in Praxis, and the dot grid. It no longer scopes any *token* — those all moved to `:root` in 0.1.10 — but almost every selector in the system is written against it, so without it you get an unstyled page, not a fallback theme. |
 | `data-theme` | `light`, `dark` | Every dark remap. Absent, dark mode never engages regardless of the system setting. |
 
 ### The cascade, in order
 
-1. `praxis-tokens.css` declares the foundation on `:root`.
-2. `praxis-core.css` layers the Praxis light values, the `--px-*` materials and the dark remaps on `body[data-variant="praxis"]`.
-3. Because that selector outranks `:root` on specificity, step 2 wins regardless of load order. Loading tokens first anyway means the cascade reads the way it behaves.
+1. `praxis-tokens.css` declares the whole light foundation on `:root` — palette, semantics, geometry, motion and the `--px-*` materials.
+2. `praxis-core.css` layers the dark remaps, also on `:root`.
+3. `praxis-core.css` paints the page material on `body[data-variant="praxis"]`. That is the only thing left on `<body>`, and it is not a token — it is the dot grid.
 
-There are two dark blocks, not one. `body[data-theme="dark"]` recolors the token-driven basics and applies to any variant; `body[data-variant="praxis"][data-theme="dark"]` adds the Praxis surfaces, glass, tone pairs and the teal remap.
+**Every token declaration is on `:root`, and that is a rule with a build gate behind it.** A custom property is substituted at the element where the *declaration* lives, so a token declared on `<body>` is invisible to any `:root` alias of it: `:root{--a:var(--b)}` plus `body{--b:x}` computes `--a` on `:root` against the old `--b`, and `<body>` inherits that. Five tokens shipped broken this way before the rule existed. Keeping every declaration on one element makes the class impossible rather than merely absent.
+
+There are still two dark blocks, not one, and they are written as `:root:has(body[data-theme="dark"])` and `:root:has(body[data-variant="praxis"][data-theme="dark"])`. The first recolors the token-driven basics; the second adds the Praxis surfaces, glass, tone pairs and the teal remap. **The theme attribute still lives on `<body>`** — nothing about the markup contract changed, and the ~220 component rules keyed on `body[data-theme="dark"]` are untouched, because they only read tokens. `:has()` is what lets `:root` see an attribute it does not carry.
 
 ### Setting the theme before first paint
 
@@ -1346,7 +1350,7 @@ Class names that appear in Praxis selectors and so look supported, but have no b
 
 These class names appear in Praxis selectors, which makes them look supported. They have no base definition. The distinction matters because the failure is silent: your `.btn` picks up the Praxis primary fill and none of the box it needs, so it renders as colored text.
 
-Verified by hand against `src/` at 0.1.9. The generated tables further down are measured every build.
+Verified by hand against `src/` at 0.1.10. The generated tables further down are measured every build.
 
 ### Classes with no base
 
@@ -1526,7 +1530,7 @@ This mode is common in industrial, government and defence environments, which is
 
 ### Why Praxis is unusually exposed
 
-The material layer is built from shadows on purpose, and the comments in `praxis-core.css` say so: `--praxis-card`, `--px-tool-shadow`, `--px-overlay`, `--px-card-rail` and `--px-card-raised` are how a surface reads as raised, and `0 0 0 .5px` ring shadows are how most components draw their edge instead of using a border.
+The material layer is built from shadows on purpose, and the comments in `praxis-tokens.css` say so: `--praxis-card`, `--px-tool-shadow`, `--px-overlay`, `--px-card-rail` and `--px-card-raised` are how a surface reads as raised, and `0 0 0 .5px` ring shadows are how most components draw their edge instead of using a border.
 
 In forced-colors, every one of those disappears at once. The result is not a degraded look, it is a loss of structure:
 
@@ -1847,7 +1851,7 @@ Each variant carries its own frame in the sections above. Seven examples on one 
 
 `praxis-rfield.css`. No script.
 
-It depends on `--px-field` and `--px-field-hover` from `praxis-core.css`, which is the shared form-field fill — the same one `.admin-field` uses. That is why the two look like one system despite living in different sheets.
+It depends on `--px-field` and `--px-field-hover` from `praxis-tokens.css`, which is the shared form-field fill — the same one `.admin-field` uses. That is why the two look like one system despite living in different sheets.
 
 ### Markup contract
 
@@ -2469,13 +2473,13 @@ If you need a `.btn` scale — because you are porting markup that has one, or b
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--px-primary-fg` | `#fff` | `#08313a` |
-| `--px-primary-grad` | `linear-gradient(180deg,#197b83,#156f77)` | `linear-gradient(180deg,#29d2d7,#1fb4b9)` |
-| `--px-primary-shadow` | `0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28)` | `0 0 0 .5px rgba(41,210,215,.30),0 1px 2px rgba(0,0,0,.45),0 8px 18px -8px rgba(41,210,215,.45),inset 0 1px 0 rgba(255,255,255,.22)` |
 | `--px-tool` | `#ffffff` | `rgba(255,255,255,.06)` |
+| `--px-toolbar-gutter` | `16px` | — |
 | `--px-tool-shadow` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35)` |
 | `--px-tool-shadow-hover` | `0 0 0 .5px rgba(16,36,58,.09),0 2px 8px -2px rgba(16,36,58,.16)` | `0 0 0 .5px rgba(255,255,255,.12),0 4px 12px -2px rgba(0,0,0,.5)` |
-| `--px-toolbar-gutter` | `16px` | — |
+| `--px-primary-grad` | `linear-gradient(180deg,#197b83,#156f77)` | `linear-gradient(180deg,#29d2d7,#1fb4b9)` |
+| `--px-primary-fg` | `#fff` | `#08313a` |
+| `--px-primary-shadow` | `0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28)` | `0 0 0 .5px rgba(41,210,215,.30),0 1px 2px rgba(0,0,0,.45),0 8px 18px -8px rgba(41,210,215,.45),inset 0 1px 0 rgba(255,255,255,.22)` |
 
 
 Plus `--praxis-control-h` for the compact height and `--praxis-color-border-focus` for the focus ring.
@@ -3081,7 +3085,7 @@ Two names, and only one of them is complete. See Variants.
 </div>
 ```
 
-**The card radius is 12px, not the 20px `--praxis-radius-card` declares.** `praxis-core.css` overrides that token to 12px under `body[data-variant="praxis"]`, at a higher specificity than `:root`, so 12px is what renders. Reading the token file gives the wrong answer. See [the nine overrides](#the-praxis-variant-overrides-nine-tokens).
+**The card radius is 12px, and `--praxis-radius-card` now says 12px.** Until 0.1.10 the token file said 20px while `praxis-core.css` overrode it under `body[data-variant="praxis"]`, so reading the token file gave the wrong answer. See [one declaration site](#one-declaration-site).
 
 `.card` gives you the surface, the radius and the shadow. It does **not** give you padding — that varies by what is inside, and a card of table rows wants none. Every example above sets its own.
 
@@ -3196,11 +3200,11 @@ That distribution is the practical problem: the complete card is in the largest 
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
+| `--px-dot` | `rgba(16,36,58,.11)` | `rgba(255,255,255,.09)` |
+| `--praxis-card` | `0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07)` |
 | `--px-card-rail` | `0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6)` | `0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.30),inset 0 .5px 0 rgba(255,255,255,.05)` |
 | `--px-card-raised` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85)` | `0 0 0 .5px rgba(255,255,255,.11),0 1px 2px rgba(0,0,0,.45),0 4px 10px -3px rgba(0,0,0,.40),0 32px 60px -24px rgba(0,0,0,.75),inset 0 .5px 0 rgba(255,255,255,.10)` |
-| `--px-dot` | `rgba(16,36,58,.11)` | `rgba(255,255,255,.09)` |
 | `--px-dot-clear` | `192px` | — |
-| `--praxis-card` | `0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07)` |
 
 
 `--praxis-radius-card` is 20px in the token file and 12px under the Praxis variant. The variant wins, so 12px is the card geometry — one of the nine documented overrides.

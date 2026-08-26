@@ -5,11 +5,13 @@ order: 35
 keywords: px material surface shadow card hover field glass drawer elevation blur
 -->
 
-<p>The <code>--px-*</code> layer is where the Praxis look actually lives. It is not in
-<code>praxis-tokens.css</code> — every one of these is declared in
-<code>praxis-core.css</code> under <code>body[data-variant="praxis"]</code>, twice, once
-per theme. That is the single most common reason someone greps the token file for
-<code>--px-surface</code> and concludes it does not exist.</p>
+<p>The <code>--px-*</code> layer is where the Praxis look actually lives. Until 0.1.10 it was
+not in <code>praxis-tokens.css</code> at all — every one of these was declared in
+<code>praxis-core.css</code> under <code>body[data-variant="praxis"]</code>, which was the
+single most common reason someone grepped the token file for <code>--px-surface</code> and
+concluded it did not exist. All 27 moved to <code>:root</code> in the token file, beside the
+rest of the foundation; the dark half is still in <code>praxis-core.css</code>, one block per
+theme.</p>
 
 <h2>The material layer</h2>
 
@@ -60,7 +62,9 @@ inventing a fourth.</p>
 
 <h2>Praxis-only layout hooks</h2>
 
-<p>Declared under the variant and nowhere else. These are the ones a page reads or sets
-rather than consumes.</p>
+<p>Responsive layout hooks, set on <code>&lt;body&gt;</code> inside <code>@media</code> and
+nowhere else. These are the ones a page reads or sets rather than consumes, and they are the
+only token declarations in Praxis that are not on <code>:root</code> — exempted because
+nothing aliases them.</p>
 
 <praxis-block name="variant-extras"></praxis-block>

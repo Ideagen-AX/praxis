@@ -33,7 +33,8 @@
   /* amber "selected row" highlight (Reporting Authorities / Schedules) */
   --admin-row-selected:#fbe6c2;
 }
-body[data-theme="dark"]{
+/* Token declarations go on :root, never on body — see praxis-core.css. */
+:root:has(body[data-theme="dark"]){
   --admin-row-selected:rgba(245,196,90,.20);
 }
 

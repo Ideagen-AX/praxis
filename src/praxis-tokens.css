@@ -40,7 +40,11 @@
   /* Hue scales */
   --praxis-color-blue-10:#edf0fd;
   --praxis-color-blue-50:#6882ef;
-  --praxis-color-blue-60:#4766eb;
+  /* #4766eb in the EHSQ-E base; Praxis tunes it down one notch so the
+     solution-accent icons (Create New groups, .admin-banner) sit beside the
+     teal without competing. Was declared under the variant, which froze
+     --praxis-color-status-info at the base value. */
+  --praxis-color-blue-60:#4361c4;
   --praxis-color-green-10:#e6f3ee;
   --praxis-color-green-60:#098b53;
   --praxis-color-orange-10:#fdf2e6;
@@ -48,6 +52,8 @@
   --praxis-color-pink-50:#e82e8b;
   --praxis-color-pink-60:#e30072;
   --praxis-color-pink-90:#810041;
+  /* Solution accent, Praxis-only — no purple ramp in the EHSQ-E base. */
+  --praxis-color-purple-60:#805ad5;
   --praxis-color-red-10:#fceaeb;
   --praxis-color-red-50:#e7535c;
   --praxis-color-red-60:#e22d38;
@@ -62,7 +68,10 @@
   --praxis-color-yellow-90:#887100;
 
   /* Semantic — text / surface / border / interactive */
-  --praxis-color-border-default:var(--praxis-color-neutral-20);
+  /* Praxis strokes are lighter than the base neutral-20 (#c8cfd7): the shell
+     leans on lit edges and shadow for separation, so a hairline that strong
+     reads as a drawn box. */
+  --praxis-color-border-default:#E2E5E9;
   --praxis-color-border-focus:var(--praxis-color-teal-50);
   /* WCAG 1.4.11: this is the control-boundary token (checkbox boxes, input
      underlines, --px-check-stroke), so it has to clear 3:1 against the surface
@@ -80,8 +89,11 @@
   --praxis-color-text-disabled:var(--praxis-color-neutral-40);
   --praxis-color-text-inverse:var(--praxis-color-white);
   --praxis-color-text-link:var(--praxis-color-teal-60);
-  --praxis-color-text-primary:var(--praxis-color-neutral-90);
-  --praxis-color-text-secondary:var(--praxis-color-neutral-60);
+  /* Praxis ink is a slate rather than the base neutrals, to match the
+     layered slate surfaces. Both are literals, not rungs: nothing else
+     should move if the neutral ramp is retuned. */
+  --praxis-color-text-primary:#2F4051;
+  --praxis-color-text-secondary:#5D6977;
   --praxis-color-text-tertiary:#616f7e;   /* promoted from page-local; one value */
 
   /* Semantic — status */
@@ -117,7 +129,9 @@
   --praxis-radius-sm:8px;   /* Praxis 8/12/16 — the value that already renders on all 27 pages */
 
   /* Elevation */
-  --praxis-elevation-1:0 1px 2px 0 rgb(32 42 53 / .06);
+  /* Praxis elevation is a hairline plus a contact shadow, not a soft drop —
+     the lit-edge material depends on the .5px ring. */
+  --praxis-elevation-1:0 0 0 .5px rgba(16,36,58,.05),0 1px 2px rgba(16,36,58,.04);
   --praxis-elevation-2:0 1px 3px 0 rgb(32 42 53 / .1), 0 1px 2px -1px rgb(32 42 53 / .06);
   --praxis-elevation-3:0 4px 6px -1px rgb(32 42 53 / .1), 0 2px 4px -2px rgb(32 42 53 / .06);
   --praxis-elevation-4:0 10px 15px -3px rgb(32 42 53 / .1), 0 4px 6px -4px rgb(32 42 53 / .05);
@@ -147,10 +161,13 @@
   --praxis-navrail-width:56px;
   --praxis-navrail-width-expanded:240px;
 
-  /* Elevation semantics (Praxis remaps these to --px-* materials) */
-  --praxis-elevation-card:0 2px 16px -4px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.1);
-  --praxis-elevation-card-raised:0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.1);
-  --praxis-elevation-popover:0 4px 6px rgba(32, 42, 53, 0.07), 0 10px 15px rgba(32, 42, 53, 0.08);
+  /* Elevation semantics — mapped onto the --px-* materials below so any
+     component that references --praxis-elevation-* inherits the lit-edge
+     look. card and card-raised deliberately share --praxis-card; the
+     raised TIER is --px-card-raised and is opt-in per component. */
+  --praxis-elevation-card:var(--praxis-card);
+  --praxis-elevation-card-raised:var(--praxis-card);
+  --praxis-elevation-popover:var(--px-overlay);
 
   /* Palette rungs completed from the EHSQ-E base */
   --praxis-color-blue-100:#202e6a;
@@ -203,7 +220,7 @@
   --praxis-color-yellow-80:#aa8d00;
 
   /* Radius completed */
-  --praxis-radius-card:20px;
+  --praxis-radius-card:12px;   /* Praxis 8/12/16 geometry, not the base 20px */
   --praxis-radius-xl:16px;
 
   /* Semantic colour completed */
@@ -296,5 +313,73 @@
   --praxis-tone-warning-fg:var(--praxis-color-orange-90);   /* -70 is 3.30:1 on orange-10; -90 is 6.28:1 */
   --praxis-tone-danger-bg:var(--praxis-color-red-10);
   --praxis-tone-danger-fg:var(--praxis-color-red-70);
+
+  /* ============ The --px-* material layer, moved here 2026-08-26 ============
+     These are the surfaces and shadows that carry the Praxis look. They were
+     declared under body[data-variant="praxis"] in praxis-core.css, which had
+     two costs: a reader who grepped this file for --px-surface concluded it did
+     not exist, and any :root token that aliased one of them computed against
+     the value this file declared rather than the one that rendered.
+     ================================================================== */
+
+  /* Praxis surface/material palette (LIGHT) */
+  --px-page:#F0F2F4; --px-surface:#ffffff; --px-surface-2:#F4F6F8; --px-tool:#ffffff;
+  --px-drawer:#ffffff;  /* shared drawer/panel surface (Mazlan + filter); dark deepens to navy */
+  --px-chip:#EEF1F4; --px-glass:rgba(255,255,255,.82); --px-hover:rgba(16,36,58,.025); --px-dot:rgba(16,36,58,.11);
+  /* Gap between a toolbar band and the first card of page content. One token
+     because it was set independently per section and drifted: 8px on the record
+     page, 6px on the admin pages and profile. Not theme-dependent. */
+  --px-toolbar-gutter:16px;
+  /* Form-field fill. Fields carry no border, so this is the whole affordance —
+     it has to read as a step off --px-surface without going dark enough to
+     fight the value inside it. Shared by the record fields (.rfield) and the
+     admin/profile fields (.admin-field), which is why it lives here. */
+  --px-field:#EEF1F4; --px-field-hover:#E6EAEF;
+  /* --px-hover is 2.5% — deliberately faint for large row targets, but invisible
+     on a small raised tool. Buttons use this stronger wash instead. */
+  --px-hover-btn:rgba(16,36,58,.075);
+  --px-scroll:rgba(16,36,58,.28); --px-scroll-hover:rgba(16,36,58,.45);
+  --praxis-card:0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7);
+  --px-tool-shadow:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05);
+  --px-tool-shadow-hover:0 0 0 .5px rgba(16,36,58,.09),0 2px 8px -2px rgba(16,36,58,.16);
+  --px-overlay:0 0 0 .5px rgba(16,36,58,.06),0 2px 6px rgba(16,36,58,.06),0 18px 38px -16px rgba(16,36,58,.18);
+  --px-edge:rgba(255,255,255,.6);
+
+  /* Elevation TIERS — a single card shadow can't express hierarchy, so a page
+     of cards reads as one flat plane. These flank --praxis-card (unchanged, so
+     nothing that already uses it moves) to give a page a subject and a support
+     cast. Additive only; opt in per component.
+       rail   ← recedes: tighter, shallower, no long throw
+       card   ← --praxis-card, the default
+       raised ← the subject: wider spread, longer throw, brighter lit edge */
+  --px-card-rail:0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6);
+  --px-card-raised:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85);
+
+  /* primary button — refined teal with lit edge (used by Submit / Create New /
+     Reassign task on the record page and the quick-actions on the workspace)
+
+     WCAG 1.4.3 — white on the whole fill, not just the bottom of it. The stops
+     were #1f8f97 → #1b838b, which put --px-primary-fg (#fff) at 3.86:1 over the
+     top of the gradient and exactly 4.50:1 over the bottom: the label failed
+     across the upper half of every primary button in the app.
+
+     Both stops moved down, not just the top one. The old bottom stop was
+     already at the 4.50 threshold, so any top lighter than it fails and any top
+     darker than it inverts the gradient — the fix has to shift the pair. The
+     original step between stops is preserved, so the lit-edge shading reads the
+     same, just a slightly deeper teal: 5.00:1 at the top, 5.88:1 at the bottom.
+
+     Not --praxis-color-teal-60 (#1b838b): that token also carries text and
+     borders, where it is measured against a light background and is fine.
+     Only the fill needed to move. */
+  --px-primary-grad:linear-gradient(180deg,#197b83,#156f77);
+  --px-primary-fg:#fff;
+  --px-primary-shadow:0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28);
+  /* Dots stop short of the top chrome: the grid running up behind the toolbar
+     and page header made them read as part of the header rather than the page.
+     Page colour is composited over the dots down to --px-dot-clear, then fades
+     out over 48px. Fixed attachment, so the stop is a viewport coordinate and
+     pages set it to their own chrome height. */
+  --px-dot-clear:192px;
 
 }

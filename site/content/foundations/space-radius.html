@@ -17,12 +17,11 @@ there is a fifth value.</p>
 
 <praxis-block name="scale" kind="radius" prefix="--praxis-radius-"></praxis-block>
 
-<div class="note note--trap">
-  <p><strong><code>--praxis-radius-card</code> is 20px in the token file and 12px under
-  Praxis.</strong> The Praxis override is the one that renders, so 12px is the card
-  geometry. The resolved columns above show the real value; see
-  <a href="color.html#the-praxis-variant-overrides-nine-tokens">the nine overrides</a> for
-  the rest.</p>
+<div class="note">
+  <p><strong><code>--praxis-radius-card</code> is 12px, and the token file now says so.</strong>
+  It read 20px until 0.1.10, while <code>praxis-core.css</code> overrode it to 12px under the
+  variant — so the file and the render disagreed. The override layer is gone; see
+  <a href="color.html#one-declaration-site">one declaration site</a>.</p>
 </div>
 
 <h2>Chrome metrics</h2>

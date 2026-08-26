@@ -43,7 +43,7 @@ does today and why the page material matters underneath it.</p>
   <tbody>
     <tr><td>Default</td><td>Exists as <code>.admin-card</code></td></tr>
     <tr><td><code>--flush</code></td><td>Exists. 16px/18px padding for a denser grid</td></tr>
-    <tr><td>Elevation tier</td><td><strong>Not exposed.</strong> <code>praxis-core.css</code> defines three tiers — <code>--px-card-rail</code> (recedes), <code>--praxis-card</code> (default), <code>--px-card-raised</code> (the subject) — with a comment explaining that a page of identically-shadowed cards reads as one flat plane. Only the middle one is reachable through a class. Candidates: <code>--rail</code> and <code>--raised</code></td></tr>
+    <tr><td>Elevation tier</td><td><strong>Not exposed.</strong> <code>praxis-tokens.css</code> defines three tiers — <code>--px-card-rail</code> (recedes), <code>--praxis-card</code> (default), <code>--px-card-raised</code> (the subject) — with a comment explaining that a page of identically-shadowed cards reads as one flat plane. Only the middle one is reachable through a class. Candidates: <code>--rail</code> and <code>--raised</code></td></tr>
     <tr><td>Interactive</td><td><strong>Missing.</strong> A card that is a link needs a hover and a focus ring. This reference site had to write both itself for its page grids</td></tr>
   </tbody>
 </table>
@@ -125,7 +125,7 @@ loading the admin shell.</p>
     <tr><td><code>--px-surface</code></td><td>Fill</td></tr>
     <tr><td><code>--praxis-card</code></td><td>Default shadow</td></tr>
     <tr><td><code>--px-card-rail</code> / <code>--px-card-raised</code></td><td>The two unreachable tiers</td></tr>
-    <tr><td><code>--praxis-radius-md</code></td><td>12px. Note <code>--praxis-radius-card</code> is 20px in the token file and 12px under the Praxis variant — the variant wins, and this is one of the nine documented overrides</td></tr>
+    <tr><td><code>--praxis-radius-md</code></td><td>12px, and so is <code>--praxis-radius-card</code>. The two disagreed until 0.1.10, when the variant override layer was folded into the token file</td></tr>
     <tr><td><code>--px-surface-2</code></td><td>A nested card</td></tr>
   </tbody>
 </table>

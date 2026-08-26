@@ -92,13 +92,18 @@ def dark_remaps():
     """
     core = read_css(os.path.join(SRC, 'praxis-core.css'))
     dark = {}
-    for m in re.finditer(r'body\[data-variant="praxis"\]\[data-theme="dark"\]\s*\{(.*?)\n\}',
-                         core, re.S):
-        for d in DEF.finditer(m.group(1)):
-            dark[d.group(1)] = d.group(2).strip()
-    for m in re.finditer(r'body\[data-theme="dark"\]\s*\{(.*?)\n\}', core, re.S):
-        for d in DEF.finditer(m.group(1)):
-            dark.setdefault(d.group(1), d.group(2).strip())
+    for sel in (r'body\[data-variant="praxis"\]\[data-theme="dark"\]',
+                r'body\[data-theme="dark"\]'):
+        # Both blocks moved onto :root via :has() on 2026-08-26 so that every
+        # token declaration lives on one element; the bare body form is still
+        # matched because a consumer sheet may carry one.
+        pattern = r'(?::root:has\()?%s\)?\s*\{(.*?)\n\}' % sel
+        for m in re.finditer(pattern, core, re.S):
+            for d in DEF.finditer(m.group(1)):
+                if sel.startswith('body\\[data-variant'):
+                    dark[d.group(1)] = d.group(2).strip()
+                else:
+                    dark.setdefault(d.group(1), d.group(2).strip())
     return dark
 
 
@@ -145,11 +150,14 @@ def token_map():
 def variant_block():
     """Everything declared under body[data-variant="praxis"] in praxis-core.css.
 
-    Returns name -> light value. This is the layer that actually renders, and it
-    is not a subset of praxis-tokens.css: it both ADDS tokens (the --px-*
-    materials, --praxis-color-purple-60) and OVERRIDES some the token file
-    already declared, at a higher specificity than :root. So the value in
-    praxis-tokens.css can be the wrong answer to "what colour is this".
+    Returns name -> light value. This used to be a whole parallel token layer —
+    41 properties, of which 9 overrode praxis-tokens.css at a higher specificity
+    than :root, so the token file was the wrong answer to "what colour is this".
+    All 41 moved to :root on 2026-08-26; what is left is the four responsive
+    layout hooks set on <body> inside @media.
+
+    Kept, rather than deleted, because it is what variant_overrides() and
+    body_declared_tokens() measure against: an empty result is the assertion.
     """
     core = read_css(os.path.join(SRC, 'praxis-core.css'))
     out = {}
@@ -164,14 +172,18 @@ def variant_block():
 def material_rows():
     """The --px-* material layer: the surfaces and shadows that carry the look.
 
-    They live in praxis-core.css, not the token file, which makes them the half
-    of the foundation a reader is most likely to go hunting for and not find.
+    They lived in praxis-core.css rather than the token file until 2026-08-26,
+    which made them the half of the foundation a reader was most likely to go
+    hunting for and not find. Both sources are still read: --px-gutter is set on
+    <body> inside @media and is legitimately not in the token file.
     Same (group, name, light, dark) shape as token_rows() so one renderer serves
     both.
     """
     dark = dark_remaps()
+    rows = {name: light for _g, name, light, _d in token_rows()}
+    rows.update(variant_block())
     return [('Material', name, value, dark.get(name, ''))
-            for name, value in sorted(variant_block().items())
+            for name, value in sorted(rows.items())
             if name.startswith('--px-')]
 
 
@@ -179,9 +191,10 @@ def variant_overrides():
     """Tokens praxis-tokens.css declares that praxis-core.css then overrides for
     the Praxis variant. [(name, token_file_value, praxis_value, dark_value)]
 
-    Worth surfacing on its own page: reading the token file alone gives the wrong
-    answer for every one of these, and the difference is not cosmetic —
-    --praxis-radius-card is 20px in the token file and 12px under Praxis.
+    Empty since 2026-08-26, and that is the point: it is measured every build so
+    the emptiness is checked rather than asserted. There were nine, and the
+    difference was not cosmetic — --praxis-radius-card read 20px in the token
+    file and rendered 12px.
     """
     declared = {name: light for _g, name, light, _d in token_rows()}
     dark = dark_remaps()
@@ -202,49 +215,170 @@ def variant_extras():
             if name not in declared and not name.startswith('--px-')]
 
 
-def frozen_aliases():
-    """Tokens whose dark value can never take effect. [(token, rung, dark_value)]
+def rule_blocks(css):
+    """Top-level (selector, body) pairs, descending into @media.
 
-    A precise, decidable bug class. `:root { --a: var(--b) }` with the dark remap
-    of `--b` declared on `body` cannot work: custom-property substitution happens
-    at the element where the DECLARATION lives, so `--a` is computed on :root
-    against the LIGHT `--b`, and body inherits that computed value. The dark remap
-    never reaches it.
-
-    This is not something the resolved-value probes can be asked to derive
-    either — a naive resolve() over a merged dark table substitutes the dark rung
-    and reports a difference the browser does not produce. So it is detected from
-    the structure instead: aliased on :root, remapped on body.
-
-    Distinct from a token that is simply the same in both themes because its rung
-    has no dark treatment at all. That is an omission; this is a rule violation.
+    A brace walk rather than a parser: the only nesting in these sheets is
+    @media wrapping ordinary rule blocks, and a declaration inside one is still
+    a declaration on whatever element the inner selector names.
     """
-    tokens_css = read_css(os.path.join(SRC, 'praxis-tokens.css'))
-    root_aliases = {}
-    for m in re.finditer(r':root\s*\{(.*?)\n\}', tokens_css, re.S):
-        for d in DEF.finditer(m.group(1)):
-            value = d.group(2).split('/*')[0].strip()
-            inner = re.fullmatch(r'var\(\s*(--[A-Za-z0-9_-]+)\s*\)', value)
-            if inner:
-                root_aliases[d.group(1)] = inner.group(1)
+    out, i = [], 0
+    while True:
+        b = css.find('{', i)
+        if b < 0:
+            return out
+        cut = max(css.rfind('}', 0, b), css.rfind('{', 0, b))
+        sel = ' '.join(css[cut + 1:b].split())
+        d, j = 1, b + 1
+        while j < len(css) and d:
+            if css[j] == '{':
+                d += 1
+            elif css[j] == '}':
+                d -= 1
+            j += 1
+        if sel.startswith('@'):
+            i = b + 1          # step INTO the at-rule
+            continue
+        out.append((sel, css[b + 1:j - 1]))
+        i = j
 
-    dark = dark_remaps()
-    # A token re-declared for the Praxis variant is computed on <body>, where the
-    # dark remap is in scope, so it is not frozen.
-    variant = set(variant_block())
 
+_HAS = re.compile(r':(?:has|is|not)\([^()]*\)')
+
+
+def declaration_sites():
+    """token -> sorted [(element, selector, value)] for every root/body declaration.
+
+    element is 'root' or 'body'. Selectors that reach past <body> (a descendant
+    combinator, a class, an element) are skipped: those are component-scoped and
+    cannot strand an inherited alias. Every sheet is read, not just
+    praxis-core.css — praxis-workspace.css and praxis-admin.css each carried a
+    body-scoped token block too, and a check that only looked at core would have
+    called the system clean while they were still there.
+    """
+    sites = collections.defaultdict(list)
+    for path in sorted(glob.glob(os.path.join(SRC, '*.css'))):
+        css = COMMENT.sub('', read_css(path))
+        for sel, body in rule_blocks(css):
+            props = [(d.group(1), d.group(2).strip()) for d in DEF.finditer(body)]
+            if not props:
+                continue
+            for part in sel.split(','):
+                bare = _HAS.sub('', part).strip()
+                if re.search(r'[>+~\s]', bare):
+                    continue                      # reaches past the subject element
+                if bare.startswith(':root') or bare == 'html':
+                    element = 'root'
+                elif re.fullmatch(r'body(\[[^\]]*\])*', bare):
+                    element = 'body'
+                else:
+                    continue
+                for name, value in props:
+                    sites[name].append((element, ' '.join(part.split()), value))
+                break
+    return {k: sorted(set(v)) for k, v in sites.items()}
+
+
+def body_declared_tokens():
+    """Tokens declared on <body> rather than :root. [(token, selector, value)]
+
+    THE structural invariant behind frozen_aliases(). Custom-property
+    substitution happens at the element where the declaration lives, so a token
+    declared on <body> cannot be seen by any :root alias of it. Keeping every
+    declaration on :root does not merely fix today's frozen aliases — it makes
+    the class impossible.
+
+    Four responsive layout hooks are exempt and named explicitly. They are set
+    on <body> inside @media on purpose, nothing aliases them, and moving them to
+    :root would not make them any more visible.
+    """
+    exempt = {'--px-gutter', '--ph-pad-x', '--home-gutter', '--sp-gutter',
+              '--navrail-w'}
     out = []
-    for token, rung in sorted(root_aliases.items()):
-        if token in variant:
+    for token, places in sorted(declaration_sites().items()):
+        if token in exempt:
             continue
-        # And a token given its OWN dark value is fine however its light value is
-        # written: surface-subtle aliases neutral-10 but is remapped directly, so
-        # the alias never has to carry the theme. Without this the check reports
-        # every such token and reads as noise.
-        if token in dark:
-            continue
-        if rung in dark:
-            out.append((token, rung, dark[rung]))
+        for element, sel, value in places:
+            if element == 'body':
+                out.append((token, sel, value))
+    return out
+
+
+_SEL_ATTR = re.compile(r'\[([a-zA-Z-]+)(?:[~|^$*]?="([^"]*)")?\]')
+
+
+def _conditions(selector):
+    """The attribute conditions a body-level selector requires, as a frozenset.
+
+    data-variant="praxis" is dropped, because it is universally true: only one
+    variant exists (Miramar was pruned 2026-08-12) and both README.md and
+    PRAXIS-FOR-AGENTS.md state the attribute is required and always "praxis".
+    Keeping it made the comparison report a freeze that cannot happen — a rung
+    remapped under body[data-theme="dark"] whose token is restated under
+    body[data-variant="praxis"][data-theme="dark"] is covered on every page that
+    exists. If a second variant is ever added, delete this line first: the
+    freeze becomes real again the moment the attribute can hold another value.
+    """
+    attrs = _SEL_ATTR.findall(_HAS.sub('', selector))
+    return frozenset(a for a in attrs if a != ('data-variant', 'praxis'))
+
+
+def frozen_aliases():
+    """Tokens whose overridden value can never take effect.
+
+    Returns [(token, rung, selector_of_the_unreachable_declaration, value)].
+
+    A precise, decidable bug class. `:root { --a: var(--b) }` with `--b`
+    re-declared on `body` cannot work: substitution happens at the element where
+    the DECLARATION lives, so `--a` is computed on :root against the :root `--b`,
+    and body inherits that computed value. The re-declaration never reaches it.
+
+    TWO THINGS THE FIRST VERSION OF THIS CHECK GOT WRONG, both of which let a
+    real bug through:
+
+    1. It only looked at dark remaps. `--b` also got re-declared under the old
+       body[data-variant="praxis"] override layer, and that axis strands the
+       alias in BOTH themes. --praxis-color-status-info aliases blue-60, the
+       variant redefined blue-60 from #4766eb to #4361c4, and the light half
+       rendered a blue the palette no longer contained.
+
+    2. It treated "the token is re-declared on body somewhere" as a clean bill of
+       health. status-info WAS re-declared on body — in the dark block only — so
+       that exemption hid the light half of the very same bug. A restatement only
+       covers a rung declaration whose conditions it is a subset of: restating a
+       token under body[data-theme="dark"] covers a rung declared under
+       body[data-variant="praxis"][data-theme="dark"], but not the reverse, and
+       not the unconditional variant block.
+
+    Detected from declaration SITES, never from a merged value table. Flattening
+    every declaration into one dict is what hides this in the first place:
+    substituting the body value reports a difference the browser never makes.
+
+    Since 2026-08-26 every token declaration lives on :root, so this is empty by
+    construction; body_declared_tokens() is the invariant that keeps it that way.
+    It is retained because it is cheap and it fires if a body-scoped token block
+    is ever reintroduced alongside an alias.
+
+    Known limitation: @media conditions are not modelled, so a rung declared only
+    inside an @media block would be reported as if it were unconditional. No
+    :root alias references one today, and media_only_tokens() lists them.
+    """
+    sites = declaration_sites()
+    out = []
+    for token, places in sorted(sites.items()):
+        covers = [_conditions(sel) for el, sel, _v in places if el == 'body']
+        for element, _sel, value in places:
+            if element != 'root':
+                continue
+            inner = re.fullmatch(r'var\(\s*(--[A-Za-z0-9_-]+)\s*\)', value)
+            if not inner:
+                continue
+            for el2, sel2, val2 in sites.get(inner.group(1), []):
+                if el2 != 'body':
+                    continue
+                if any(c <= _conditions(sel2) for c in covers):
+                    continue        # the token is restated wherever the rung is
+                out.append((token, inner.group(1), sel2, val2))
     return out
 
 

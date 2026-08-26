@@ -8,10 +8,13 @@ keywords: color color palette swatch ramp neutral teal pink semantic status tone
 -->
 
 <p>Every color on this page is painted from a live document, once per theme, rather than
-copied out of the stylesheet. That matters more here than anywhere else in Praxis: several
-color tokens are declared one way in <code>praxis-tokens.css</code> and
-<a href="#the-praxis-variant-overrides-nine-tokens">overridden</a> under the Praxis variant,
-so the token file is not the answer to "what color is this".</p>
+copied out of the stylesheet. It used to be the only way to get a true answer: nine tokens
+were declared one way in <code>praxis-tokens.css</code> and re-declared under the Praxis
+variant at a higher specificity, so the token file was not the answer to "what color is
+this". <a href="#one-declaration-site">That layer is gone</a> — but the page still reads
+resolved values, because a build can only report what a token is <em>declared</em> as, and a
+token declared as <code>var(--rung)</code> is worth exactly whatever the cascade hands the
+rung.</p>
 
 <h2>The whole palette</h2>
 
@@ -110,8 +113,8 @@ dark text is visible rather than something you work out.</p>
 
 <h3>Purple</h3>
 
-<p>One rung, and it is defined only under the Praxis variant in
-<code>praxis-core.css</code>. There is no purple ramp in the token file.</p>
+<p>One rung. There is no purple ramp in the EHSQ-E base — this is a Praxis solution accent,
+used to tint module and record-type icons alongside blue, orange, teal and pink.</p>
 
 <praxis-block name="ramp" hue="purple"></praxis-block>
 
@@ -119,12 +122,33 @@ dark text is visible rather than something you work out.</p>
 
 <praxis-block name="swatches" prefix="--praxis-color-white"></praxis-block>
 
-<h2>The Praxis variant overrides nine tokens</h2>
+<h2>One declaration site</h2>
 
-<p>Measured, not asserted. Each row below is a token <code>praxis-tokens.css</code>
-declares and <code>praxis-core.css</code> then re-declares for the Praxis variant.</p>
+<p>Praxis used to declare nine tokens twice: on <code>:root</code> in
+<code>praxis-tokens.css</code>, and again under <code>body[data-variant="praxis"]</code> in
+<code>praxis-core.css</code>. The second won on specificity, so the token file gave the wrong
+answer for every one of them, and the difference was not cosmetic —
+<code>--praxis-radius-card</code> read <code>20px</code> and rendered <code>12px</code>.</p>
+
+<p>Overriding at a variant scope is a reasonable pattern when there is more than one variant.
+There is not: the frozen "Miramar" comparison view was pruned on 2026-08-12 and
+<code>data-variant</code> has been required-and-always-<code>praxis</code> ever since. The
+layer was buying nothing and costing the ambiguity.</p>
+
+<p>The nine moved to <code>:root</code> in 0.1.10, along with the whole <code>--px-*</code>
+material layer. The table below is regenerated from both stylesheets on every build, and an
+empty result is the assertion — a tenth override fails the build rather than quietly
+reintroducing the problem.</p>
 
 <praxis-block name="overrides"></praxis-block>
+
+<p>Tidiness was not the reason. A token declared on <code>&lt;body&gt;</code> is invisible to
+any <code>:root</code> alias of it, which is the same defect as the frozen aliases below —
+and it had already produced one. <code>--praxis-color-status-info</code> aliases
+<code>blue-60</code>; the variant redefined <code>blue-60</code> from <code>#4766eb</code> to
+<code>#4361c4</code>; the alias, computed on <code>:root</code>, kept the old value. So the
+info color rendered a blue the palette no longer contained. Only its dark half had ever been
+restated, so the fix that landed on 2026-08-18 left the light half frozen for another week.</p>
 
 <h2>Four semantic tokens do not change in dark</h2>
 
@@ -176,11 +200,27 @@ success, warning and info sat at 7.88, 7.89 and 5.30. It is now <code>red-40</co
 
 <praxis-block name="frozen-aliases"></praxis-block>
 
-<p>That table is generated from the structure of the stylesheets on every build, and an empty
-result is now a <strong>gate</strong>: a fifth frozen alias fails the build rather than waiting
-for someone to notice a control behaving backwards. It is deliberately not derived from the
-resolved values — a resolver asked for the dark value substitutes the dark rung and reports a
-difference the browser never produces, which is the whole reason this went unseen.</p>
+<p>That table is generated from the declaration <em>sites</em> in the stylesheets on every
+build, and an empty result is a <strong>gate</strong>: another frozen alias fails the build
+rather than waiting for someone to notice a control behaving backwards. It is deliberately not
+derived from the resolved values — a resolver asked for the dark value substitutes the dark
+rung and reports a difference the browser never produces, which is the whole reason this went
+unseen.</p>
+
+<p>The check itself was wrong twice, in ways worth naming because both made it report clean
+while a real bug was live. It only looked at <em>dark</em> remaps, so it never saw the variant
+layer stranding <code>status-info</code> in light. And it treated "the token is restated on
+<code>body</code> somewhere" as a clean bill of health — which is how the same token stayed
+half-broken after being half-fixed. A restatement only covers a rung declaration whose
+conditions it is a subset of.</p>
+
+<p>Since 0.1.10 there is a stronger check underneath it: <strong>no token may be declared on
+<code>&lt;body&gt;</code> at all.</strong> That is what makes the class impossible rather than
+merely absent, and it is why the dark blocks now sit on
+<code>:root:has(body[data-theme="dark"])</code>. The theme attribute stays on
+<code>&lt;body&gt;</code>, so nothing about the markup contract changed.</p>
+
+<praxis-block name="body-tokens"></praxis-block>
 
 <h3>The four that remain, and why they are fine</h3>
 
