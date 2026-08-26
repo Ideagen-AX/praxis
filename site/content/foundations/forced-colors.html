@@ -1,7 +1,7 @@
 <!--praxis
 title: Forced colors and high contrast
 summary: Zero forced-colors support, in a system that carries nearly all of its structure in box-shadow. Shadows are dropped in that mode, so the shell loses its shape. Planned.
-order: 110
+order: 130
 icon: visibility
 keywords: forced-colors high contrast windows accessibility wcag procurement shadow border planned
 -->
@@ -40,7 +40,7 @@ is a loss of structure:</p>
     <tr><td><code>.px-pop</code>, <code>.tb-dropdown</code>, <code>.appswitch__pop</code></td><td>Separation from the page beneath. Under the Praxis variant these explicitly set <code>border:0</code> and rely on <code>--px-overlay</code></td></tr>
     <tr><td>Praxis fields</td><td>Everything. Fields carry no border by design — <code>--px-field</code> is documented as "the whole affordance" — and a fill difference is exactly what forced-colors removes</td></tr>
     <tr><td>The app shell</td><td>The nav rail is transparent with one border; the app bar has none. Both blend into the page by design</td></tr>
-    <tr><td><a href="../components/loading.html">Skeletons</a></td><td>A fill with no border and no text vanishes completely</td></tr>
+    <tr><td><a href="../patterns/loading-states.html">Skeletons</a></td><td>A fill with no border and no text vanishes completely</td></tr>
     <tr><td>Status pills, stepper markers, tone chips</td><td>All fill-differentiated, so several states collapse into one</td></tr>
   </tbody>
 </table>

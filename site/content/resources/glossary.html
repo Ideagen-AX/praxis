@@ -1,0 +1,73 @@
+<!--praxis
+title: Glossary
+slug: glossary
+summary: Twenty terms this reference uses without stopping to define them — tier, variant, rung, material layer, frozen alias, page family, part-only name.
+order: 40
+keywords: glossary terms definitions vocabulary tier variant rung material frozen alias family
+icon: menu_book
+-->
+
+<p>Praxis has a working vocabulary that appears everywhere on this site and is defined
+nowhere. Several of the terms are ordinary words used in a specific way, which is the worst
+kind: nobody thinks to look them up.</p>
+
+<h2>The system</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Means</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Praxis</strong></td><td>The design system for Ideagen EHSQ Enterprise. Plain CSS and vanilla JS, no framework, no build step for consumers.</td></tr>
+    <tr><td><strong>Variant</strong></td><td>The value of <code>data-variant</code> on <code>&lt;body&gt;</code>. There is exactly one, <code>praxis</code>, and it is required. A second variant (<em>Miramar</em>) existed as a frozen comparison view and was pruned on 2026-08-12.</td></tr>
+    <tr><td><strong>Theme</strong></td><td>The value of <code>data-theme</code> — <code>light</code> or <code>dark</code>. Also on <code>&lt;body&gt;</code>, and set before first paint or the page flashes.</td></tr>
+    <tr><td><strong>The barrel</strong></td><td><code>dist/praxis.css</code> — the foundation plus every component sheet concatenated in cascade order. What a consumer loads.</td></tr>
+    <tr><td><strong>Consumer</strong></td><td>An application using Praxis. There is one today: the <code>groom-lake</code> prototype, which vendors a built copy rather than importing from <code>node_modules</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Tokens</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Means</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Rung</strong></td><td>A step on a palette ramp — <code>--praxis-color-teal-60</code>. Rungs are raw values. You should almost never reference one directly.</td></tr>
+    <tr><td><strong>Semantic token</strong></td><td>A token named for its job rather than its value — <code>--praxis-color-text-primary</code>. Usually an alias of a rung, and the thing that themes.</td></tr>
+    <tr><td><strong>Alias</strong></td><td>A token whose value is <code>var(--another-token)</code>. Convenient and the source of the system's most persistent bug class — see <em>frozen alias</em>.</td></tr>
+    <tr><td><strong>Material layer</strong></td><td>The <code>--px-*</code> tokens: surfaces, shadows, washes and fills. This is where the Praxis <em>look</em> lives, as opposed to <code>--praxis-*</code>, which is the foundation. Both are in <code>praxis-tokens.css</code> as of 0.1.10.</td></tr>
+    <tr><td><strong>Frozen alias</strong></td><td>A token aliased on <code>:root</code> whose rung is re-declared on <code>&lt;body&gt;</code>. Substitution happens where the <em>declaration</em> lives, so the alias never sees the override. Five shipped broken. It is now structurally impossible and there is a gate for it.</td></tr>
+    <tr><td><strong>Tier</strong> (elevation)</td><td>One of <code>--px-card-rail</code> / <code>--praxis-card</code> / <code>--px-card-raised</code> — recede, default, subject. Not the same word as the status tier below.</td></tr>
+    <tr><td><strong>Resolved value</strong></td><td>What a token actually computes to in the browser, as opposed to what the file declares. The two differ often enough that this site reads the former.</td></tr>
+  </tbody>
+</table>
+
+<h2>This reference</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Means</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tier</strong> (status)</td><td>How settled a component is: <span class="admin-pill admin-pill--ok">Ready</span> <span class="admin-pill admin-pill--info">Settling</span> <span class="admin-pill admin-pill--warning">Unstable</span> <span class="admin-pill admin-pill--off">Planned</span>. It is the pill on the page. It does not affect where the page sits in the nav.</td></tr>
+    <tr><td><strong>Layer</strong></td><td>What a component <em>is</em>: Global, Core or Records. This is what groups the nav.</td></tr>
+    <tr><td><strong>Planned page</strong></td><td>A page documenting a component with no rule in <code>src/</code>. It is a brief, not documentation, and it is excluded from <code>PRAXIS-FOR-AGENTS.md</code>.</td></tr>
+    <tr><td><strong>Page family</strong></td><td>A class naming the <em>kind</em> of page — <code>.home</code>, <code>.view</code>, <code>.record</code>, <code>.demo</code>. All four are referenced in descendant selectors and none is defined.</td></tr>
+    <tr><td><strong>Part-only name</strong></td><td>A class whose parts are styled while the container never was — <code>.section__header</code> exists, <code>.section</code> does not. Fourteen of these.</td></tr>
+    <tr><td><strong>Class family</strong></td><td>A class name up to its first <code>__</code> or <code>--</code>. There are 237 in <code>src/</code>, and every one must be claimed by a page or the build fails.</td></tr>
+    <tr><td><strong>Praxis block</strong></td><td><code>&lt;praxis-block name="…"&gt;</code> in a content file — a measured fact inserted at build time. Token tables, the palette, coverage, the release list.</td></tr>
+    <tr><td><strong>Probe document</strong></td><td>One of two hidden pages, one per theme, that this site loads to read resolved token values with <code>getComputedStyle</code>.</td></tr>
+    <tr><td><strong>Gate</strong></td><td>A build check that fails rather than warns. There are eight, and they exist because every one of them corresponds to something that went wrong silently.</td></tr>
+  </tbody>
+</table>
+
+<h2>The product</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Means</th></tr></thead>
+  <tbody>
+    <tr><td><strong>EHSQ</strong></td><td>Environment, Health, Safety and Quality. The domain.</td></tr>
+    <tr><td><strong>EHSQ-E</strong></td><td>EHSQ Enterprise, the product Praxis is the design system for. Previously DevonWay.</td></tr>
+    <tr><td><strong>CAPA</strong></td><td>Corrective and Preventive Action. A record type, and a staged workflow.</td></tr>
+    <tr><td><strong>MOC</strong></td><td>Management of Change. Another staged record type.</td></tr>
+    <tr><td><strong>Record</strong></td><td>The unit of work — an incident, a finding, a CAPA, a permit. See <a href="../patterns/record-page.html">record page</a>.</td></tr>
+    <tr><td><strong>Register</strong></td><td>The list a record came from.</td></tr>
+    <tr><td><strong>Mazlan</strong></td><td>The contextual AI assistant surface — the four-dot glyph, the agentic gradient, the drawer.</td></tr>
+    <tr><td><strong>Helix</strong></td><td>Ideagen's corporate design system. Praxis is not Helix and does not claim alignment with it; per-component alignment tables were removed on 2026-08-25.</td></tr>
+  </tbody>
+</table>

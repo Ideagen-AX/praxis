@@ -1,0 +1,147 @@
+<!--praxis
+title: Data display
+slug: data-display
+summary: A complete table wearing the wrong name, the largest component in the system doing the filtering, and no pagination base under the pager classes every list needs.
+order: 50
+keywords: table list data grid filter sort pagination density column row selection
+icon: table
+-->
+
+<h2>Problem</h2>
+
+<p>Most screens in EHSQ Enterprise are a list of records that someone needs to narrow. An
+audit programme is a few thousand rows; an incident register spans years. The user arriving
+at one of these has a question — open CAPAs assigned to me, overdue inspections at this
+site — and the list is only useful to the extent it can be reduced to the answer.</p>
+
+<p>Two things go wrong. The reduction is expressed differently on every screen, so a filter
+learned in one module does not transfer. And the table itself gets rebuilt per page, because
+the one Praxis has is called <code>.admin-table</code> and a record page reasonably concludes
+it is not for them.</p>
+
+<h2>Solution</h2>
+
+<p>One table, one filter vocabulary, and a clear split between the filters that are always
+visible and the ones behind a drawer.</p>
+
+<h3>The table</h3>
+
+<p><code>.admin-table</code> is complete — header, rows, hover, alignment, the scroll wrapper
+— and it is named for one section of the application. Every list in Praxis either uses it
+under a name that does not fit or reinvents it. The promotion to <code>.table</code> is
+<a href="../components/table.html">planned</a> and is a rename plus an alias, not new
+CSS.</p>
+
+<template data-example="admin-table inside its scroll wrapper" data-height="240">
+  <div class="admin-table-wrap"><div class="admin-table-scroll">
+    <table class="admin-table">
+      <thead><tr><th>Reference</th><th>Type</th><th>Status</th><th>Due</th></tr></thead>
+      <tbody>
+        <tr><td>INC-2024-0417</td><td>Near miss</td><td><span class="admin-pill admin-pill--warning">Open</span></td><td>12 Sep</td></tr>
+        <tr><td>CAPA-2024-0088</td><td>Corrective</td><td><span class="admin-pill admin-pill--ok">Closed</span></td><td>—</td></tr>
+        <tr><td>AUD-2024-0031</td><td>Internal</td><td><span class="admin-pill admin-pill--info">In review</span></td><td>30 Sep</td></tr>
+      </tbody>
+    </table>
+  </div></div>
+</template>
+
+<h3>Filtering, in two ranges</h3>
+
+<p><a href="../components/filters.html">Filters</a> is the largest component in Praxis — 403
+rules — and its central decision is that Standard and Custom are two different products
+sharing a chrome.</p>
+
+<table>
+  <thead><tr><th>Range</th><th>Affordance</th><th>For</th></tr></thead>
+  <tbody>
+    <tr><td>Always visible</td><td>Quick filters — <code>.qfilter</code>, and <code>.qrail</code> below 640px</td><td>The three or four reductions almost everyone wants. One tap.</td></tr>
+    <tr><td>On demand</td><td>Filter drawer — <code>.filter-drawer</code></td><td>Field, operator, value. The long tail.</td></tr>
+    <tr><td>Saved</td><td>Custom builder — <code>.custom-builder</code></td><td>Grouped conditions with joins. A query, expressed as UI.</td></tr>
+  </tbody>
+</table>
+
+<p>Applied filters come back as chips (<code>.filter-chips</code>,
+<code>.frow-chip</code>), and the chip is what makes the reduction reversible: a user who
+cannot see what is filtering a list cannot tell an empty result from a broken one. That is
+the same failure <a href="empty-states.html">empty states</a> exists to prevent.</p>
+
+<h3>Sorting and density</h3>
+
+<p><code>.sortbtn</code> is a name with a press transform and <strong>no base</strong>, like
+most of the button family — see <a href="../components/buttons.html">buttons</a>. Column
+sort, pin, reorder, resize, density and saved views are all
+<a href="../components/data-grid.html">data grid extensions</a>, and none of them
+exists.</p>
+
+<h3>Pagination</h3>
+
+<p><code>.pager</code> and <code>.pager__btn</code> exist as names with hover and disabled
+states applied over no base. Every list in the application needs this and
+<a href="../components/pagination.html">it is planned</a>.</p>
+
+<h2>Detail view</h2>
+
+<p>A row leads to a record. Two things matter at that transition and both are
+navigation concerns: the way back is the breadcrumb rather than history, and the list state
+survives — see <a href="navigation.html">navigation</a>. A user who loses a filter by opening
+a row learns not to open rows.</p>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Use a real <code>&lt;table&gt;</code>.</strong> <code>.admin-table</code> is
+      styled on table elements; a grid of divs loses row and column association entirely and
+      there is no ARIA that makes it as good.</li>
+  <li><strong>Header cells are <code>&lt;th&gt;</code> with a <code>scope</code>.</strong>
+      Without it a screen reader cannot say which column a cell is in.</li>
+  <li><strong>Sortable columns announce their state.</strong> <code>aria-sort</code> on the
+      header, and the control inside it is a button with a name that includes the column.</li>
+  <li><strong>The scroll wrapper needs to be focusable.</strong> A horizontally scrolling
+      region that cannot be reached by keyboard is unreachable content. WCAG 2.1.1.</li>
+  <li><strong>Status is not colour.</strong> The pills carry text; keep it. WCAG 1.4.1 — and
+      <code>.admin-pill--ok</code> and <code>--lock</code> only cleared 1.4.3 in 0.1.10, so
+      do not assume any tinted chip is safe without measuring.</li>
+  <li><strong>Announce the result count when filters change</strong>, through a live region.
+      A sighted user sees the list shrink; nobody else does.</li>
+  <li><strong>Row actions need accessible names.</strong> An icon-only button repeated on
+      every row produces forty controls called "more" unless each names its row.</li>
+</ul>
+
+<h2>Guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Show applied filters as removable chips, always.</li>
+  <li>Put the two or three highest-value reductions in quick filters and leave the rest in
+      the drawer.</li>
+  <li>Right-align numbers and dates; left-align text. It is the cheapest scanning
+      improvement available.</li>
+  <li>Give the table its scroll wrapper. Without it a wide table breaks the page layout
+      instead of scrolling.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Rebuild <code>.admin-table</code> because of its name. Use it and wait for the
+      alias.</li>
+  <li>Filter a list without showing what is filtering it.</li>
+  <li>Paginate where scrolling would do. A regulated register is often read in sequence.</li>
+  <li>Put more than one primary action in a row. Rows are dense; a row with four buttons is
+      a menu.</li>
+</ul>
+
+<h2>Related components</h2>
+
+<ul>
+  <li><a href="../components/filters.html">Filters</a> — the whole reduction system.</li>
+  <li><a href="../components/quick-rail.html">Quick-filter rail</a> — the narrow-width
+      form.</li>
+  <li><a href="../components/admin.html">The admin shell</a> — where
+      <code>.admin-table</code> lives today.</li>
+  <li><a href="../components/table.html">Table base</a> — planned: the alias.</li>
+  <li><a href="../components/data-grid.html">Data grid extensions</a> — planned: pin,
+      reorder, resize, density, saved views.</li>
+  <li><a href="../components/pagination.html">Pagination</a> — planned.</li>
+  <li><a href="empty-states.html">Empty states</a> — what a filtered list shows when it
+      returns nothing.</li>
+</ul>

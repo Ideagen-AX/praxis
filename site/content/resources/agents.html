@@ -1,0 +1,93 @@
+<!--praxis
+title: For AI agents
+slug: agents
+summary: One markdown file ships in the npm tarball and states what Praxis defines. This page is what it is, what it deliberately leaves out, and why that omission is the important part.
+order: 20
+keywords: agents ai llm markdown guide tarball generated planned contract
+icon: psychology
+-->
+
+<p>Praxis ships a single file for agents building against it:
+<a href="https://github.com/Ideagen-AX/praxis/blob/main/PRAXIS-FOR-AGENTS.md"><code>PRAXIS-FOR-AGENTS.md</code></a>.
+It is in the npm tarball, so <code>node_modules/@ideagen-ax/praxis/PRAXIS-FOR-AGENTS.md</code>
+is present in any project that has installed the package, and an agent can read it without
+network access.</p>
+
+<h2>It is this site</h2>
+
+<p>The file is <strong>generated from <code>site/content/</code></strong> and rendered to one
+markdown document. Not summarised, not maintained alongside — the same source, a different
+renderer. Every measured table on this site is a measured table in that file, from the same
+<code>praxis_meta</code> call.</p>
+
+<p>That is enforced. <code>npm run site:check</code> fails if the committed file differs from
+what the content produces, because a content edit that does not reach it publishes a guide
+that disagrees with the site.</p>
+
+<div class="note">
+  <p><strong>Do not edit it.</strong> The edit belongs in <code>site/content/</code>, followed
+  by <code>python3 build-site.py --agents-doc</code>.</p>
+</div>
+
+<h2>What it leaves out, and why that matters most</h2>
+
+<p><strong>Every <span class="admin-pill admin-pill--off">Planned</span> page is excluded.</strong>
+Thirty of the forty-seven component pages on this site document something with no rule in
+<code>src/</code>. They are useful to a person — a named gap is worth more than a silent
+one — and actively harmful to an agent, which would read a class name and write markup
+against it.</p>
+
+<p>That failure already exists in the system without any help: <code>.btn</code>,
+<code>.section</code>, <code>.px-menu</code> and <code>.callout</code> are all referenced by
+Praxis and never defined, so writing <code>class="btn"</code> gets you nothing and the
+stylesheet does not say so. The guide names them explicitly for that reason. Adding thirty
+more phantom classes to the same file would have been the same bug, deliberately.</p>
+
+<p>So the contract is narrow and worth stating plainly: <strong>the agent guide states what
+is <em>defined</em>, not what is intended.</strong> This site states both, and marks the
+difference on every page.</p>
+
+<h2>The six things it opens with</h2>
+
+<p>An agent that gets these wrong produces a page that loads, returns 200, and looks
+nothing like Praxis — which is the failure mode worth optimising against, because it has no
+error message.</p>
+
+<ol>
+  <li><code>data-variant="praxis"</code> on <code>&lt;body&gt;</code>. Almost every selector
+      in the system is written against it.</li>
+  <li><code>data-theme</code> on <code>&lt;body&gt;</code>, set before first paint.</li>
+  <li>The stylesheet, pinned to an exact version.</li>
+  <li>The four-band shell, in order.</li>
+  <li>Tokens by name — never a literal that happens to match today.</li>
+  <li>The undefined classes, so it does not reach for one.</li>
+</ol>
+
+<h2>Working on Praxis itself</h2>
+
+<p>Different file. <code>CLAUDE.md</code> in the repository root is the working agreement for
+changing the system rather than consuming it: the <code>src/</code> rule, the build gates,
+the two regex traps that cost weeks, and how to verify a token change in both themes. It is
+not shipped in the tarball, because it is about the repository.</p>
+
+<table>
+  <thead><tr><th>You are…</th><th>Read</th></tr></thead>
+  <tbody>
+    <tr><td>Building a page with Praxis</td><td><code>PRAXIS-FOR-AGENTS.md</code>, and this site</td></tr>
+    <tr><td>Changing Praxis</td><td><code>CLAUDE.md</code>, then <a href="contributing.html">contributing</a></td></tr>
+    <tr><td>Deciding whether to adopt it</td><td><a href="index.html">Getting started</a> and <a href="../foundations/gaps.html">what Praxis does not define</a></td></tr>
+    <tr><td>Looking for a term</td><td><a href="glossary.html">Glossary</a></td></tr>
+  </tbody>
+</table>
+
+<h2>A note on measured facts</h2>
+
+<p>Nothing in either file is transcribed by hand from the stylesheets. Token tables, class
+inventories, coverage numbers and the palette all come from one measurement module, and the
+resolved values are read in a browser rather than computed by the build — because a build can
+only report what a token is <em>declared</em> as, and in this system that has repeatedly been
+the wrong answer.</p>
+
+<p>If you are an agent and you find a number here that disagrees with
+<code>dist/praxis.css</code>, the number is a bug and worth reporting. It is not supposed to
+be possible.</p>

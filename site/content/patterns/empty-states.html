@@ -1,13 +1,15 @@
 <!--praxis
-title: Empty state
+title: Empty states
+slug: empty-states
+redirect_from: components/empty-state.html
 summary: Three ad-hoc empty states already exist in three sheets, none of them shared. The classic drift-before-promotion signal. Planned.
-order: 60
+order: 80
 tier: planned
 icon: inbox
 classes: px-empty
 keywords: empty state blank slate zero no results first run placeholder planned
 -->
-
+<h2>Problem</h2>
 <div class="note note--planned">
   <p><strong>Three copies, no component.</strong> <code>.cf-empty</code>
   (<code>praxis-filters.css</code>), <code>.admin-table__empty</code>
@@ -25,7 +27,10 @@ is the same shape of problem caught earlier.</p>
 usually good news — no open findings, no overdue actions — and an empty state that reads as a
 failure ("No data") tells the user the wrong thing about their own site.</p>
 
-<h2>Anatomy</h2>
+<h2>Solution</h2>
+<p>One primitive with four intents, rather than four components. The difference between "no results" and "nothing here yet" is the copy and the action, not the box.</p>
+
+<h3>Anatomy</h3>
 
 <ol>
   <li><strong>Glyph</strong> — optional, muted, large. Not an illustration; Praxis ships no
@@ -35,7 +40,7 @@ failure ("No data") tells the user the wrong thing about their own site.</p>
   <li><strong>Action</strong> — optional, one button.</li>
 </ol>
 
-<h2>Variants</h2>
+<h3>Variants</h3>
 
 <table>
   <thead><tr><th>Variant</th><th>Situation</th><th>Tone</th></tr></thead>
@@ -43,7 +48,7 @@ failure ("No data") tells the user the wrong thing about their own site.</p>
     <tr><td><code>--first-run</code></td><td>Nothing has been created yet</td><td>Inviting, with an action. "No permits yet — create the first one"</td></tr>
     <tr><td><code>--clear</code></td><td>There is genuinely nothing, and that is the desired state</td><td>Positive, no action. "No overdue actions". This is the variant general design systems do not have and this domain needs</td></tr>
     <tr><td><code>--no-results</code></td><td>A filter or search excluded everything</td><td>Neutral, with a clear-filters action. What <code>.cf-empty</code> does today</td></tr>
-    <tr><td><code>--error</code></td><td>The data could not be loaded</td><td>Not an empty state. Belongs to <a href="dialog.html">alert</a> or an inline banner — worth naming here so it does not get folded in</td></tr>
+    <tr><td><code>--error</code></td><td>The data could not be loaded</td><td>Not an empty state. Belongs to <a href="../components/dialog.html">alert</a> or an inline banner — worth naming here so it does not get folded in</td></tr>
   </tbody>
 </table>
 
@@ -126,11 +131,32 @@ each other. The three existing names stay as aliases per the roadmap's decision 
   </tbody>
 </table>
 
-<h2>Figma adaptation</h2>
+<h2>Dimensions</h2>
 
-<p>Not mapped.</p>
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Container</td><td>Padding</td><td>48px 24px, or 8px 10px for <code>--inline</code></td></tr>
+    <tr><td>Container</td><td>Max width</td><td>24rem, centred</td></tr>
+    <tr><td>Glyph</td><td>Size</td><td>32px</td></tr>
+    <tr><td><code>__head</code></td><td>Size / weight</td><td>14px / 600</td></tr>
+    <tr><td><code>__body</code></td><td>Size</td><td>13px</td></tr>
+  </tbody>
+</table>
 
-<h2>Usage guidelines</h2>
+<h2>Accessibility</h2>
+
+<ul>
+  <li>The headline is text, not an image or a glyph.</li>
+  <li>The glyph is <code>aria-hidden</code>.</li>
+  <li>An empty state arriving after a filter change is a content change and needs announcing;
+  arriving on first paint does not.</li>
+  <li>Contrast: <code>--praxis-color-text-tertiary</code> is <code>#616f7e</code> and must be
+  checked against whatever surface the empty state lands on. Inside a
+  <code>--px-surface-2</code> panel it is tighter than on white.</li>
+</ul>
+
+<h2>Guidelines</h2>
 
 <p><strong>Do</strong></p>
 <ul>
@@ -148,28 +174,16 @@ each other. The three existing names stay as aliases per the roadmap's decision 
   <li>Leave the container blank. A table body with nothing in it reads as a loading failure.</li>
 </ul>
 
-<h2>Accessibility</h2>
-
+<h2>Related components</h2>
 <ul>
-  <li>The headline is text, not an image or a glyph.</li>
-  <li>The glyph is <code>aria-hidden</code>.</li>
-  <li>An empty state arriving after a filter change is a content change and needs announcing;
-  arriving on first paint does not.</li>
-  <li>Contrast: <code>--praxis-color-text-tertiary</code> is <code>#616f7e</code> and must be
-  checked against whatever surface the empty state lands on. Inside a
-  <code>--px-surface-2</code> panel it is tighter than on white.</li>
+  <li><a href="loading-states.html">Loading states</a> — what precedes an empty state. A
+      skeleton that never resolves and an empty state look identical to a user, which is why the
+      ~200ms delay matters.</li>
+  <li><a href="data-display.html">Data display</a> — every table, list and grid needs the
+      no-results variant, and the filters that produced it are what the reset action clears.</li>
+  <li><a href="../components/filters.html">Filters</a> — "no results" is nearly always a filter
+      outcome, so the empty state's primary action is usually "clear filters".</li>
+  <li><a href="../components/buttons.html">Buttons</a> — the call to action inside the box.</li>
+  <li><a href="../components/table.html">Table</a> — three of the ad-hoc empty states that exist
+      today are table-scoped, which is the drift this pattern consolidates.</li>
 </ul>
-
-<h2>Dimensions</h2>
-
-<table>
-  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
-  <tbody>
-    <tr><td>Container</td><td>Padding</td><td>48px 24px, or 8px 10px for <code>--inline</code></td></tr>
-    <tr><td>Container</td><td>Max width</td><td>24rem, centred</td></tr>
-    <tr><td>Glyph</td><td>Size</td><td>32px</td></tr>
-    <tr><td><code>__head</code></td><td>Size / weight</td><td>14px / 600</td></tr>
-    <tr><td><code>__body</code></td><td>Size</td><td>13px</td></tr>
-  </tbody>
-</table>
-

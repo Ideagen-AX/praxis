@@ -1,0 +1,56 @@
+<!--praxis
+title: Foundations overview
+slug: index
+summary: The decisions everything else is built on — color, type, space, elevation, motion — plus the four pages about what Praxis does to your page that no other design system has to explain.
+order: 10
+keywords: foundations overview index tokens primitives
+icon: tune
+-->
+
+<p>A foundation page is an essay about one decision, not documentation of one component.
+None of them follows the component skeleton, and an "Anatomy" heading on the color page
+would have nothing under it.</p>
+
+<h2>The core ten</h2>
+
+<p>These are the ones every design system has, in the order the previous EHSQ-E design
+system put them. If you have used that site, this list is the same list.</p>
+
+<praxis-block name="catalog" section="foundations"></praxis-block>
+
+<h2>Where the values come from</h2>
+
+<p>Every number on every one of those pages is <strong>measured, not transcribed</strong>.
+The token tables are read out of <code>src/</code> at build time and their resolved values
+are read from two hidden probe documents in the browser, one per theme. A build can only
+report what a token is <em>declared</em> as, and that has repeatedly been the wrong
+answer — a token declared as <code>var(--rung)</code> is worth whatever the cascade hands
+the rung, which is not always what the file appears to say.</p>
+
+<p>Four gates fail the build rather than let this rot: every token defined in
+<code>src/</code> must appear on some page, every class family must be claimed by a page,
+the agent guide must not be stale, and no token may be declared anywhere but
+<code>:root</code>.</p>
+
+<h2>The four that are unusual</h2>
+
+<p>Most design systems do not need a page for these. Praxis does, and each one exists
+because something broke.</p>
+
+<table>
+  <thead><tr><th>Page</th><th>Why it exists</th></tr></thead>
+  <tbody>
+    <tr><td><a href="theming.html">Theming</a></td><td>Two attributes on <code>&lt;body&gt;</code>, two dark blocks, and the substitution rule that decides whether a token can theme at all.</td></tr>
+    <tr><td><a href="materials.html">Materials and glass</a></td><td>The <code>--px-*</code> layer is where the Praxis look actually lives. It is half the foundation and it is not named like the other half.</td></tr>
+    <tr><td><a href="forced-colors.html">Forced colors</a></td><td>Praxis draws most edges with ring shadows, and forced-colors mode drops shadows. The system is unusually exposed.</td></tr>
+    <tr><td><a href="gaps.html">What Praxis does not define</a></td><td>The classes Praxis <em>names</em> and never defines. Writing markup against <code>.btn</code> gets you nothing, and nothing in the stylesheet says so.</td></tr>
+  </tbody>
+</table>
+
+<h2>And two that are corrections</h2>
+
+<p><a href="corrections.html">Corrections</a> lists the places where
+<code>DESIGN-SYSTEM.md</code> says something this site can prove is wrong, and
+<a href="conventions.html">naming and state conventions</a> is the vocabulary — what a
+modifier means, which state goes on the element and which on an attribute — that the rest
+of the reference assumes you already have.</p>

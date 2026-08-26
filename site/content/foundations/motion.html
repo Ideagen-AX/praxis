@@ -1,0 +1,77 @@
+<!--praxis
+title: Motion
+slug: motion
+summary: Five durations, one spring you should use unless you have a reason not to, and two component motions that are longer because their travel is.
+order: 100
+keywords: motion duration easing transition spring drawer rail menu reduced animation
+icon: speed
+-->
+
+<h2>Durations</h2>
+
+<praxis-block name="scale" kind="motion" prefix="--praxis-motion-"></praxis-block>
+
+<p>120 / 180 / 260 is the canonical scale — a state change, a small move, a large one.
+<code>drawer</code> and <code>slowest</code> sit outside it for the two cases that needed
+more, and both were promoted from pages that had invented their own.</p>
+
+<h2>Easing</h2>
+
+<p><code>--praxis-ease-default</code> is the Praxis spring,
+<code>cubic-bezier(.32,.72,0,1)</code>. Use it unless you have a reason not to.</p>
+
+<praxis-block name="tokens" prefix="--praxis-ease-"></praxis-block>
+
+<div class="note">
+  <p>The Mazlan drawer's transitions once referenced <code>--dur-base</code>,
+  <code>--ease-spring</code> and <code>--ease-spring-soft</code> with no fallback, and those
+  three were defined on exactly one page. On every other page the declarations were invalid
+  at computed-value time and the drawer had no transition at all. That is why
+  <code>--praxis-motion-drawer</code> and the two spring easings are in the foundation
+  rather than in the sheet that happens to use them.</p>
+</div>
+
+<h2>Component motion</h2>
+
+<p>The quick-filter rail and the profile menu each have their own duration and easing
+because their travel is much longer than a state change. Seven pages had defined the rail
+values identically, which is about as clear a signal as a token gets. The rail's
+<em>width</em> is deliberately not a token: it was genuinely different on every page, so it
+stays a per-page decision.</p>
+
+<praxis-block name="tokens" prefix="--praxis-rail-|--praxis-menu-"></praxis-block>
+
+<h2>Reduced motion</h2>
+
+<p>Praxis does not blanket-disable animation under
+<code>prefers-reduced-motion</code> — the sheets that animate handle it themselves. If you
+add motion of your own, guard it. The duration tokens are not a substitute for the media
+query: setting one to <code>0ms</code> does not stop a transform.</p>
+
+<h2>Usage guidelines</h2>
+
+<ul>
+  <li><strong>Animate the cheap properties.</strong> <code>transform</code> and
+      <code>opacity</code> composite; <code>height</code>, <code>top</code> and
+      <code>box-shadow</code> do not. Every long transition in <code>src/</code> is a
+      transform.</li>
+  <li><strong>Match the duration to the distance.</strong> A hover wash at 480ms feels
+      broken and a drawer at 120ms feels like a cut. That is what the scale encodes.</li>
+  <li><strong>Do not animate on load.</strong> Praxis animates in response to input.
+      Anything that moves before the user has done something is decoration, and it competes
+      with the content on a page whose job is to be read quickly.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<p>WCAG 2.2 <strong>2.3.3 Animation from Interactions</strong> (AAA) asks that motion
+triggered by interaction can be disabled, and <strong>2.2.2 Pause, Stop, Hide</strong> (A)
+covers anything that moves for more than five seconds. Nothing in Praxis runs that long, so
+the obligation here is <code>prefers-reduced-motion</code>, and it is on the sheet that
+adds the motion.</p>
+
+<p>The pattern used in <code>src/</code> is to opt <em>in</em> rather than out — the
+transition is declared inside <code>@media (prefers-reduced-motion: no-preference)</code>,
+so a user who has expressed the preference gets no transition even if a rule is added later
+and its author forgets. Copy that shape rather than writing a <code>reduce</code> block that
+has to enumerate everything it is turning off.</p>

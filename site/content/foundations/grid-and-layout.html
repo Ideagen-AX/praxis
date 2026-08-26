@@ -1,0 +1,97 @@
+<!--praxis
+title: Grid and layout
+slug: grid-and-layout
+summary: Four fixed bands, one breakpoint that matters, and the derived clearance that stops the dot grid running up behind the page header.
+order: 90
+keywords: grid layout breakpoint responsive chrome appbar navrail height width band content
+icon: dashboard
+-->
+
+<h2>Page anatomy</h2>
+
+<p>Every Praxis page is the same four bands in the same order, and
+<a href="../components/app-shell.html">the app shell</a> documents the markup. The heights
+are fixed and tokenised, because the dot texture's clearance is derived from their sum —
+change a band on one page and the grid cuts across your header.</p>
+
+<praxis-block name="scale" kind="chrome" prefix="--praxis-appbar-h|--praxis-navrail-width|--praxis-record-rail-w|--praxis-control-h"></praxis-block>
+
+<table>
+  <thead><tr><th>Band</th><th>Size</th><th>Token</th></tr></thead>
+  <tbody>
+    <tr><td>App bar</td><td>64px tall</td><td><code>--praxis-appbar-h</code>, and <code>--appbar-h</code> locally</td></tr>
+    <tr><td>Nav rail</td><td>56px wide, 240px expanded</td><td><code>--praxis-navrail-width</code>, <code>--praxis-navrail-width-expanded</code></td></tr>
+    <tr><td>Page header</td><td>68px min</td><td><code>--ph-h</code></td></tr>
+    <tr><td>Toolbar band</td><td>60px min</td><td><code>--px-toolbar-h</code></td></tr>
+  </tbody>
+</table>
+
+<p>Page content therefore starts at <strong>192px</strong>, and
+<code>--px-dot-clear</code> is set to exactly that so the dot grid stops short of the
+chrome.</p>
+
+<h2>Breakpoints</h2>
+
+<p><strong>Praxis has one breakpoint that changes the shell: 640px.</strong> Below it the
+nav rail is hidden and its destinations move into a drawer, the toolbar collapses, and every
+horizontal inset switches to <code>--px-gutter</code> at once.</p>
+
+<table>
+  <thead><tr><th>Query</th><th>What changes</th></tr></thead>
+  <tbody>
+    <tr><td><code>max-width: 640px</code></td><td>Rail hidden, <code>--navrail-w</code> zeroed, drawer available from the app bar hamburger, all gutters become <code>--px-gutter</code> (16px).</td></tr>
+    <tr><td><code>max-width: 639px</code></td><td>Used by a handful of component sheets for their own reflow — one pixel off the shell breakpoint, which is an inconsistency rather than a design.</td></tr>
+    <tr><td><code>prefers-reduced-motion</code></td><td>Handled per sheet. See <a href="motion.html">motion</a>.</td></tr>
+    <tr><td><code>forced-colors</code></td><td>See <a href="forced-colors.html">forced colors</a>.</td></tr>
+  </tbody>
+</table>
+
+<p>There is no tablet breakpoint and no container-query use anywhere in
+<code>src/</code>. The compact toolbar is the one component that adapts by
+<em>measurement</em> rather than by width — it collapses when its contents would no longer
+fit on one line, which is a better answer than a breakpoint and is not generalised.</p>
+
+<h2>Content width</h2>
+
+<p>Praxis sets no maximum content width. The <code>.content</code> column fills whatever is
+left after the rail, and a page that wants a reading measure sets one itself — this
+documentation site does, in <code>site.css</code>, and says so there because Praxis styles
+no long-form prose at all.</p>
+
+<h2>Grid</h2>
+
+<p>There is no column grid. <code>.admin-cols</code> is the only multi-column primitive and
+it is a two-track flex layout — a main column and an aside — not a twelve-column system.
+Everything else composes with flex and <code>gap</code>.</p>
+
+<p>That is a deliberate scope decision rather than an oversight: an application shell with a
+fixed rail, a fixed header and one content column has nowhere to put a column grid that a
+flex row would not serve better. It is on <a href="gaps.html">what Praxis does not
+define</a> so that nobody assumes one is hiding somewhere.</p>
+
+<h2>Usage guidelines</h2>
+
+<ul>
+  <li><strong>Do not hard-code 64px, 56px or 192px.</strong> Every one of them is a token,
+      and the dot clearance is derived from the sum. A literal is a page that will drift
+      the first time a band changes.</li>
+  <li><strong>Offset content with the token, whichever way you do it.</strong> Pages offset
+      by the rail width with <code>margin-left</code>, <code>padding-left</code> and a grid
+      column in different places; zeroing <code>--navrail-w</code> below 640px covers all
+      three at once, which only works if you read the token.</li>
+  <li><strong>Put page-level padding on <code>.content</code>.</strong>
+      <code>--ph-pad-x</code> is inherited from there by the header, the toolbar band and
+      your body.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<p>WCAG 2.2 <strong>1.4.10 Reflow</strong> requires content to work at 320 CSS pixels wide
+without two-dimensional scrolling. The 640px breakpoint is what delivers that: the rail
+would otherwise eat a sixth of a 360px viewport while showing unlabelled icons. Below it the
+same destinations appear in the drawer <em>with</em> labels, which is the accessibility win
+rather than a side effect.</p>
+
+<p>The skip link (<code>.px-skip</code>) exists because the four bands put a lot of
+repeated chrome ahead of the content in DOM order. It is the first focusable thing on the
+page and it targets <code>#main</code>; a page that omits the target breaks it silently.</p>

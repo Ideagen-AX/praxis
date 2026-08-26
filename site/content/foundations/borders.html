@@ -1,0 +1,88 @@
+<!--praxis
+title: Borders
+slug: borders
+summary: An 8/12/16 radius scale with a fifth step that is not a fifth value, four semantic border colors, and no width scale at all — which is a gap, not an omission.
+order: 70
+keywords: border radius corner hairline stroke outline rule divider
+icon: aspect_ratio
+-->
+
+<h2>Border radii</h2>
+
+<p>The Praxis radius scale is 8/12/16. Note that <code>lg</code> and <code>xl</code> are
+both 16px — <code>xl</code> exists for callers that expect a five-step scale, not because
+there is a fifth value.</p>
+
+<praxis-block name="scale" kind="radius" prefix="--praxis-radius-"></praxis-block>
+
+<div class="note">
+  <p><strong><code>--praxis-radius-card</code> is 12px, and the token file now says so.</strong>
+  It read 20px until 0.1.10, while <code>praxis-core.css</code> overrode it to 12px under the
+  variant — so the file and the render disagreed. The override layer is gone; see
+  <a href="color.html#one-declaration-site">one declaration site</a>.</p>
+</div>
+
+<h2>Semantic border colors</h2>
+
+<p>Four tokens, and the distinction between the first two is the one that catches people.
+They are drawn here as hairlines rather than filled squares, because a border color judged
+as a swatch tells you nothing about whether you can see it.</p>
+
+<praxis-block name="role-swatches" prefix="--praxis-color-border-"></praxis-block>
+
+<table>
+  <thead><tr><th>Token</th><th>For</th></tr></thead>
+  <tbody>
+    <tr><td><code>--praxis-color-border-default</code></td><td>The ordinary hairline between two surfaces — table rules, card edges, panel splits.</td></tr>
+    <tr><td><code>--praxis-color-border-subtle</code></td><td>A quieter rule <em>inside</em> a grouping that already reads as one thing. In dark it resolves to the surface-2 fill, so it is invisible on a recessed panel — see the trap below.</td></tr>
+    <tr><td><code>--praxis-color-border-strong</code></td><td>A control boundary: the checkbox box, the input underline. Repointed to <code>neutral-50</code> on 2026-08-20 because <code>neutral-40</code> measured 2.95:1 on white and WCAG 1.4.11 asks for 3:1.</td></tr>
+    <tr><td><code>--praxis-color-border-focus</code></td><td>The focus ring, and only the focus ring.</td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong><code>border-subtle</code> is invisible in dark on a recessed surface.</strong>
+  It resolves to <code>#222B39</code>, which is also the <code>--px-surface-2</code> fill —
+  so a subtle hairline on a nested panel disappears in exactly the theme that needs it most.
+  This site hit it twice, on the document sheet and on <code>.scale__row</code>. Use
+  <code>--praxis-color-border-default</code> for any hairline that has to survive both
+  themes.</p>
+</div>
+
+<h2>Border widths</h2>
+
+<p><strong>Praxis defines none.</strong> There is no <code>--praxis-border-width-*</code>
+family; every rule in <code>src/</code> writes <code>1px</code>, <code>1.5px</code> or
+<code>2px</code> as a literal, and the <code>.5px</code> ring shadows that carry most of the
+material layer are baked into the shadow tokens rather than expressed as borders at all.</p>
+
+<p>That is a real hole rather than a considered omission, and it is listed on
+<a href="gaps.html">what Praxis does not define</a>. Until it is filled, match the literal
+the neighbouring component uses rather than introducing a third value.</p>
+
+<h2>Usage guidelines</h2>
+
+<ul>
+  <li><strong>Prefer a surface step to a border.</strong> Praxis separates most things by
+      moving the fill — <code>--px-surface</code> to <code>--px-surface-2</code> — and by
+      the <code>.5px</code> ring inside the shadow. A drawn border on top of both reads as
+      a box around a box.</li>
+  <li><strong>Radius is geometry, not decoration.</strong> The 8/12/16 steps correspond to
+      control, card and panel. Picking one because it looks right at the size you are
+      working at is how a system ends up with seven radii.</li>
+  <li><strong>Do not use <code>--praxis-radius-full</code> for anything but a pill or a
+      circle.</strong> It is <code>9999px</code>; on a rectangle it produces a stadium, which
+      is a different component.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<p>WCAG 2.2 <strong>1.4.11 Non-text Contrast</strong> applies to any border that is the only
+thing identifying a control — an input underline, an unchecked checkbox, a chip outline.
+Those need 3:1 against their surface, which is why <code>border-strong</code> exists and why
+it is a different token from <code>border-default</code>. A decorative rule between two
+paragraphs has no contrast requirement; a rule that tells you where a field is does.</p>
+
+<p>Radius has no contrast requirement, but it does have a focus one: an outline follows the
+border box, so a control with <code>--praxis-radius-full</code> gets a stadium-shaped focus
+ring for free, and one with a clipped overflow can lose it entirely.</p>

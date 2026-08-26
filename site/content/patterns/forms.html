@@ -1,0 +1,183 @@
+<!--praxis
+title: Forms
+slug: forms
+summary: The most exercised composition in EHSQ Enterprise and the one with the most missing parts — two field systems that look alike, no select, no date picker, and no way to summarise what went wrong.
+order: 20
+keywords: form field label validation required error input select date grouping progressive disclosure
+icon: edit_note
+-->
+
+<h2>Problem</h2>
+
+<p>EHSQ Enterprise is a data-entry application wearing a dashboard. An incident report can
+exceed thirty fields; an inspection is a multi-section checklist; a CAPA is a form that
+several people fill in at different times and that an auditor reads years later. Field
+users complete these on tablets, often in a hurry, often in conditions where re-entering a
+section is not a small cost.</p>
+
+<p>Three things go wrong when the form composition is left to each page. Fields drift, so
+two screens in the same module look like two products. Validation arrives at submit rather
+than at the field, so a long form fails all at once. And the required-field story is told in
+three places that disagree.</p>
+
+<h2>Solution</h2>
+
+<p>One field system per surface, a label that is always visible, validation that lands where
+the mistake is, and grouping that lets a long form be read in sections rather than as a
+wall.</p>
+
+<h3>Two field systems, and when each applies</h3>
+
+<p>Praxis ships two, and they are not variants of one another. They look alike on purpose
+and they are built differently.</p>
+
+<table>
+  <thead><tr><th></th><th><code>.rfield</code></th><th><code>.admin-field</code></th></tr></thead>
+  <tbody>
+    <tr><td>For</td><td>Record forms — the incident, the audit, the CAPA</td><td>Admin and settings screens</td></tr>
+    <tr><td>Sheet</td><td><code>praxis-rfield.css</code></td><td><code>praxis-admin.css</code></td></tr>
+    <tr><td>Fill</td><td colspan="2"><code>--px-field</code> / <code>--px-field-hover</code> — shared, which is why they read as one system</td></tr>
+    <tr><td>Border</td><td colspan="2">None. The fill <em>is</em> the affordance.</td></tr>
+    <tr><td>Documented at</td><td><a href="../components/rfield.html">Fields</a></td><td><a href="../components/admin.html">The admin shell</a></td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong>A borderless field is a contrast decision, not a style one.</strong> Because
+  there is no boundary line, the only thing distinguishing a field from its surface is the
+  fill step — so a field placed on <code>--px-surface-2</code> instead of
+  <code>--px-surface</code> nearly disappears. Put fields on the card, not in a recess.</p>
+</div>
+
+<h3>Layout</h3>
+
+<p>One column. Praxis has no form grid and
+<a href="../foundations/grid-and-layout.html">no column grid at all</a>, and for this application that is
+the right default rather than a limitation: a two-column form on a tablet in portrait
+becomes a one-column form with a broken reading order, and a regulated record is read top to
+bottom by someone who was not there.</p>
+
+<p>Pair fields side by side only when they are one value — a date range, a quantity and its
+unit. <code>.rfield__group</code> is the container for that.</p>
+
+<h3>Label, hint, error</h3>
+
+<p><code>.rfield</code> gives three slots and they stack in a fixed order: label, control,
+then <code>.rfield__hint</code>. The error message takes the hint's place rather than
+appearing beside it, so the field does not change height when it goes invalid and the form
+does not reflow under the user's cursor.</p>
+
+<template data-example="A record field: label, control, hint" data-height="150">
+  <div class="rfield">
+    <label class="rfield__label" for="ex-loc">Location <span class="req">*</span></label>
+    <input class="rfield__control" id="ex-loc" type="text" value="Bay 4 — press line">
+    <span class="rfield__hint">Where the incident occurred, as specific as you can be.</span>
+  </div>
+</template>
+
+<h3>Required fields</h3>
+
+<p><code>.req</code> is the asterisk. It is the only required-field affordance Praxis
+defines, and on its own it is not enough — an asterisk with no legend is a WCAG 3.3.2
+failure, and a thirty-field form needs to say how many are outstanding, not just which.
+That progress affordance is a real component in the product and
+<strong>Praxis does not define it</strong>. See
+<a href="../foundations/gaps.html">what Praxis does not define</a>.</p>
+
+<h3>Validation timing</h3>
+
+<table>
+  <thead><tr><th>Moment</th><th>Do</th></tr></thead>
+  <tbody>
+    <tr><td>While typing</td><td>Nothing, unless the field is already invalid — then re-validate so the user sees the error clear.</td></tr>
+    <tr><td>On blur</td><td>Validate. This is the moment the user has finished with the field and has not yet committed to the form.</td></tr>
+    <tr><td>On submit</td><td>Validate everything, move focus to the summary, and do not clear anything.</td></tr>
+  </tbody>
+</table>
+
+<h3>Long-form strategies</h3>
+
+<ul>
+  <li><strong>Section, do not paginate.</strong> A regulated record is reviewed as a whole.
+      Sections that collapse keep the whole document addressable; a wizard does not.</li>
+  <li><strong>Save partial work.</strong> A thirty-field form that loses everything on a
+      failed submit is the single worst outcome in this application.</li>
+  <li><strong>Put the least certain fields last.</strong> The ones a field user may have to
+      go and check should not block the ones they know.</li>
+</ul>
+
+<h2>What is missing</h2>
+
+<p>More of this pattern is unbuilt than built, and a form is where it shows.</p>
+
+<table>
+  <thead><tr><th>Needed</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><a href="../components/select.html">Select and combobox</a></td><td>Exists only inside the filter system. <code>.rfield</code> has no select at all.</td></tr>
+    <tr><td><a href="../components/date-picker.html">Date picker</a></td><td>Same — filters only. A record date field falls through to the bare native control.</td></tr>
+    <tr><td><a href="../components/radio.html">Radio</a></td><td>Praxis styles the bare checkbox and not the bare radio.</td></tr>
+    <tr><td><a href="../components/file-upload.html">File upload</a></td><td>Nothing. Incident photos, audit evidence, CAPA documents all need it.</td></tr>
+    <tr><td><a href="../components/number-input.html">Number input</a></td><td>Nothing, and the native spinner is unstyled.</td></tr>
+    <tr><td><a href="error-handling.html">Error summary</a></td><td>Nothing aggregates a form's errors to the top.</td></tr>
+    <tr><td><a href="../components/character-count.html">Character count</a></td><td>Capped free-text fields cannot show the cap before submit.</td></tr>
+  </tbody>
+</table>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Every control has a programmatic label.</strong> <code>.rfield__label</code>
+      needs a <code>for</code> that matches the control's <code>id</code>. A visual label
+      that is not associated is not a label.</li>
+  <li><strong>The hint is associated too.</strong> <code>aria-describedby</code> pointing at
+      <code>.rfield__hint</code>, or the guidance is invisible to a screen reader — and the
+      hint is often where the format requirement lives.</li>
+  <li><strong>Errors are announced, not just coloured.</strong>
+      <code>aria-invalid="true"</code> on the control, the message associated through the
+      same <code>aria-describedby</code>, and never colour alone (WCAG 1.4.1).</li>
+  <li><strong>Required is stated in text.</strong> The asterisk needs a legend, or each
+      field needs <code>required</code> / <code>aria-required</code>. WCAG 3.3.2.</li>
+  <li><strong>Do not move focus on blur validation.</strong> Announce through a live region
+      if you must; taking focus back to a field the user has just left traps them.</li>
+  <li><strong>Group related controls.</strong> A set of radios or checkboxes needs a
+      <code>fieldset</code> and <code>legend</code>, which Praxis does not style and does
+      not prevent.</li>
+</ul>
+
+<h2>Guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Keep the label visible. Placeholder-as-label fails the moment the user types.</li>
+  <li>Say what a valid value looks like <em>before</em> it is rejected, in the hint.</li>
+  <li>Write errors as the fix, not the fault: "Enter a date on or after the incident date",
+      not "Invalid date".</li>
+  <li>Match the control to the data. A free-text field where a select belongs is how a
+      regulated dataset becomes unqueryable.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Put a field on <code>--px-surface-2</code>. It has no border to fall back on.</li>
+  <li>Validate on every keystroke. It punishes a user who types slowly.</li>
+  <li>Reset the form on failure, ever.</li>
+  <li>Use two columns for unrelated fields.</li>
+  <li>Invent a third field system. There are already two and they are already confusing.</li>
+</ul>
+
+<h2>Related components</h2>
+
+<ul>
+  <li><a href="../components/rfield.html">Fields</a> — the record form system, and the most
+      exercised component in Praxis.</li>
+  <li><a href="../components/form-controls.html">Form controls</a> — the checkbox, the
+      toggle switch and the skip link, including the two the browser does not give you.</li>
+  <li><a href="../components/filters.html">Filters</a> — the largest component in the
+      system, and where the select and date controls currently live.</li>
+  <li><a href="../components/buttons.html">Buttons</a> — submit, cancel, and the fact that
+      only <code>.tbtn</code> has a base.</li>
+  <li><a href="error-handling.html">Error handling</a> — the three ranges an error can
+      surface at.</li>
+  <li><a href="record-page.html">Record page</a> — where all of this is composed at full
+      size.</li>
+</ul>

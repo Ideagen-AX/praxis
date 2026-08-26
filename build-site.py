@@ -63,20 +63,53 @@ TEMPLATES = os.path.join(SITE, 'templates')
 ASSETS = os.path.join(SITE, 'assets')
 OUT = os.path.join(HERE, '_site')
 
-# Nav sections, in order. Component pages are grouped by their `tier`, reusing
-# the churn-risk classification the system already documents rather than
-# inventing a second one.
+# ---------------------------------------------------------------------------
+# Information architecture
+#
+# Four content sections plus an overview, taken from the previous EHSQ-E design
+# system docs (ehsqe-design-system-docs.vercel.app) so that a reader who knows
+# that site can find things here. Praxis used to group the nav by stability
+# TIER — "Components — ready", "— settling", "— unstable", "— planned" — which
+# answered "how much will this churn" before "what is it". Stability is now the
+# pill on the page; the nav answers what a thing IS.
+#
+# The one deliberate difference: EHSQ-E is VitePress and swaps the whole sidebar
+# per top-nav section. Praxis has a single persistent .adminnav, so all four
+# sections live in one scrolling list with group headings. Same IA, one fewer
+# click, and no second nav to keep in step.
+# ---------------------------------------------------------------------------
+
 SECTIONS = [
     ('overview', 'Overview'),
     ('foundations', 'Foundations'),
-    ('ready', 'Components — ready'),
-    ('settling', 'Components — settling'),
-    ('unstable', 'Components — unstable'),
-    # Planned last, and a section of its own rather than a chip on a real page:
-    # a reader scanning the nav should be able to tell what EXISTS from what is
-    # only intended without opening anything.
-    ('planned', 'Components — planned'),
+    ('patterns', 'Patterns'),
+    ('components', 'Components'),
+    ('resources', 'Resources'),
 ]
+
+# Components are sub-grouped by LAYER, which is EHSQ-E's own taxonomy (Global /
+# Core / Records, plus groups for surfaces Praxis does not have). A page
+# declares its group with `group:`; the value is checked, because a typo would
+# otherwise create a silent fourth group of one.
+#
+# .adminnav gives one level of grouping and no more. Rather than invent a nested
+# nav part in site.css — which would be the docs reaching for something Praxis
+# does not define — the sub-groups are flattened into their own group headings,
+# exactly as the tier sections were. The visual language is unchanged.
+COMPONENT_GROUPS = [
+    ('global', 'Global',
+     'Chrome that is present on every page: the app bar, the rails, the '
+     'drawers and the menus hung off them.'),
+    ('core', 'Core',
+     'Primitives a page composes with — buttons, fields, cards, tables, '
+     'overlays. Nothing here knows what page it is on.'),
+    ('records', 'Records',
+     'Parts that only make sense on a record: the audit trail, the comment '
+     'thread, the signature block, the AI surfaces beside them.'),
+]
+
+COMPONENT_GROUP_LABEL = {k: v for k, v, _d in COMPONENT_GROUPS}
+COMPONENT_GROUP_BLURB = {k: d for k, _v, d in COMPONENT_GROUPS}
 
 TIER_LABEL = {
     'ready': 'Ready · in daily use and load-bearing',
@@ -98,10 +131,37 @@ TIER_PILL = {'ready': 'ok', 'settling': 'info', 'unstable': 'warning',
 # A Material Symbols ligature per section, used in .pageheader__icon. Pages
 # override with an `icon:` line.
 SECTION_ICON = {
-    'overview': 'home', 'foundations': 'tune',
-    'ready': 'grid_view', 'settling': 'grid_view', 'unstable': 'grid_view',
-    'planned': 'construction',
+    'overview': 'home', 'foundations': 'tune', 'patterns': 'hub',
+    'components': 'grid_view', 'resources': 'book',
 }
+
+
+def nav_key(page):
+    """The sidebar group a page belongs to. Components split by layer.
+
+    A section index stays under the section's own heading rather than falling
+    into a layer, which is what puts "Components overview" above Global instead
+    of alphabetically inside Core.
+    """
+    if page['section'] == 'components' and page['slug'] != 'index':
+        return 'components/' + page['meta'].get('group', 'core').lower()
+    return page['section']
+
+
+def nav_groups():
+    """[(key, label)] in sidebar order, components expanded into their layers.
+
+    The layer headings are bare — "Global", not "Components — global" — because
+    they sit immediately under the "Components" heading and the prefix would
+    repeat it three times. That is also how the EHSQ-E sidebar reads.
+    """
+    out = []
+    for key, label in SECTIONS:
+        out.append((key, label))
+        if key == 'components':
+            out.extend(('components/' + g, lbl) for g, lbl, _d in COMPONENT_GROUPS)
+    return out
+
 
 GITHUB = 'https://github.com/Ideagen-AX/praxis'
 
@@ -179,6 +239,12 @@ META_BLOCK = re.compile(r'^\s*<!--praxis\s*(.*?)-->', re.S)
 REQUIRED_META = ('title', 'summary')
 
 
+def slug_of(path, meta):
+    """A page's slug. Needed before the metadata checks, because a section index
+    is a catalog rather than a component and owes neither tier nor group."""
+    return meta.get('slug') or os.path.splitext(os.path.basename(path))[0]
+
+
 def parse_content(path):
     """A content file is a metadata comment followed by body HTML.
 
@@ -206,13 +272,31 @@ def parse_content(path):
         if not meta.get(key):
             fail(rel, 'metadata is missing %s' % key)
 
+    # The section IS the directory. It used to be the tier for anything under
+    # components/, which meant moving a page between stability tiers moved it in
+    # the nav — the reader's map of the system rearranged itself for a reason
+    # that has nothing to do with what the components are.
     section = os.path.dirname(rel) or 'overview'
-    if section == 'components':
-        section = meta.get('tier', 'settling')
-        if section not in TIER_LABEL:
+    known = {k for k, _l in SECTIONS}
+    if section not in known:
+        fail(rel, 'directory %r is not a section. Content lives in one of: %s'
+             % (section, ', '.join(sorted(known - {'overview'}))))
+        section = 'components'
+
+    if section == 'components' and slug_of(path, meta) != 'index':
+        tier = meta.get('tier', '')
+        if tier not in TIER_LABEL:
             fail(rel, 'tier must be one of %s (got %r)'
-                 % (', '.join(sorted(TIER_LABEL)), section))
-            section = 'settling'
+                 % (', '.join(sorted(TIER_LABEL)), tier))
+            meta['tier'] = 'settling'
+        group = meta.get('group', '').lower()
+        if group not in COMPONENT_GROUP_LABEL:
+            fail(rel, 'group must be one of %s (got %r). It is what places the '
+                      'page in the nav, and an unrecognised value would quietly '
+                      'create a group of one.'
+                 % (', '.join(k for k, _v, _d in COMPONENT_GROUPS), group))
+            group = 'core'
+        meta['group'] = group
 
     # Old paths this page should answer for, so a rename does not 404 a URL
     # someone has already shared. Site-root-relative, comma separated.
@@ -229,7 +313,7 @@ def parse_content(path):
                   'MAT2LUCIDE.' % icon)
     meta['icon'] = icon
 
-    slug = meta.get('slug') or os.path.splitext(os.path.basename(path))[0]
+    slug = slug_of(path, meta)
     subdir = os.path.dirname(rel)
     return {
         'path': path, 'rel': rel, 'meta': meta, 'section': section, 'slug': slug,
@@ -249,8 +333,21 @@ def load_pages():
             if f.endswith('.html'):
                 paths.append(os.path.join(dirpath, f))
     pages = [p for p in (parse_content(p) for p in sorted(paths)) if p]
-    rank = {name: i for i, (name, _) in enumerate(SECTIONS)}
-    pages.sort(key=lambda p: (rank.get(p['section'], 99), p['order'], p['meta']['title']))
+    rank = {key: i for i, (key, _l) in enumerate(nav_groups())}
+
+    def sort_key(p):
+        # Foundations, patterns and resources are ORDERED — they are a reading
+        # sequence, and `order:` is the editorial decision about it. A component
+        # layer is a CATALOG of thirty things you arrive at knowing the name of,
+        # so it is alphabetical, which is what the EHSQ-E sidebar does too.
+        # A leading "The " is dropped from the sort so "The app shell" files
+        # under A rather than stranding four pages under T.
+        if p['section'] == 'components' and p['slug'] != 'index':
+            title = re.sub(r'^the\s+', '', p['meta']['title'].lower())
+            return (rank.get(nav_key(p), 99), 0, title)
+        return (rank.get(nav_key(p), 99), p['order'], p['meta']['title'].lower())
+
+    pages.sort(key=sort_key)
     return pages
 
 
@@ -960,17 +1057,127 @@ def block_manifest_md(args):
                      + ['| `%s` | %s |' % (f, w) for f, w in sorted(man['excluded'].items())])
 
 
+def _page_selection(args):
+    """Pages matching section= and group=, in nav order. Overview pages excluded.
+
+    Both filters are comma-separated. group= only means anything for components,
+    and is what lets a section index show one layer at a time.
+    """
+    want = [x.strip() for x in (args.get('section') or '').split(',') if x.strip()]
+    groups = [x.strip().lower() for x in (args.get('group') or '').split(',') if x.strip()]
+    out = []
+    for p in block_pages.pages or []:
+        if p['section'] == 'overview' or p['slug'] == 'index':
+            continue
+        if want and p['section'] not in want:
+            continue
+        if groups and p['meta'].get('group', '') not in groups:
+            continue
+        out.append(p)
+    return out
+
+
+def block_catalog(args):
+    """The catalog table for a section index: name, status, one-line description.
+
+    The shape is the EHSQ-E design system's component catalog, which is the thing
+    a reader lands on and scans. Generated from the page list rather than
+    transcribed, because a hand-written index is a second place for a component
+    to exist and the two drift — that site's own catalog lists five components
+    while its sidebar lists twenty.
+    """
+    rows = _page_selection(args)
+    if not rows:
+        return '<p>Nothing here yet.</p>'
+    show_status = any(p['meta'].get('tier') for p in rows)
+    head = ['<th>Page</th>'] + (['<th>Status</th>'] if show_status else []) + ['<th>What it is</th>']
+    out = ['<table class="admin-table"><thead><tr>%s</tr></thead><tbody>' % ''.join(head)]
+    for p in rows:
+        cells = ['<td><a href="%s%s">%s</a></td>'
+                 % (block_pages.root, p['href'], html.escape(p['meta']['title']))]
+        if show_status:
+            tier = p['meta'].get('tier', '')
+            cells.append('<td>%s</td>' % (
+                '<span class="admin-pill admin-pill--%s" title="%s">%s</span>'
+                % (TIER_PILL.get(tier, 'off'), html.escape(TIER_LABEL.get(tier, '')),
+                   html.escape(TIER_SHORT.get(tier, tier))) if tier else ''))
+        cells.append('<td>%s</td>' % html.escape(p['meta']['summary']))
+        out.append('<tr>%s</tr>' % ''.join(cells))
+    out.append('</tbody></table>')
+    return ('<div class="admin-table-wrap"><div class="admin-table-scroll">%s'
+            '</div></div>' % '\n'.join(out))
+
+
+def block_catalog_md(args):
+    rows = _page_selection(args)
+    if not rows:
+        return 'Nothing here yet.'
+    show = any(p['meta'].get('tier') for p in rows)
+    head = ['Page'] + (['Status'] if show else []) + ['What it is']
+    out = ['| %s |' % ' | '.join(head), '|%s' % ('---|' * len(head))]
+    for p in rows:
+        cells = ['[%s](#%s)' % (p['meta']['title'], slugify(p['meta']['title']))]
+        if show:
+            cells.append(TIER_SHORT.get(p['meta'].get('tier', ''), ''))
+        cells.append(p['meta']['summary'])
+        out.append('| %s |' % ' | '.join(cells))
+    return '\n'.join(out)
+
+
+RELEASE_H = re.compile(r'^## (\d+\.\d+\.\d+) — (\S+)$', re.M)
+
+
+def block_releases(args):
+    """Released versions, parsed out of CHANGELOG.md.
+
+    Generated rather than transcribed for the same reason everything else here
+    is: a hand-written release list on the site is a second place the version
+    history exists, and the two drift silently. The headline is the first bold
+    run under each heading, which is the shape every entry in that file uses.
+    """
+    path = os.path.join(HERE, 'CHANGELOG.md')
+    if not os.path.exists(path):
+        fail('block releases', 'CHANGELOG.md is missing')
+        return ''
+    text = read(path)
+    marks = list(RELEASE_H.finditer(text))
+    limit = int(args.get('limit') or 0)
+    rows = []
+    for i, m in enumerate(marks):
+        body = text[m.end():marks[i + 1].start() if i + 1 < len(marks) else len(text)]
+        lead = re.search(r'\*\*(.+?)\*\*', body, re.S)
+        rows.append((m.group(1), m.group(2),
+                     ' '.join(lead.group(1).split()) if lead else ''))
+    if limit:
+        rows = rows[:limit]
+    out = ['<table class="admin-table"><thead><tr><th>Version</th><th>Date</th>'
+           '<th>Headline</th></tr></thead><tbody>']
+    for ver, date, lead in rows:
+        out.append('<tr><td><a href="%s/blob/main/CHANGELOG.md#%s">%s</a></td>'
+                   '<td>%s</td><td>%s</td></tr>'
+                   % (GITHUB, slugify('%s %s' % (ver, date)), html.escape(ver),
+                      html.escape(date), html.escape(lead)))
+    out.append('</tbody></table>')
+    return ('<div class="admin-table-wrap"><div class="admin-table-scroll">%s'
+            '</div></div>' % '\n'.join(out))
+
+
+def block_releases_md(args):
+    path = os.path.join(HERE, 'CHANGELOG.md')
+    text = read(path) if os.path.exists(path) else ''
+    marks = list(RELEASE_H.finditer(text))
+    limit = int(args.get('limit') or 0)
+    out = ['| Version | Date |', '|---|---|']
+    for m in (marks[:limit] if limit else marks):
+        out.append('| `%s` | %s |' % (m.group(1), m.group(2)))
+    return '\n'.join(out)
+
+
 def block_pages(args):
     """A card grid of other pages. Rendered at build time from the page list, so
     a new content file appears here without anyone updating an index."""
-    want = [s.strip() for s in (args.get('section') or '').split(',') if s.strip()]
-    pages = block_pages.pages or []
     out = ['<div class="admin-grid admin-grid--2 cardgrid">']
-    for p in pages:
-        if want and p['section'] not in want:
-            continue
-        if p['section'] == 'overview':
-            continue
+    for p in _page_selection(args):
         out.append('<a class="admin-card admin-card--flush" href="%s%s">'
                    '<strong>%s</strong><span>%s</span></a>'
                    % (block_pages.root, p['href'],
@@ -1009,6 +1216,8 @@ BLOCKS = {
     'absent-tokens': (block_absent_tokens, block_absent_tokens_md),
     'manifest': (block_manifest, block_manifest_md),
     'pages': (block_pages, block_pages_md),
+    'catalog': (block_catalog, block_catalog_md),
+    'releases': (block_releases, block_releases_md),
 }
 
 BLOCK_TAG = re.compile(r'<praxis-block\b([^>]*?)\s*/?>(?:\s*</praxis-block>)?')
@@ -1067,6 +1276,7 @@ SHELL_SCRIPTS = {
     'dotfield': 'praxis-dotfield.js',
     'breadcrumb-back': 'praxis-breadcrumb-back.js',
     'admin-chrome': 'praxis-admin-chrome.js',
+    'toast': 'praxis-toast.js',
 }
 
 
@@ -1205,26 +1415,40 @@ SKELETON = [
     'Usage guidelines', 'Accessibility', 'Dimensions',
 ]
 
-# Component tiers only. Foundation pages are essays about the system rather than
-# documentation of one component, and forcing an "Anatomy" section onto the colour
-# page would produce a heading with nothing under it.
-SKELETON_SECTIONS = {'ready', 'settling', 'unstable', 'planned'}
+# Patterns answer a different question from components, so they get their own
+# skeleton rather than being forced into the component one or left ungated. The
+# shape is the EHSQ-E design system's: state the problem, state the solution,
+# then the pattern-specific sections, then the three that every pattern owes a
+# reader. Accessibility is in both skeletons on purpose.
+PATTERN_SKELETON = ['Problem', 'Solution', 'Accessibility', 'Guidelines',
+                    'Related components']
+
+# Foundation and resource pages are essays about the system rather than
+# documentation of one thing, and forcing an "Anatomy" heading onto the colour
+# page would produce a section with nothing under it.
+SKELETONS = {'components': SKELETON, 'patterns': PATTERN_SKELETON}
 
 H2 = re.compile(r'<h2>(.*?)</h2>', re.S)
 
 
 def skeleton_problems(page, body):
-    """Which canonical sections a component page is missing or has out of order."""
-    if page['section'] not in SKELETON_SECTIONS:
+    """Which canonical sections a page is missing or has out of order.
+
+    Which skeleton applies is decided by section. An overview page is exempt:
+    /components/ is a catalog, not a component, and every section's index is a
+    map of what is below it.
+    """
+    skeleton = SKELETONS.get(page['section'])
+    if not skeleton or page['slug'] == 'index':
         return []
     found = [re.sub(r'<[^>]+>', '', h).strip() for h in H2.findall(body)]
     out = []
-    missing = [s for s in SKELETON if s not in found]
+    missing = [s for s in skeleton if s not in found]
     if missing:
         out.append('missing section(s): %s' % ', '.join(missing))
     # Relative order of the ones that ARE present.
-    present = [s for s in found if s in SKELETON]
-    expected = [s for s in SKELETON if s in present]
+    present = [s for s in found if s in skeleton]
+    expected = [s for s in skeleton if s in present]
     if present != expected:
         out.append('sections out of order: got %s, expected %s'
                    % (' > '.join(present), ' > '.join(expected)))
@@ -1294,8 +1518,8 @@ def render_nav(pages, current):
     beside a filter field. It replaced a hand-rolled .nav__list that reimplemented
     the same three states with different values."""
     out = []
-    for key, label in SECTIONS:
-        group = [p for p in pages if p['section'] == key]
+    for key, label in nav_groups():
+        group = [p for p in pages if nav_key(p) == key]
         if not group:
             continue
         # A classless wrapper, on purpose: the filter hides a whole group when
@@ -1326,6 +1550,17 @@ def render_breadcrumb(page):
     anatomy. The section is not a page, so it is plain text rather than a dead
     link to nothing."""
     label = dict(SECTIONS).get(page['section'], page['section'])
+    # A component's layer is a real level of the IA, so it earns a crumb. It is
+    # not a page, so it is text rather than a link to nothing — same treatment
+    # the section itself gets.
+    trail = [label]
+    if page['section'] == 'components':
+        trail.append(COMPONENT_GROUP_LABEL.get(page['meta'].get('group', ''), ''))
+    # A section index IS the section, so "Components > Components overview" is a
+    # crumb pointing at itself one level up. Same reasoning as the overview page.
+    if page['slug'] == 'index':
+        trail = []
+    trail = [t for t in trail if t]
     # The overview page IS home, so it gets the glyph and its own name and no
     # trail: "home > Praxis" on the Praxis page is a crumb pointing at itself.
     if page['section'] == 'overview':
@@ -1336,11 +1571,13 @@ def render_breadcrumb(page):
              '<span class="material-symbols-rounded">home</span></a>' % page['root'],
              '          <span class="breadcrumb__sep">'
              '<span class="material-symbols-rounded">chevron_right</span></span>',
-             '          <span>%s</span>' % html.escape(label),
-             '          <span class="breadcrumb__sep">'
-             '<span class="material-symbols-rounded">chevron_right</span></span>',
-             '          <span class="breadcrumb__current">%s</span>'
-             % html.escape(page['meta']['title'])]
+             ]
+    for t in trail:
+        parts.append('          <span>%s</span>' % html.escape(t))
+        parts.append('          <span class="breadcrumb__sep">'
+                     '<span class="material-symbols-rounded">chevron_right</span></span>')
+    parts.append('          <span class="breadcrumb__current">%s</span>'
+                 % html.escape(page['meta']['title']))
     return '\n'.join(parts)
 
 
@@ -1494,6 +1731,88 @@ def build():
                 'root': '../' * depth,
             }))
             n_redirects += 1
+
+    # A GATE, added 2026-08-26 with the IA restructure. Renaming a page is the
+    # one edit that silently breaks the site: redirect_from keeps the OLD url
+    # alive, and nothing was checking the links pointing AT it. Moving nine
+    # pages left eighteen dead hrefs, every one of which still returned a page
+    # that looked fine until it was clicked. GitHub Pages serves static files,
+    # so a 404 here is a real 404 for a reader.
+    #
+    # Checked against what was actually written to _site/, redirect stubs
+    # included — a link to a moved page is fine if the stub is there, which is
+    # what the stubs are for.
+    canonical = {p['href'] for p in pages}
+    stubs = {old: p['href'] for p in pages for old in p['redirects']}
+    dead, stale = [], []
+    for page in pages:
+        base = os.path.dirname(page['href'])
+        # Template contents are example markup, not site navigation: they are
+        # rendered into an iframe or shown as source, and they legitimately
+        # reference files that are not part of this site (a consumer's
+        # <link rel="stylesheet" href="praxis-mazlan.css">). Only real prose
+        # anchors are checked.
+        prose = re.sub(r'<template\b.*?</template>', '', page['body'], flags=re.S)
+        for href in sorted(set(re.findall(r'<a\b[^>]*?\bhref="([^"]+)"', prose))):
+            if re.match(r'(?:[a-z+.-]+:|//|#|\{\{)', href) or not href:
+                continue
+            target = href.split('#')[0].split('?')[0]
+            if not target:
+                continue
+            resolved = os.path.normpath(os.path.join(base, target)).replace(os.sep, '/')
+            if resolved in canonical:
+                continue
+            if resolved in stubs:
+                stale.append('%s -> %s (now %s)' % (page['rel'], href, stubs[resolved]))
+            elif not os.path.exists(os.path.join(OUT, resolved)):
+                dead.append('%s -> %s' % (page['rel'], href))
+    if dead:
+        fail('dead links',
+             '%d internal link(s) point at a page that does not exist: %s.'
+             % (len(dead), '; '.join(sorted(dead)[:12])
+                + (' \u2026' if len(dead) > 12 else '')))
+    if stale:
+        fail('stale links',
+             '%d internal link(s) go through a redirect stub: %s. A stub is for a '
+             'URL someone else has already shared, not for this site\'s own '
+             'navigation \u2014 point the link at the page.'
+             % (len(stale), '; '.join(sorted(stale)[:12])
+                + (' \u2026' if len(stale) > 12 else '')))
+
+    # A GATE over the WRITTEN OUTPUT, not the source. The check above enforces
+    # link policy in the prose; this one crawls every file actually emitted —
+    # including the example iframes, which the prose check skips because their
+    # markup is illustrative. That distinction matters: the toast demo shipped
+    # with <script src="../praxis-toast.js"> for weeks, resolving to nothing, so
+    # the buttons called an undefined function and the frame just sat there. A
+    # live example IS a document and its references have to resolve.
+    on_disk = set()
+    for dirpath, _dirs, names in os.walk(OUT):
+        for n in names:
+            on_disk.add(os.path.relpath(os.path.join(dirpath, n), OUT).replace(os.sep, '/'))
+    broken = []
+    for rel in sorted(f for f in on_disk if f.endswith('.html')):
+        doc = read(os.path.join(OUT, rel))
+        # <code> and <pre> hold DISPLAYED markup, not references. Prose about a
+        # broken src= is normal on a docs site and is not itself broken — this
+        # check flagged the sentence describing the toast bug it had just caught.
+        doc = re.sub(r'<(code|pre)\b.*?</\1>', '', doc, flags=re.S)
+        base = os.path.dirname(rel)
+        for ref in sorted(set(re.findall(r'(?:href|src)="([^"]+)"', doc))):
+            if re.match(r'(?:[a-z+.-]+:|//|#)', ref) or not ref:
+                continue
+            target = ref.split('#')[0].split('?')[0]
+            if not target:
+                continue
+            resolved = os.path.normpath(os.path.join(base, target)).replace(os.sep, '/')
+            if resolved not in on_disk:
+                broken.append('%s -> %s' % (rel, ref))
+    if broken:
+        fail('broken references',
+             '%d href/src in the built site resolve to nothing: %s. Pages are served '
+             'as static files, so each of these is a real 404 for a reader.'
+             % (len(broken), '; '.join(broken[:12])
+                + (' \u2026' if len(broken) > 12 else '')))
 
     # Coverage is a GATE now, not advisory. It went from 15% to 100% while these
     # pages were written; leaving it advisory would let the next component sheet
@@ -1813,10 +2132,10 @@ def agents_doc(pages):
     an agent grepping one markdown file for a class name does not.
     """
     href_to_anchor = {os.path.basename(p['href']): '#' + slugify(p['meta']['title'])
-                      for p in pages if p['section'] != 'planned'}
+                      for p in pages if p['meta'].get('tier') != 'planned'}
     parts = []
     for page in pages:
-        if page['section'] in ('overview', 'planned'):
+        if page['section'] == 'overview' or page['meta'].get('tier') == 'planned':
             continue
         blocks = []
         body = page['body'].replace('{{version}}', version())
@@ -1942,8 +2261,8 @@ def main():
 
     pages = result['pages']
     counts = {}
-    for key, _label in SECTIONS:
-        counts[key] = len([p for p in pages if p['section'] == key])
+    for key, _label in nav_groups():
+        counts[key] = len([p for p in pages if nav_key(p) == key])
 
     if '--agents-doc' in argv:
         out = os.path.join(HERE, 'PRAXIS-FOR-AGENTS.md')
@@ -1975,8 +2294,10 @@ def main():
         # Count what was WRITTEN, not what was offered. agents_doc() skips the
         # overview and every `tier: planned` page, so subtracting only the
         # overview overstated the total by the size of the backlog.
-        rendered = sum(1 for p in pages if p['section'] not in ('overview', 'planned'))
-        skipped = counts.get('planned', 0)
+        rendered = sum(1 for p in pages
+                       if p['section'] != 'overview'
+                       and p['meta'].get('tier') != 'planned')
+        skipped = sum(1 for p in pages if p['meta'].get('tier') == 'planned')
         print('wrote %s (%d pages, %d lines%s)%s'
               % (os.path.basename(out), rendered, doc.count('\n'),
                  ', %d planned page(s) excluded' % skipped if skipped else '',
@@ -2019,8 +2340,10 @@ def main():
         print('  %d redirect stub(s) for renamed pages' % result['redirects'])
     print('  %d pages (%s), %d live examples'
           % (len(pages),
-             ', '.join('%d %s' % (counts[k], l.lower().replace('components — ', ''))
-                       for k, l in SECTIONS if counts[k]),
+             ', '.join('%d %s' % (counts[k],
+                                  'components overview' if k == 'components'
+                                  else l.lower())
+                       for k, l in nav_groups() if counts[k]),
              result['examples']))
     m = praxis_meta.measure()
     print('  %d tokens measured, %d cyclic var() chains, %d used-but-undefined'

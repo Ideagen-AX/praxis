@@ -53,20 +53,32 @@ writing markup.</p>
      and the generated grids below it are one component. Without them these two
      rendered as bare underlined links beside eleven cards. -->
 <div class="admin-grid admin-grid--2 cardgrid">
-  <a class="admin-card admin-card--flush" href="foundations/getting-started.html"><strong>Getting started</strong><span>The six non-negotiables, a complete working page, and how to diagnose a page that looks wrong</span></a>
-  <a class="admin-card admin-card--flush" href="foundations/mental-model.html"><strong>The one mental model</strong><span>Praxis styles component contents. Your page owns container positioning.</span></a>
+  <a class="admin-card admin-card--flush" href="resources/index.html"><strong>Getting started</strong><span>The six non-negotiables, a complete working page, and how to diagnose a page that looks wrong</span></a>
+  <a class="admin-card admin-card--flush" href="foundations/design-principles.html"><strong>Design principles</strong><span>Praxis styles component contents. Your page owns container positioning.</span></a>
+</div>
+
+<h2>Four sections</h2>
+
+<p>The shape is the previous EHSQ-E design system's, so a reader who knows that site knows
+this one. <strong>Foundations</strong> are the decisions everything is built on.
+<strong>Patterns</strong> are recurring problems and the compositions that answer them.
+<strong>Components</strong> are the parts, grouped by layer and carrying a status.
+<strong>Resources</strong> is everything about the system rather than in it.</p>
+
+<div class="admin-grid admin-grid--2 cardgrid">
+  <a class="admin-card admin-card--flush" href="foundations/index.html"><strong>Foundations</strong><span>Color, type, space, elevation, motion — plus the four pages about what Praxis does to your page that no other design system has to explain</span></a>
+  <a class="admin-card admin-card--flush" href="patterns/index.html"><strong>Patterns</strong><span>Ten recurring problems and how the system answers them. A pattern is a composition and a decision; a component is a box</span></a>
+  <a class="admin-card admin-card--flush" href="components/index.html"><strong>Components</strong><span>Forty-seven pages in three layers, thirty of which document something that does not exist yet, on purpose</span></a>
+  <a class="admin-card admin-card--flush" href="resources/index.html"><strong>Resources</strong><span>Installing, the agent guide, contributing, the glossary and the release history</span></a>
 </div>
 
 <h2>Foundations</h2>
 
 <praxis-block name="pages" section="foundations"></praxis-block>
 
-<h2>Components</h2>
+<h2>Patterns</h2>
 
-<p>Tiered by how much use each has actually had. The tiers are a statement about churn
-risk, not quality — everything here works.</p>
-
-<praxis-block name="pages" section="ready,settling,unstable"></praxis-block>
+<praxis-block name="pages" section="patterns"></praxis-block>
 
 <h2>Install</h2>
 
@@ -93,6 +105,7 @@ will all pick up breaking changes while Praxis is pre-1.0.</p>
     <tr><td><code>README.md</code></td><td>Installing, publishing, fonts, licence</td></tr>
     <tr><td><code>PRAXIS-FOR-AGENTS.md</code></td><td>The same content as this site, as one markdown file, shipped in the npm tarball for agents</td></tr>
     <tr><td><code>DESIGN-SYSTEM.md</code></td><td>Design rationale, and <em>why</em> a component looks the way it does. Also carries an audit history that is notes to maintainers, not instructions.</td></tr>
+    <tr><td><code>ROADMAP.md</code></td><td>The backlog. Every item on it has a <a href="components/index.html">planned page</a>, and none of them is in the tarball's agent guide.</td></tr>
   </tbody>
 </table>
 

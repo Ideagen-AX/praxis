@@ -1,0 +1,140 @@
+<!--praxis
+title: Page layout
+slug: page-layout
+summary: Chrome, then a card on a textured page, then a step to surface-2 for anything nested. Depth in Praxis is as often a change of surface as a change of shadow.
+order: 40
+keywords: layout page card surface panel texture dot grid composition family admin-cols
+icon: space_dashboard
+-->
+
+<h2>Problem</h2>
+
+<p>Every screen in the application is "some chrome and then a region of content", and the
+region has internal structure — a card containing a panel containing a table. Left to each
+page, that nesting is expressed differently every time: one screen separates with a border,
+another with a shadow, a third with a background it invented.</p>
+
+<p>The specific failure Praxis kept hitting is white on white. A card inside a card can only
+separate by shadow, and that shadow is too faint to survive a lit edge in light — while in
+dark the card is already the lightest surface in the shell, so a lift has nothing to lift
+away from. Pages compensated by inventing fills, and the fills drifted.</p>
+
+<h2>Solution</h2>
+
+<p>A fixed outer composition, and one rule for what happens inside it: <strong>nesting steps
+the surface, it does not stack the shadow.</strong></p>
+
+<h3>The outer composition</h3>
+
+<p><code>.app</code> wraps everything; <code>.main</code> is the rail plus
+<code>.content</code>; <code>.content</code> carries <code>.pageheader</code>, the
+<code>.toolbar</code> band and then the body. The body class names the page
+<em>family</em> — and this is where Praxis is at its least finished.</p>
+
+<div class="note note--trap">
+  <p><strong>Fourteen class names in <code>praxis-core.css</code> are mentioned and never
+  defined</strong>, and several are page families: <code>.home</code>, <code>.view</code>,
+  <code>.record</code>, <code>.demo</code>. They appear in descendant selectors, so a rule
+  keyed on <code>.record .foo</code> works while <code>.record</code> itself styles nothing.
+  Writing <code>class="record"</code> and expecting a layout gets you nothing. See
+  <a href="../components/core-page-families.html">page families and part-only names</a>.</p>
+</div>
+
+<h3>The page material</h3>
+
+<p>The page is not a flat fill. <code>--px-page</code> plus a dot grid, faded at the left
+and right edges and cleared for the top 192px so the texture does not run up behind the
+header. The clearance is <code>--px-dot-clear</code> and it is derived from the four band
+heights — see <a href="../foundations/grid-and-layout.html">grid and layout</a>.</p>
+
+<p>The dot grid is what makes a card read as an object lying on something rather than a
+lighter rectangle. It is painted on <code>&lt;body&gt;</code>, which is the one thing in
+Praxis still declared at that level, because it needs an element.</p>
+
+<h3>The surface ladder</h3>
+
+<table>
+  <thead><tr><th>Level</th><th>Token</th><th>Light</th><th>Dark</th></tr></thead>
+  <tbody>
+    <tr><td>The page</td><td><code>--px-page</code></td><td>#F0F2F4</td><td>rgb(14,19,36)</td></tr>
+    <tr><td>A card on it</td><td><code>--px-surface</code></td><td>#FFFFFF</td><td>#192336</td></tr>
+    <tr><td>A panel inside the card</td><td><code>--px-surface-2</code></td><td>#F4F6F8</td><td>#232C3B</td></tr>
+  </tbody>
+</table>
+
+<p>Note that surface-2 moves <em>down</em> in light and <em>up</em> in dark. That is the
+whole trick: the step is always away from its parent in whichever direction is visible, so
+one declaration is right in both themes.</p>
+
+<template data-example="Card on the page, panel on the card" data-height="220">
+  <div class="admin-card" style="padding:1rem">
+    <strong style="display:block;margin-bottom:.75rem">Card — --px-surface</strong>
+    <div class="admin-panel" style="padding:1rem">
+      Panel — --px-surface-2. One step away from the card, in whichever direction is visible.
+    </div>
+  </div>
+</template>
+
+<h3>Two columns, where there are two</h3>
+
+<p><code>.admin-cols</code> is the only multi-column primitive: a main column and an aside.
+It is not a grid system, and <a href="../foundations/grid-and-layout.html">Praxis has
+none</a>. This documentation site uses it for the document sheet plus the table of
+contents.</p>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Reading order is DOM order.</strong> The aside in <code>.admin-cols</code>
+      comes after the main column in the source, which is correct — a table of contents or
+      a metadata rail read before the content is noise on a screen reader.</li>
+  <li><strong>A surface step is not a boundary.</strong> A panel distinguished only by fill
+      is invisible to assistive technology and gone under forced colors. If the grouping
+      means something, give it a heading or <code>aria-labelledby</code>.</li>
+  <li><strong>The dot grid is decoration</strong> and must never carry information. It is a
+      background image on <code>&lt;body&gt;</code>, so it is already invisible to the
+      accessibility tree — keep it that way.</li>
+  <li><strong>Reflow at 320px.</strong> WCAG 1.4.10. The 640px switch is what delivers it;
+      a page that sets its own minimum width defeats it.</li>
+  <li><strong>One <code>main</code> per page</strong>, and it is where
+      <code>.px-skip</code> points.</li>
+</ul>
+
+<h2>Guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Step the surface for a region inside a region. <code>--px-surface-2</code> is the
+      answer to "how do I show this is nested".</li>
+  <li>Use <code>--praxis-color-border-default</code> for a hairline on a stepped surface —
+      <code>border-subtle</code> resolves to the surface-2 fill in dark and vanishes.</li>
+  <li>Let the card carry the shadow and the panel carry the fill.</li>
+  <li>Keep <code>--px-dot-clear</code> in step with the chrome if you change a band.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Nest shadows. A card on a card on a card is three shadows and no hierarchy.</li>
+  <li>Write <code>class="record"</code> or <code>class="view"</code> expecting a layout.</li>
+  <li>Put a borderless field on <code>--px-surface-2</code> — see
+      <a href="forms.html">forms</a>.</li>
+  <li>Invent a fourth surface. Two steps is the ladder; a third means the composition is too
+      deep.</li>
+</ul>
+
+<h2>Related components</h2>
+
+<ul>
+  <li><a href="../components/card-and-page.html">Card, page and texture</a> — the two
+      surfaces every screen is made of, and why the card reads the way it does.</li>
+  <li><a href="../components/core-page-families.html">Page families and part-only names</a> —
+      the fourteen names that are mentioned and not defined.</li>
+  <li><a href="../components/app-shell.html">The app shell</a> — the chrome above all of
+      this.</li>
+  <li><a href="../components/admin.html">The admin shell</a> — despite the name, it carries
+      <code>.content</code>, <code>.admin-cols</code> and most of the layout vocabulary.</li>
+  <li><a href="../components/card.html">Card base</a> — planned: <code>.admin-card</code> is
+      a complete card wearing the name of one section.</li>
+  <li><a href="../foundations/materials.html">Materials and glass</a> — the full
+      <code>--px-*</code> inventory.</li>
+</ul>

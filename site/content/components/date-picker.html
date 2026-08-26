@@ -3,6 +3,7 @@ title: Date picker and range
 summary: Date controls exist only inside the filter system. A record form date field has no picker at all. Planned.
 order: 120
 tier: planned
+group: core
 icon: calendar_month
 classes: px-date
 keywords: date picker calendar range from to due occurred timezone planned
@@ -47,7 +48,7 @@ today.</p>
 <ul>
   <li><strong>Empty / filled / invalid</strong> — the invalid case needs
   <code>aria-invalid</code> and an inline message, wired to
-  <a href="error-summary.html">the error summary</a>.</li>
+  <a href="../patterns/error-handling.html">the error summary</a>.</li>
   <li><strong>Out of range</strong> — a future date on "date occurred" is not a format error,
   it is a logic error, and the message should say which.</li>
   <li><strong>Disabled dates</strong> — before a record was opened, after today.</li>
