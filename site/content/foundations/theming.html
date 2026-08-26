@@ -16,7 +16,7 @@ something that is not Praxis.</p>
   <thead><tr><th>Attribute</th><th>Values</th><th>What depends on it</th></tr></thead>
   <tbody>
     <tr><td><code>data-variant</code></td><td><code>praxis</code></td>
-        <td>Every <code>--px-*</code> material, the dot grid, the 8/12/16 radius scale, the primary button, and the nine token overrides. Without it you get the unstyled base layer, not a fallback theme.</td></tr>
+        <td>Every component rule in Praxis, and the dot grid. It no longer scopes any <em>token</em> — those all moved to <code>:root</code> in 0.1.10 — but almost every selector in the system is written against it, so without it you get an unstyled page, not a fallback theme.</td></tr>
     <tr><td><code>data-theme</code></td><td><code>light</code>, <code>dark</code></td>
         <td>Every dark remap. Absent, dark mode never engages regardless of the system setting.</td></tr>
   </tbody>
@@ -25,19 +25,32 @@ something that is not Praxis.</p>
 <h2>The cascade, in order</h2>
 
 <ol>
-  <li><code>praxis-tokens.css</code> declares the foundation on <code>:root</code>.</li>
-  <li><code>praxis-core.css</code> layers the Praxis light values, the
-      <code>--px-*</code> materials and the dark remaps on
-      <code>body[data-variant="praxis"]</code>.</li>
-  <li>Because that selector outranks <code>:root</code> on specificity, step 2 wins
-      regardless of load order. Loading tokens first anyway means the cascade reads the way
-      it behaves.</li>
+  <li><code>praxis-tokens.css</code> declares the whole light foundation on
+      <code>:root</code> — palette, semantics, geometry, motion and the
+      <code>--px-*</code> materials.</li>
+  <li><code>praxis-core.css</code> layers the dark remaps, also on <code>:root</code>.</li>
+  <li><code>praxis-core.css</code> paints the page material on
+      <code>body[data-variant="praxis"]</code>. That is the only thing left on
+      <code>&lt;body&gt;</code>, and it is not a token — it is the dot grid.</li>
 </ol>
 
-<p>There are two dark blocks, not one. <code>body[data-theme="dark"]</code> recolors the
-token-driven basics and applies to any variant;
-<code>body[data-variant="praxis"][data-theme="dark"]</code> adds the Praxis surfaces,
-glass, tone pairs and the teal remap.</p>
+<p><strong>Every token declaration is on <code>:root</code>, and that is a rule with a
+build gate behind it.</strong> A custom property is substituted at the element where the
+<em>declaration</em> lives, so a token declared on <code>&lt;body&gt;</code> is invisible to
+any <code>:root</code> alias of it: <code>:root{--a:var(--b)}</code> plus
+<code>body{--b:x}</code> computes <code>--a</code> on <code>:root</code> against the old
+<code>--b</code>, and <code>&lt;body&gt;</code> inherits that. Five tokens shipped broken this
+way before the rule existed. Keeping every declaration on one element makes the class
+impossible rather than merely absent.</p>
+
+<p>There are still two dark blocks, not one, and they are written as
+<code>:root:has(body[data-theme="dark"])</code> and
+<code>:root:has(body[data-variant="praxis"][data-theme="dark"])</code>. The first recolors the
+token-driven basics; the second adds the Praxis surfaces, glass, tone pairs and the teal
+remap. <strong>The theme attribute still lives on <code>&lt;body&gt;</code></strong> — nothing
+about the markup contract changed, and the ~220 component rules keyed on
+<code>body[data-theme="dark"]</code> are untouched, because they only read tokens.
+<code>:has()</code> is what lets <code>:root</code> see an attribute it does not carry.</p>
 
 <h2>Setting the theme before first paint</h2>
 

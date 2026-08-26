@@ -224,29 +224,71 @@ Four gates that fail the build, all on purpose:
   into the output, which turned the whole document binary and made `grep` stop
   seeing it — silent, and the byte count looked right.
 
-Two things are reported but deliberately **not** gates, because both are defects
-in `src/` rather than in the site and failing here would turn `main` red for a
-pre-existing bug: `frozen_aliases()` (below) and the used-but-never-defined token
-count.
+Two more are gates as of 0.1.10: **no token may be declared on `<body>`**, and
+**no token may be declared twice** (`variant_overrides()` must stay empty). The
+used-but-never-defined token count is still reported and deliberately not a gate.
 
-### `frozen_aliases()` — a decidable bug class
+### Every token declaration lives on `:root`
 
-`praxis_meta.frozen_aliases()` finds tokens whose dark value **can never apply**:
-declared on `:root` as `var(--rung)` while the rung's dark remap is declared on
-`body`. Substitution happens at the element where the declaration lives, so the
-token computes on `:root` against the light rung and `body` inherits that. Four
-tokens are in this state today — `--praxis-color-interactive-active`,
-`border-subtle`, `surface-muted` and `status-info`.
+**This is the rule. `praxis_meta.body_declared_tokens()` is the gate.**
 
-It is detected structurally rather than from resolved values on purpose: asking a
-resolver for the dark value substitutes the dark rung and reports a difference the
-browser never produces, which is exactly why this went unnoticed. The build prints
-it as an advisory, **not** a gate — it is a defect in `src/`, and failing here
-would have turned `main` red for a pre-existing bug. Make it a gate once fixed.
+A custom property is substituted at the element where the *declaration* lives, not
+where it is read. So `:root{--a:var(--b)}` plus `body{--b:x}` computes `--a` on
+`:root` against the old `--b`, and `<body>` inherits that — the override never
+reaches the alias. Five tokens shipped broken this way. Keeping every declaration
+on one element makes the class impossible rather than merely absent, which is why
+the rule is about *where declarations go* and not about the aliases themselves.
+
+Consequences worth knowing before you edit a sheet:
+
+- **The dark blocks are `:root:has(body[data-theme="dark"])`**, not
+  `body[data-theme="dark"]`. The theme attribute is still on `<body>` — nothing
+  about the markup contract changed, and the ~220 component rules keyed on
+  `body[data-theme="dark"] .foo` are untouched, because they only *read* tokens.
+  `:has()` is what lets `:root` see an attribute it does not carry. Specificity is
+  deliberate: (0,2,1) for the base block and (0,3,1) for the variant-scoped one,
+  which is the precedence the two body-scoped blocks had.
+- **`body[data-variant="praxis"]` no longer declares a single token.** It holds the
+  dot-grid page material and nothing else. Nine tokens it used to override — and
+  the whole 27-token `--px-*` material layer — are in `praxis-tokens.css` now. Do
+  not put a token back there; the build will fail.
+- **Four responsive layout hooks are exempt** (`--px-gutter`, `--ph-pad-x`,
+  `--home-gutter`, `--sp-gutter`, plus `--navrail-w`). They are set on `<body>`
+  inside `@media` on purpose and nothing aliases them. The exemption list is in
+  `body_declared_tokens()`.
+
+### `frozen_aliases()` — and the two ways it was wrong
+
+It still runs, still a gate, and should stay empty by construction. It is retained
+because it is cheap and it fires if a body-scoped token block is reintroduced next
+to an alias. Both of its earlier bugs made it report clean while a real defect was
+live, which is the failure mode to watch for in any check like this:
+
+1. **It only looked at dark remaps.** The `body[data-variant="praxis"]` override
+   layer strands an alias in *both* themes, and the check could not see that axis
+   at all. It missed `--praxis-color-status-info`, which aliases `blue-60` while
+   the variant redefined `blue-60` from `#4766eb` to `#4361c4` — so the info colour
+   rendered a blue the palette no longer contained.
+2. **It treated "the token is restated on `body` somewhere" as a clean bill of
+   health.** `status-info` *was* restated — in the dark block only — so that
+   exemption hid the light half of the same bug for a week after the dark half was
+   fixed. A restatement only covers a rung declaration whose conditions it is a
+   subset of.
+
+It is detected from declaration *sites* rather than from resolved values on
+purpose: asking a resolver for the dark value substitutes the dark rung and reports
+a difference the browser never produces, which is exactly why this went unnoticed.
 
 Do not confuse it with a token that is merely the same in both themes because its
 rung has no dark treatment at all. That is an omission; this is a rule violation.
 `--praxis-color-text-inverse` is white in both by design.
+
+**Verifying a change of this shape:** there is no headless browser in the repo, but
+Chrome can be driven directly. A page that loads the barrel, calls
+`getComputedStyle` on `<body>` for every token in both themes and writes the result
+into the DOM, dumped with `--headless --dump-dom`, gives real computed values for a
+before/after diff. That is how 0.1.10 was checked: 220 tokens x 2 themes, one
+intended change in light and zero in dark.
 
 ### Deploy
 

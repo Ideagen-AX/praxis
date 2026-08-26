@@ -1,6 +1,88 @@
 # Changelog
 
-## Unreleased
+## 0.1.10 — 2026-08-26
+
+**Every token declaration now lives on `:root`.** Praxis declared 127 of them on
+`<body>` — the 41-property `body[data-variant="praxis"]` block and three dark
+blocks — and nine of those were *second* declarations of tokens
+`praxis-tokens.css` had already made on `:root`. The variant selector outranks
+`:root`, so for those nine the token file stated a value that never rendered:
+`--praxis-radius-card` read `20px` and rendered `12px`.
+
+That was not only untidy. A custom property is substituted at the element where
+the **declaration** lives, so a token declared on `<body>` is invisible to any
+`:root` alias of it: `:root{--a:var(--b)}` plus `body{--b:x}` computes `--a` on
+`:root` against the old `--b`, and `<body>` inherits that. Five tokens shipped
+broken this way. Keeping every declaration on one element makes the class
+impossible rather than merely absent.
+
+Overriding at a variant scope is a reasonable pattern when there is more than one
+variant. There is not — the frozen "Miramar" comparison view was pruned on
+2026-08-12 and `data-variant` has been required-and-always-`praxis` since. The
+layer was buying nothing and costing the ambiguity.
+
+**No markup change, and no consumer migration.** The theme attribute is still on
+`<body>`. The dark blocks moved to `:root:has(body[data-theme="dark"])`, which
+lets `:root` see an attribute it does not carry; the ~220 component rules keyed on
+`body[data-theme="dark"] .foo` are untouched, because they only *read* tokens.
+
+### Fixed
+
+- **`--praxis-color-status-info` rendered `#4766eb` in light — a blue the palette
+  no longer contained.** It aliases `blue-60` on `:root`, and the variant block
+  redefined `blue-60` from `#4766eb` to `#4361c4`, so the alias froze at the
+  pre-variant value. Only the dark half had ever been restated (0.1.5, 2026-08-18),
+  which left the light half broken for another eight days. It is now `#4361c4`,
+  matching `blue-60` as the token file always claimed.
+
+  **This is the only rendered value that changes in this release.** Verified in
+  headless Chrome, `getComputedStyle` on `<body>` across 220 tokens x 2 themes,
+  before and after: one change in light, zero in dark.
+
+### Changed — `src/`
+
+- The nine variant overrides are folded into `:root` in `praxis-tokens.css`:
+  `--praxis-color-text-primary`, `text-secondary`, `border-default`, `blue-60`,
+  `--praxis-radius-card`, `--praxis-elevation-1`, `-card`, `-card-raised` and
+  `-popover`. Five redundant restatements that already agreed with the token file
+  were dropped.
+- **The 27-token `--px-*` material layer moved into `praxis-tokens.css`.** It was
+  the single most common reason someone grepped the token file for `--px-surface`
+  and concluded it did not exist. The dark half stays in `praxis-core.css`, also
+  on `:root`.
+- `--praxis-color-purple-60` is a real palette rung rather than a variant-only
+  extra.
+- `body[data-variant="praxis"]` no longer declares a single token. It holds the
+  dot-grid page material and nothing else.
+- `praxis-workspace.css` and `praxis-admin.css` each carried a body-scoped token
+  block too; both moved to `:root`. The workspace one is a drifted duplicate of
+  the base dark remap in `praxis-core.css` and two of its values disagree with
+  core — preserved verbatim, because this release is a pure move, and flagged in
+  place for a separate fix.
+
+### Added — build gates
+
+- **`praxis_meta.body_declared_tokens()` — no token may be declared on `<body>`.**
+  The structural invariant behind all of this. Four responsive layout hooks set
+  inside `@media` are exempt and named explicitly.
+- **`praxis_meta.variant_overrides()` must stay empty** — no token declared twice.
+- **`frozen_aliases()` was wrong in two ways, both of which made it report clean
+  while a real defect was live.** It only looked at *dark* remaps, so it could not
+  see the variant axis at all; and it treated "the token is restated on `body`
+  somewhere" as a clean bill of health, which is exactly how `status-info` stayed
+  half-broken after being half-fixed. It now works from declaration *sites* across
+  every sheet, and a restatement only excuses a rung declaration whose conditions
+  it is a subset of. Against the 0.1.9 tree the new version reports the one real
+  freeze; the old version reported none.
+
+### Site
+
+- The colour page's *One declaration site* section replaces *The Praxis variant
+  overrides nine tokens*, with a redirect-free anchor change and every
+  cross-reference updated. The theming, materials, space-and-radius, card and
+  card-and-page pages no longer describe a layer that is gone.
+
+### Also in this release — the reference site
 
 **The reference site is now built in Praxis.** It used to consume the tokens and
 draw its own chrome from a parallel `--doc-*` layer with hand-written dark

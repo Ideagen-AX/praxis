@@ -46,13 +46,13 @@
 <!-- GENERATED:stats -->
 | Measure | Value |
 |---|---|
-| Distinct custom properties defined | **224** |
-| `var()` usages | **1,554** |
-| Raw colour literals remaining | 825 (370 hex / 455 rgb·rgba) |
+| Distinct custom properties defined | **226** |
+| `var()` usages | **1,552** |
+| Raw colour literals remaining | 822 (374 hex / 448 rgb·rgba) |
 | Tokenization coverage | **65%** |
-| Tokens defined in more than one file | 75 |
+| Tokens defined in more than one file | 90 |
 | Used but never defined (excluding runtime-set) | 3 — `--muted`, `--ph-pad-top`, `--praxis-filters-gutter` |
-| Defined but never referenced | 96 |
+| Defined but never referenced | 97 |
 | Stylesheets measured | 17 |
 | Consumer pages measured | none — src/ measured in isolation |
 <!-- /GENERATED:stats -->
@@ -302,7 +302,7 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 |---|---|---|
 | `--praxis-color-blue-10` | `#edf0fd` | — |
 | `--praxis-color-blue-50` | `#6882ef` | — |
-| `--praxis-color-blue-60` | `#4766eb` | `#7a93e0` |
+| `--praxis-color-blue-60` | `#4361c4` | `#7a93e0` |
 | `--praxis-color-green-10` | `#e6f3ee` | — |
 | `--praxis-color-green-60` | `#098b53` | — |
 | `--praxis-color-orange-10` | `#fdf2e6` | — |
@@ -310,6 +310,12 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-color-pink-50` | `#e82e8b` | — |
 | `--praxis-color-pink-60` | `#e30072` | — |
 | `--praxis-color-pink-90` | `#810041` | — |
+
+**Solution accent, Praxis-only — no purple ramp in the EHSQ-E base.**
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--praxis-color-purple-60` | `#805ad5` | `#b088e8` |
 | `--praxis-color-red-10` | `#fceaeb` | — |
 | `--praxis-color-red-50` | `#e7535c` | — |
 | `--praxis-color-red-60` | `#e22d38` | — |
@@ -327,7 +333,7 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-color-border-default` | `var(--praxis-color-neutral-20)` | `rgba(255,255,255,.10)` |
+| `--praxis-color-border-default` | `#E2E5E9` | `rgba(255,255,255,.10)` |
 | `--praxis-color-border-focus` | `var(--praxis-color-teal-50)` | — |
 | `--praxis-color-border-strong` | `var(--praxis-color-neutral-50)` | — |
 | `--praxis-color-interactive-active` | `var(--praxis-color-teal-80)` | `#5CE0E5` |
@@ -338,8 +344,8 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-color-text-disabled` | `var(--praxis-color-neutral-40)` | `#62707e` |
 | `--praxis-color-text-inverse` | `var(--praxis-color-white)` | — |
 | `--praxis-color-text-link` | `var(--praxis-color-teal-60)` | `#5CE0E5` |
-| `--praxis-color-text-primary` | `var(--praxis-color-neutral-90)` | `#e7ebf1` |
-| `--praxis-color-text-secondary` | `var(--praxis-color-neutral-60)` | `#9aa7b4` |
+| `--praxis-color-text-primary` | `#2F4051` | `#e7ebf1` |
+| `--praxis-color-text-secondary` | `#5D6977` | `#9aa7b4` |
 | `--praxis-color-text-tertiary` | `#616f7e` | `#8b98a6` |
 
 **Semantic — status**
@@ -387,7 +393,7 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-elevation-1` | `0 1px 2px 0 rgb(32 42 53 / .06)` | — |
+| `--praxis-elevation-1` | `0 0 0 .5px rgba(16,36,58,.05),0 1px 2px rgba(16,36,58,.04)` | — |
 | `--praxis-elevation-2` | `0 1px 3px 0 rgb(32 42 53 / .1), 0 1px 2px -1px rgb(32 42 53 / .06)` | — |
 | `--praxis-elevation-3` | `0 4px 6px -1px rgb(32 42 53 / .1), 0 2px 4px -2px rgb(32 42 53 / .06)` | — |
 | `--praxis-elevation-4` | `0 10px 15px -3px rgb(32 42 53 / .1), 0 4px 6px -4px rgb(32 42 53 / .05)` | — |
@@ -410,9 +416,9 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 |---|---|---|
 | `--praxis-navrail-width` | `56px` | — |
 | `--praxis-navrail-width-expanded` | `240px` | — |
-| `--praxis-elevation-card` | `0 2px 16px -4px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.1)` | — |
-| `--praxis-elevation-card-raised` | `0 8px 24px -6px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.1)` | — |
-| `--praxis-elevation-popover` | `0 4px 6px rgba(32, 42, 53, 0.07), 0 10px 15px rgba(32, 42, 53, 0.08)` | — |
+| `--praxis-elevation-card` | `var(--praxis-card)` | — |
+| `--praxis-elevation-card-raised` | `var(--praxis-card)` | — |
+| `--praxis-elevation-popover` | `var(--px-overlay)` | — |
 
 **Palette rungs completed from the EHSQ-E base**
 
@@ -471,7 +477,7 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 
 | Token | Light | Dark (via `praxis-core.css`) |
 |---|---|---|
-| `--praxis-radius-card` | `20px` | — |
+| `--praxis-radius-card` | `12px` | — |
 | `--praxis-radius-xl` | `16px` | — |
 
 **Semantic colour completed**
@@ -531,6 +537,37 @@ Every `--praxis-*` foundation token, from `praxis-tokens.css`, with the dark val
 | `--praxis-tone-warning-fg` | `var(--praxis-color-orange-90)` | `#f5b45c` |
 | `--praxis-tone-danger-bg` | `var(--praxis-color-red-10)` | `rgba(226,45,56,.18)` |
 | `--praxis-tone-danger-fg` | `var(--praxis-color-red-70)` | `#f28b91` |
+
+**Praxis surface/material palette (LIGHT)**
+
+| Token | Light | Dark (via `praxis-core.css`) |
+|---|---|---|
+| `--px-page` | `#F0F2F4` | `rgb(14,19,36)` |
+| `--px-surface` | `#ffffff` | `#192336` |
+| `--px-surface-2` | `#F4F6F8` | `#232c3b` |
+| `--px-tool` | `#ffffff` | `rgba(255,255,255,.06)` |
+| `--px-drawer` | `#ffffff` | `#0e1324` |
+| `--px-chip` | `#EEF1F4` | `rgba(255,255,255,.07)` |
+| `--px-glass` | `rgba(255,255,255,.82)` | `rgba(26,32,45,.72)` |
+| `--px-hover` | `rgba(16,36,58,.025)` | `rgba(255,255,255,.05)` |
+| `--px-dot` | `rgba(16,36,58,.11)` | `rgba(255,255,255,.09)` |
+| `--px-toolbar-gutter` | `16px` | — |
+| `--px-field` | `#EEF1F4` | `#262F3F` |
+| `--px-field-hover` | `#E6EAEF` | `#2C3646` |
+| `--px-hover-btn` | `rgba(16,36,58,.075)` | `rgba(255,255,255,.10)` |
+| `--px-scroll` | `rgba(16,36,58,.28)` | `rgba(255,255,255,.26)` |
+| `--px-scroll-hover` | `rgba(16,36,58,.45)` | `rgba(255,255,255,.42)` |
+| `--praxis-card` | `0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.4),0 16px 40px -18px rgba(0,0,0,.6),inset 0 .5px 0 rgba(255,255,255,.07)` |
+| `--px-tool-shadow` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05)` | `0 0 0 .5px rgba(255,255,255,.08),0 1px 2px rgba(0,0,0,.35)` |
+| `--px-tool-shadow-hover` | `0 0 0 .5px rgba(16,36,58,.09),0 2px 8px -2px rgba(16,36,58,.16)` | `0 0 0 .5px rgba(255,255,255,.12),0 4px 12px -2px rgba(0,0,0,.5)` |
+| `--px-overlay` | `0 0 0 .5px rgba(16,36,58,.06),0 2px 6px rgba(16,36,58,.06),0 18px 38px -16px rgba(16,36,58,.18)` | `0 0 0 .5px rgba(255,255,255,.08),0 2px 6px rgba(0,0,0,.4),0 24px 50px -20px rgba(0,0,0,.7)` |
+| `--px-edge` | `rgba(255,255,255,.6)` | `rgba(255,255,255,.08)` |
+| `--px-card-rail` | `0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6)` | `0 0 0 .5px rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.30),inset 0 .5px 0 rgba(255,255,255,.05)` |
+| `--px-card-raised` | `0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85)` | `0 0 0 .5px rgba(255,255,255,.11),0 1px 2px rgba(0,0,0,.45),0 4px 10px -3px rgba(0,0,0,.40),0 32px 60px -24px rgba(0,0,0,.75),inset 0 .5px 0 rgba(255,255,255,.10)` |
+| `--px-primary-grad` | `linear-gradient(180deg,#197b83,#156f77)` | `linear-gradient(180deg,#29d2d7,#1fb4b9)` |
+| `--px-primary-fg` | `#fff` | `#08313a` |
+| `--px-primary-shadow` | `0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28)` | `0 0 0 .5px rgba(41,210,215,.30),0 1px 2px rgba(0,0,0,.45),0 8px 18px -8px rgba(41,210,215,.45),inset 0 1px 0 rgba(255,255,255,.22)` |
+| `--px-dot-clear` | `192px` | — |
 <!-- /GENERATED:foundation -->
 
 ---
@@ -695,16 +732,34 @@ The record body is now step-aware, and this is the pattern for it.
 
 ## 7. Theming Model
 
-- Root scope: `body[data-variant="praxis"]`. **Only one variant exists now** — the frozen
-  "Miramar" comparison view was pruned on 2026-08-12 (§13.7). The attribute and its scoping
-  stay because every Praxis selector is written against it; removing it would mean rewriting
-  thousands of selectors for no rendering gain.
-- Theme: `body[data-theme="light"|"dark"]`. Dark applies in two cascading blocks — `body[data-theme="dark"]` (base token recolor, covers legacy Miramar) then `body[data-variant="praxis"][data-theme="dark"]` (Praxis slate surfaces + materials).
+- Root scope for *rules*: `body[data-variant="praxis"]`. **Only one variant exists now** — the
+  frozen "Miramar" comparison view was pruned on 2026-08-12 (§13.7). The attribute and its
+  scoping stay because every Praxis selector is written against it; removing it would mean
+  rewriting thousands of selectors for no rendering gain.
+- **Every token declaration is on `:root`, and nothing declares a token on `<body>`.** This is
+  a build gate (`praxis_meta.body_declared_tokens()`). Custom-property substitution happens at
+  the element where the *declaration* lives, so a token declared on `<body>` is invisible to
+  any `:root` alias of it — `:root{--a:var(--b)}` plus `body{--b:x}` computes `--a` on `:root`
+  against the old `--b`, and `<body>` inherits that. Five tokens shipped broken this way. As of
+  0.1.10 the rule makes the class impossible rather than merely absent.
+- Theme: `body[data-theme="light"|"dark"]` — **the attribute is still on `<body>`**. Dark
+  applies in two cascading blocks, both now written on `:root` via `:has()`:
+  `:root:has(body[data-theme="dark"])` (base token recolor, covers legacy Miramar) then
+  `:root:has(body[data-variant="praxis"][data-theme="dark"])` (Praxis slate surfaces +
+  materials). Specificity (0,2,1) then (0,3,1) preserves the precedence the two body-scoped
+  blocks had. The ~220 component rules keyed on `body[data-theme="dark"] .foo` are untouched:
+  they only read tokens, so they never needed to move.
 - Bootstrapping: an inline head script applies `localStorage('gl-theme')` **before** first paint so theme-aware components (e.g. Highcharts) render correctly the first time.
-- **Load order is `praxis-tokens.css` → `praxis-core.css`.** The foundation declares on
-  `:root`; Praxis overrides and dark remaps declare on `body[data-variant="praxis"]`, a
-  higher specificity, so they win regardless of order — but keeping the order means the
-  cascade reads the way it behaves.
+- **Load order is `praxis-tokens.css` → `praxis-core.css`.** Both declare on `:root` now, so
+  order is what decides rather than specificity — it is load-bearing, not belt-and-braces.
+  praxis-core.css's dark blocks outrank the light `:root` on specificity anyway, but the
+  light material layer and the dark remaps meeting on one element is the whole point.
+- **The nine variant overrides are gone.** `praxis-tokens.css` used to declare nine tokens
+  that `praxis-core.css` re-declared under `body[data-variant="praxis"]`, at a higher
+  specificity, so the token file was the wrong answer to "what value is this" —
+  `--praxis-radius-card` read 20px and rendered 12px. Folded into `:root` in 0.1.10 along
+  with the 27-token `--px-*` material layer. `praxis_meta.variant_overrides()` measures the
+  emptiness every build.
 - **A page must not re-declare foundation tokens.** That was the single largest source of
   drift found in the 2026-08-12 audit, and every copy has been removed.
 - Primary-CTA dark ink is enforced with a high-specificity rule so per-page `color:#fff` can't override it.
@@ -741,7 +796,7 @@ Measured by CSS class-block frequency across all sources. Grouped by area.
 | `praxis-admin.css` | 261 | `.switch`, `.adminnav`, `.ws-item`, `.admin-field`, `.tbtn` |
 | `praxis-appbar.css` | 53 | `.appbar`, `.appswitch`, `.msel`, `.iconbtn-ghost` |
 | `praxis-controls.css` | 32 | `.tb-dropdown`, `.iconbtn`, `.filterfield`, `.icon`, `.material-symbols-rounded` |
-| `praxis-core.css` | 46 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
+| `praxis-core.css` | 48 | `.tbtn`, `.switch`, `.btn`, `.pill-btn`, `.praxis-navrail` |
 | `praxis-create-new.css` | 83 | `.cn-group`, `.cn-flyout`, `.cn-row`, `.material-symbols-rounded`, `.cn-tpl` |
 | `praxis-filters.css` | 403 | `.filter-row`, `.filter-drawer`, `.select-menu`, `.qfilter`, `.filter-chips` |
 | `praxis-mazlan.css` | 270 | `.mazlan-drawer`, `.mazlan-menu`, `.mazlan-reasoning`, `.material-symbols-rounded`, `.mazlan-msg` |

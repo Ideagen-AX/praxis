@@ -238,7 +238,13 @@ body[data-theme="dark"] .persona-picker--in-menu .persona-popover{
    DARK MODE — Mazlan deep-slate palette (token overrides cascade to the
    token-driven Concierge components; plus targeted surface fixes).
    ===================================================================== */
-body[data-theme="dark"]{
+/* Token declarations go on :root, never on body — see praxis-core.css.
+   NOTE: this block is a drifted duplicate of the base dark remap in
+   praxis-core.css and should not exist. It is preserved verbatim here,
+   including the two values that disagree with core (surface-subtle
+   #12161f vs #161c27, neutral-05 #12161f vs #10151e), because deleting it
+   is a rendering change and this commit is a pure move. Tracked separately. */
+:root:has(body[data-theme="dark"]){
   color-scheme:dark;
   --praxis-color-surface-default:#192336;
   --praxis-color-surface-subtle:#12161f;

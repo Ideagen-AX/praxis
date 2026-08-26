@@ -439,9 +439,9 @@ def _rows_table(rows, note=''):
 def block_materials(args):
     rows = praxis_meta.material_rows()
     rendered_tokens.update(r[1] for r in rows)
-    return _rows_table(rows, 'Defined in <code>praxis-core.css</code> under '
-                             '<code>body[data-variant="praxis"]</code>, once per theme — '
-                             'not in <code>praxis-tokens.css</code>.')
+    return _rows_table(rows, 'Light values on <code>:root</code> in '
+                             '<code>praxis-tokens.css</code>; dark in '
+                             '<code>praxis-core.css</code>, also on <code>:root</code>.')
 
 
 def block_materials_md(args):
@@ -500,12 +500,13 @@ def block_frozen_aliases(args):
     rows = praxis_meta.frozen_aliases()
     if not rows:
         return '<p>None. Every aliased token can carry its dark value.</p>'
-    out = ['<table><thead><tr><th>Token</th><th>Aliases</th>'
-           '<th>Dark value that never applies</th></tr></thead><tbody>']
-    for token, rung, dark in rows:
+    out = ['<table><thead><tr><th>Token</th><th>Aliases</th><th>Axis</th>'
+           '<th>Value that never applies</th></tr></thead><tbody>']
+    for token, rung, axis, value in rows:
         out.append('<tr><td><code>%s</code></td><td><code>%s</code></td>'
-                   '<td><code>%s</code></td></tr>'
-                   % (html.escape(token), html.escape(rung), html.escape(dark)))
+                   '<td>%s</td><td><code>%s</code></td></tr>'
+                   % (html.escape(token), html.escape(rung), html.escape(axis),
+                      html.escape(value)))
     out.append('</tbody></table>')
     out.append('<p class="sw__val">Detected from structure every build, not from the '
                'resolved values \u2014 asking a resolver would give the wrong answer, '
@@ -517,8 +518,34 @@ def block_frozen_aliases_md(args):
     rows = praxis_meta.frozen_aliases()
     if not rows:
         return 'None.'
-    return '\n'.join(['| Token | Aliases | Dark value that never applies |', '|---|---|---|']
-                     + ['| `%s` | `%s` | `%s` |' % r for r in rows])
+    return '\n'.join(['| Token | Aliases | Axis | Value that never applies |',
+                      '|---|---|---|---|']
+                     + ['| `%s` | `%s` | %s | `%s` |' % r for r in rows])
+
+
+def block_body_tokens(args):
+    rows = praxis_meta.body_declared_tokens()
+    if not rows:
+        return ('<p>None. Every token in <code>src/</code> is declared on '
+                '<code>:root</code>, so no alias can be stranded by one — the four '
+                'responsive layout hooks set on <code>&lt;body&gt;</code> inside '
+                '<code>@media</code> are exempt and nothing aliases them.</p>')
+    out = ['<table><thead><tr><th>Token</th><th>Declared on</th><th>Value</th>'
+           '</tr></thead><tbody>']
+    for token, sel, value in rows:
+        out.append('<tr><td><code>%s</code></td><td><code>%s</code></td>'
+                   '<td><code>%s</code></td></tr>'
+                   % (html.escape(token), html.escape(sel), html.escape(value)))
+    out.append('</tbody></table>')
+    return '\n'.join(out)
+
+
+def block_body_tokens_md(args):
+    rows = praxis_meta.body_declared_tokens()
+    if not rows:
+        return 'None. Every token is declared on `:root`.'
+    return '\n'.join(['| Token | Declared on | Value |', '|---|---|---|']
+                      + ['| `%s` | `%s` | `%s` |' % r for r in rows])
 
 
 def block_absent_tokens(args):
@@ -978,6 +1005,7 @@ BLOCKS = {
     'overrides': (block_overrides, block_overrides_md),
     'media-only-tokens': (block_media_only, block_media_only_md),
     'frozen-aliases': (block_frozen_aliases, block_frozen_aliases_md),
+    'body-tokens': (block_body_tokens, block_body_tokens_md),
     'absent-tokens': (block_absent_tokens, block_absent_tokens_md),
     'manifest': (block_manifest, block_manifest_md),
     'pages': (block_pages, block_pages_md),
@@ -1484,15 +1512,46 @@ def build():
     # while they existed, because failing here would have turned main red for a
     # pre-existing bug in src/ that nobody had a way to see until this site
     # measured it. At zero there is no reason to let a fifth one in.
+    # A GATE. Nine tokens were declared on :root and again under the variant, at a
+    # higher specificity, so praxis-tokens.css was the wrong answer for all nine
+    # (--praxis-radius-card read 20px and rendered 12px). Folded into :root in
+    # 0.1.10; measuring the emptiness is what keeps a tenth from landing.
+    dupes = praxis_meta.variant_overrides()
+    if dupes:
+        fail('duplicate token declarations',
+             '%d token(s) are declared in praxis-tokens.css and re-declared under '
+             'body[data-variant="praxis"]: %s. The variant wins on specificity, so '
+             'the token file states a value that never renders. Only one variant '
+             'exists \u2014 put the real value on :root and delete the override.'
+             % (len(dupes), ', '.join('%s (%s -> %s)' % (n, a, b)
+                                      for n, a, b, _d in dupes[:5])))
+
+    # A GATE, and the one that makes frozen aliases impossible rather than merely
+    # absent. Custom-property substitution happens at the element where the
+    # declaration lives, so a token declared on <body> cannot be seen by any
+    # :root alias of it. 127 declarations were in this state until 2026-08-26.
+    on_body = praxis_meta.body_declared_tokens()
+    if on_body:
+        fail('tokens on body',
+             '%d token declaration(s) sit on <body> rather than :root: %s. A :root '
+             'alias of any of them silently keeps the pre-override value. Move the '
+             'block to :root — use :root:has(body[data-theme="dark"]) if it needs to '
+             'see an attribute on <body>, which keeps the markup contract unchanged.'
+             % (len(on_body),
+                ', '.join('%s (%s)' % (t, sel) for t, sel, _v in on_body[:6])
+                + (' \u2026' if len(on_body) > 6 else '')))
+
     frozen_now = praxis_meta.frozen_aliases()
     if frozen_now:
         fail('frozen aliases',
-             '%d token(s) alias a rung the dark theme remaps, declared on :root, so '
-             'their dark value can never apply: %s. Substitution happens where the '
-             'declaration lives, so give each its own value in the dark block \u2014 '
-             'see --praxis-color-surface-subtle for the pattern.'
+             '%d token(s) alias a rung that is re-declared on <body>, while the alias '
+             'itself is declared on :root — so the re-declaration can never reach '
+             'them: %s. Substitution happens where the declaration lives. Fix by '
+             'declaring the rung on :root too, not by restating the alias in one '
+             'theme: a dark restatement leaves the light half frozen, which is how '
+             '--praxis-color-status-info stayed half-broken.'
              % (len(frozen_now),
-                ', '.join('%s -> %s' % (t, r) for t, r, _d in frozen_now)))
+                ', '.join('%s -> %s (%s)' % (t, r, ax) for t, r, ax, _v in frozen_now)))
 
     # A GATE. The skeleton is what makes 39 component pages answer the same
     # questions in the same order; a page that quietly drops "Accessibility"

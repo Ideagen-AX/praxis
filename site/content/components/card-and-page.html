@@ -47,13 +47,11 @@ traps; the bundle makes it moot.</p>
   </div>
 </template>
 
-<div class="note note--trap">
-  <p><strong>The card radius is 12px, not the 20px <code>--praxis-radius-card</code>
-  declares.</strong> <code>praxis-core.css</code> overrides that token to 12px under
-  <code>body[data-variant="praxis"]</code>, at a higher specificity than <code>:root</code>,
-  so 12px is what renders. Reading the token file gives the wrong answer. See
-  <a href="../foundations/color.html#the-praxis-variant-overrides-nine-tokens">the nine
-  overrides</a>.</p>
+<div class="note">
+  <p><strong>The card radius is 12px, and <code>--praxis-radius-card</code> now says 12px.</strong>
+  Until 0.1.10 the token file said 20px while <code>praxis-core.css</code> overrode it under
+  <code>body[data-variant="praxis"]</code>, so reading the token file gave the wrong answer.
+  See <a href="../foundations/color.html#one-declaration-site">one declaration site</a>.</p>
 </div>
 
 <p><code>.card</code> gives you the surface, the radius and the shadow. It does

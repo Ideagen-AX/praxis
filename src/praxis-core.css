@@ -17,93 +17,14 @@
    ===================================================================== */
 
 body[data-variant="praxis"]{
-  /* ink + strokes (light) */
-  --praxis-color-text-primary:#2F4051; --praxis-color-text-secondary:#5D6977;
-  --praxis-color-border-default:#E2E5E9;
-
-  /* Solution accent palette — used to tint module/record-type icons (Create New
-     groups). pink + teal already exist as brand tokens; add the rest here so
-     nothing is hardcoded. */
-  --praxis-color-blue-60:#4361c4; --praxis-color-orange-60:#ef8100; --praxis-color-purple-60:#805ad5;
-
-  /* geometry + motion — Praxis 8/12/16 geometry takes primacy */
-  --praxis-radius-sm:8px; --praxis-radius-md:12px; --praxis-radius-lg:16px;
-  --praxis-radius-card:12px;
-  --praxis-ease-default:cubic-bezier(.32,.72,0,1);
-
-  /* slate elevation */
-  --praxis-elevation-1:0 0 0 .5px rgba(16,36,58,.05),0 1px 2px rgba(16,36,58,.04);
-
-  /* Praxis surface/material palette (LIGHT) */
-  --px-page:#F0F2F4; --px-surface:#ffffff; --px-surface-2:#F4F6F8; --px-tool:#ffffff;
-  --px-drawer:#ffffff;  /* shared drawer/panel surface (Mazlan + filter); dark deepens to navy */
-  --px-chip:#EEF1F4; --px-glass:rgba(255,255,255,.82); --px-hover:rgba(16,36,58,.025); --px-dot:rgba(16,36,58,.11);
-  /* Gap between a toolbar band and the first card of page content. One token
-     because it was set independently per section and drifted: 8px on the record
-     page, 6px on the admin pages and profile. Not theme-dependent. */
-  --px-toolbar-gutter:16px;
-  /* Form-field fill. Fields carry no border, so this is the whole affordance —
-     it has to read as a step off --px-surface without going dark enough to
-     fight the value inside it. Shared by the record fields (.rfield) and the
-     admin/profile fields (.admin-field), which is why it lives here. */
-  --px-field:#EEF1F4; --px-field-hover:#E6EAEF;
-  /* --px-hover is 2.5% — deliberately faint for large row targets, but invisible
-     on a small raised tool. Buttons use this stronger wash instead. */
-  --px-hover-btn:rgba(16,36,58,.075);
-  --px-scroll:rgba(16,36,58,.28); --px-scroll-hover:rgba(16,36,58,.45);
-  --praxis-card:0 0 0 .5px rgba(16,36,58,.06),0 1px 1.5px rgba(16,36,58,.045),0 10px 28px -14px rgba(16,36,58,.10),inset 0 .5px 0 rgba(255,255,255,.7);
-  --px-tool-shadow:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05);
-  --px-tool-shadow-hover:0 0 0 .5px rgba(16,36,58,.09),0 2px 8px -2px rgba(16,36,58,.16);
-  --px-overlay:0 0 0 .5px rgba(16,36,58,.06),0 2px 6px rgba(16,36,58,.06),0 18px 38px -16px rgba(16,36,58,.18);
-  --px-edge:rgba(255,255,255,.6);
-
-  /* Elevation TIERS — a single card shadow can't express hierarchy, so a page
-     of cards reads as one flat plane. These flank --praxis-card (unchanged, so
-     nothing that already uses it moves) to give a page a subject and a support
-     cast. Additive only; opt in per component.
-       rail   ← recedes: tighter, shallower, no long throw
-       card   ← --praxis-card, the default
-       raised ← the subject: wider spread, longer throw, brighter lit edge */
-  --px-card-rail:0 0 0 .5px rgba(16,36,58,.055),0 1px 1px rgba(16,36,58,.035),inset 0 .5px 0 rgba(255,255,255,.6);
-  --px-card-raised:0 0 0 .5px rgba(16,36,58,.07),0 1px 2px rgba(16,36,58,.05),0 2px 6px -2px rgba(16,36,58,.06),0 24px 48px -22px rgba(16,36,58,.20),inset 0 .5px 0 rgba(255,255,255,.85);
-
-  /* primary button — refined teal with lit edge (used by Submit / Create New /
-     Reassign task on the record page and the quick-actions on the workspace)
-
-     WCAG 1.4.3 — white on the whole fill, not just the bottom of it. The stops
-     were #1f8f97 → #1b838b, which put --px-primary-fg (#fff) at 3.86:1 over the
-     top of the gradient and exactly 4.50:1 over the bottom: the label failed
-     across the upper half of every primary button in the app.
-
-     Both stops moved down, not just the top one. The old bottom stop was
-     already at the 4.50 threshold, so any top lighter than it fails and any top
-     darker than it inverts the gradient — the fix has to shift the pair. The
-     original step between stops is preserved, so the lit-edge shading reads the
-     same, just a slightly deeper teal: 5.00:1 at the top, 5.88:1 at the bottom.
-
-     Not --praxis-color-teal-60 (#1b838b): that token also carries text and
-     borders, where it is measured against a light background and is fine.
-     Only the fill needed to move. */
-  --px-primary-grad:linear-gradient(180deg,#197b83,#156f77);
-  --px-primary-fg:#fff;
-  --px-primary-shadow:0 0 0 .5px rgba(16,36,58,.2),0 1px 2px rgba(16,36,58,.15),0 8px 18px -8px rgba(25,123,131,.5),inset 0 .5px 0 rgba(255,255,255,.28);
-
-  /* Map the generic elevation tokens onto Praxis materials so any component
-     that references --praxis-elevation-* inherits the lit-edge look. The record
-     page uses its own --praxis-elevation-1..4 scale, so these only affect the
-     workspace's cards/popovers. */
-  --praxis-elevation-card:var(--praxis-card);
-  --praxis-elevation-card-raised:var(--praxis-card);
-  --praxis-elevation-popover:var(--px-overlay);
-
+  /* Every TOKEN this block used to declare now lives on :root in
+     praxis-tokens.css. See "One declaration site" in that file's header: a
+     token declared here was computed on <body>, so any :root alias of it
+     silently kept the pre-variant value. What is left is the one thing that
+     genuinely needs an element rather than the root — the page material
+     painted on <body>. */
   /* dotted-grid page texture — faded at left/right edges (page-color gradient
      over the dots). Fixed to the viewport so it reads as page material. */
-  /* Dots stop short of the top chrome: the grid running up behind the toolbar
-     and page header made them read as part of the header rather than the page.
-     Page colour is composited over the dots down to --px-dot-clear, then fades
-     out over 48px. Fixed attachment, so the stop is a viewport coordinate and
-     pages set it to their own chrome height. */
-  --px-dot-clear:192px;
   background-color:var(--px-page);
   background-image:
     /* The horizontal fade is symmetric about the CONTENT area, not the
@@ -128,8 +49,22 @@ body[data-variant="praxis"]{
   color:var(--praxis-color-text-primary);
 }
 
+/* WHY :root:has(body[...]) AND NOT body[...] — see praxis-tokens.css.
+   Every token declaration in Praxis lives on :root. A custom property is
+   substituted at the element where the DECLARATION lives, so a token declared
+   on <body> is invisible to any :root alias of it: `:root{--a:var(--b)}` plus
+   `body{--b:x}` computes --a on :root against the OLD --b, and body inherits
+   that. Four tokens shipped broken this way. Keeping every declaration on one
+   element makes the whole class impossible rather than merely absent.
+
+   The theme attribute stays on <body>, so this is not a breaking change and the
+   ~220 component rules keyed on body[data-theme="dark"] are untouched — they
+   only READ tokens. :has() lets :root see the attribute without moving it.
+   Specificity is deliberate: :root:has(body[data-theme="dark"]) is (0,2,1) and
+   the variant-scoped form below is (0,3,1), which preserves the exact
+   precedence the two body-scoped blocks had. */
 /* ---- base DARK: recolors token-driven styles (covers Miramar too) ---- */
-body[data-theme="dark"]{
+:root:has(body[data-theme="dark"]){
   color-scheme:dark;
   --praxis-color-surface-default:#192336; --praxis-color-surface-subtle:#161c27;
   --praxis-color-neutral-05:#10151e; --praxis-color-neutral-10:#222b39;
@@ -155,7 +90,7 @@ body[data-theme="dark"]{
 }
 
 /* ---- Praxis DARK: Mazlan dark surfaces + materials ---- */
-body[data-variant="praxis"][data-theme="dark"]{
+:root:has(body[data-variant="praxis"][data-theme="dark"]){
   /* Glass and status tones, centralised from page <head>s 2026-08-13. The
      light values live in praxis-tokens.css; these are the dark counterparts
      the three glass pages and two tone pages were each carrying locally. The
