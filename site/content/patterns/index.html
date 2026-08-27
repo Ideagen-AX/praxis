@@ -1,0 +1,56 @@
+<!--praxis
+title: Patterns overview
+slug: index
+summary: Ten recurring problems and how the system answers them. A pattern is a composition and a decision; a component is a box.
+order: 10
+keywords: patterns overview index composition problem solution
+icon: hub
+-->
+
+<p>A component page tells you what a thing is. A pattern page tells you which things to
+reach for, in what arrangement, to solve a problem that keeps coming back. The same
+<code>.rfield</code> appears in a two-field filter drawer and a thirty-field incident
+report; what changes is everything around it.</p>
+
+<h2>The catalog</h2>
+
+<praxis-block name="catalog" section="patterns"></praxis-block>
+
+<h2>How patterns relate to components</h2>
+
+<p>Three of these — loading, empty and error states — were component pages until 0.1.11.
+They read badly as components because none of them is one thing: "loading" is a skeleton,
+a spinner and an inline resolution, and the whole design decision is choosing between them.
+That is a pattern. They moved, and kept their briefs.</p>
+
+<p>The rest compose components that already exist. Where a pattern depends on something
+Praxis has not built, the page says so and links the planned component rather than
+describing markup you cannot write.</p>
+
+<h2>What a pattern page owes you</h2>
+
+<p>Five sections, in order, and it is a build gate. The shape is the previous EHSQ-E design
+system's, which stated the <strong>Problem</strong> before the <strong>Solution</strong> so
+that a reader could tell whether they had the problem before reading the answer.</p>
+
+<table>
+  <thead><tr><th>Section</th><th>Answers</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Problem</strong></td><td>What goes wrong without this, in this application specifically. Not a definition of the pattern.</td></tr>
+    <tr><td><strong>Solution</strong></td><td>The arrangement, and the decision inside it.</td></tr>
+    <tr><td><strong>Accessibility</strong></td><td>What the composition owes that no single component in it can deliver alone — focus order, announcement, error association.</td></tr>
+    <tr><td><strong>Guidelines</strong></td><td>Do and don't. The don'ts are the useful half.</td></tr>
+    <tr><td><strong>Related components</strong></td><td>What to open next, including the planned ones this pattern is waiting on.</td></tr>
+  </tbody>
+</table>
+
+<p>Pages add their own sections between Solution and Accessibility. The gate checks that the
+five are present and in relative order; it does not care what sits between them.</p>
+
+<div class="note">
+  <p><strong>A pattern page can carry a status too.</strong> Loading, empty and error states
+  are all <span class="admin-pill admin-pill--off">Planned</span>, because the components
+  they compose do not exist. The pattern is still worth writing down — it is what the
+  component brief is measured against — but nothing on those three pages is markup you can
+  use today.</p>
+</div>

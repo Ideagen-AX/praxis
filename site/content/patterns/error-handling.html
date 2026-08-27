@@ -1,13 +1,15 @@
 <!--praxis
-title: Error summary
+title: Error handling
+slug: error-handling
+redirect_from: components/error-summary.html
 summary: Praxis marks required fields and shows one inline alert. Nothing aggregates a form's errors to the top and links to each one. Planned.
-order: 70
+order: 90
 tier: planned
 icon: error
 classes: form-summary
 keywords: error summary validation required form alert inline message focus link accessibility planned
 -->
-
+<h2>Problem</h2>
 <div class="note note--planned">
   <p><strong>Nothing aggregates form errors.</strong> <code>.form-alert</code> exists in
   <code>praxis-rfield.css</code> as a single inline message and <code>.req</code> marks a
@@ -26,7 +28,10 @@ collapsed, which means an error can be inside something that is closed. That las
 this more than a convenience: without a summary, a validation error can be genuinely
 invisible.</p>
 
-<h2>Anatomy</h2>
+<h2>Solution</h2>
+<p>Errors surface at three ranges — beside the field, at the top of the form, and across the page — and the pattern is choosing the right range, not styling a red box.</p>
+
+<h3>Anatomy</h3>
 
 <ol>
   <li><strong>Container</strong> — a danger-toned box at the top of the form.</li>
@@ -37,7 +42,7 @@ invisible.</p>
   <li><strong>Link</strong> — text is the error message; the target is the field.</li>
 </ol>
 
-<h2>Variants</h2>
+<h3>Variants</h3>
 
 <p>One. A form either has errors or it does not.</p>
 
@@ -144,11 +149,34 @@ both invisible when wrong.</p>
   </tbody>
 </table>
 
-<h2>Figma adaptation</h2>
+<h2>Dimensions</h2>
 
-<p>Not mapped.</p>
+<table>
+  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
+  <tbody>
+    <tr><td>Container</td><td>Padding</td><td>16px</td></tr>
+    <tr><td>Container</td><td>Left rule</td><td>3px, matching the reference site's own callouts</td></tr>
+    <tr><td>Container</td><td>Bottom margin</td><td><code>--praxis-space-24</code></td></tr>
+    <tr><td><code>__head</code></td><td>Size / weight</td><td>16px / 700</td></tr>
+    <tr><td><code>__list</code></td><td>Item spacing</td><td><code>--praxis-space-4</code></td></tr>
+  </tbody>
+</table>
 
-<h2>Usage guidelines</h2>
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Focus the summary on render.</strong> Scrolling to it is not enough — a screen
+  reader user is wherever their cursor was, which is the submit button at the bottom.</li>
+  <li><strong>Expand collapsed ancestors before focusing a target.</strong> The single most
+  likely bug in this component.</li>
+  <li><code>aria-invalid</code> and <code>aria-describedby</code> on every failing field, or the
+  summary is the only place the error exists.</li>
+  <li>Scroll the right container — <code>.admin-body</code>, not the window.</li>
+  <li>Colour is not the only indicator: the inline message is text and the field gets
+  <code>aria-invalid</code>, so a red border is reinforcement rather than the signal.</li>
+</ul>
+
+<h2>Guidelines</h2>
 
 <p><strong>Do</strong></p>
 <ul>
@@ -169,30 +197,16 @@ both invisible when wrong.</p>
   the list they did.</li>
 </ul>
 
-<h2>Accessibility</h2>
-
+<h2>Related components</h2>
 <ul>
-  <li><strong>Focus the summary on render.</strong> Scrolling to it is not enough — a screen
-  reader user is wherever their cursor was, which is the submit button at the bottom.</li>
-  <li><strong>Expand collapsed ancestors before focusing a target.</strong> The single most
-  likely bug in this component.</li>
-  <li><code>aria-invalid</code> and <code>aria-describedby</code> on every failing field, or the
-  summary is the only place the error exists.</li>
-  <li>Scroll the right container — <code>.admin-body</code>, not the window.</li>
-  <li>Colour is not the only indicator: the inline message is text and the field gets
-  <code>aria-invalid</code>, so a red border is reinforcement rather than the signal.</li>
+  <li><a href="forms.html">Forms</a> — where most errors are raised, and where the summary
+      pattern earns its place.</li>
+  <li><a href="../components/rfield.html">Fields</a> — carries the inline error, the invalid
+      state and the description slot the message replaces.</li>
+  <li><a href="feedback.html">Feedback</a> — the range above a form: banners, toasts and the
+      question of which failures deserve which.</li>
+  <li><a href="../components/dialog.html">Confirm and alert dialog</a> — a destructive action
+      that failed needs a modal answer, not a toast that disappears.</li>
+  <li><a href="empty-states.html">Empty states</a> — an error empty state is the page-range
+      version of this pattern.</li>
 </ul>
-
-<h2>Dimensions</h2>
-
-<table>
-  <thead><tr><th>Element</th><th>Property</th><th>Proposed</th></tr></thead>
-  <tbody>
-    <tr><td>Container</td><td>Padding</td><td>16px</td></tr>
-    <tr><td>Container</td><td>Left rule</td><td>3px, matching the reference site's own callouts</td></tr>
-    <tr><td>Container</td><td>Bottom margin</td><td><code>--praxis-space-24</code></td></tr>
-    <tr><td><code>__head</code></td><td>Size / weight</td><td>16px / 700</td></tr>
-    <tr><td><code>__list</code></td><td>Item spacing</td><td><code>--praxis-space-4</code></td></tr>
-  </tbody>
-</table>
-

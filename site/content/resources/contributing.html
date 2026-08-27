@@ -1,0 +1,162 @@
+<!--praxis
+title: Contributing
+slug: contributing
+summary: One rule, eight gates, and a release that is a git tag. Also the two regex traps and the cyclic-token bug that each cost weeks, because they are the ones you would repeat.
+order: 30
+keywords: contributing build src dist gates release publish tag workflow ci verify
+icon: build
+-->
+
+<h2>The one rule</h2>
+
+<p><strong><code>src/</code> is the source of truth. <code>dist/</code> is generated and
+gitignored.</strong> Never hand-edit <code>dist/</code>. Edit the sheet in <code>src/</code>,
+then rebuild.</p>
+
+<p>The same rule holds twice more: <code>site/content/</code> is the source and
+<code>_site/</code> is generated, and <code>PRAXIS-FOR-AGENTS.md</code> is generated from
+<code>site/content/</code>. There is also a generated mirror in the consumer —
+<code>groom-lake/prototype/vendor/praxis/</code> — and editing that is always wrong.</p>
+
+<h2>The commands</h2>
+
+<table>
+  <thead><tr><th>Command</th><th>Does</th></tr></thead>
+  <tbody>
+    <tr><td><code>npm run build</code></td><td>Regenerate <code>dist/</code> from <code>src/</code> and verify the output.</td></tr>
+    <tr><td><code>npm run site</code></td><td>Build <code>_site/</code>.</td></tr>
+    <tr><td><code>npm run site:serve</code></td><td>Build, then serve on :8000, rebuilding on each request.</td></tr>
+    <tr><td><code>npm run site:check</code></td><td>The CI gate — pages build, tokens surfaced, agent guide current.</td></tr>
+    <tr><td><code>npm run docs</code></td><td>Regenerate the measured sections of <code>DESIGN-SYSTEM.md</code>.</td></tr>
+    <tr><td><code>python3 build-site.py --agents-doc</code></td><td>Regenerate <code>PRAXIS-FOR-AGENTS.md</code>.</td></tr>
+    <tr><td><code>python3 build-site.py --coverage</code></td><td>Class-family coverage report.</td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong><code>npm run check</code> is not a CI gate</strong>, despite how it reads. It
+  compares a rebuild against the <code>dist/</code> already on disk, and <code>dist/</code>
+  is gitignored — so in a fresh clone it exits 1 with "dist/ is missing". CI runs
+  <code>npm run build</code>, which performs the same verification.</p>
+</div>
+
+<h2>Adding a component</h2>
+
+<ol>
+  <li>Write the rule in <code>src/</code>, in the sheet that owns it. A component used by
+      more than one page belongs in <code>praxis-core.css</code>, not in the feature sheet
+      that needed it first — that is the mistake <code>praxis-controls.css</code> exists to
+      correct.</li>
+  <li>Add a page under <code>site/content/components/</code> with
+      <code>tier:</code>, <code>group:</code> and a <code>classes:</code> list.</li>
+  <li>Follow the <a href="../components/index.html">twelve-section skeleton</a>. It is a
+      gate.</li>
+  <li><code>npm run build &amp;&amp; npm run site &amp;&amp; python3 build-site.py --agents-doc</code>.</li>
+</ol>
+
+<p>The generator globs <code>site/content/</code>, so there is no index or registry to
+update. A section index is built from the page list.</p>
+
+<h2>The gates</h2>
+
+<p>These fail the build rather than warn. Each exists because the corresponding failure
+happened and nobody saw it.</p>
+
+<table>
+  <thead><tr><th>Gate</th><th>Because</th></tr></thead>
+  <tbody>
+    <tr><td>Every token defined in <code>src/</code> appears on a page</td><td>A token nobody can look up is invisible to every consumer.</td></tr>
+    <tr><td>Every class family is claimed by a page's <code>classes:</code></td><td>An earlier version counted <code>.card</code> as covered because seven pages said the word in prose.</td></tr>
+    <tr><td><code>PRAXIS-FOR-AGENTS.md</code> is current</td><td>It ships in the tarball.</td></tr>
+    <tr><td>The markdown conversion is clean</td><td>An unreplaced placeholder once wrote NUL bytes into the output, turning the document binary — and the byte count looked right.</td></tr>
+    <tr><td>Component pages follow the twelve-section skeleton</td><td>A page that quietly drops "Accessibility" looks complete.</td></tr>
+    <tr><td>Pattern pages follow the five-section skeleton</td><td>Same reason, different shape.</td></tr>
+    <tr><td>No token is declared on <code>&lt;body&gt;</code></td><td>Five tokens shipped with a value that could never apply. This makes the class impossible rather than absent.</td></tr>
+    <tr><td>No token is declared twice</td><td>Nine were, and the token file stated values that never rendered.</td></tr>
+    <tr><td>No internal link is dead</td><td>Renaming nine pages left eighteen dead hrefs, each of which still rendered a page that looked fine until it was clicked.</td></tr>
+    <tr><td>No internal link goes through a redirect stub</td><td>A stub is for a URL someone else has shared, not for this site's own navigation.</td></tr>
+    <tr><td>Nothing in the built output resolves to a 404</td><td>Crawls every emitted file, examples included. The toast demo shipped with <code>src="../praxis-toast.js"</code> for weeks, so the buttons called an undefined function and the frame just sat there.</td></tr>
+    <tr><td>Every <code>icon:</code> is a ligature the converter maps</td><td>Otherwise it renders a fallback circle, silently.</td></tr>
+    <tr><td>Every component page declares a valid <code>tier:</code> and <code>group:</code></td><td>A typo in <code>group:</code> would quietly create a nav group of one.</td></tr>
+  </tbody>
+</table>
+
+<p>Two things are reported and deliberately <em>not</em> gates: the used-but-never-defined
+token count, and anything else that is a pre-existing defect in <code>src/</code>. Failing
+there turns <code>main</code> red for a bug someone else introduced.</p>
+
+<h2>Three traps, all hit for real</h2>
+
+<p>These are in <code>CLAUDE.md</code> too. They are here because they are the ones a
+newcomer will repeat.</p>
+
+<ol>
+  <li><strong>Matching custom properties with an unanchored regex.</strong>
+      <code>--[\w-]+\s*:</code> also matches BEM modifiers in selectors, so
+      <code>.chip--danger:hover{…}</code> reads as a token named <code>--danger</code>. This
+      overstated the token count for weeks and let phantom definitions mask genuinely
+      undefined tokens. Anchor to the start of a declaration.</li>
+  <li><strong>A value pattern of <code>[^;}]*</code> matches newlines</strong>, so it runs
+      from a line of comment prose that looks like a declaration through to the next real
+      semicolon — silently eating the comment's closing <code>*/</code>. Use
+      <code>[^;{}\n]*</code>.</li>
+  <li><strong>Renaming a page-local alias to a canonical token.</strong> Safe only when the
+      token is dedicated to that use. Renaming <code>--card-header-pad</code> to
+      <code>--praxis-space-24</code> produced
+      <code>--praxis-space-24: var(--praxis-space-24)</code> — a cycle, invalid at
+      computed-value time, so every use in scope resolved to <code>unset</code>.</li>
+</ol>
+
+<p>The corollary is worth keeping: <strong>HTTP 200 proves nothing about rendering.</strong>
+Both of the first two passed a green smoke test. Check comment balance, brace balance and
+cyclic definitions.</p>
+
+<h2>Verifying a token change</h2>
+
+<p><strong>Never substitute one token for another by name.</strong> Check the resolved values
+in both themes. <code>--t-sm</code> looks like it maps to
+<code>--praxis-type-size-sm</code> and its fallback resolved to
+<code>type-size-base</code>; <code>--r-lg</code> is <code>1rem</code> against a canonical
+<code>16px</code>, equal only because nothing overrides the root font size.</p>
+
+<p>For a change that touches the cascade rather than one value, drive a browser. A page that
+loads the barrel, calls <code>getComputedStyle</code> on <code>&lt;body&gt;</code> for every
+token in both themes and writes the result into the DOM, dumped with
+<code>--headless --dump-dom</code>, gives real before/after computed values. That is how the
+0.1.10 token move was checked: 220 tokens × 2 themes, one intended change and zero
+others.</p>
+
+<h2>Releasing</h2>
+
+<p><strong>Publishing is automated. Push a version tag.</strong></p>
+
+<ol>
+  <li>Bump <code>version</code> in <code>package.json</code>.</li>
+  <li>Write the <code>CHANGELOG.md</code> entry.</li>
+  <li>Sync the version strings in <code>README.md</code> — they drifted to 0.1.0 while the
+      package was at 0.1.2, so the quickstart's CDN URLs served a two-version-stale
+      build.</li>
+  <li>Commit, then <code>git tag v0.1.11 &amp;&amp; git push origin v0.1.11</code>.</li>
+</ol>
+
+<p>The workflow builds, verifies the tag matches <code>package.json</code>, and publishes via
+npm trusted publishing — a short-lived OIDC credential, no token in the repository.
+Provenance is attached automatically.</p>
+
+<div class="note note--trap">
+  <p><strong>The trusted publisher is bound to the workflow <em>filename</em></strong>
+  (<code>publish.yml</code>), which is part of the OIDC claim. Renaming that file breaks
+  publishing, and it fails as an OIDC error that reads like a credentials problem.</p>
+</div>
+
+<p>Pushing to <code>main</code> does not publish; the tag is the trigger, because npm refuses
+to republish an existing version and a push-triggered job would be red on every commit that
+does not bump. Pull requests get no public URL — they get
+<code>build-site.py --check</code>, which proves the site builds and publishes nothing.</p>
+
+<h2>Fonts</h2>
+
+<p>Praxis sets <code>font-family: 'Gilroy'</code> and ships <strong>no font files</strong> —
+Gilroy is licensed and cannot be redistributed. The build strips the
+<code>@font-face</code> blocks and emits <code>praxis-fonts.example.css</code> instead.
+<strong>No font binary may ever enter this package</strong>; the build fails if one does.</p>

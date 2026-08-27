@@ -1,0 +1,149 @@
+<!--praxis
+title: Navigation
+slug: navigation
+summary: Four bands, three ranges of movement, and one breakpoint that turns the rail into a drawer. The part Praxis has actually finished.
+order: 30
+keywords: navigation nav rail drawer breadcrumb appbar module workspace wayfinding skip link
+icon: explore
+-->
+
+<h2>Problem</h2>
+
+<p>EHSQ Enterprise is twenty-odd modules behind one login. A user arriving at a record has
+usually come from a list, which came from a module, which they chose from a switcher — and
+they need to get back out again without losing the filter that produced the list. On a
+tablet the same journey has to work with a rail that cannot be on screen.</p>
+
+<p>Three failures follow from getting this wrong: a user cannot tell which module they are
+in, cannot get back to where they came from, and cannot reach a destination at all on a
+narrow viewport because the only route was a 56px icon rail.</p>
+
+<h2>Solution</h2>
+
+<p>Navigation is split by <strong>range</strong> — how far the movement goes — and each
+range has one affordance. This is the most complete pattern in Praxis: nearly everything it
+composes is <span class="admin-pill admin-pill--ok">Ready</span> or
+<span class="admin-pill admin-pill--info">Settling</span>.</p>
+
+<h3>The four bands</h3>
+
+<p>Every page is the same composition, documented at
+<a href="../components/app-shell.html">the app shell</a> and dimensioned at
+<a href="../foundations/grid-and-layout.html">grid and layout</a>.</p>
+
+<table>
+  <thead><tr><th>Band</th><th>Carries</th><th>Range</th></tr></thead>
+  <tbody>
+    <tr><td><code>.appbar</code></td><td>Brand, module scope, search, profile, theme</td><td>Cross-application</td></tr>
+    <tr><td><code>.praxis-navrail</code></td><td>Destinations within the application</td><td>Cross-module</td></tr>
+    <tr><td><code>.pageheader</code> / <code>.breadcrumb</code></td><td>Where you are and the way back</td><td>Within a hierarchy</td></tr>
+    <tr><td><code>.toolbar</code></td><td>Actions on what is in front of you</td><td>Within a page</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <p><strong>The toolbar is not navigation and it is in this list anyway.</strong> It sits in
+  the same stack and it holds the back button, so a reader building the shell needs to know
+  where it goes. Its contents are actions — see <a href="page-layout.html">page layout</a>.</p>
+</div>
+
+<h3>Choosing the affordance</h3>
+
+<table>
+  <thead><tr><th>Movement</th><th>Use</th><th>Component</th></tr></thead>
+  <tbody>
+    <tr><td>Switch module or scope</td><td>App-bar module chip</td><td><a href="../components/module-selector.html">Module selector</a></td></tr>
+    <tr><td>Switch workspace or persona</td><td>App-bar flyout</td><td><a href="../components/workspace.html">Workspace chrome</a></td></tr>
+    <tr><td>Go to a destination in this application</td><td>Rail item</td><td><a href="../components/app-shell.html">App shell</a></td></tr>
+    <tr><td>The same, below 640px</td><td>Drawer from the hamburger</td><td><a href="../components/nav-drawer.html">Nav drawer</a></td></tr>
+    <tr><td>Go up a level</td><td>Breadcrumb, or the toolbar back button</td><td><a href="../components/breadcrumb-back.html">Breadcrumb back</a></td></tr>
+    <tr><td>Create something</td><td>Rail create button into a flyout</td><td><a href="../components/create-new.html">Create New menu</a></td></tr>
+    <tr><td>Jump anywhere by name</td><td>—</td><td><a href="../components/command-palette.html">Command palette</a> — nothing exists</td></tr>
+  </tbody>
+</table>
+
+<h3>The 640px switch</h3>
+
+<p>At 56px the rail costs a sixth of a 360px viewport and its items carry no labels. Below
+640px it is hidden, <code>--navrail-w</code> is zeroed so every offset collapses at once,
+and the same destinations appear in a drawer <em>with</em> labels. The labels are the point:
+the phone form of the rail is more usable than the rail.</p>
+
+<template data-example="Breadcrumb: home, trail, current" data-height="110" data-scripts="lucide">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a class="breadcrumb__home" href="#" aria-label="Home"><span class="material-symbols-rounded">home</span></a>
+    <span class="breadcrumb__sep"><span class="material-symbols-rounded">chevron_right</span></span>
+    <span>Incidents</span>
+    <span class="breadcrumb__sep"><span class="material-symbols-rounded">chevron_right</span></span>
+    <span class="breadcrumb__current">INC-2024-0417</span>
+  </nav>
+</template>
+
+<h3>What breadcrumbs do not do</h3>
+
+<p><code>.breadcrumb</code> has no truncation behaviour. A deep hierarchy wraps it into the
+page header and pushes the title down. That is
+<a href="../components/breadcrumb-overflow.html">breadcrumb overflow</a>, and it is
+planned.</p>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>The skip link is load-bearing here.</strong> Four bands of repeated chrome
+      precede the content in DOM order. <code>.px-skip</code> is the first focusable element
+      and targets <code>#main</code>; a page that omits the target breaks it silently. WCAG
+      2.4.1.</li>
+  <li><strong>Mark the current destination.</strong> <code>aria-current="page"</code> on the
+      active rail or drawer item. The teal fill and the 3px marker are not available to a
+      screen reader.</li>
+  <li><strong>An icon-only rail item needs an accessible name.</strong> Below 640px labels
+      appear; above it they do not, and the icon is a ligature that reads as its own text if
+      you let it.</li>
+  <li><strong>The drawer traps focus and returns it.</strong> Opening moves focus in, Escape
+      closes, and focus goes back to the hamburger. Without the return the user is dropped
+      at the top of the document.</li>
+  <li><strong>Breadcrumbs are a <code>nav</code> with a label.</strong>
+      <code>aria-label="Breadcrumb"</code>, and the current page is not a link.</li>
+  <li><strong>Landmarks, once each.</strong> One <code>banner</code>, one
+      <code>main</code>, and every <code>nav</code> distinguished by label — two unlabelled
+      navs are indistinguishable in a landmark list.</li>
+</ul>
+
+<h2>Guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Keep the four bands in the same order on every page. The shell is the one thing a user
+      should never have to re-learn.</li>
+  <li>Let the breadcrumb drive the back button. <a href="../components/breadcrumb-back.html">It
+      already does</a> — history-based back sends a user somewhere they did not come
+      from.</li>
+  <li>Preserve list state when returning from a record. Losing a filter is the most common
+      complaint this pattern can cause.</li>
+  <li>Read <code>--navrail-w</code> for any content offset, whichever property you use.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Add a second persistent nav. There is a rail; anything else competes with it.</li>
+  <li>Nest the drawer more than one level. It is a phone affordance, not a site map.</li>
+  <li>Use the breadcrumb for anything but ancestry. It is not a wizard and not a history.</li>
+  <li>Hard-code 56px, 64px or 192px anywhere.</li>
+</ul>
+
+<h2>Related components</h2>
+
+<ul>
+  <li><a href="../components/app-shell.html">The app shell</a> — the four bands as one
+      composition.</li>
+  <li><a href="../components/nav-drawer.html">Nav drawer and rail flyouts</a> — the phone
+      form, derived from the rail.</li>
+  <li><a href="../components/breadcrumb-back.html">Breadcrumb back button</a>.</li>
+  <li><a href="../components/module-selector.html">Module selector</a> and
+      <a href="../components/workspace.html">workspace chrome</a> — the two app-bar
+      switchers.</li>
+  <li><a href="../components/create-new.html">Create New menu</a>.</li>
+  <li><a href="../components/command-palette.html">Command palette</a> — planned, and the
+      obvious answer to twenty modules.</li>
+  <li><a href="../components/breadcrumb-overflow.html">Breadcrumb overflow</a> — planned.</li>
+</ul>

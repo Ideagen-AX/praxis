@@ -2,6 +2,7 @@
 title: Fields
 slug: rfield
 tier: ready
+group: core
 order: 10
 sheet: praxis-rfield.css
 classes: rfield, rfield__label, rfield__control, rfield__hint, rfield__group, pillset, pill, rref, rtable, subsec, form-alert, mazbtn, admin-field, req
@@ -265,7 +266,7 @@ field grey — a table of rows is content, and the grey read as one large input.
   <li><strong>Required</strong> — <code>.req</code> on the label.</li>
   <li><strong>Collapsed</strong> — <code>.is-collapsed</code> on a containing
   <code>.section</code>. A field inside a collapsed section is invisible <em>and</em> out of the
-  tab order, which is why <a href="error-summary.html">the error summary</a> has to expand
+  tab order, which is why <a href="../patterns/error-handling.html">the error summary</a> has to expand
   ancestors before focusing a target.</li>
 </ul>
 
@@ -374,7 +375,7 @@ different sheets.</p>
   <code>--px-surface</code> is the control boundary and has to clear 3:1 under WCAG 1.4.11. This is
   the reason <code>--praxis-color-border-strong</code> was repointed after measuring 2.95:1.</li>
   <li>A form with more than a handful of fields needs an
-  <a href="error-summary.html">error summary</a>, which Praxis does not have — and a field inside a
+  <a href="../patterns/error-handling.html">error summary</a>, which Praxis does not have — and a field inside a
   collapsed section is unreachable without one.</li>
   <li><code>.pillset</code> wraps real radios, so arrow-key navigation and group semantics come
   free. Do not replace them with buttons.</li>

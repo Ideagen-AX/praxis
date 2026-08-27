@@ -2,6 +2,7 @@
 title: Toast
 slug: toast
 tier: settling
+group: core
 order: 75
 icon: notifications
 scripts: praxis-toast.js
@@ -55,14 +56,13 @@ covers the control that triggered it, which is why it takes no pointer events at
 
 <h2>Interactive demo</h2>
 
-<template data-example="Fire a toast" data-height="220">
+<template data-example="Fire a toast" data-height="220" data-scripts="toast">
   <div style="display:flex;gap:.5rem;flex-wrap:wrap">
     <button class="tbtn" type="button" onclick="praxisToast('Link copied')">Neutral</button>
     <button class="tbtn" type="button" onclick="praxisToast('Workspace saved', { tone: 'success' })">Success</button>
     <button class="tbtn" type="button" onclick="praxisToast('Could not save — try again', { tone: 'danger', duration: 4000 })">Danger</button>
     <button class="tbtn" type="button" onclick="praxisToast('First'); praxisToast('Second'); praxisToast('Third')">Three at once</button>
   </div>
-  <script src="../praxis-toast.js"></script>
 </template>
 
 <h2>Code</h2>

@@ -1,0 +1,46 @@
+<!--praxis
+title: Changelog
+slug: changelog
+summary: Every published version, parsed out of CHANGELOG.md at build time so this page cannot disagree with the file that ships.
+order: 50
+keywords: changelog release version history semver tag publish npm
+icon: history
+-->
+
+<p>Praxis is published as
+<a href="https://www.npmjs.com/package/@ideagen-ax/praxis"><code>@ideagen-ax/praxis</code></a>
+under MIT. The table below is generated from <code>CHANGELOG.md</code> on every build — a
+hand-written release list on the site would be a second place the history exists, and the
+two would drift.</p>
+
+<h2>Releases</h2>
+
+<praxis-block name="releases"></praxis-block>
+
+<p>Each version links to its full entry. The headline column is the first bold run under the
+heading, which is the shape every entry in that file uses.</p>
+
+<h2>Versioning</h2>
+
+<div class="note note--trap">
+  <p><strong>Praxis is pre-1.0 and is not production-ready.</strong> Pin the exact version —
+  <code>@0.1.11</code>, never <code>@0.1</code>, <code>^0.1.11</code> or
+  <code>@latest</code>. Within <code>0.x</code> a minor bump may change rendered values; the
+  0.1.10 release moved every token declaration and changed one resolved colour on
+  purpose.</p>
+</div>
+
+<p>The tag is the trigger. Pushing to <code>main</code> does not publish, because npm refuses
+to republish an existing version and a push-triggered job would be red on every commit that
+does not bump. See <a href="contributing.html">contributing</a>.</p>
+
+<h2>What counts as a change</h2>
+
+<p>The changelog records changes to <code>src/</code> and to the published package. It also
+records changes to this site, in their own section, because the site is generated from the
+same repository and its content is what <code>PRAXIS-FOR-AGENTS.md</code> is built from — a
+site-only change still alters a file that ships in the tarball.</p>
+
+<p>What it does not record: the roadmap. Planned components live in
+<a href="https://github.com/Ideagen-AX/praxis/blob/main/ROADMAP.md"><code>ROADMAP.md</code></a>
+and on their own pages, and a planned component appearing there is not a release.</p>

@@ -1,0 +1,172 @@
+<!--praxis
+title: Record page
+slug: record-page
+summary: The composition the whole system exists for — and the one where Praxis's chrome is finished and its record-specific parts are almost entirely unbuilt.
+order: 100
+keywords: record page incident capa audit form sections tasks audit trail signature comments mazlan
+icon: description
+-->
+
+<h2>Problem</h2>
+
+<p>A record is the unit of work in EHSQ Enterprise. An incident, an audit finding, a CAPA, a
+permit, a management-of-change request — each is a long structured document that several
+people edit at different times, that carries a workflow state, and that an auditor may read
+years later without any of the context the people who wrote it had.</p>
+
+<p>So a record page has to do four things at once: present a long form, show where the
+record is in its process, show who did what and when, and let the current user do their part
+without scrolling past everyone else's. Get the composition wrong and either the form
+becomes unfillable or the history becomes unreadable.</p>
+
+<p>Praxis's problem specifically: <strong>the chrome around a record is finished and the
+record itself is not.</strong> The app shell, the toolbar, the fields and the AI drawer are
+all real. The audit trail, the comment thread and the signature block are not built at
+all.</p>
+
+<h2>Solution</h2>
+
+<p>The standard shell, a single-column document body divided into sections, and the
+record-specific affordances arranged by <em>who they are for</em>: the form is for the
+person filling it in, the trail is for whoever reads it later.</p>
+
+<h3>Anatomy</h3>
+
+<ol>
+  <li><strong>The four bands</strong> — app bar, rail, page header, toolbar. Identical to
+      every other page. See <a href="navigation.html">navigation</a>.</li>
+  <li><strong>Page header</strong> — breadcrumb up to the register, the record reference as
+      the title, and the workflow state as a pill.</li>
+  <li><strong>Toolbar</strong> — the back button driven by the breadcrumb, the primary
+      action for the current user, and the overflow.</li>
+  <li><strong>Body</strong> — sections of <code>.rfield</code>, one column.</li>
+  <li><strong>Trail</strong> — history, comments and signatures, below or beside the
+      form.</li>
+  <li><strong>Mazlan</strong> — the contextual AI drawer, over the page rather than in
+      it.</li>
+</ol>
+
+<h3>Sections, not pages</h3>
+
+<p>A record is reviewed as a whole, so it stays one document. Sections collapse; they do not
+become steps. <code>.subsec</code> is the record sub-section and
+<code>.section__header</code> has a tick, a flex order and a collapse rotation —
+<strong>and no base rule</strong>, which is one of the fourteen part-only names. See
+<a href="../components/core-page-families.html">page families and part-only names</a> and
+<a href="../components/accordion.html">accordion and disclosure</a>.</p>
+
+<h3>The current user's part</h3>
+
+<p>The single most useful thing a record page does is make the next action obvious to the
+person looking at it. Everything else on the page is context. In practice that means the
+current task belongs in the toolbar or at the top of the body, not discovered by scrolling
+to the section that happens to contain it.</p>
+
+<h3>Reference and related records</h3>
+
+<p><code>.rref</code> is the record-reference control and <code>.rtable</code> the embedded
+table — both in <code>praxis-rfield.css</code>, both real. A record that points at another
+record is the normal case here: a CAPA arises from a finding, a finding from an audit.</p>
+
+<template data-example="Two record fields in a section" data-height="230">
+  <div class="admin-card" style="padding:1.25rem">
+    <div class="rfield">
+      <label class="rfield__label" for="rp-ref">Reference</label>
+      <input class="rfield__control" id="rp-ref" type="text" value="INC-2024-0417" readonly>
+    </div>
+    <div class="rfield" style="margin-top:1rem">
+      <label class="rfield__label" for="rp-sum">Summary <span class="req">*</span></label>
+      <input class="rfield__control" id="rp-sum" type="text" value="Guard interlock bypassed on press line 4">
+      <span class="rfield__hint">One line. The register shows this, not the description.</span>
+    </div>
+  </div>
+</template>
+
+<h2>What a regulated record needs and Praxis does not have</h2>
+
+<p>This is the least-built area of the system, and the gaps are not cosmetic — three of them
+are compliance requirements rather than features.</p>
+
+<table>
+  <thead><tr><th>Needed</th><th>Why it is not optional</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><a href="../components/audit-trail.html">Audit trail</a></td><td>Every regulated record needs an immutable, legible history. Nothing in Praxis renders one.</td><td><span class="admin-pill admin-pill--off">Planned</span></td></tr>
+    <tr><td><a href="../components/signature.html">E-signature and attestation</a></td><td>Sign-off with attribution and intent is a regulatory requirement, not a UI affordance.</td><td><span class="admin-pill admin-pill--off">Planned</span></td></tr>
+    <tr><td><a href="../components/comments.html">Comment thread</a></td><td>Praxis has an AI conversation surface and nothing for human annotation on a record.</td><td><span class="admin-pill admin-pill--off">Planned</span></td></tr>
+    <tr><td><a href="../components/stepper.html">Stepper and progress tracker</a></td><td>CAPA stages, permit states and MOC approvals are all staged workflows. <code>.capa-prio</code> is a name with no base.</td><td><span class="admin-pill admin-pill--off">Planned</span></td></tr>
+    <tr><td><a href="../components/file-upload.html">File upload</a></td><td>Photos, evidence, documents. Nothing at all.</td><td><span class="admin-pill admin-pill--off">Planned</span></td></tr>
+    <tr><td><a href="../components/avatar.html">Avatar</a></td><td>One avatar exists and it is welded to the app bar. Assignment, comments and sign-off all need it.</td><td><span class="admin-pill admin-pill--off">Planned</span></td></tr>
+  </tbody>
+</table>
+
+<h2>The AI surface</h2>
+
+<p><a href="../components/mazlan.html">Mazlan</a> is the contextual assistant: the four-dot
+signature glyph, the agentic gradient, and a drawer over the record. It is the one
+record-adjacent thing that is built, and it is
+<span class="admin-pill admin-pill--warning">Unstable</span>.</p>
+
+<p>It sits <em>over</em> the page deliberately. An assistant that pushed the form sideways
+would make the record narrower every time someone asked a question, and the form is the
+thing the user came for.</p>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>Section headings are headings.</strong> A collapsible section needs a real
+      heading with a <code>button</code> inside it and
+      <code>aria-expanded</code> — not a styled div. A long record is navigated by heading
+      more than by scroll.</li>
+  <li><strong>The workflow state is text.</strong> A pill in the page header carries the
+      state; the colour is the echo. WCAG 1.4.1.</li>
+  <li><strong>Read-only is not disabled.</strong> A field the current user may not edit
+      should be <code>readonly</code> — focusable and readable — not
+      <code>disabled</code>, which removes it from the tab order and from most screen-reader
+      browse modes. On a record most fields are read-only most of the time.</li>
+  <li><strong>The audit trail is a list, in order.</strong> When it is built, it needs to be
+      a real list with real timestamps in a machine-readable element, because it is the part
+      an auditor will read with assistive technology.</li>
+  <li><strong>The AI drawer is a dialog or a complementary landmark</strong>, labelled, and
+      it must not steal focus when it opens on its own.</li>
+  <li><strong>Do not rely on the dot texture or elevation</strong> to separate the trail from
+      the form. Under forced colors both are gone — see
+      <a href="../foundations/forced-colors.html">forced colors</a>.</li>
+</ul>
+
+<h2>Guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Put the current user's next action where they land, not where it belongs logically.</li>
+  <li>Keep the record one document. Sections collapse; the record does not paginate.</li>
+  <li>Show the reference in the title and the summary in the field. The register shows the
+      summary.</li>
+  <li>Preserve list state on the way back — see <a href="navigation.html">navigation</a>.</li>
+  <li>Save partial work. A thirty-field form that loses everything is the worst outcome
+      available.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Turn a record into a wizard. It is read as a whole by someone who was not there.</li>
+  <li>Two-column the form. See <a href="forms.html">forms</a>.</li>
+  <li>Build a bespoke history list per module. Wait for the audit trail, or you will build
+      the drift it exists to remove.</li>
+  <li>Let the assistant push the content. It goes over.</li>
+</ul>
+
+<h2>Related components</h2>
+
+<ul>
+  <li><a href="../components/rfield.html">Fields</a> — the record form system.</li>
+  <li><a href="../components/app-shell.html">The app shell</a> and
+      <a href="../components/breadcrumb-back.html">breadcrumb back</a> — the chrome.</li>
+  <li><a href="../components/mazlan.html">Mazlan — AI surfaces</a>.</li>
+  <li><a href="../components/core-page-families.html">Page families and part-only names</a> —
+      <code>.record</code> is one of them.</li>
+  <li><a href="../components/audit-trail.html">Audit trail</a>,
+      <a href="../components/signature.html">e-signature</a>,
+      <a href="../components/comments.html">comment thread</a> — planned, and the reason this
+      pattern is mostly a brief.</li>
+  <li><a href="forms.html">Forms</a> — the composition inside the body.</li>
+</ul>

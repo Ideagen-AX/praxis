@@ -135,7 +135,9 @@ Credit where it is due: `prefers-reduced-motion` is handled in 7 places and
 ## Stub page convention
 
 Settled 2026-08-25. Every planned page carries `tier: planned`, which puts it in
-its own **Components — planned** nav section with a neutral *Planned* pill, and
+a neutral *Planned* pill on its page — it sits in its component layer with
+everything else, since the 2026-08-26 restructure grouped the nav by layer
+rather than by tier — and
 opens with a `.note--planned` callout — the section and the pill are both easy to
 miss when a page is deep-linked to, so the status is stated three times on
 purpose.
@@ -197,7 +199,7 @@ Complete as of 2026-08-25. All 35 items have a page.
 | 3 | **14 of 14** | tree, data-grid, table, slider, number-input, character-count, inline-edit, kbd, command-palette, copy-button, radio, separator, breadcrumb-overflow, meter |
 | Foundations | **3 of 3** | print, forced-colors, rtl — under `foundations/`, not `components/`, because none of them is a component |
 
-The 32 component stubs sit in a **Components — planned** nav section. The three
+The 32 component stubs sit in their component layer, marked *Planned*. The three
 foundation pages sit with the other foundations and **are** in
 `PRAXIS-FOR-AGENTS.md`: "Praxis has no print stylesheet" is a fact an agent
 benefits from knowing, and each page states it in its opening callout. A planned

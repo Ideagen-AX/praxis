@@ -1,0 +1,140 @@
+<!--praxis
+title: Feedback
+slug: feedback
+summary: Four ranges from a status pill to a modal, one of which exists, one of which is settling, and two of which are not built — including the one that should confirm a destructive action.
+order: 60
+keywords: feedback toast banner dialog confirm status tone alert notification success error
+icon: campaign
+-->
+
+<h2>Problem</h2>
+
+<p>In a regulated application the user needs to know that something happened, and often that
+it happened <em>to a record someone else will read</em>. A submission that appears to
+succeed and did not is worse than an obvious failure. So is a deletion that happens without
+being asked about.</p>
+
+<p>The failure mode Praxis has today is narrower and more specific: there is one transient
+affordance and no blocking one. A confirm dialog does not exist, so a destructive action is
+either unconfirmed or confirmed by something the feature invented.</p>
+
+<h2>Solution</h2>
+
+<p>Match the affordance to two things — how much the user needs to notice, and whether they
+have to respond.</p>
+
+<h3>The four ranges</h3>
+
+<table>
+  <thead><tr><th>Range</th><th>Interrupts?</th><th>Use for</th><th>Component</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Status</strong></td><td>No</td><td>The standing state of a thing — open, closed, overdue, locked</td><td><code>.admin-pill</code>, <a href="../components/admin.html">admin shell</a></td></tr>
+    <tr><td><strong>Transient</strong></td><td>No</td><td>An action landed. "Saved", "Assigned to Priya"</td><td><a href="../components/toast.html">Toast</a> <span class="admin-pill admin-pill--info">Settling</span></td></tr>
+    <tr><td><strong>Persistent</strong></td><td>No, but it stays</td><td>A condition affecting the whole page — record locked, offline, validation failed</td><td><code>.admin-banner</code>, <a href="error-handling.html">error handling</a></td></tr>
+    <tr><td><strong>Blocking</strong></td><td>Yes</td><td>A decision that must be made before continuing</td><td><a href="../components/dialog.html">Confirm and alert dialog</a> <span class="admin-pill admin-pill--off">Planned</span></td></tr>
+  </tbody>
+</table>
+
+<h3>Tone</h3>
+
+<p>Five paired background/foreground tones, remapped per theme, documented at
+<a href="../foundations/color.html">color</a>. They are pairs on purpose: a tinted background
+with an ink chosen separately is how a chip ends up at 3:1.</p>
+
+<praxis-block name="tone-pairs"></praxis-block>
+
+<div class="note note--trap">
+  <p><strong>The <code>-70</code> palette rungs are tuned for light surfaces and go muddy on
+  dark</strong>, which is why the dark tone foregrounds are literals rather than palette
+  references. If you build a sixth tone, measure it in both themes rather than deriving it
+  from the ramp.</p>
+</div>
+
+<h3>Choosing between transient and persistent</h3>
+
+<p>The test is whether the user can act on it later. A toast that carries the only record of
+a failure is a bug: it disappears, and the thing it was telling you about did not. Anything
+a user might need to come back to is a banner.</p>
+
+<ul>
+  <li><strong>Toast</strong> — success, and reversible actions with an undo.</li>
+  <li><strong>Banner</strong> — failure, degraded state, anything with a next step.</li>
+  <li><strong>Never both</strong> for the same event.</li>
+</ul>
+
+<template data-example="Status pills — the non-interrupting range" data-height="120">
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+    <span class="admin-pill admin-pill--ok">Closed</span>
+    <span class="admin-pill admin-pill--info">In review</span>
+    <span class="admin-pill admin-pill--warning">Overdue</span>
+    <span class="admin-pill admin-pill--off">Draft</span>
+  </div>
+</template>
+
+<h2>What is missing</h2>
+
+<p><strong>There is no confirm dialog.</strong> Praxis has two modals and both are welded to
+the feature that needed them, so there is nothing to put a destructive confirmation in. In
+an application where records are auditable and deletions are consequential, that is the most
+serious gap in this pattern. See <a href="../components/dialog.html">confirm and alert
+dialog</a>.</p>
+
+<p><code>.admin-banner</code> exists and is admin-scoped, so a record page reaching for the
+persistent range has the same naming problem the table has.</p>
+
+<h2>Accessibility</h2>
+
+<ul>
+  <li><strong>A toast must be announced.</strong> <code>role="status"</code> with
+      <code>aria-live="polite"</code>, or the one confirmation a sighted user gets is the one
+      a screen-reader user does not. Use <code>assertive</code> only for failures.</li>
+  <li><strong>Do not move focus to a toast.</strong> It is transient; taking focus to
+      something that is about to disappear strands the user.</li>
+  <li><strong>Give a toast enough time.</strong> WCAG 2.2.1 — anything auto-dismissing needs
+      to be dismissible, extendable, or long enough to read. Four seconds is not long enough
+      for a sentence.</li>
+  <li><strong>A dialog traps focus and returns it.</strong> <code>role="dialog"</code>,
+      <code>aria-modal="true"</code>, a label, Escape to close, focus back to the trigger.
+      The component does not exist yet; the contract does.</li>
+  <li><strong>Never colour alone.</strong> Every pill and banner carries text or an icon as
+      well as a tone. WCAG 1.4.1.</li>
+  <li><strong>Measure tinted text.</strong> <code>.admin-pill--ok</code> and
+      <code>--lock</code> sat at 3.81:1 and 3.88:1 until 0.1.10. A tone that looks
+      comfortable is not evidence.</li>
+</ul>
+
+<h2>Guidelines</h2>
+
+<p><strong>Do</strong></p>
+<ul>
+  <li>Say what happened to what: "Assigned INC-2024-0417 to Priya", not "Saved".</li>
+  <li>Put the feedback where the action was, when you can. Inline beats global.</li>
+  <li>Offer undo instead of a confirmation, where undo is possible. It is faster and it
+      cannot be dismissed by habit.</li>
+  <li>Keep failures on screen until the user does something about them.</li>
+</ul>
+
+<p><strong>Don't</strong></p>
+<ul>
+  <li>Use a toast for an error. It is the one message that must not disappear.</li>
+  <li>Stack toasts. One at a time; a queue that scrolls is noise.</li>
+  <li>Confirm the reversible. A dialog on every action trains people to dismiss dialogs.</li>
+  <li>Use a banner for something that resolves in under a second.</li>
+</ul>
+
+<h2>Related components</h2>
+
+<ul>
+  <li><a href="../components/toast.html">Toast</a> — the transient range, and the only one
+      that is built.</li>
+  <li><a href="../components/dialog.html">Confirm and alert dialog</a> — planned, and the
+      most consequential gap in this pattern.</li>
+  <li><a href="../components/admin.html">The admin shell</a> — carries
+      <code>.admin-pill</code> and <code>.admin-banner</code>.</li>
+  <li><a href="error-handling.html">Error handling</a> — the failure half of this pattern at
+      three ranges.</li>
+  <li><a href="loading-states.html">Loading states</a> — inline loading resolves to a
+      success state rather than vanishing, which is feedback on the control itself.</li>
+  <li><a href="../foundations/color.html">Color</a> — the tone pairs and how they were
+      measured.</li>
+</ul>

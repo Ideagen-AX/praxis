@@ -1,5 +1,97 @@
 # Changelog
 
+## 0.1.11 — 2026-08-26
+
+**The reference site is restructured onto the EHSQ-E design system's information
+architecture.** Four content sections — **Foundations, Patterns, Components,
+Resources** — each with an overview, taken from
+`ehsqe-design-system-docs.vercel.app` so that a reader who knows that site can
+find things here. 66 pages became 82.
+
+**Components are grouped by layer, not by stability.** The nav used to read
+`Components — ready` / `— settling` / `— unstable` / `— planned`, which answered
+"how much will this churn" before "what is it" and moved a page in the sidebar
+when its churn risk changed. Stability is now the pill on the page and nothing
+else; `group: global | core | records` places the page. Layers are alphabetical,
+because a layer is a catalog of thirty things you arrive at knowing the name of;
+foundations, patterns and resources keep `order:`, because they are a reading
+sequence.
+
+No `src/` behaviour changed. Two live defects that the restructure's new gates
+caught are fixed below.
+
+### Fixed
+
+- **The toast interactive demo never worked.** It loaded
+  `<script src="../praxis-toast.js">` from inside its example frame, which
+  resolves to nothing — so every button on it called an undefined
+  `praxisToast()`. `praxis-toast.js` is now a known `data-scripts` value and the
+  path is generated.
+- **The breadcrumb demo's home link pointed at a page that does not exist.**
+
+### Added — Patterns
+
+- **Ten pattern pages**, a section Praxis did not have: Forms, Navigation, Page
+  layout, Data display, Feedback, Loading states, Empty states, Error handling,
+  Record page, plus an overview. Each states the **Problem** before the
+  **Solution**, which is the EHSQ-E order and the useful part — it lets a reader
+  tell whether they have the problem before reading the answer.
+- **A five-section skeleton for them, gated:** Problem, Solution, Accessibility,
+  Guidelines, Related components. A pattern answers a different question from a
+  component; forcing it into the twelve would produce an "Anatomy" of a
+  composition.
+- Loading states, empty states and error handling **moved from Components to
+  Patterns** and were restructured onto that skeleton. They read badly as
+  components because none of them is one thing — "loading" is a skeleton, a
+  spinner and an inline resolution, and choosing between them is the whole design
+  decision.
+
+### Added — Resources
+
+- **Getting started** (moved from Foundations), **For AI agents**,
+  **Contributing**, **Glossary** and **Changelog**. The changelog page is
+  generated from this file, so it cannot disagree with it. Helix alignment was
+  deliberately not added back: per-component Helix sections were removed on
+  2026-08-25 and re-adding a comparison the project decided to drop would be a
+  regression.
+
+### Added — build gates
+
+- **No internal link may be dead**, and **no internal link may go through a
+  redirect stub**. Renaming nine pages left eighteen dead hrefs, every one of
+  which still rendered a page that looked fine until it was clicked. A stub is
+  for a URL someone else has already shared, not for this site's own navigation.
+- **Nothing in the built output may resolve to a 404.** A separate crawl over
+  every emitted file, examples included, because the prose check skips
+  `<template>` markup — which is exactly where the toast bug was hiding.
+  `<code>` and `<pre>` are excluded: prose about a broken `src=` is not itself
+  broken, and the check flagged the sentence describing the bug it had just
+  found.
+- **Pattern pages must follow the pattern skeleton.**
+- **`group:` must be one of the three layers.** A typo would quietly create a nav
+  group of one.
+
+### Changed — Foundations
+
+- Split to match the reference IA: `space-radius` became **Spacing**,
+  **Borders** and **Grid and layout**; `elevation-motion` became **Elevation**
+  and **Motion**. Each gained the Usage guidelines and Accessibility sections
+  that convention ends on.
+- Renamed: `mental-model` → **Design principles**, `type` → **Typography**,
+  `icons` → **Iconography**. All ten EHSQ-E foundation names now exist.
+- Praxis's eight additional pages — Theming, Materials and glass, Forced colors,
+  Print, Right-to-left, Gaps, Corrections, Conventions — stay, after the ten.
+
+### Changed — site
+
+- Ten `redirect_from` stubs keep every old URL alive.
+- Section indexes are exempt from `tier:`, `group:`, the skeleton and their own
+  breadcrumb, and are excluded from the catalogs so they cannot list themselves.
+- The agent doc's planned-page exclusion now keys on `tier`, not on the section.
+  It keyed on the section until this release; a planned page now lives under
+  `Core` with everything else, so a section test would have started shipping
+  thirty phantom classes into the npm tarball.
+
 ## 0.1.10 — 2026-08-26
 
 **Every token declaration now lives on `:root`.** Praxis declared 127 of them on

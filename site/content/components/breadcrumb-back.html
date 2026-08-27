@@ -2,6 +2,7 @@
 title: Breadcrumb back button
 slug: breadcrumb-back
 tier: settling
+group: global
 order: 70
 sheet: praxis-pageheader.css
 scripts: praxis-breadcrumb-back.js
@@ -66,13 +67,13 @@ instead, which is deliberate but has consequences. See
 <template data-example="A breadcrumb and the back button it drives" data-height="230" data-scripts="lucide,breadcrumb-back">
   <div class="pageheader">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a class="breadcrumb__home" href="index.html" aria-label="Home">
+      <a class="breadcrumb__home" href="#" aria-label="Home">
         <span class="material-symbols-rounded" aria-hidden="true">home</span>
       </a>
       <span class="breadcrumb__sep" aria-hidden="true">
         <span class="material-symbols-rounded">chevron_right</span>
       </span>
-      <a href="incidents.html">Incident management</a>
+      <a href="#">Incident management</a>
       <span class="breadcrumb__sep" aria-hidden="true">
         <span class="material-symbols-rounded">chevron_right</span>
       </span>

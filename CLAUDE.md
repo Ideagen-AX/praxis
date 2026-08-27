@@ -63,8 +63,47 @@ python3 build-site.py --coverage    # class-family coverage report
 python3 build-site.py --agents-doc  # regenerate PRAXIS-FOR-AGENTS.md
 ```
 
-31 pages as of 2026-08-25, and **every one of the 237 class families in `src/` is
+82 pages as of 2026-08-26, and **every one of the 237 class families in `src/` is
 claimed by a page**.
+
+### The information architecture is the EHSQ-E design system's
+
+Four content sections plus an overview — **Foundations, Patterns, Components,
+Resources** — taken from `ehsqe-design-system-docs.vercel.app` so that a reader
+who knows that site can find things here. Restructured 2026-08-26.
+
+**The nav used to be grouped by stability tier** (`Components — ready`,
+`— settling`, `— unstable`, `— planned`), which answered "how much will this
+churn" before "what is it", and moved a page in the sidebar when its churn risk
+changed. Stability is now the pill on the page and nothing else; components are
+grouped by **layer** — `group: global | core | records`, checked, because a typo
+would quietly create a group of one.
+
+Two deliberate differences from the reference site, both consequences of the
+shell rather than preferences:
+
+- **One sidebar, not one per section.** EHSQ-E is VitePress and swaps the whole
+  sidebar off a top nav. Praxis has a single persistent `.adminnav`, so all four
+  sections live in one scrolling list. Same IA, one fewer click, no second nav to
+  keep in step.
+- **The layer headings are flattened, and bare.** `.adminnav` gives one level of
+  grouping. Rather than invent a nested nav part in `site.css` — which would be
+  the docs reaching for something Praxis does not define — the layers are their
+  own group headings, exactly as the tier sections were. They read `Global`,
+  `Core`, `Records`, with no `Components — ` prefix, because they sit directly
+  under the `Components` heading and the prefix would repeat it three times. That
+  is also how the EHSQ-E sidebar reads.
+
+**Ordering is per section and it is a decision, not an oversight.** Foundations,
+patterns and resources are a reading *sequence* and use `order:`. A component
+layer is a *catalog* of thirty things you arrive at already knowing the name of,
+so it is alphabetical with a leading `The ` stripped — otherwise four pages
+strand under T.
+
+**A section index is exempt from almost everything.** `slug: index` means the
+page is a catalog: no `tier:`, no `group:`, no skeleton, no crumb of its own
+section, and it is excluded from every generated catalog so it cannot list
+itself.
 
 ### The site is built in Praxis
 
@@ -131,12 +170,17 @@ Two more consequences worth keeping in mind:
 
 **`tier: planned` is a real tier, and it is excluded from the agent doc.** A
 planned page documents a component that has no rule in `src/` yet — see
-`ROADMAP.md` for the backlog and the thirteen-section convention those pages
-follow. It gets its own nav section and a neutral pill, and `agents_doc()` skips
-it, because `PRAXIS-FOR-AGENTS.md` ships in the tarball and its contract is that
-it states what is *defined*. Rendering a planned component into it would invite an
-agent to write markup against a class that does not exist, which is the failure
-`.btn` causes today.
+`ROADMAP.md` for the backlog. It sits in its layer alongside everything else and
+wears a neutral pill; `agents_doc()` skips it, because `PRAXIS-FOR-AGENTS.md`
+ships in the tarball and its contract is that it states what is *defined*.
+Rendering a planned component into it would invite an agent to write markup
+against a class that does not exist, which is the failure `.btn` causes today.
+
+The exclusion keys on **`tier`**, not on the section. It keyed on the section
+until 2026-08-26, when the nav stopped being tier-shaped — a planned page now
+lives under `Core` with everything else, so a section test would have started
+shipping thirty phantom classes into the tarball. That is the kind of change that
+looks like a rename and is not.
 
 **Every component page follows one twelve-section skeleton, and it is a gate.**
 Anatomy, Variants, States, Responsive behavior, Interactive demo, Code, Markup
@@ -145,8 +189,25 @@ Dimensions — taken from the previous EHSQ-E design system docs, with *API*
 replaced by *Markup contract* because Praxis ships no framework bindings and has
 no props or events to document. `skeleton_problems()` fails the build on a missing,
 misordered or duplicated section. Extra headings are fine; the twelve must all be
-present and in relative order. Foundation pages are exempt — they are essays, and
-an "Anatomy" heading on the colour page would have nothing under it.
+present and in relative order. Foundation and resource pages are exempt — they are
+essays, and an "Anatomy" heading on the colour page would have nothing under it.
+
+**Pattern pages have their own five-section skeleton, also a gate:** Problem,
+Solution, Accessibility, Guidelines, Related components. A pattern answers a
+different question from a component and forcing it into the twelve would produce
+an "Anatomy" of a composition. Problem before Solution is the EHSQ-E order and it
+is the useful part — it lets a reader tell whether they have the problem before
+reading the answer.
+
+**Internal links are a gate, in two flavours.** Renaming a page is the one edit
+that silently breaks the site: `redirect_from` keeps the OLD url alive and nothing
+was checking the links pointing *at* it. The 2026-08-26 restructure moved nine
+pages and left eighteen dead hrefs, every one of which still rendered a page that
+looked fine until it was clicked. So: a link to a page that does not exist
+**fails**, and a link that only resolves *through a redirect stub* also **fails** —
+a stub is for a URL someone else has already shared, not for this site's own
+navigation. Markup inside `<template>` is exempt, because example markup
+legitimately references files that are not part of this site.
 
 **`icon:` metadata is checked against the converter's own map.** `praxis-lucide.js`
 falls back to a plain circle for a ligature it does not know, which is silent, so

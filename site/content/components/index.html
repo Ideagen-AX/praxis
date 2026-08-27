@@ -1,0 +1,70 @@
+<!--praxis
+title: Components overview
+slug: index
+summary: Forty-seven pages in three layers, each carrying a status that says how much it will churn — and thirty of them documenting something that does not exist yet, on purpose.
+order: 10
+keywords: components overview index catalog status tier global core records
+icon: grid_view
+-->
+
+<p>Components are grouped by <strong>layer</strong> — what a thing is — and carry a
+<strong>status</strong> that says how settled it is. Those are two different questions and
+they used to be answered by the same thing: the nav was grouped by stability, so a
+component moved in the sidebar when its churn risk changed, which rearranged the reader's
+map of the system for a reason that has nothing to do with what the components are.</p>
+
+<h2>Status key</h2>
+
+<table>
+  <thead><tr><th>Status</th><th>Badge</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Ready</strong></td><td><span class="admin-pill admin-pill--ok">Ready</span></td><td>In daily use and load-bearing. Changing it breaks something.</td></tr>
+    <tr><td><strong>Settling</strong></td><td><span class="admin-pill admin-pill--info">Settling</span></td><td>Real and working, one or two consumers. The shape is right; the details may move.</td></tr>
+    <tr><td><strong>Unstable</strong></td><td><span class="admin-pill admin-pill--warning">Unstable</span></td><td>Page-scoped. Expect reorganisation — often the sheet is named for the one page that needed it.</td></tr>
+    <tr><td><strong>Planned</strong></td><td><span class="admin-pill admin-pill--off">Planned</span></td><td><strong>Nothing is defined in <code>src/</code> yet.</strong> The page is the brief, not the documentation.</td></tr>
+  </tbody>
+</table>
+
+<div class="note note--trap">
+  <p><strong>A planned page documents a class that does not exist.</strong> Thirty of the
+  forty-seven pages here are planned, and writing markup against one gets you an unstyled
+  element. They are on the site because a named gap is worth more than a silent one — see
+  <code>ROADMAP.md</code> — and they are excluded from
+  <code>PRAXIS-FOR-AGENTS.md</code> entirely, because that file ships in the npm tarball and
+  its contract is to state what is <em>defined</em>.</p>
+</div>
+
+<h2>Global</h2>
+
+<p>Chrome that is present on every page: the app bar, the rails, the drawers and the menus
+hung off them. If you are building a screen, you compose these once and then stop thinking
+about them.</p>
+
+<praxis-block name="catalog" section="components" group="global"></praxis-block>
+
+<h2>Core</h2>
+
+<p>Primitives a page composes with — buttons, fields, cards, tables, overlays. Nothing here
+knows what page it is on. This is also where most of the backlog is: Praxis grew out of a
+prototype, so its chrome is far more complete than its primitives.</p>
+
+<praxis-block name="catalog" section="components" group="core"></praxis-block>
+
+<h2>Records</h2>
+
+<p>Parts that only make sense on a record — the audit trail, the comment thread, the
+signature block, and the AI surfaces that sit beside them. These are the most
+domain-specific things in the system and, with one exception, the least built.</p>
+
+<praxis-block name="catalog" section="components" group="records"></praxis-block>
+
+<h2>What every component page answers</h2>
+
+<p>Twelve sections, in the same order, on all forty-seven — and it is a build gate, so a
+page that quietly drops one fails rather than looking complete. The list is the previous
+EHSQ-E design system's, with <em>API</em> replaced by <em>Markup contract</em>: Praxis ships
+no framework bindings, so there are no props or events to document.</p>
+
+<p>Anatomy · Variants · States · Responsive behavior · Interactive demo · Code · Markup
+contract · Token reference · Figma adaptation · Usage guidelines · Accessibility ·
+Dimensions.</p>

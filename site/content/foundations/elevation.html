@@ -1,0 +1,87 @@
+<!--praxis
+title: Elevation
+slug: elevation
+redirect_from: foundations/elevation-motion.html
+summary: Four generic steps, three semantic ones remapped to the material layer, and a three-tier system that exists because a page of identically-shadowed cards reads as one flat plane.
+order: 60
+keywords: elevation shadow depth raise card popover tier lit edge material
+icon: stairs
+-->
+
+<h2>The scale</h2>
+
+<p>Steps 1 to 4 are generic. <code>card</code>, <code>card-raised</code> and
+<code>popover</code> are mapped onto <code>--px-*</code> materials, so reach for those three
+by name and let the material layer decide the recipe.</p>
+
+<praxis-block name="scale" kind="elevation" prefix="--praxis-elevation-"></praxis-block>
+
+<h2>Elevation is a hairline first and a shadow second</h2>
+
+<p>Every Praxis elevation begins with a <code>0 0 0 .5px</code> ring and a short contact
+shadow, then adds throw. That ordering is the whole look: the ring is what makes an edge
+legible on a light page and in dark, and the long throw is what makes it float. A soft drop
+shadow with no ring reads as a blur, not an object.</p>
+
+<p>It also means Praxis is unusually exposed under forced colors, where shadows are dropped
+entirely and a component drawn only with a ring shadow loses its edge — see
+<a href="forced-colors.html">forced colors</a>.</p>
+
+<h2>The three tiers</h2>
+
+<p>A single card shadow cannot express hierarchy, so a page of cards reads as one flat
+plane. Three tiers flank the default, and they are additive: nothing that already uses
+<code>--praxis-card</code> moves.</p>
+
+<praxis-block name="tokens" prefix="--px-card-rail|--px-card-raised"></praxis-block>
+
+<template data-example="The three tiers: recede, default, subject" data-height="180">
+  <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+    <div style="padding:1rem;border-radius:var(--praxis-radius-md);background:var(--px-surface);box-shadow:var(--px-card-rail)">Rail — recedes</div>
+    <div style="padding:1rem;border-radius:var(--praxis-radius-md);background:var(--px-surface);box-shadow:var(--praxis-card)">Card — default</div>
+    <div style="padding:1rem;border-radius:var(--praxis-radius-md);background:var(--px-surface);box-shadow:var(--px-card-raised)">Raised — the subject</div>
+  </div>
+</template>
+
+<p>In dark the tiers are carried by shadow density and edge light rather than by cast
+shadow, because a dark surface has nothing to cast onto. The token names are the same; the
+recipes are not. That is the point of naming the tier rather than the shadow.</p>
+
+<h2>Shadow is not the only way up</h2>
+
+<p>Praxis steps the <em>surface</em> as often as it raises it. A panel inside a card takes
+<code>--px-surface-2</code> rather than a shadow, because white on white can only separate
+by shadow and that is too faint to survive a lit edge — and in dark the card is already the
+lightest thing in the shell, so a lift has nothing to lift away from.</p>
+
+<p>The rule of thumb: <strong>an object that floats over the page gets a shadow; a region
+inside another region gets a surface step.</strong> This documentation site is built that
+way, and <a href="materials.html">materials and glass</a> has the full inventory.</p>
+
+<h2>Usage guidelines</h2>
+
+<ul>
+  <li><strong>Name the tier, not the shadow.</strong> <code>--px-card-raised</code> tells a
+      reader what the element is; a four-layer <code>box-shadow</code> literal tells them
+      nothing and will not theme.</li>
+  <li><strong>One subject per page.</strong> If everything is raised, nothing is. The
+      raised tier is for the thing the page is about.</li>
+  <li><strong>Do not stack a shadow on a surface step.</strong> Pick one. Both together
+      reads as a card that has come unstuck.</li>
+  <li><strong>Overlays use <code>--px-overlay</code>, not <code>elevation-4</code>.</strong>
+      Popovers, menus and flyouts share one recipe so they read as one layer of the
+      interface.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<p>Shadow is not information. Nothing in Praxis should be distinguishable only by
+elevation — WCAG 2.2 <strong>1.4.1 Use of Color</strong> generalises to any purely visual
+channel, and shadow is the most fragile of them: it is removed under
+<code>forced-colors</code>, invisible to a screen reader, and close to invisible on a low
+quality panel in a lit room.</p>
+
+<p>Where elevation carries meaning — a menu is above the page, a dialog is above
+everything — the meaning has to be in the markup too: <code>role="dialog"</code>,
+<code>aria-expanded</code>, focus containment. The shadow is the visual echo of that, not
+the source.</p>

@@ -1,0 +1,72 @@
+<!--praxis
+title: Spacing
+slug: spacing
+redirect_from: foundations/space-radius.html
+summary: A 4-to-48 scale on an 8px grid, the one canonical gutter between the toolbar band and content, and the four gutters that exist only below 640px.
+order: 50
+keywords: space spacing scale gutter padding margin rhythm 8px grid
+icon: unfold_more
+-->
+
+<h2>The scale</h2>
+
+<p>Six steps, 4px to 48px. Every one is a multiple of four and all but
+<code>--praxis-space-4</code> are multiples of eight, which is the grid the shell is built
+on — see <a href="grid-and-layout.html">grid and layout</a>.</p>
+
+<praxis-block name="scale" kind="space" prefix="--praxis-space-"></praxis-block>
+
+<p>There is no <code>space-2</code> and no <code>space-64</code>. Both were considered and
+neither had a second caller: a 2px gap is optical alignment rather than spacing, and
+anything past 48px in this application is a layout decision belonging to the page, not a
+token.</p>
+
+<h2>Gutters</h2>
+
+<p><code>--px-toolbar-gutter</code> is the canonical 16px gap between the toolbar band and
+the first card of content. It exists because that gap was set per section and drifted — 8px
+on one page, 6px on another. <code>--ph-pad-x</code> is declared on <code>.content</code>
+and inherited by the header, the toolbar band and your body, so changing it once resets the
+page rhythm.</p>
+
+<praxis-block name="tokens" prefix="--px-toolbar-gutter|--px-gutter|--ph-pad-x|--home-gutter|--sp-gutter"></praxis-block>
+
+<p>Four of those read <em>unset</em> in the resolved columns, and both reasons are
+correct rather than broken:</p>
+
+<ul>
+  <li><code>--px-gutter</code>, <code>--home-gutter</code> and <code>--sp-gutter</code>
+      are declared <strong>only inside a media query</strong>. They exist at 640px and
+      below and nowhere else. The table below is measured every build.</li>
+  <li><code>--ph-pad-x</code> is declared on <strong><code>.content</code></strong>, in
+      <code>praxis-admin.css</code>, not on <code>&lt;body&gt;</code>. The header, the
+      toolbar band and your page body inherit it from there — which is what makes changing
+      it once reset the whole page rhythm. A probe reading
+      <code>&lt;body&gt;</code> cannot see a token declared on a descendant.</li>
+</ul>
+
+<praxis-block name="media-only-tokens"></praxis-block>
+
+<h2>Usage guidelines</h2>
+
+<ul>
+  <li><strong>Gap, not margin.</strong> Nearly every spacing decision in Praxis is a
+      <code>gap</code> on a flex or grid container. A margin on a child is a decision the
+      child makes about its neighbours, and it collapses; a gap is a decision the container
+      makes, and it does not.</li>
+  <li><strong>Reach for the toolbar gutter by name.</strong> If you are setting the space
+      between the toolbar band and the first card, that is <code>--px-toolbar-gutter</code>,
+      not <code>--praxis-space-16</code> that happens to equal it today.</li>
+  <li><strong>Do not build a phone layout out of the scale.</strong> Below 640px the shell
+      switches to <code>--px-gutter</code> for every horizontal inset at once. Setting
+      <code>--praxis-space-16</code> on your own container opts out of that.</li>
+</ul>
+
+<h2>Accessibility</h2>
+
+<p>Spacing is a touch-target concern before it is an aesthetic one. WCAG 2.2 <strong>2.5.8
+Target Size (Minimum)</strong> asks for 24x24 CSS pixels, and a control smaller than that
+passes only if it is spaced far enough from its neighbours that a 24px circle centred on it
+touches nothing else. <code>--praxis-control-h</code> is 32px, so a compact control clears
+the minimum on its own; a row of 20px icon buttons does not, and the gap between them is
+what decides it.</p>
